@@ -92,7 +92,9 @@ describe('ThemeProvider', () => {
 
   test('CT-TEMA-03: useTheme fora do provedor lança erro claro', async () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    await expect(render(<Probe />)).rejects.toThrow('useTheme deve ser usado dentro do ThemeProvider');
+    await expect(render(<Probe />)).rejects.toThrow(
+      'useTheme deve ser usado dentro do ThemeProvider',
+    );
     spy.mockRestore();
   });
 });

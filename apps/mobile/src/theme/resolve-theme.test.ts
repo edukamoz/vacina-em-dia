@@ -10,7 +10,10 @@ describe('resolveTheme (CT-TEMA)', () => {
     ['highContrast', 'dark', 'highContrast'],
     ['light', 'dark', 'light'],
     ['dark', 'light', 'dark'],
-  ] as const)('CT-TEMA-01: preferência %s com sistema %s resulta em %s', (preference, system, expected) => {
-    expect(resolveTheme(preference, system)).toBe(expected);
-  });
+  ] as const)(
+    'CT-TEMA-01: preferência %s com sistema %s resulta em %s',
+    (preference, system, expected) => {
+      expect(resolveTheme(preference, system)).toBe(expected);
+    },
+  );
 });

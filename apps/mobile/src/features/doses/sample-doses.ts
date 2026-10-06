@@ -20,9 +20,39 @@ export const SAMPLE_SOURCE: FonteCalendario = {
 
 /** Doses de exemplo, uma por estado, até a API de doses (SCRUM-18) e o calendário oficial entrarem. */
 export const SAMPLE_DOSES: readonly SampleDose[] = [
-  { id: 'ex-1', vaccine: 'Vacina de exemplo A', doseLabel: '1ª dose', status: 'APPLIED', date: '2026-03-10' },
-  { id: 'ex-2', vaccine: 'Vacina de exemplo B', doseLabel: '2ª dose', status: 'OVERDUE', date: '2026-09-15' },
-  { id: 'ex-3', vaccine: 'Vacina de exemplo C', doseLabel: 'Dose única', status: 'SCHEDULED', date: '2026-11-04' },
-  { id: 'ex-4', vaccine: 'Vacina de exemplo D', doseLabel: 'Reforço', status: 'PENDING', date: '2027-01-20' },
-  { id: 'ex-5', vaccine: 'Vacina de exemplo E', doseLabel: '1ª dose', status: 'CANCELLED', date: '2026-05-02' },
+  {
+    id: 'ex-1',
+    vaccine: 'Vacina de exemplo A',
+    doseLabel: '1ª dose',
+    status: 'APPLIED',
+    date: '2026-03-10',
+  },
+  {
+    id: 'ex-2',
+    vaccine: 'Vacina de exemplo B',
+    doseLabel: '2ª dose',
+    status: 'OVERDUE',
+    date: '2026-09-15',
+  },
+  {
+    id: 'ex-3',
+    vaccine: 'Vacina de exemplo C',
+    doseLabel: 'Dose única',
+    status: 'SCHEDULED',
+    date: '2026-11-04',
+  },
+  {
+    id: 'ex-4',
+    vaccine: 'Vacina de exemplo D',
+    doseLabel: 'Reforço',
+    status: 'PENDING',
+    date: '2027-01-20',
+  },
+  {
+    id: 'ex-5',
+    vaccine: 'Vacina de exemplo E',
+    doseLabel: '1ª dose',
+    status: 'CANCELLED',
+    date: '2026-05-02',
+  },
 ];

@@ -32,11 +32,14 @@ describe('tokens do design system', () => {
     expect(colors.fundo).toBe('var(--cor-fundo)');
   });
 
-  test.each(THEME_NAMES)('CT-TOK-03: texto e fundo do tema %s têm contraste mínimo de 4,5:1', (name) => {
-    const cores = getThemeColors(name);
-    expect(contrast(cores.texto, cores.fundo)).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(cores.sobrePrimaria, cores.primaria)).toBeGreaterThanOrEqual(4.5);
-  });
+  test.each(THEME_NAMES)(
+    'CT-TOK-03: texto e fundo do tema %s têm contraste mínimo de 4,5:1',
+    (name) => {
+      const cores = getThemeColors(name);
+      expect(contrast(cores.texto, cores.fundo)).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(cores.sobrePrimaria, cores.primaria)).toBeGreaterThanOrEqual(4.5);
+    },
+  );
 
   test('CT-TOK-04: alto contraste tem contraste mínimo de 7:1 no texto', () => {
     const cores = getThemeColors('highContrast');
