@@ -60,6 +60,39 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+  nlp:
+    name: Serviço de PLN (pytest e cobertura)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/nlp
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: apps/nlp/requirements-dev.txt
+
+      - name: Instalar as dependências
+        run: pip install -r requirements-dev.txt
+
+      # Falha se algum teste falhar ou a cobertura ficar abaixo de 80% (pyproject.toml).
+      - name: Testes com cobertura (mínimo de 80%)
+        run: pytest --cov --cov-report=term-missing --cov-report=xml
+
+      - name: Guardar o relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cobertura-nlp
+          path: apps/nlp/coverage.xml
+          if-no-files-found: ignore
+
   seguranca:
     name: Auditoria de dependências (npm audit)
     runs-on: ubuntu-latest
@@ -109,6 +142,9 @@ jobs:
           # Sem sessão, a API recusa (401): prova que o proxy chega à API e que o acesso é conferido.
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/members)" = "401"
           curl -fsS http://localhost:8080/ > /dev/null
+          # Serviço de PLN: saúde livre e chatbot protegido pela chave da função (401 sem ela).
+          curl -fsS http://localhost:7072/api/health
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -d '{}' http://localhost:7072/api/chat)" = "401"
 
       - name: Mostrar os logs se algo falhar
         if: failure()
