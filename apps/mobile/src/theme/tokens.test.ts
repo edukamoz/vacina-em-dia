@@ -3,6 +3,7 @@ import { THEME_NAMES, getThemeColors } from './tokens';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const tailwindConfig = require('../../tailwind.config.js') as {
+  darkMode: string;
   theme: { extend: { colors: Record<string, string> } };
 };
 
@@ -30,6 +31,10 @@ describe('tokens do design system', () => {
     const colors = tailwindConfig.theme.extend.colors;
     expect(Object.keys(colors).sort()).toEqual(Object.keys(tokensJson.temas.claro).sort());
     expect(colors.fundo).toBe('var(--cor-fundo)');
+  });
+
+  test('CT-TOK-05: darkMode "class" evita o erro do NativeWind na web em desenvolvimento', () => {
+    expect(tailwindConfig.darkMode).toBe('class');
   });
 
   test.each(THEME_NAMES)(
