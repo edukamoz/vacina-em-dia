@@ -25,6 +25,33 @@ export interface LimitReachedError {
   readonly code: 'LIMIT_REACHED';
 }
 
+/** Limite de uso do assistente atingido (ADR-010). */
+export interface RateLimitedError {
+  readonly code: 'RATE_LIMITED';
+  /** Segundos até a próxima janela livre. */
+  readonly retryAfterSeconds: number;
+}
+
+/** O serviço de PLN ou de voz não respondeu ou não está configurado. */
+export interface AssistantUnavailableError {
+  readonly code: 'ASSISTANT_UNAVAILABLE';
+}
+
+/** A fala não foi entendida (silêncio, ruído ou outro idioma). */
+export interface SpeechNotRecognizedError {
+  readonly code: 'SPEECH_NOT_RECOGNIZED';
+}
+
+/** O áudio não está no formato aceito (WAV PCM de 16 kHz, mono). */
+export interface UnsupportedAudioError {
+  readonly code: 'UNSUPPORTED_AUDIO';
+}
+
+/** O áudio é maior que o limite aceito. */
+export interface AudioTooLargeError {
+  readonly code: 'AUDIO_TOO_LARGE';
+}
+
 /** Erros de domínio dos casos de uso, mapeados para HTTP em um único ponto. */
 export type ServiceError =
   | NotFoundError
@@ -32,6 +59,11 @@ export type ServiceError =
   | GuardianDeclarationRequiredError
   | InvalidBirthDateError
   | LimitReachedError
+  | RateLimitedError
+  | AssistantUnavailableError
+  | SpeechNotRecognizedError
+  | UnsupportedAudioError
+  | AudioTooLargeError
   | TransitionError;
 
 /** Resultado de um caso de uso: o valor ou um erro de domínio, nunca uma exceção. */
