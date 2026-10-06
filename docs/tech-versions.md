@@ -44,7 +44,9 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | Tecnologia | Versão | Observação |
 |---|---|---|
 | TypeScript | 6.0.3 | modo estrito. A 7.0.2 é a mais nova do npm, mas `typescript-eslint`, `typedoc` e `ts-jest` ainda não a suportam; usar a 6.0.x |
-| Zod | 4.6.5 | esquemas compartilhados |
+| Zod | 4.6.5 | esquemas compartilhados (app, API e documentação) |
+| @asteasolutions/zod-to-openapi | 9.1.0 | gera o OpenAPI 3.1 dos esquemas Zod (ADR-012) |
+| Swagger UI (`swagger-ui-dist`) | 5.33.1 | página `/api/docs`, carregada da CDN jsDelivr com a versão fixa e verificação de integridade (SRI sha384); não é dependência do projeto |
 | Jest | 30.5.2 | testes e cobertura (limite de 80% por pacote) |
 | ts-jest | 29.4.14 | |
 | @types/jest / @types/node | 30.0.0 / 24.19.1 | tipos de Node alinhados ao Node 24 |

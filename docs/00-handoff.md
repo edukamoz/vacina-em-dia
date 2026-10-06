@@ -37,6 +37,13 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - **Falta da Fase C:** API de doses de exemplo + OpenAPI/Swagger (ADR-012; depende do PR da branch `docs/SCRUM-23-openapi-swagger` estar na `main`), depois `docker-compose.yml` (SCRUM-25) e a Fase D (Azure, SCRUM-22).
 - Para o app achar `@vacina/shared`, rode `npm run build` na raiz antes de `npm run dev:mobile` (o pacote aponta para `dist`); nos testes o Jest lê o código-fonte direto.
 
+**Atualização de 06/10/2026 (SCRUM-18 e SCRUM-23, API de doses e Swagger):**
+- Branch `feature/SCRUM-18-api-doses-swagger`: `GET /api/doses`, `GET /api/doses/{id}`, `POST /api/doses/{id}/events` (usa a máquina de estados; erros 400, 404, 409, 422, 500), `GET /api/openapi.json` e `GET /api/docs` (Swagger UI, só com `DOCS_ENABLED=true`). Dados em memória com seed `FICTITIOUS` (ids `ex-1` a `ex-5`), sem login e sem dados pessoais. O "hoje" das regras é o dia civil de Brasília.
+- Camadas: `handlers` → `services` → `domain` (`@vacina/shared`) → `repositories` (em memória; o banco entra no SCRUM-22). A montagem com `new Date()` fica só em `src/functions/composition.ts`.
+- Código 401, 403 e 429 só constam na especificação quando existirem login e rate limit (SCRUM-13).
+- O app **ainda não chama a API** (decisão do autor: PR separado). Próximo passo: TanStack Query + `EXPO_PUBLIC_API_URL` + CORS, depois `docker-compose` (SCRUM-25) e Azure mínimo (SCRUM-22).
+- Node 24 LTS adotado (`.nvmrc`); no computador de casa, `nvm install 24 && nvm use`.
+
 **Lembretes por item (revisar com o autor quando o item começar):**
 
 | Item | O que revisar |
