@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
+import { Grade } from '../../components/grade';
 import { SeletorDeMembro } from '../../components/seletor-de-membro';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
@@ -77,13 +78,17 @@ export function HistoryScreen() {
           descricao="Quando você registrar uma vacina como aplicada, ela aparece aqui."
         />
       )}
-      {historico?.map((dose) => (
-        <DoseCard
-          key={dose.id}
-          dose={dose}
-          aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
-        />
-      ))}
+      {historico && historico.length > 0 && (
+        <Grade>
+          {historico.map((dose) => (
+            <DoseCard
+              key={dose.id}
+              dose={dose}
+              aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
+            />
+          ))}
+        </Grade>
+      )}
       {doses.data && <AvisoFonte fonte={doses.data.source} />}
     </Tela>
   );
