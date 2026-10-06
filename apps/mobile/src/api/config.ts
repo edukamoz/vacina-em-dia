@@ -2,16 +2,19 @@
 export const DEFAULT_API_BASE_URL = 'http://localhost:7071/api';
 
 /**
- * Normaliza a URL base da API. Aceita só `http` e `https`, remove a barra final e usa a URL local
+ * Normaliza a URL base da API. Aceita `http` e `https` ou um caminho na mesma origem (por exemplo
+ * `/api`, usado pela versão web atrás de proxy no Docker), remove a barra final e usa a URL local
  * padrão quando nada foi configurado.
  *
  * @param value - Valor de `EXPO_PUBLIC_API_URL`, se houver.
  * @returns URL base sem barra final.
- * @throws Error se o valor não for uma URL `http` ou `https`.
+ * @throws Error se o valor não for uma URL `http` ou `https` nem um caminho começando com uma barra.
  */
 export function resolveApiBaseUrl(value: string | undefined): string {
   const trimmed = value?.trim();
   if (!trimmed) return DEFAULT_API_BASE_URL;
+  // `//host` e `/\host` trocam de origem; só um caminho simples (`/api`) é "mesma origem".
+  if (/^\/(?![/\\])/.test(trimmed)) return trimmed.replace(/\/+$/, '');
   let url: URL;
   try {
     url = new URL(trimmed);

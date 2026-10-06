@@ -16,6 +16,23 @@ describe('resolveApiBaseUrl', () => {
     expect(resolveApiBaseUrl(value)).toBe(expected);
   });
 
+  test.each([
+    ['/api', '/api'],
+    ['/api/', '/api'],
+  ])(
+    'CT-APP-A12: aceita caminho relativo na mesma origem (web atrás de proxy): %p',
+    (value, expected) => {
+      expect(resolveApiBaseUrl(value)).toBe(expected);
+    },
+  );
+
+  test.each(['//evil.example/api', '///x', '/\\evil.example'])(
+    'CT-APP-A13: rejeita endereço que muda de origem sem dizer (%p)',
+    (value) => {
+      expect(() => resolveApiBaseUrl(value)).toThrow('EXPO_PUBLIC_API_URL');
+    },
+  );
+
   test.each(['ftp://x', 'javascript:alert(1)', 'nao-e-url'])('CT-APP-A03: rejeita %p', (value) => {
     expect(() => resolveApiBaseUrl(value)).toThrow('EXPO_PUBLIC_API_URL');
   });
