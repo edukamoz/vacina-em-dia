@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
+import { Grade } from '../../components/grade';
 import { SeletorDeMembro } from '../../components/seletor-de-membro';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
@@ -106,13 +107,15 @@ export function CalendarScreen() {
             <Texto variante="titulo3" accessibilityRole="header">
               {titulo}
             </Texto>
-            {lista.map((dose) => (
-              <DoseCard
-                key={dose.id}
-                dose={dose}
-                aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
-              />
-            ))}
+            <Grade>
+              {lista.map((dose) => (
+                <DoseCard
+                  key={dose.id}
+                  dose={dose}
+                  aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
+                />
+              ))}
+            </Grade>
           </View>
         );
       })}

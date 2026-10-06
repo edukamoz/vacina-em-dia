@@ -82,4 +82,5 @@ Automatizados em `packages/shared/src/calendar/rules.test.ts` e `packages/shared
 | CT-PRIV-01 a 04 | `apps/api/src/services/consent-account.test.ts` | Consentimento e exclusão da conta |
 | CT-REP-01 a 04, CT-SEG-01 a 03 | `apps/api/src/repositories`, `identity.test.ts` | Isolamento por dono, limite de donos e formato da sessão |
 | CT-API-O01 a O08 | `apps/api/src/openapi/build-spec.test.ts` | Toda rota registrada e documentada com seus códigos de erro |
+| CT-LAY-01 a 06 | `apps/mobile/src/lib/layout.test.ts`, `components/barra-de-navegacao.test.tsx` | Modos de layout por largura (599/600, 1023/1024), posição da barra e navegação como links |
 | CT-APP-A, E, C, F, M, X, K, H, D, I e CT-T02, T03, T05, T08, T10 no app | `apps/mobile/src` | Cliente da API, fluxos de cada tela e ações do ciclo de vida da dose |
