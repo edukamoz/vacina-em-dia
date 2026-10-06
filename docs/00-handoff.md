@@ -13,6 +13,22 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - Branch `docs/SCRUM-5-claude-md-word-e-pdf`: `CLAUDE.md` atualizado com a regra "Word (ABNT) durante o desenvolvimento, PDF só na entrega".
 - Jira SCRUM-5: comentário com o commit e worklog de 2h 17m lançados. Status **não** alterado.
 
+**Atualização de 06/10/2026 (SCRUM-31, UML e DER):**
+- Branch `docs/SCRUM-31-uml-der` com casos de uso, classes, 3 sequências (login, registrar dose, lembrete), arquitetura, DER e dicionário de dados em `docs/03-uml/`. Todos os diagramas Mermaid foram validados e renderizados com o `@mermaid-js/mermaid-cli` (instalado só na pasta temporária da sessão, fora do projeto; reinstalar com `npm install @mermaid-js/mermaid-cli` num diretório de scratch se precisar validar de novo). PNGs não foram versionados; gerar na hora de montar os Word (SCRUM-34).
+- Decisões de modelagem adotadas por padrão (autor delegou): lembrete por push do Expo + sinalização no app (sem e-mail); doses gravadas no banco ao cadastrar o membro; só a data de aplicação (sem lote e local); tabela de eventos da dose; exclusão em cascata; consentimento com versão do termo e declaração de responsável para menores.
+- **Pendências do autor:** fornecer ou confirmar os dados oficiais do calendário do PNI (até lá, o seed é `FICTITIOUS`); validar a antecedência dos lembretes e a lista de grupos específicos.
+
+**Lembretes por item (revisar com o autor quando o item começar):**
+
+| Item | O que revisar |
+|---|---|
+| SCRUM-22 | Registrar os provedores `Microsoft.Sql`, `Microsoft.CognitiveServices` e `Microsoft.AzureActiveDirectory`; criar o tenant externo (diretório do Centro Paula Souza); recursos antigos do DelBicos no Azure (inventário feito em 06/10/2026: `rg-delbicos` e `DefaultResourceGroup-CQ`; nada foi apagado e é preciso decidir com o autor, pois podem consumir o crédito) |
+| SCRUM-13 | Bloqueio de tentativas de login no Entra; validar o ADR-009 (token) com o fluxo real e escolher entre MSAL e `expo-auth-session` |
+| SCRUM-14 | Texto de consentimento mencionando a transferência de dados para fora do Brasil (Entra sem região no Brasil) |
+| SCRUM-19 | Antecedência dos lembretes; texto genérico da notificação |
+| SCRUM-20 e 21 | Calibrar os limites do ADR-010; rede entre API e PLN |
+| SCRUM-26 | Confirmar custos na calculadora oficial (Speech F0, Functions, Application Insights) |
+
 **Atualização de 06/10/2026 (fim da sessão):**
 - SCRUM-5: PR #1 já mesclado na `main`.
 - SCRUM-27 (plano de teste): `docs/07-testes/plano-de-teste.md`, branch `docs/SCRUM-27-plano-de-teste`, enviada ao GitHub; PR a abrir pelo autor.
@@ -49,11 +65,11 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 | `docs/Fase0_Documento_de_Visao_e_Escopo.docx` | Documento formal em ABNT | Rascunho; falta RA na folha de rosto |
 | `docs/01-visao-e-escopo.md` | Mesma Fase 0 em Markdown | Gerado do .docx |
 | `docs/02-requisitos.md` | RF01 a RF12 e RNF01 a RNF10 | Extraído da Fase 0 |
-| `docs/03-uml/estados-dose.*` | Diagrama de estados da dose (Mermaid, PNG, SVG) e tabelas | Rascunho; Mermaid não foi renderizado, conferir no GitHub |
+| `docs/03-uml/estados-dose.*` | Diagrama de estados da dose (Mermaid, PNG, SVG) e tabelas | Rascunho; Mermaid validado com o mermaid-cli em 06/10/2026 (renderiza sem erro) |
 | `docs/07-testes/casos-teste-estados-dose.md` | 42 casos de teste (CT-...) | Rascunho (SCRUM-29) |
 | `docs/referencias-disciplinas/` | PDFs do PI-VI, modelos de documentação, Qualidade e Testes, PLN | Material da faculdade, só leitura |
 
-**Ainda não existem:** `docs/04-design-system.md`, `docs/05-adrs/`, `docs/06-seguranca-e-lgpd.md`, plano de teste, DER e demais diagramas UML.
+**Já existem:** ADRs (`docs/05-adrs/`), plano de teste (`docs/07-testes/plano-de-teste.md`), UML, DER e dicionário de dados (`docs/03-uml/`). **Ainda não existem:** `docs/04-design-system.md`, `docs/06-seguranca-e-lgpd.md`, `docs/tech-versions.md`.
 
 ## 3. Jira (projeto SCRUM, site vacinaemdia.atlassian.net)
 
