@@ -161,14 +161,16 @@ Verificar em toda tela nova, nos três temas e a 200% de texto.
 
 ## 6. Como os tokens entram no código (SCRUM-23)
 
-O projeto ainda não tem `apps/mobile`, então os tokens são **especificados** aqui e em `tokens.json`; a aplicação no `tailwind.config` do NativeWind acontece no setup do monorepo (SCRUM-23). Plano:
+Implementado em `apps/mobile`:
 
-1. Gerar o `tailwind.config` e as variáveis de tema a partir de `tokens.json`, para os três temas.
-2. Um `ThemeProvider` (Context API, ADR-006) guarda o tema escolhido e aplica as variáveis. Por padrão segue o sistema (claro ou escuro); **Alto contraste** é escolha do usuário, e na web também pode seguir a preferência de contraste do navegador (a validar no SCRUM-23, porque o suporte varia).
-3. Carregar a fonte com `expo-font` e **testar o carregamento na web**.
-4. Testes de componentes com a React Native Testing Library verificam rótulos, papéis e tamanhos mínimos.
+1. `tokens.json` continua sendo a **fonte única**. O `tailwind.config.js` lê o arquivo e expõe cada cor como variável CSS (`bg-fundo`, `text-texto`, `border-borda`...), além de espaçamento, raios, bordas, alturas de toque (`min-h-toque` 48 dp, `min-h-principal` 56 dp), tamanhos de texto, famílias e breakpoints (`medio:` 600, `expandido:` 1024). Os nomes das classes seguem o vocabulário do design system (em português), 1:1 com as variáveis do Figma.
+2. O `ThemeProvider` (`src/theme/theme-provider.tsx`, Context API, ADR-006) grava as cores do tema ativo como variáveis (`--cor-<token>`). Por padrão segue o sistema (claro ou escuro); **Alto contraste** é escolha do usuário. Seguir a preferência de contraste do navegador na web ficou como melhoria futura, porque o suporte varia.
+3. A fonte Atkinson Hyperlegible é carregada com `expo-font` (pacote `@expo-google-fonts`); **verificado na web** (as duas fontes carregam e o título usa a negrito).
+4. Componentes base já criados: Texto, Botão, Cartão, Selo de estado da dose e Aviso de fonte, mais o cartão de dose. Os testes (Jest + React Native Testing Library) verificam papéis, rótulos, estados, dica de leitura e o aviso de fonte; um teste confere que os três temas têm os mesmos tokens e que os contrastes mínimos (4,5:1; 7:1 no Alto contraste) valem.
 
-As versões exatas de NativeWind, Expo e da fonte entram em `docs/tech-versions.md`.
+Limitações conhecidas: os ícones do selo são símbolos de texto (sem biblioteca de ícones); o aviso de "texto a 200%" e o teste com leitores de tela ainda precisam ser feitos à mão.
+
+As versões exatas de NativeWind, Expo e da fonte estão em `docs/tech-versions.md`.
 
 ## 7. Linguagem e microcopy
 
