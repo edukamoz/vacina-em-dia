@@ -1,0 +1,418 @@
+{
+  "_comentario": "Conjunto de teste, separado do treino (intents.json). Nenhuma frase pode repetir uma do treino. Usado só para avaliar (acurácia e F1), nunca para treinar.",
+  "_comentario_ruido": "Entradas sem sentido, para medir quantas caem na resposta padrão de baixa confiança.",
+  "ruido": [
+    "asdf",
+    "xyz 123",
+    "kkkk",
+    "????",
+    "banana",
+    "qwerty uiop",
+    "hmm",
+    "aaaaaa",
+    "123456",
+    "pqp zzz"
+  ],
+  "examples": [
+    {
+      "text": "oi, tudo bem com você?",
+      "intent": "saudacao"
+    },
+    {
+      "text": "bom dia, preciso de uma ajudinha",
+      "intent": "saudacao"
+    },
+    {
+      "text": "boa tarde assistente",
+      "intent": "saudacao"
+    },
+    {
+      "text": "olá, queria tirar umas dúvidas",
+      "intent": "saudacao"
+    },
+    {
+      "text": "oi pessoal",
+      "intent": "saudacao"
+    },
+    {
+      "text": "muito obrigado, ajudou bastante",
+      "intent": "despedida_agradecimento"
+    },
+    {
+      "text": "tchau, até depois",
+      "intent": "despedida_agradecimento"
+    },
+    {
+      "text": "valeu demais",
+      "intent": "despedida_agradecimento"
+    },
+    {
+      "text": "era isso, obrigada",
+      "intent": "despedida_agradecimento"
+    },
+    {
+      "text": "agradecida pela atenção",
+      "intent": "despedida_agradecimento"
+    },
+    {
+      "text": "me explica o que você é capaz de fazer",
+      "intent": "ajuda_o_que_faz"
+    },
+    {
+      "text": "em que você pode me ajudar hoje",
+      "intent": "ajuda_o_que_faz"
+    },
+    {
+      "text": "quais perguntas posso fazer a você",
+      "intent": "ajuda_o_que_faz"
+    },
+    {
+      "text": "como esse assistente funciona",
+      "intent": "ajuda_o_que_faz"
+    },
+    {
+      "text": "o que esse aplicativo faz",
+      "intent": "ajuda_o_que_faz"
+    },
+    {
+      "text": "como faço para cadastrar minha filha pequena",
+      "intent": "como_adicionar_pessoa"
+    },
+    {
+      "text": "quero incluir minha avó no app",
+      "intent": "como_adicionar_pessoa"
+    },
+    {
+      "text": "onde eu adiciono mais um membro da família",
+      "intent": "como_adicionar_pessoa"
+    },
+    {
+      "text": "como altero o nome de uma pessoa que cadastrei",
+      "intent": "como_adicionar_pessoa"
+    },
+    {
+      "text": "preciso colocar meu irmão no aplicativo",
+      "intent": "como_adicionar_pessoa"
+    },
+    {
+      "text": "como faço para registrar a vacina que meu filho tomou hoje",
+      "intent": "como_registrar_dose"
+    },
+    {
+      "text": "onde eu marco que a dose foi aplicada",
+      "intent": "como_registrar_dose"
+    },
+    {
+      "text": "quero informar que já tomei essa vacina",
+      "intent": "como_registrar_dose"
+    },
+    {
+      "text": "como lançar uma vacina que já foi feita",
+      "intent": "como_registrar_dose"
+    },
+    {
+      "text": "como atualizo a carteirinha com a dose de ontem",
+      "intent": "como_registrar_dose"
+    },
+    {
+      "text": "como marco o dia que vou levar meu filho para vacinar",
+      "intent": "como_agendar_dose"
+    },
+    {
+      "text": "quero agendar a próxima vacina",
+      "intent": "como_agendar_dose"
+    },
+    {
+      "text": "como mudo o dia da dose que marquei",
+      "intent": "como_agendar_dose"
+    },
+    {
+      "text": "posso remarcar uma dose pelo app",
+      "intent": "como_agendar_dose"
+    },
+    {
+      "text": "onde defino a data para tomar a vacina",
+      "intent": "como_agendar_dose"
+    },
+    {
+      "text": "o que quer dizer que a dose está atrasada",
+      "intent": "significado_atrasada"
+    },
+    {
+      "text": "por que várias vacinas aparecem atrasadas",
+      "intent": "significado_atrasada"
+    },
+    {
+      "text": "minha vacina está vermelha atrasada, e agora",
+      "intent": "significado_atrasada"
+    },
+    {
+      "text": "o que fazer quando a dose fica atrasada",
+      "intent": "significado_atrasada"
+    },
+    {
+      "text": "atrasada significa que passou da data",
+      "intent": "significado_atrasada"
+    },
+    {
+      "text": "qual a diferença entre agendada e pendente",
+      "intent": "significado_estados"
+    },
+    {
+      "text": "o que significam os estados das vacinas",
+      "intent": "significado_estados"
+    },
+    {
+      "text": "o que quer dizer pendente no app",
+      "intent": "significado_estados"
+    },
+    {
+      "text": "explica as legendas e cores das doses",
+      "intent": "significado_estados"
+    },
+    {
+      "text": "dose aplicada e dose cancelada são diferentes",
+      "intent": "significado_estados"
+    },
+    {
+      "text": "como faço para cancelar uma vacina da lista",
+      "intent": "como_cancelar_dose"
+    },
+    {
+      "text": "quero remover uma dose que não preciso",
+      "intent": "como_cancelar_dose"
+    },
+    {
+      "text": "dá para voltar atrás depois de cancelar a dose",
+      "intent": "como_cancelar_dose"
+    },
+    {
+      "text": "onde fica a opção de cancelar dose",
+      "intent": "como_cancelar_dose"
+    },
+    {
+      "text": "cancelar uma vacina funciona como",
+      "intent": "como_cancelar_dose"
+    },
+    {
+      "text": "onde consulto as vacinas que meu filho já tomou",
+      "intent": "como_ver_historico"
+    },
+    {
+      "text": "quero ver o histórico de vacinas da família",
+      "intent": "como_ver_historico"
+    },
+    {
+      "text": "como vejo o que já foi aplicado",
+      "intent": "como_ver_historico"
+    },
+    {
+      "text": "onde encontro as vacinas tomadas",
+      "intent": "como_ver_historico"
+    },
+    {
+      "text": "mostra a carteirinha com as doses aplicadas",
+      "intent": "como_ver_historico"
+    },
+    {
+      "text": "quero excluir minha conta e tudo que cadastrei",
+      "intent": "como_excluir_dados"
+    },
+    {
+      "text": "como faço para apagar todos os meus dados",
+      "intent": "como_excluir_dados"
+    },
+    {
+      "text": "onde eu deleto minha conta",
+      "intent": "como_excluir_dados"
+    },
+    {
+      "text": "gostaria de remover as informações da minha família do app",
+      "intent": "como_excluir_dados"
+    },
+    {
+      "text": "excluir tudo é permanente",
+      "intent": "como_excluir_dados"
+    },
+    {
+      "text": "o aplicativo pede meu cpf",
+      "intent": "privacidade_dados"
+    },
+    {
+      "text": "que dados pessoais vocês guardam de mim",
+      "intent": "privacidade_dados"
+    },
+    {
+      "text": "minhas informações de saúde ficam seguras",
+      "intent": "privacidade_dados"
+    },
+    {
+      "text": "vocês passam meus dados para outras empresas",
+      "intent": "privacidade_dados"
+    },
+    {
+      "text": "preciso aceitar o termo para usar o app",
+      "intent": "privacidade_dados"
+    },
+    {
+      "text": "de onde vem o calendário de vacinas do aplicativo",
+      "intent": "fonte_calendario"
+    },
+    {
+      "text": "esse calendário é do ministério da saúde",
+      "intent": "fonte_calendario"
+    },
+    {
+      "text": "posso deixar a caderneta de papel de lado e usar só o app",
+      "intent": "fonte_calendario"
+    },
+    {
+      "text": "qual a versão do calendário nacional que vocês seguem",
+      "intent": "fonte_calendario"
+    },
+    {
+      "text": "as informações do app são oficiais",
+      "intent": "fonte_calendario"
+    },
+    {
+      "text": "como faço para falar com o assistente em vez de escrever",
+      "intent": "como_usar_voz"
+    },
+    {
+      "text": "onde ligo o microfone",
+      "intent": "como_usar_voz"
+    },
+    {
+      "text": "dá para perguntar por áudio",
+      "intent": "como_usar_voz"
+    },
+    {
+      "text": "minha avó prefere falar, tem como",
+      "intent": "como_usar_voz"
+    },
+    {
+      "text": "o navegador pediu acesso ao microfone",
+      "intent": "como_usar_voz"
+    },
+    {
+      "text": "o aplicativo manda lembrete de vacina",
+      "intent": "lembretes"
+    },
+    {
+      "text": "como faço para receber avisos das doses",
+      "intent": "lembretes"
+    },
+    {
+      "text": "vou ser avisado quando a vacina estiver chegando",
+      "intent": "lembretes"
+    },
+    {
+      "text": "tem notificação no celular para vacinas atrasadas",
+      "intent": "lembretes"
+    },
+    {
+      "text": "queria um alerta para não esquecer a dose",
+      "intent": "lembretes"
+    },
+    {
+      "text": "a vacina bcg serve para quê",
+      "intent": "vacina_para_que_serve"
+    },
+    {
+      "text": "contra o que a vacina de hepatite A protege",
+      "intent": "vacina_para_que_serve"
+    },
+    {
+      "text": "o que a tríplice viral previne",
+      "intent": "vacina_para_que_serve"
+    },
+    {
+      "text": "para que é a vacina da gripe",
+      "intent": "vacina_para_que_serve"
+    },
+    {
+      "text": "o que a vacina contra dengue evita",
+      "intent": "vacina_para_que_serve"
+    },
+    {
+      "text": "em que idade toma a vacina bcg",
+      "intent": "vacina_quando"
+    },
+    {
+      "text": "quando é a vacina da febre amarela",
+      "intent": "vacina_quando"
+    },
+    {
+      "text": "com quantos anos se toma o hpv",
+      "intent": "vacina_quando"
+    },
+    {
+      "text": "quando se toma a vacina da varicela",
+      "intent": "vacina_quando"
+    },
+    {
+      "text": "a hepatite B é tomada com qual idade",
+      "intent": "vacina_quando"
+    },
+    {
+      "text": "quais vacinas um bebê precisa tomar",
+      "intent": "vacinas_do_grupo"
+    },
+    {
+      "text": "lista das vacinas para idosos",
+      "intent": "vacinas_do_grupo"
+    },
+    {
+      "text": "que vacinas uma gestante precisa",
+      "intent": "vacinas_do_grupo"
+    },
+    {
+      "text": "o que um adulto de 35 anos precisa tomar",
+      "intent": "vacinas_do_grupo"
+    },
+    {
+      "text": "vacinas para um adolescente de 12 anos",
+      "intent": "vacinas_do_grupo"
+    },
+    {
+      "text": "meu filho está com febre posso levar para vacinar",
+      "intent": "orientacao_medica"
+    },
+    {
+      "text": "o que fazer se der reação depois da vacina",
+      "intent": "orientacao_medica"
+    },
+    {
+      "text": "qual remédio posso dar para dor depois da vacina",
+      "intent": "orientacao_medica"
+    },
+    {
+      "text": "estou grávida e com tosse posso vacinar",
+      "intent": "orientacao_medica"
+    },
+    {
+      "text": "meu braço está inchado depois da vacina é perigoso",
+      "intent": "orientacao_medica"
+    },
+    {
+      "text": "vai chover amanhã",
+      "intent": "fora_do_escopo"
+    },
+    {
+      "text": "me recomenda um restaurante",
+      "intent": "fora_do_escopo"
+    },
+    {
+      "text": "quem foi o campeão da copa",
+      "intent": "fora_do_escopo"
+    },
+    {
+      "text": "como instalar um programa no computador",
+      "intent": "fora_do_escopo"
+    },
+    {
+      "text": "qual é o melhor time de futebol",
+      "intent": "fora_do_escopo"
+    }
+  ]
+}

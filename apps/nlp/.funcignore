@@ -1,0 +1,10 @@
+.venv
+.pytest_cache
+__pycache__
+tests
+local.settings.json
+.coverage
+coverage.xml
+requirements-dev.txt
+pyproject.toml
+README.md
