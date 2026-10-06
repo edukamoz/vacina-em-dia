@@ -1,10 +1,9 @@
-import type { DoseStatus } from '@vacina/shared';
+import type { DoseResponse, DoseStatus } from '@vacina/shared';
 import { View } from 'react-native';
 import { Cartao } from '../../components/cartao';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { Texto } from '../../components/texto';
 import { formatCivilDate } from './format-date';
-import type { SampleDose } from './sample-doses';
 
 const DICA: Readonly<Record<DoseStatus, string>> = {
   PENDING: 'Ainda sem data marcada',
@@ -23,9 +22,17 @@ const FAIXA: Readonly<Record<DoseStatus, string>> = {
 };
 
 /** Texto de apoio do cartão, por exemplo "Marcada para 04/11/2026". */
-export function doseHint(dose: Pick<SampleDose, 'status' | 'date'>): string {
-  if (dose.status === 'PENDING' || dose.status === 'CANCELLED') return DICA[dose.status];
-  return `${DICA[dose.status]} ${formatCivilDate(dose.date)}`;
+export function doseHint(
+  dose: Pick<DoseResponse, 'status' | 'dueDate' | 'scheduledDate' | 'appliedDate'>,
+): string {
+  const date = {
+    SCHEDULED: dose.scheduledDate,
+    OVERDUE: dose.dueDate,
+    APPLIED: dose.appliedDate,
+    PENDING: null,
+    CANCELLED: null,
+  }[dose.status];
+  return date ? `${DICA[dose.status]} ${formatCivilDate(date)}` : DICA[dose.status];
 }
 
 /**
@@ -33,7 +40,7 @@ export function doseHint(dose: Pick<SampleDose, 'status' | 'date'>): string {
  *
  * @param props.dose - Dose a exibir.
  */
-export function DoseCard({ dose }: { dose: SampleDose }) {
+export function DoseCard({ dose }: { dose: DoseResponse }) {
   return (
     <Cartao className="flex-row overflow-hidden p-0">
       <View className={`w-[6px] ${FAIXA[dose.status]}`} />
