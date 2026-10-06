@@ -3,6 +3,7 @@ import {
   ageGroupForMonths,
   ageGroupOf,
   canBecomeOverdue,
+  describeTiming,
   dueDateForRule,
   notesForRule,
   rulesForMember,
@@ -155,5 +156,26 @@ describe('notesForRule', () => {
   test('CT-CAL-17 ignora notas ausentes do calendário', () => {
     const rule: CalendarRule = { ...ruleById('crianca-bcg'), noteIds: ['inexistente.9'] };
     expect(notesForRule(PNI_2026, rule)).toEqual([]);
+  });
+});
+
+describe('describeTiming', () => {
+  test.each([
+    [{ kind: 'AGE', months: 0 }, 'Ao nascer'],
+    [{ kind: 'AGE', months: 1 }, '1 mês'],
+    [{ kind: 'AGE', months: 2 }, '2 meses'],
+    [{ kind: 'AGE', months: 15 }, '15 meses'],
+    [{ kind: 'AGE', months: 48 }, '4 anos'],
+    [{ kind: 'AGE', months: 108 }, '9 anos'],
+    [{ kind: 'AGE', months: 132 }, '11 anos'],
+    [{ kind: 'AGE', months: 144 }, '12 anos'],
+    [{ kind: 'AGE', months: 61 }, '5 anos e 1 mês'],
+    [{ kind: 'AGE', months: 62 }, '5 anos e 2 meses'],
+    [{ kind: 'AGE', months: 12 * 49 }, '49 anos'],
+    [{ kind: 'HISTORY' }, 'Conforme histórico vacinal'],
+    [{ kind: 'GESTATION', week: null }, 'Ao saber da gravidez'],
+    [{ kind: 'GESTATION', week: 28 }, 'A partir da 28ª semana de gestação'],
+  ] as const)('CT-CAL-18 %j vira "%s"', (timing, text) => {
+    expect(describeTiming(timing)).toBe(text);
   });
 });

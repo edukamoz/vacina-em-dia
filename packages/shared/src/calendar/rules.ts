@@ -1,5 +1,5 @@
 import { addMonths, ageInMonths, type CivilDate } from '../domain/civil-date';
-import type { CalendarDataset, CalendarGroup, CalendarRule } from './types';
+import type { CalendarDataset, CalendarGroup, CalendarRule, CalendarTiming } from './types';
 
 /** Faixa etária (sem a gestante, que depende de um grupo específico do membro). */
 export type AgeGroup = Exclude<CalendarGroup, 'PREGNANT'>;
@@ -96,4 +96,31 @@ export function notesForRule(dataset: CalendarDataset, rule: CalendarRule): read
     const text = dataset.notes[id];
     return text === undefined ? [] : [text];
   });
+}
+
+/**
+ * Texto curto do momento indicado, em português simples, para mostrar na tela.
+ *
+ * @param timing - Momento da regra.
+ * @returns Por exemplo "Ao nascer", "2 meses", "4 anos", "Conforme histórico vacinal" ou
+ *   "A partir da 20ª semana de gestação".
+ */
+export function describeTiming(timing: CalendarTiming): string {
+  switch (timing.kind) {
+    case 'HISTORY':
+      return 'Conforme histórico vacinal';
+    case 'GESTATION':
+      return timing.week === null
+        ? 'Ao saber da gravidez'
+        : `A partir da ${timing.week}ª semana de gestação`;
+    case 'AGE': {
+      const { months } = timing;
+      if (months === 0) return 'Ao nascer';
+      if (months < 48) return months === 1 ? '1 mês' : `${months} meses`;
+      const years = Math.floor(months / 12);
+      const rest = months % 12;
+      const yearsText = years === 1 ? '1 ano' : `${years} anos`;
+      return rest === 0 ? yearsText : `${yearsText} e ${rest} ${rest === 1 ? 'mês' : 'meses'}`;
+    }
+  }
 }

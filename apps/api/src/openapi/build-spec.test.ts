@@ -7,6 +7,7 @@ type Operation = {
   description?: string;
   tags?: string[];
   responses: Record<string, unknown>;
+  security?: unknown;
 };
 type Doc = {
   openapi: string;
@@ -47,7 +48,7 @@ describe('especificação OpenAPI', () => {
 
   test('CT-API-O02: toda função HTTP registrada está documentada (e vice-versa)', () => {
     const routes = registeredRoutes().filter((r) => !NOT_IN_SPEC.has(r.name));
-    expect(routes.length).toBeGreaterThanOrEqual(5);
+    expect(routes.length).toBeGreaterThanOrEqual(12);
     for (const r of routes) {
       expect(doc.paths[r.path]?.[r.method]).toBeDefined();
     }
@@ -70,12 +71,33 @@ describe('especificação OpenAPI', () => {
   });
 
   test.each([
-    ['get', '/doses', ['200', '500']],
-    ['get', '/doses/{id}', ['200', '400', '404', '500']],
-    ['post', '/doses/{id}/events', ['200', '400', '404', '409', '422', '500']],
+    ['get', '/consent', ['200', '401', '500']],
+    ['put', '/consent', ['200', '400', '401', '500']],
+    ['delete', '/account', ['204', '401', '500']],
+    ['get', '/members', ['200', '401', '500']],
+    ['post', '/members', ['201', '400', '401', '403', '422', '500']],
+    ['get', '/members/{id}', ['200', '400', '401', '404', '500']],
+    ['put', '/members/{id}', ['200', '400', '401', '403', '404', '422', '500']],
+    ['delete', '/members/{id}', ['204', '400', '401', '404', '500']],
+    ['get', '/members/{id}/doses', ['200', '400', '401', '404', '500']],
+    ['get', '/doses/{id}', ['200', '400', '401', '404', '500']],
+    ['post', '/doses/{id}/events', ['200', '400', '401', '404', '409', '422', '500']],
   ])('CT-API-O04: %s %s documenta os códigos %j', (method, path, codes) => {
     const responses = Object.keys(doc.paths[path]?.[method]?.responses ?? {});
     expect(responses).toEqual(expect.arrayContaining(codes));
+  });
+
+  test('CT-API-O08: toda rota de dados exige a sessão e declara o esquema de segurança', () => {
+    const open = new Set(['/health', '/openapi.json']);
+    for (const [path, ops] of Object.entries(doc.paths)) {
+      if (open.has(path)) continue;
+      for (const [method, op] of Object.entries(ops)) {
+        expect([`${method} ${path}`, JSON.stringify(op)]).toEqual([
+          `${method} ${path}`,
+          expect.stringContaining('demoSession'),
+        ]);
+      }
+    }
   });
 
   test('CT-API-O05: o corpo do evento tem exemplos e usa os esquemas compartilhados', () => {
@@ -90,8 +112,9 @@ describe('especificação OpenAPI', () => {
 
   test('CT-API-O06: as respostas de dose referenciam componentes nomeados', () => {
     const json = JSON.stringify(doc);
-    expect(json).toContain('#/components/schemas/Dose');
-    expect(json).toContain('#/components/schemas/ApiError');
+    for (const name of ['Dose', 'Member', 'MemberDoses', 'Consent', 'ApiError']) {
+      expect(json).toContain(`#/components/schemas/${name}`);
+    }
   });
 
   test('CT-API-O07: não expõe segredos nem dados pessoais', () => {
