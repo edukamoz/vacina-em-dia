@@ -1,0 +1,19 @@
+[project]
+name = "vacina-em-dia-nlp"
+version = "0.1.0"
+description = "Serviço de PLN do Vacina em Dia: chatbot (TF-IDF + SVM) e busca sobre o calendário vacinal."
+requires-python = ">=3.13"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error::FutureWarning", "error::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["vacina_nlp", "function_app"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
