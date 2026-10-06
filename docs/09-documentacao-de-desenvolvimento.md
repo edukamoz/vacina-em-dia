@@ -13,7 +13,7 @@
 | Nome do projeto | Vacina em Dia: carteira de vacinação digital com lembretes e assistente por voz |
 | Projeto | Projeto Interdisciplinar VI (PI-VI) |
 | Grupo | Individual |
-| Integrante | Eduardo Kamo Iguei, RA [a informar] |
+| Integrante | Eduardo Kamo Iguei, RA 3011392413005 |
 | Curso | Tecnologia em Desenvolvimento de Software Multiplataforma, Fatec Votorantim |
 | Semestre | 6º semestre, 2026 |
 | Professor orientador | Prof. Dr. Cassio R. F. Riedo |
@@ -30,7 +30,7 @@ O projeto é individual: o autor acumula os papéis de dono do produto, Scrum Ma
 
 ### 3.1 Registro de atividades individuais
 
-Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no repositório), exceto quando indicado. Tempo e horário são do autor.
+Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no repositório), exceto quando indicado. O tempo é a **média de 30 minutos por item informada pelo autor**, também lançada como worklog no Jira; ajustar item a item se algum tiver durado diferente.
 
 **3.1.1 Fundação do repositório (SCRUM-5)**
 
@@ -45,7 +45,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 **3.1.2 Plano de teste (SCRUM-27)**
 
 - **Data:** 06/10/2026
-- **Tempo gasto:** [a informar]
+- **Tempo gasto:** 30 min (média por item informada pelo autor; lançada no Jira)
 - **Membro:** Eduardo Kamo Iguei
 - **Descrição:** plano de teste com objetivo, escopo, requisitos relevantes (RF e RNF), itens a testar, estratégia (partição de equivalência, valor limite e cobertura de estados), critérios de entrada e saída, recursos, cronograma estimado e papéis acumulados por uma pessoa (`docs/07-testes/plano-de-teste.md`).
 - **Materiais e ferramentas:** enunciado de Qualidade e Testes, `docs/02-requisitos.md`, Jira, Claude Code.
@@ -55,7 +55,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 **3.1.3 Decisões técnicas e verificações no Azure (SCRUM-33)**
 
 - **Data:** 06/10/2026
-- **Tempo gasto:** [a informar]
+- **Tempo gasto:** 30 min (média por item informada pelo autor; lançada no Jira)
 - **Membro:** Eduardo Kamo Iguei
 - **Descrição:** 10 registros de decisão de arquitetura (ADR-001 a ADR-010), incluindo a decisão de não usar Express, o armazenamento do token na web e a limitação de taxa. Verificações somente de leitura no Azure com a CLI: oferta gratuita do Azure SQL compatível com a assinatura, regiões permitidas, disponibilidade do Entra External ID e dos serviços de voz e Functions em Brazil South.
 - **Materiais e ferramentas:** Azure CLI, documentação da Microsoft Learn, Claude Code, Jira.
@@ -65,7 +65,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 **3.1.4 UML e DER (SCRUM-31)**
 
 - **Data:** 06/10/2026
-- **Tempo gasto:** [a informar]
+- **Tempo gasto:** 30 min (média por item informada pelo autor; lançada no Jira)
 - **Membro:** Eduardo Kamo Iguei
 - **Descrição:** diagramas de casos de uso, classes, sequência (login, registrar dose, lembrete) e arquitetura; DER do Azure SQL com 11 tabelas e dicionário de dados com classificação LGPD (`docs/03-uml/`).
 - **Materiais e ferramentas:** Mermaid, mermaid-cli (validação e renderização), Claude Code.
@@ -75,7 +75,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 **3.1.5 UML de estados e casos de teste da dose (SCRUM-29)**
 
 - **Data:** [a informar] (produzido antes do repositório e versionado em 06/10/2026)
-- **Tempo gasto:** [a informar]
+- **Tempo gasto:** 30 min (média por item informada pelo autor; lançada no Jira)
 - **Membro:** Eduardo Kamo Iguei
 - **Descrição:** diagrama de estados do ciclo de vida da dose (5 estados, 12 transições) e 42 casos de teste de estados, transições, guardas, inválidas e caminhos (`docs/03-uml/estados-dose.md` e `docs/07-testes/casos-teste-estados-dose.md`).
 - **Materiais e ferramentas:** Mermaid, enunciado de Qualidade e Testes.
@@ -85,7 +85,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 **3.1.6 Design system (SCRUM-32)**
 
 - **Data:** 06/10/2026
-- **Tempo gasto:** [a informar]
+- **Tempo gasto:** 30 min (média por item informada pelo autor; lançada no Jira)
 - **Membro:** Eduardo Kamo Iguei
 - **Descrição:** documento do design system (tokens, três temas, tipografia, componentes, telas, checklist de acessibilidade e microcopy), fonte única de tokens em JSON e ADR-011. Protótipo no Figma parcialmente construído: variáveis por tema, estilos de texto, 14 componentes e 4 telas de celular.
 - **Materiais e ferramentas:** Figma (via integração com o Claude Code), cálculo de contraste do WCAG 2.1, Atkinson Hyperlegible, Claude Code.
@@ -95,7 +95,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 **3.1.7 Documentação de desenvolvimento (SCRUM-35)**
 
 - **Data:** 06/10/2026
-- **Tempo gasto:** [a informar]
+- **Tempo gasto:** 30 min (média por item informada pelo autor; lançada no Jira)
 - **Membro:** Eduardo Kamo Iguei
 - **Descrição:** criação deste documento a partir do modelo da disciplina.
 - **Materiais e ferramentas:** modelo de Documentação de Desenvolvimento, Claude Code.
@@ -103,13 +103,14 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 
 ### 3.2 Registro de reuniões
 
-As reuniões do Scrum são **simuladas** (projeto individual): o autor acumula os papéis. Data, horário, duração e local são do autor.
+As reuniões do Scrum são **simuladas** (projeto individual): o autor acumula os papéis. **Padrão informado pelo autor:** sextas-feiras às 20:05, com duração de 30 a 40 minutos; a sexta-feira também é o dia da reunião com o professor. A data de cada reunião e a duração efetiva são registradas pelo autor depois que ela ocorre.
 
 **3.2.1 Planejamento da Sprint 1**
 
 - **Tipo:** Planejamento
 - **Data:** [a informar]
-- **Horário:** [a informar]
+- **Horário:** 20:05 (padrão informado pelo autor; confirmar)
+- **Duração:** 30 a 40 minutos (padrão informado pelo autor; informar a efetiva)
 - **Local:** [a informar]
 - **Membros presentes:** Eduardo Kamo Iguei (dono do produto, Scrum Master e desenvolvedor)
 - **Pauta:** objetivo e itens da Sprint 1; critérios de aceite de cada item.
@@ -136,20 +137,28 @@ As reuniões do Scrum são **simuladas** (projeto individual): o autor acumula o
 **3.2.4 Encerramento da Sprint 1**
 
 - **Tipo:** Encerramento
-- **Data:** [a realizar até 12/10/2026; informar]
+- **Data:** [a realizar até 12/10/2026; pelo padrão, sexta-feira 09/10/2026 às 20:05; informar após a reunião]
 - **Resumo e decisões:** [a preencher após a reunião: itens aceitos e movidos para "Concluído", motivos de qualquer item não aceito.]
 
 ### 3.3 Registro de atividades de aprendizagem
 
-Registrar apenas o que o autor de fato estudou, com tempo e tipo (curso, aula, leitura, experimentação). Os temas abaixo foram **pesquisados durante a Sprint 1** e ficam como candidatos; o autor confirma quais registrar e o tempo de cada um.
+**Rotina semanal de estudo informada pelo autor:** de segunda a sexta-feira, das 19:00 às 21:45 (2 h 45 min por dia), com um tema por dia. Cada atividade só é registrada **depois que ocorre**, com a data real e o tempo efetivo; os campos abaixo são o padrão, não registros feitos.
 
-| Tema | Data | Tempo | Tipo | Conteúdo aprendido |
+| Dia da semana | Horário padrão | Tema | Tipo |
+|---|---|---|---|
+| Segunda-feira | 19:00 às 21:45 | Processamento de Linguagem Natural | [a informar] |
+| Terça-feira | 19:00 às 21:45 | Computação em Nuvem | [a informar] |
+| Quarta-feira | 19:00 às 21:45 | Mineração de Dados | [a informar] |
+| Quinta-feira | 19:00 às 21:45 | Qualidade de Software | [a informar] |
+| Sexta-feira | 19:00 às 21:45 | Reunião com o professor (orientação) | Reunião |
+
+**Registros efetivos (modelo por atividade):** Data, Tempo gasto, Tipo (curso, aula, leitura ou experimentação), Membro, Descrição e Conhecimento adquirido.
+
+| Data | Tempo | Tema | Tipo | Conhecimento adquirido |
 |---|---|---|---|---|
-| Ofertas gratuitas do Azure (SQL, Functions, Speech, Application Insights) | 06/10/2026 | [a informar] | [a informar] | Limites e condições de cada oferta e a compatibilidade com a assinatura de estudante |
-| Microsoft Entra External ID | 06/10/2026 | [a informar] | [a informar] | Cobrança por usuário ativo, tenant externo e a ausência de região no Brasil |
-| Acessibilidade WCAG 2.1 e alvos de toque para idosos | 06/10/2026 | [a informar] | [a informar] | Contraste mínimo, texto a 200% e tamanho de alvo |
-| Modelagem UML e DER com Mermaid | 06/10/2026 | [a informar] | [a informar] | Tipos de diagrama e limitações da sintaxe |
-| Variáveis, modos e componentes no Figma | 06/10/2026 | [a informar] | [a informar] | Limites do plano gratuito e organização de um design system |
+| [a informar] | [a informar] | [a informar] | [a informar] | [a informar] |
+
+**Pesquisas feitas durante o desenvolvimento da Sprint 1** (06/10/2026), que o autor pode registrar como aprendizagem se quiser, com tempo próprio: ofertas gratuitas do Azure; Microsoft Entra External ID; acessibilidade WCAG 2.1 e alvos de toque para idosos; UML e DER com Mermaid; variáveis, modos e componentes no Figma.
 
 ## 4 Integração com a metodologia Scrum
 
@@ -178,10 +187,10 @@ Os valores vêm dos registros das seções 3.1 e 3.3. Campos `[a informar]` depe
 
 | Categoria | Horas dedicadas (h:min) | Materiais e recursos utilizados | Custo estimado (R$) |
 |---|---|---|---|
-| Atividades individuais | [a informar] (já registrado: 2:17 no SCRUM-5) | Git e GitHub, Jira, Mermaid, Azure CLI, Figma (plano gratuito), Claude Code | 0,00 |
+| Atividades individuais | 5:17 (2:17 no SCRUM-5 e 6 itens de 0:30: SCRUM-27, 29, 31, 32, 33 e 35) | Git e GitHub, Jira, Mermaid, Azure CLI, Figma (plano gratuito), Claude Code | 0,00 |
 | Reuniões do grupo | [a informar] | Reuniões simuladas | 0,00 |
 | Atividades de aprendizagem | [a informar] | Documentação da Microsoft Learn, WCAG | 0,00 |
-| **Total geral** | [a informar] | | **0,00** |
+| **Total geral (parcial)** | 5:17 (sem reuniões e aprendizagem ainda) | | **0,00** |
 
 **Custos de nuvem:** nenhum recurso foi criado no Azure para este projeto até 06/10/2026, e o autor confirma custo zero até o momento. A assinatura Azure for Students tem crédito de US$ 100 e limite de gastos ativado. A estimativa mensal de custo da solução fica na Documentação Técnica (SCRUM-26).
 
