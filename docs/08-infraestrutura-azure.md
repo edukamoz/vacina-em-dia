@@ -36,3 +36,27 @@ O fluxo `.github/workflows/deploy.yml` publica a API e o app web ao integrar na 
 - App web: `https://blue-rock-0d7abc710.4.azurestaticapps.net`, já consumindo a API publicada; o CORS permite só essa origem.
 - Login do CI: registro de aplicativo `gh-vacinaemdia-deploy` com credencial federada (OIDC) e papel Contributor só no `rg-vacinaemdia`. Os repositórios deste GitHub emitem o subject com IDs numéricos (`repo:<dono>@<id>/<repo>@<id>:ref:refs/heads/main`); o formato sem IDs não casa.
 - A identidade da Function tem o papel "Key Vault Secrets User" no Key Vault.
+
+## Infraestrutura como código (Bicep)
+
+Os recursos acima estão descritos em `infra/` (Bicep, módulos por serviço). Validados em 07/10/2026 com `az bicep build`, `az bicep lint` e `az deployment group validate` contra o grupo real (sem implantar). O `what-if` mostra que o template **não** deve ser aplicado sobre o `rg-vacinaemdia` (nomes de plano diferentes); ele serve para recriar o ambiente em um grupo novo. Detalhes e avisos em `infra/README.md`. O fluxo `.github/workflows/infra.yml` compila e roda o linter a cada mudança em `infra/`.
+
+## Equivalência de serviços: AWS (semestre anterior) para Azure (este projeto)
+
+O projeto do semestre anterior usava AWS; este nasceu direto na Azure. A tabela mostra, para cada função, o serviço usado antes e o equivalente adotado agora (comparação conferida na documentação da Microsoft de mapeamento de serviços AWS/Azure).
+
+| Função | AWS | Azure (neste projeto) | Observação |
+|---|---|---|---|
+| Código sem servidor (API) | Lambda | Azure Functions (Flex Consumption) | Cobrança por execução |
+| Entrada HTTP | API Gateway | Gatilho HTTP das Functions | Sem Express |
+| Site estático | S3 + CloudFront / Amplify | Static Web Apps (Free) | HTTPS e CDN incluídos |
+| Banco relacional | RDS / Aurora Serverless | Azure SQL Database (serverless, oferta gratuita) | Pausa automática |
+| Segredos | Secrets Manager | Key Vault | Acesso por identidade gerenciada |
+| Identidade e login | Cognito | Microsoft Entra External ID (ou login próprio, ver ADR) | |
+| Monitoramento e logs | CloudWatch | Application Insights + Log Analytics | |
+| Fala para texto | Transcribe | Azure AI Speech (F0) | pt-BR |
+| Armazenamento de objetos | S3 | Storage Account (Blob) | Usado nos pacotes de implantação |
+| Contêineres (local) | Docker / ECR | Docker Compose (Azurite emula o armazenamento) | |
+| Infraestrutura como código | CloudFormation | Bicep | |
+| Permissões | IAM | Entra ID + RBAC | |
+| CI/CD | CodePipeline / CodeBuild | GitHub Actions com login OIDC | |
