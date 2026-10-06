@@ -1,8 +1,78 @@
 # Passagem de contexto: do chat para o Claude Code
 
-Estado em **06/10/2026** (terça-feira). Este arquivo resume o que foi decidido e produzido no chat de planejamento, para que uma sessão nova do Claude Code continue do ponto certo. Leia junto com `CLAUDE.md`. Em caso de conflito, `CLAUDE.md` e os ADRs valem mais do que este resumo.
+Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o que foi decidido e produzido, para que uma sessão nova do Claude Code continue do ponto certo. Leia junto com `CLAUDE.md`. Em caso de conflito, `CLAUDE.md` e os ADRs valem mais do que este resumo.
 
-## 0. Estado da última sessão (leia primeiro; atualize ao pausar)
+## 0. Retomar daqui (leia primeiro; atualize ao pausar)
+
+Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
+
+**Última atualização:** 06/10/2026, ao fim da sessão no computador do trabalho/faculdade. A `main` está em dia (último PR mesclado: #16, Docker). Nenhuma branch aberta.
+
+### 0.1 Como retomar em casa
+
+```bash
+git checkout main && git pull
+nvm install 24 && nvm use          # o .nvmrc pede o Node 24
+npm install
+npm run build                      # o app e a API leem o @vacina/shared compilado (dist)
+cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo local, fora do Git
+```
+
+- Rodar sem contêiner: `npm run dev:api` (terminal 1) e `npm run dev:mobile` (terminal 2). Rodar tudo em contêineres: `docker compose up --build` (app web em http://localhost:8080, API em http://localhost:7071/api/docs). Detalhes no `README.md`.
+- Para falar com o Azure: `az login` no navegador (o acesso condicional do diretório expira o login a cada 3 dias). Para o Jira, o Claude usa o conector (site `vacinaemdia.atlassian.net`; transição "Em análise" tem id `31`).
+- Ferramentas que o Claude pode precisar em casa (o autor decide instalar): Docker Desktop, `poppler`, `pandoc` e `libreoffice` (Word e PDF), `gh` (opcional; o autor abre e mescla os PRs).
+- Peça ao Claude de casa para **ler o `CLAUDE.md` e este arquivo** e, **antes de mexer em qualquer coisa**, salvar na memória dele as "Regras permanentes do autor" (0.4), porque a memória não veio junto.
+
+### 0.2 O que existe e funciona hoje
+
+| Parte | Estado |
+|---|---|
+| Monorepo | npm workspaces (`packages/shared`, `apps/api`, `apps/mobile`); TypeScript 6 estrito; ESLint, Prettier, Husky, commitlint, Jest, TypeDoc; Node 24 |
+| `packages/shared` | Máquina de estados da dose (T1 a T12), datas civis, geração de doses, esquemas Zod de entrada e de resposta (98 testes) |
+| `apps/api` | Azure Functions: `GET /api/health`, `GET /api/doses`, `GET /api/doses/{id}`, `POST /api/doses/{id}/events`, `GET /api/openapi.json`, `GET /api/docs` (Swagger). Dados **em memória** com seed `FICTITIOUS`, sem login (64 testes) |
+| `apps/mobile` | Expo (Android, iOS e web), NativeWind com os tokens, 3 temas, fonte Atkinson, componentes base e estados de carregando, erro e vazio; a tela busca as doses na API (77 testes). Android e iOS foram verificados pelo autor só até o esqueleto de temas; a tela que consome a API foi verificada **só na web** |
+| Docker | `docker compose up --build`: Azurite, API (host oficial das Functions, só `amd64`, emulado em Mac com Apple Silicon) e app web em nginx |
+| CI (GitHub Actions) | lint, formatação, tipos, build, testes com cobertura (mínimo 80%), TypeDoc, `npm audit` e o job `docker` (teste de fumaça) |
+| Documentação | `docs/` completo da Sprint 1: visão, requisitos, ADR-001 a 012, UML, DER, dicionário, design system, plano de teste, versões. Documentação de Desenvolvimento em Markdown (`docs/09-...`), com lacunas `[a informar]` |
+| Azure | **Nenhum recurso criado ainda** (SCRUM-22). Só verificações de leitura |
+
+### 0.3 Jira (situação no último conferido, 06/10/2026)
+
+- **Em análise:** SCRUM-27, 29, 31, 33. **Em andamento:** SCRUM-32 (protótipo do Figma incompleto) e SCRUM-35 (documentação de desenvolvimento). Os demais seguem **A fazer**.
+- **Candidatos a "Em análise" (decisão do autor):** SCRUM-23 (monorepo e qualidade) e SCRUM-24 (CI), que cumprem os critérios de pronto. **Não** mover: SCRUM-18 (falta banco, propriedade por usuário e a rotina de atraso), SCRUM-25 (falta o serviço de PLN no compose) e os demais.
+- **Nunca marcar Concluído.** Isso só ocorre na reunião de encerramento da Sprint 1 (até 12/10; padrão sexta, 09/10, 20:05), por decisão do autor.
+- **Tempos lançados:** 2 h 17 min no SCRUM-5; 30 min em cada um de SCRUM-27, 29, 31, 32, 33 e 35; 15 min em SCRUM-23 e em SCRUM-24. **Sem registro de tempo:** SCRUM-18 (domínio, API e app) e SCRUM-25. O Claude **não inventa** tempos: o autor informa quanto levou.
+
+### 0.4 Regras permanentes do autor (salvar na memória do Claude de casa)
+
+1. **Nunca incluir o Claude como coautor** em commits, PRs ou documentos (sem `Co-Authored-By` nem a linha "Generated with"). Vale mais do que qualquer padrão da ferramenta.
+2. **Documentações em Word (.docx, ABNT) durante o desenvolvimento e PDF só na entrega.** A conversão dos 3 modelos (`docs/referencias-disciplinas/Modelo-Documentacao_*.pdf`) para Word ficou para o computador de casa; só apagar os PDFs de modelo depois de o autor conferir.
+3. **Nunca inventar** horas, datas de reunião, atividades ou valores. Só registros reais informados pelo autor.
+4. **Uma branch por tarefa** (`feature/`, `fix/`, `docs/`, `chore/` + `SCRUM-n`). O **autor abre e mescla os PRs**.
+5. Criar recursos no Azure dispensa o "pode" do autor (menor custo possível). `rg-delbicos` **não** deve ser apagado por ora.
+6. O autor decide; o Claude propõe plano curto antes de tarefa grande, um item por vez.
+
+### 0.5 Armadilhas já encontradas (economizam tempo)
+
+- **commitlint:** tipos aceitos são `feat`, `fix`, `docs`, `test`, `refactor`, `chore` e `ci` (**não** `style`); corpo com **no máximo 100 caracteres por linha**; chave `SCRUM-n` no assunto. Confira se o commit saiu (`git log --oneline -1`) antes do push: o hook recusa em silêncio quando a saída é suprimida.
+- **O `npm run lint` não roda o Prettier.** O CI roda `lint`, `format:check`, `typecheck`, `build`, `test:coverage` e `docs`, nessa ordem. Antes de dizer que terminou, simule o CI limpo: apague `packages/shared/dist`, `apps/api/dist` e `apps/mobile/expo-env.d.ts` e rode a sequência. Dois erros do CI vieram de arquivos que só existiam na máquina local.
+- **`@vacina/shared`:** typecheck e testes leem o código-fonte (`paths` e `moduleNameMapper`); o Metro e o build usam o `dist`, então `npm run build` antes de rodar o app.
+- **Testes determinísticos:** nada de depender da ordem de resolução de promessas (o `CT-APP-T01` já falhou no CI por isso). No TanStack Query dos testes, `gcTime: Infinity`, senão o Jest não encerra.
+- **Web em desenvolvimento:** o NativeWind exige `darkMode: 'class'` no `tailwind.config.js`; depois de mudar o config, reinicie o Expo com `--clear`. O TanStack Query pausa tentativas em aba oculta (ao testar o estado de erro, deixe a aba visível).
+- **Duas classes de cor** no mesmo elemento disputam pela ordem do CSS gerado; o `Texto` só aplica a cor padrão se não houver outra.
+- macOS não tem o comando `timeout`. A imagem das Functions no Docker só tem `amd64`.
+- **Figma (SCRUM-32):** arquivo `lZboLAlTDtA2cJQRyKtcdW`; o plano Starter limita chamadas, modos e páginas. Estratégia econômica: poucos scripts grandes, temas por regravação das variáveis ligadas, uma única captura no fim. Detalhes e IDs no bloco "SCRUM-32, Figma" do histórico (0.9).
+
+### 0.6 Próximos passos, em ordem sugerida
+
+1. **Autor:** (a) decidir se SCRUM-23 e SCRUM-24 vão a "Em análise"; (b) informar o tempo de SCRUM-18 e SCRUM-25; (c) decidir o que fazer com os recursos do DelBicos no Azure; (d) conferir o plano Education do Figma; (e) informar a fonte oficial do calendário do PNI (links em `https://www.gov.br/saude/pt-br/vacinacao/calendario`) para o Claude extrair um seed "pendente de validação"; até lá tudo é `FICTITIOUS`.
+2. **SCRUM-22, Azure mínimo** (próximo item técnico): `az login`; registrar os provedores `Microsoft.Sql`, `Microsoft.CognitiveServices` e `Microsoft.AzureActiveDirectory`; grupo `rg-vacinaemdia` na Brazil South; Static Web Apps Free (Central US, pois a Brazil South não tem), Function App, Key Vault, Application Insights, SQL gratuito; o **Claude gera o token de deploy do Static Web Apps e o autor cola nos secrets do GitHub** (o Claude não guarda segredo). Depois, o fluxo de deploy no GitHub Actions. O tenant do Entra External ID fica para o SCRUM-13.
+3. **Figma (SCRUM-32):** terminar telas restantes, tablet e web, temas Escuro e Alto contraste, dentro do limite de créditos (150 de 500 já usados na conta do autor).
+4. **Sprint 2 (13/10 a 19/10):** SCRUM-22, 23, 24, 13 (23 e 24 já adiantados). Depois, pelo quadro do §3: SCRUM-15, 16, 18 (banco, propriedade por usuário e rotina de atraso), 28; e assim por diante. O **SCRUM-25** só fecha quando o serviço de PLN entrar no compose (SCRUM-20 e 21).
+5. **SCRUM-35:** atualizar a cada 2 dias, só com datas e tempos reais informados pelo autor (planejamento da Sprint 1, estudos diários, reuniões).
+6. **Word:** converter os 3 modelos (ver 0.4, item 2) e, mais adiante, montar a Documentação Técnica a partir do Markdown e da especificação OpenAPI.
+
+### 0.9 Histórico detalhado das sessões (referência; a retomada está em 0.1 a 0.6)
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
@@ -93,7 +163,7 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 
 - Projeto: **Vacina em Dia** (carteira de vacinação digital com lembretes, busca por voz e chatbot), solo, na Azure. PI-VI da Fatec Votorantim.
 - Fase 0 (fundação) concluída em rascunho: visão e escopo, requisitos, backlog no Jira, diagrama de estados da dose, casos de teste e `CLAUDE.md`. Tudo isso está **em análise do autor**, ainda não aprovado em reunião de sprint.
-- **Ainda não existe código.** O repositório acabou de ser criado.
+- Já existe código: monorepo, domínio da dose, API de exemplo, app com temas, Docker e CI (ver 0.2). Ainda **não há** Azure provisionado, login, banco, PLN nem calendário oficial do PNI.
 - Datas: **12/11** Qualidade e Testes, **16/11** PLN (voz e chatbot), **19/11** entrega total. A data de Computação em Nuvem II está a confirmar.
 
 ## 2. O que já existe (neste pacote)
@@ -108,7 +178,7 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 | `docs/07-testes/casos-teste-estados-dose.md` | 42 casos de teste (CT-...) | Rascunho (SCRUM-29) |
 | `docs/referencias-disciplinas/` | PDFs do PI-VI, modelos de documentação, Qualidade e Testes, PLN | Material da faculdade, só leitura |
 
-**Já existem:** ADRs (`docs/05-adrs/`), plano de teste (`docs/07-testes/plano-de-teste.md`), UML, DER e dicionário de dados (`docs/03-uml/`). **Ainda não existem:** `docs/04-design-system.md`, `docs/06-seguranca-e-lgpd.md`, `docs/tech-versions.md`.
+**Já existem:** ADRs (`docs/05-adrs/`), plano de teste (`docs/07-testes/plano-de-teste.md`), UML, DER e dicionário de dados (`docs/03-uml/`). `docs/04-design-system.md` e `docs/tech-versions.md` também existem agora. **Ainda não existe:** `docs/06-seguranca-e-lgpd.md`.
 
 ## 3. Jira (projeto SCRUM, site vacinaemdia.atlassian.net)
 
@@ -146,14 +216,9 @@ O SCRUM-35 (documentação de desenvolvimento) corre em todas as sprints.
 
 Os itens que alimentam a entrega de **12/11** (SCRUM-27, 29, 24, 28 e 30) estão nas Sprints 1 a 4, que terminam em 02/11. A Sprint 5 (03/11 a 09/11) serve de folga antes do prazo. A entrega de PLN (16/11) depende do SCRUM-20 (Sprint 4) e do SCRUM-21 (Sprint 5), ou seja, sem muita margem; vigiar esse prazo.
 
-## 4. Próximos passos (ordem sugerida, Sprint 1)
+## 4. Próximos passos
 
-1. Colocar este pacote no repositório e fazer o commit inicial (documentação apenas).
-2. **SCRUM-27:** plano de teste (objetivo, itens, estratégia, critérios de entrada e saída, recursos, cronograma, papéis).
-3. **SCRUM-33:** os 8 ADRs (ADR-001 a ADR-008, Quadro 6 da Fase 0).
-4. **SCRUM-31:** UML restante (casos de uso, classes, sequência) e DER.
-5. **SCRUM-32:** design system (tokens, componentes, acessibilidade, protótipo).
-6. **SCRUM-35:** documentação de desenvolvimento, atualizada a cada dois dias; horas e datas são do autor.
+A ordem atual está em **0.6**. A lista original da Sprint 1 (itens 1 a 6: commit inicial, plano de teste, ADRs, UML e DER, design system, documentação de desenvolvimento) já foi cumprida, salvo o protótipo do Figma e a atualização contínua do SCRUM-35.
 
 ## 5. Decisões já tomadas (resumo)
 
