@@ -48,13 +48,17 @@ describe('DosesScreen', () => {
   afterEach(() => jest.restoreAllMocks());
 
   test('CT-APP-T01: mostra "Carregando" enquanto busca e depois as doses e o aviso da fonte', async () => {
-    jest.spyOn(globalThis, 'fetch').mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ source, items }),
-    } as Response);
+    // A resposta só chega quando o teste libera; assim o estado "Carregando" não depende de sorte.
+    let release: (response: Response) => void = () => undefined;
+    jest.spyOn(globalThis, 'fetch').mockReturnValue(
+      new Promise<Response>((resolve) => {
+        release = resolve;
+      }),
+    );
     await renderScreen();
     expect(screen.getByLabelText('Carregando as doses')).toBeOnTheScreen();
+
+    release({ ok: true, status: 200, json: async () => ({ source, items }) } as Response);
     expect(await screen.findByText('Vacina de exemplo B, 2ª dose')).toBeOnTheScreen();
     expect(screen.getByText('Era para 15/09/2026')).toBeOnTheScreen();
     expect(screen.getByText(/Calendário de exemplo/)).toBeOnTheScreen();
