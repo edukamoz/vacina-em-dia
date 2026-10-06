@@ -32,6 +32,7 @@ O app é uma base de código única para Android, iOS e web (ADR-006) e atende p
 - A fonte precisa ser carregada também na web; testar o carregamento e usar fonte reserva.
 - O suporte à preferência de contraste do navegador varia; validar no SCRUM-23.
 - Mudanças visuais passam por `tokens.json` e pelos contrastes: todo valor novo precisa ser conferido.
+- No Figma Starter, cada tema é uma **coleção de variáveis separada** (o plano permite só um modo por coleção e três páginas). Ao ampliar o plano, as coleções podem virar modos de uma só.
 
 ## Verificações e fontes
 

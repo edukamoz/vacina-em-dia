@@ -181,13 +181,26 @@ As versões exatas de NativeWind, Expo e da fonte entram em `docs/tech-versions.
 
 ## 8. Protótipo no Figma
 
-Arquivo **Vacina-em-dia** (a vincular). Conteúdo planejado:
+Arquivo: [Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vacina-em-dia) (chave `lZboLAlTDtA2cJQRyKtcdW`). Estado em 06/10/2026:
 
-1. **Variáveis:** cores nos três modos (Claro, Escuro e Alto contraste), espaçamento, raios e estilos de texto, espelhando `tokens.json`.
-2. **Componentes:** os da seção 3, com as variações e os estados.
-3. **Telas principais:** da seção 4, em **celular (390 px)** e **web (1280 px)**, mais uma largura **média (768 px)** para as telas de Início e Calendário.
+| Parte | Situação |
+|---|---|
+| Variáveis de cor | Feitas: 21 variáveis por tema, nas coleções **Cor (Claro)**, **Cor (Escuro)** e **Cor (Alto contraste)**, espelhando `tokens.json` |
+| Medidas | Feitas: coleção **Medidas** com espaçamento, raios, bordas e alvos de toque (17 variáveis) |
+| Estilos de texto | Feitos: 8 estilos com Atkinson Hyperlegible |
+| Componentes | Feitos (14, ligados às variáveis do tema Claro): Selo de estado, Botão, Campo de texto, Cartão de dose, Botão de voz, Aviso de fonte e versão, Estado vazio, Estado de erro, Estado carregando, Item de navegação, Cartão de membro, Mensagem do chat |
+| Telas de celular (390 px, tema Claro) | Criadas, **ainda não conferidas visualmente**: Entrar, Consentimento, Família e Calendário do membro |
+| Telas restantes de celular | A fazer: Detalhe da dose, Confirmação de cancelamento, Perguntar por voz, Assistente, Histórico, Conta e privacidade |
+| Telas de tablet (768 px) e web (1280 px) | A fazer: Entrar, Família, Calendário com painel de detalhe, Histórico e Assistente |
+| Temas Escuro e Alto contraste nas telas | A fazer: copiar o Calendário do celular e trocar as variáveis para as coleções de cada tema |
 
-Link do arquivo: _a preencher quando a vinculação for concluída._
+**Limites do plano Starter do Figma** (encontrados na construção):
+
+- **Um modo por coleção.** Por isso os temas são **coleções separadas** com as mesmas variáveis e os mesmos nomes, em vez de três modos de uma coleção. Se o plano passar a permitir modos, basta juntar as coleções (o `tokens.json` é a fonte).
+- **Três páginas no máximo.** Páginas usadas: "Fundamentos e componentes", "Telas: celular" e "Telas: tablet e web".
+- **Limite de chamadas do Figma MCP.** O limite do plano foi atingido durante a construção; as telas restantes dependem de o limite ser renovado ou de o plano e o assento serem ampliados. O plano de estudante do Figma (Education) costuma liberar o plano Professional sem custo; conferir em figma.com/education.
+
+Tudo o que foi criado usa variáveis e estilos (nenhuma cor ou medida solta), então a conferência de contraste vale para o arquivo.
 
 ## 9. Referências
 
