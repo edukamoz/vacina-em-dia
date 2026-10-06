@@ -23,9 +23,16 @@ O fluxo `.github/workflows/deploy.yml` publica a API e o app web ao integrar na 
 - `AZURE_STATIC_WEB_APPS_API_TOKEN`: token de deploy do Static Web Apps.
 
 ## Pendências
-- Conceder à identidade da Function o papel "Key Vault Secrets User" (precisa do `az login` com escopo do Graph; o token anterior expirou).
 - Criar o usuário do banco para a identidade da Function e as tabelas (SCRUM-13, 15, 18).
 - Tenant do Entra External ID (SCRUM-13); Azure AI Speech (SCRUM-20).
 - O plano Linux Consumo (Y1) foi descartado em 06/10/2026: o app ficou preso em erro 503, inclusive no Kudu. Trocado por Flex Consumption (sucessor recomendado pelo Azure). O Flex não aceita perfil de publicação, por isso o deploy usa OIDC.
 - Custos: confirmar na calculadora oficial (SCRUM-26). Custo esperado hoje: zero ou perto disso.
 - Recursos antigos do DelBicos (`rg-delbicos`) continuam intocados.
+
+## Estado do deploy (06/10/2026)
+
+- Deploy pelo GitHub Actions funcionando: API e app web publicados (execução manual do fluxo na `main`).
+- API: `https://func-vacinaemdia-vedia6398.azurewebsites.net/api` (`/health`, `/doses`, `/docs` e `/openapi.json` respondem 200).
+- App web: `https://blue-rock-0d7abc710.4.azurestaticapps.net`, já consumindo a API publicada; o CORS permite só essa origem.
+- Login do CI: registro de aplicativo `gh-vacinaemdia-deploy` com credencial federada (OIDC) e papel Contributor só no `rg-vacinaemdia`. Os repositórios deste GitHub emitem o subject com IDs numéricos (`repo:<dono>@<id>/<repo>@<id>:ref:refs/heads/main`); o formato sem IDs não casa.
+- A identidade da Function tem o papel "Key Vault Secrets User" no Key Vault.
