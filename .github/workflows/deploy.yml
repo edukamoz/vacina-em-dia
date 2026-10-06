@@ -2,7 +2,9 @@ name: Deploy
 
 # Publica a API (Azure Functions) e o app web (Static Web Apps) na Azure (SCRUM-22).
 # Roda ao integrar na main ou manualmente. Os segredos ficam em Settings > Secrets do GitHub,
-# nunca no repositório: AZURE_FUNCTIONAPP_PUBLISH_PROFILE e AZURE_STATIC_WEB_APPS_API_TOKEN.
+# nunca no repositório. A API entra na Azure por login federado (OIDC, sem senha guardada):
+# AZURE_CLIENT_ID, AZURE_TENANT_ID e AZURE_SUBSCRIPTION_ID (identificadores, não são segredos de
+# acesso por si sós). O app web usa AZURE_STATIC_WEB_APPS_API_TOKEN.
 on:
   push:
     branches: [main]
@@ -10,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: deploy
@@ -49,12 +52,19 @@ jobs:
           # -L resolve o link do workspace @vacina/shared para os arquivos reais.
           cp -rL node_modules pacote/node_modules
 
-      - name: Publicar na Function App
+      - name: Entrar na Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Publicar na Function App (Flex Consumption)
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.FUNCTIONAPP_NAME }}
           package: pacote
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          sku: flexconsumption
 
       - name: Teste de fumaça
         run: |
