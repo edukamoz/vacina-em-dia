@@ -1,14 +1,16 @@
-import {
-  apiErrorSchema,
-  doseIdSchema,
-  doseListResponseSchema,
-  doseResponseSchema,
-} from './dose-api';
+import { apiErrorSchema, calendarSourceSchema, doseIdSchema, doseResponseSchema } from './dose-api';
 
 const dose = {
   id: 'ex-1',
-  vaccine: 'Vacina de exemplo A',
+  memberId: 'm-1',
+  ruleId: 'crianca-penta-1',
+  vaccine: 'penta (DTP+Hib+HB)',
   doseLabel: '1ª dose',
+  diseases: 'difteria, tétano',
+  timingKind: 'AGE',
+  timingLabel: '2 meses',
+  conditional: false,
+  notes: [],
   status: 'PENDING',
   dueDate: '2026-11-04',
   scheduledDate: null,
@@ -39,10 +41,18 @@ describe('esquemas de resposta da API de doses', () => {
     },
   );
 
-  test('CT-API-S05: a lista exige fonte e versão do calendário', () => {
-    const source = { name: 'x', version: '1', isFictitious: true, notice: 'aviso' };
-    expect(doseListResponseSchema.safeParse({ source, items: [dose] }).success).toBe(true);
-    expect(doseListResponseSchema.safeParse({ items: [dose] }).success).toBe(false);
+  test('CT-API-S05: a fonte do calendário exige versão e aviso', () => {
+    const source = {
+      name: 'x',
+      publisher: 'y',
+      version: '1',
+      url: 'https://exemplo.gov.br',
+      retrievedAt: '2026-10-06',
+      isFictitious: false,
+      notice: 'aviso',
+    };
+    expect(calendarSourceSchema.safeParse(source).success).toBe(true);
+    expect(calendarSourceSchema.safeParse({ ...source, version: undefined }).success).toBe(false);
   });
 
   test('CT-API-S06: o erro só aceita códigos conhecidos', () => {

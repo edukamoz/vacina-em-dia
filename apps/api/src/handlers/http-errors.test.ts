@@ -1,9 +1,13 @@
 import { apiErrorSchema } from '@vacina/shared';
-import { internalErrorResult, toErrorResult } from './http-errors';
+import { internalErrorResult, toErrorResult, unauthorizedResult } from './http-errors';
 
 describe('mapeamento de erros para HTTP', () => {
   test.each([
     ['NOT_FOUND', { code: 'NOT_FOUND' as const }, 404],
+    ['CONSENT_REQUIRED', { code: 'CONSENT_REQUIRED' as const }, 403],
+    ['GUARDIAN_DECLARATION_REQUIRED', { code: 'GUARDIAN_DECLARATION_REQUIRED' as const }, 422],
+    ['INVALID_BIRTH_DATE', { code: 'INVALID_BIRTH_DATE' as const }, 422],
+    ['LIMIT_REACHED', { code: 'LIMIT_REACHED' as const }, 422],
     [
       'INVALID_TRANSITION',
       {
@@ -35,5 +39,11 @@ describe('mapeamento de erros para HTTP', () => {
     const res = internalErrorResult();
     expect(res.status).toBe(500);
     expect(JSON.stringify(res.jsonBody)).not.toMatch(/stack|Error:|at /);
+  });
+
+  test('CT-API-E03: sessão ausente devolve 401 no formato de erro da API', () => {
+    const res = unauthorizedResult();
+    expect(res.status).toBe(401);
+    expect(apiErrorSchema.safeParse(res.jsonBody).success).toBe(true);
   });
 });

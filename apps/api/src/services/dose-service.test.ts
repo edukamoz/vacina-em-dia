@@ -1,26 +1,72 @@
-import { createInMemoryDoseRepository } from '../repositories/in-memory-dose-repository';
-import { SAMPLE_CALENDAR_SOURCE, createSampleDoses } from '../seed/sample-doses';
-import { createDoseService } from './dose-service';
+import type { DoseResponse } from '@vacina/shared';
+import { OTHER_OWNER, OWNER, buildApp } from '../test-support';
 
-const NOW = '2026-10-06T15:00:00.000Z'; // hoje (civil): 2026-10-06
-const build = () =>
-  createDoseService({
-    repository: createInMemoryDoseRepository(createSampleDoses()),
-    clock: () => NOW,
-    source: SAMPLE_CALENDAR_SOURCE,
+// Hoje (civil, Brasília): 2026-10-06. O bebê nasceu em 2026-01-01, então as doses até os 9 meses
+// já venceram e as demais ainda estão no futuro.
+const BABY = { name: 'Bebê', birthDate: '2026-01-01', isPregnant: false };
+
+async function setup() {
+  const app = buildApp();
+  await app.consent();
+  const created = await app.members.create(OWNER, BABY);
+  if (!created.ok) throw new Error('falhou');
+  const memberId = created.value.id;
+  const list = async () => {
+    const result = await app.doses.listForMember(OWNER, memberId);
+    if (!result.ok) throw new Error('calendário ausente');
+    return result.value;
+  };
+  const dose = async (ruleId: string): Promise<DoseResponse> => {
+    const found = (await list()).items.find((d) => d.ruleId === ruleId);
+    if (!found) throw new Error(`dose ${ruleId} ausente`);
+    return found;
+  };
+  return { app, memberId, list, dose };
+}
+
+describe('serviço de doses e calendário do membro (RF03 e RF04)', () => {
+  test('CT-API-V01: lista com fonte e versão, ordenada pela data prevista', async () => {
+    const { list } = await setup();
+    const calendar = await list();
+    expect(calendar.source).toMatchObject({ version: '2026', isFictitious: false });
+    expect(calendar.source.notice).toMatch(/não substitui a caderneta oficial/);
+    expect(calendar.member.ageGroup).toBe('CHILD');
+    const dates = calendar.items.map((d) => d.dueDate);
+    expect(dates).toEqual([...dates].sort());
+    expect(calendar.items[0]?.timingLabel).toBe('Ao nascer');
   });
 
-describe('serviço de doses', () => {
-  test('CT-API-V01: lista as doses com a fonte do calendário', async () => {
-    const result = await build().listDoses();
-    expect(result.items).toHaveLength(5);
-    expect(result.source.isFictitious).toBe(true);
+  test('CT-T04 via API: a rotina de prazo marca como atrasada a dose vencida', async () => {
+    const { dose } = await setup();
+    expect((await dose('crianca-hepatite-b')).status).toBe('OVERDUE');
+    expect((await dose('crianca-penta-1')).status).toBe('OVERDUE');
+    expect((await dose('crianca-covid-3')).status).toBe('OVERDUE');
+    expect((await dose('crianca-scr-1')).status).toBe('PENDING');
   });
 
-  test('CT-API-V02: busca uma dose e informa quando não existe', async () => {
-    const service = build();
-    expect(await service.getDose('ex-2')).toMatchObject({ ok: true });
-    expect(await service.getDose('nao-existe')).toEqual({
+  test('CT-API-V03: dose condicional e dose sem prazo fixo nunca atrasam sozinhas', async () => {
+    const { dose } = await setup();
+    const conditional = await dose('crianca-febre-amarela-excepcional');
+    expect(conditional.dueDate < '2026-10-06').toBe(true);
+    expect(conditional).toMatchObject({ status: 'PENDING', conditional: true });
+    expect(conditional.notes.length).toBeGreaterThan(0);
+  });
+
+  test('CT-API-V04: ler o calendário duas vezes dá o mesmo resultado', async () => {
+    const { list } = await setup();
+    const first = await list();
+    expect(await list()).toEqual(first);
+  });
+
+  test('CT-API-V02: busca uma dose e informa quando não existe ou é de outro dono', async () => {
+    const { app, dose } = await setup();
+    const target = await dose('crianca-scr-1');
+    expect(await app.doses.get(OWNER, target.id)).toMatchObject({ ok: true });
+    expect(await app.doses.get(OWNER, 'nao-existe')).toEqual({
+      ok: false,
+      error: { code: 'NOT_FOUND' },
+    });
+    expect(await app.doses.get(OTHER_OWNER, target.id)).toEqual({
       ok: false,
       error: { code: 'NOT_FOUND' },
     });
@@ -28,79 +74,143 @@ describe('serviço de doses', () => {
 
   test.each([
     [
+      'CT-T02 via API: agendar uma dose pendente',
+      'crianca-scr-1',
+      { type: 'SCHEDULE', date: '2026-10-10' },
+      'SCHEDULED',
+    ],
+    [
       'CT-T03 via API: aplicar uma dose pendente',
-      'ex-4',
+      'crianca-scr-1',
       { type: 'APPLY', date: '2026-10-06' },
       'APPLIED',
     ],
     [
-      'CT-T02 via API: agendar uma dose pendente',
-      'ex-4',
-      { type: 'SCHEDULE', date: '2026-10-06' },
-      'SCHEDULED',
+      'CT-T05 via API: cancelar uma dose pendente',
+      'crianca-scr-1',
+      { type: 'CANCEL', confirmed: true },
+      'CANCELLED',
     ],
     [
       'CT-T10 via API: reagendar uma dose atrasada',
-      'ex-2',
+      'crianca-penta-1',
       { type: 'RESCHEDULE', date: '2026-10-20' },
       'SCHEDULED',
     ],
     [
-      'CT-T09 via API: cancelar uma dose agendada',
-      'ex-3',
+      'CT-T11 via API: aplicar uma dose atrasada',
+      'crianca-penta-1',
+      { type: 'APPLY', date: '2026-10-06' },
+      'APPLIED',
+    ],
+    [
+      'CT-T12 via API: cancelar uma dose atrasada',
+      'crianca-penta-1',
       { type: 'CANCEL', confirmed: true },
       'CANCELLED',
     ],
-    ['CT-T08 via API: desmarcar o agendamento', 'ex-3', { type: 'UNSCHEDULE' }, 'PENDING'],
-  ] as const)('%s', async (_nome, id, event, expected) => {
-    const service = build();
-    const result = await service.applyEvent(id, event);
-    expect(result).toMatchObject({ ok: true, dose: { status: expected } });
-    expect(await service.getDose(id)).toMatchObject({ ok: true, dose: { status: expected } });
+  ] as const)('%s', async (_nome, ruleId, event, expected) => {
+    const { app, dose } = await setup();
+    const target = await dose(ruleId);
+    const result = await app.doses.applyEvent(OWNER, target.id, event);
+    expect(result).toMatchObject({ ok: true, value: { status: expected } });
+    expect((await app.doses.get(OWNER, target.id)).ok).toBe(true);
   });
 
-  test('CT-API-V03: transição inválida devolve INVALID_TRANSITION e mantém o estado', async () => {
-    const service = build();
-    const result = await service.applyEvent('ex-1', { type: 'CANCEL', confirmed: true });
-    expect(result).toMatchObject({ ok: false, error: { code: 'INVALID_TRANSITION' } });
-    expect(await service.getDose('ex-1')).toMatchObject({ dose: { status: 'APPLIED' } });
+  test('CT-T06, T08 e T09 via API: dose agendada pode ser aplicada, desmarcada ou cancelada', async () => {
+    const { app, dose } = await setup();
+    const target = await dose('crianca-scr-1');
+    const schedule = { type: 'SCHEDULE', date: '2026-10-10' } as const;
+
+    await app.doses.applyEvent(OWNER, target.id, schedule);
+    expect(await app.doses.applyEvent(OWNER, target.id, { type: 'UNSCHEDULE' })).toMatchObject({
+      value: { status: 'PENDING', scheduledDate: null },
+    });
+    await app.doses.applyEvent(OWNER, target.id, schedule);
+    expect(
+      await app.doses.applyEvent(OWNER, target.id, { type: 'CANCEL', confirmed: true }),
+    ).toMatchObject({ value: { status: 'CANCELLED' } });
+
+    const second = await dose('crianca-scr-2');
+    await app.doses.applyEvent(OWNER, second.id, { type: 'SCHEDULE', date: '2026-10-10' });
+    expect(
+      await app.doses.applyEvent(OWNER, second.id, { type: 'APPLY', date: '2026-10-06' }),
+    ).toMatchObject({ value: { status: 'APPLIED', appliedDate: '2026-10-06' } });
+  });
+
+  test('CT-T07 via API: o agendamento vencido vira atrasado quando o dia passa', async () => {
+    const { app, dose } = await setup();
+    const target = await dose('crianca-scr-1');
+    await app.doses.applyEvent(OWNER, target.id, { type: 'SCHEDULE', date: '2026-10-10' });
+    expect((await app.doses.get(OWNER, target.id)).ok && (await dose('crianca-scr-1')).status).toBe(
+      'SCHEDULED',
+    );
+
+    app.setNow('2026-10-11T15:00:00.000Z');
+    expect(await app.doses.get(OWNER, target.id)).toMatchObject({
+      ok: true,
+      value: { status: 'OVERDUE', scheduledDate: '2026-10-10' },
+    });
+  });
+
+  test('CT-API-V05: ação inválida devolve erro de transição e mantém o estado', async () => {
+    const { app, dose } = await setup();
+    const target = await dose('crianca-scr-1');
+    await app.doses.applyEvent(OWNER, target.id, { type: 'APPLY', date: '2026-10-06' });
+    const again = await app.doses.applyEvent(OWNER, target.id, {
+      type: 'CANCEL',
+      confirmed: true,
+    });
+    expect(again).toMatchObject({ ok: false, error: { code: 'INVALID_TRANSITION' } });
+    expect(await app.doses.get(OWNER, target.id)).toMatchObject({ value: { status: 'APPLIED' } });
   });
 
   test.each([
-    ['agendar no passado', 'ex-4', { type: 'SCHEDULE', date: '2026-10-05' }, 'DATE_IN_PAST'],
-    ['aplicar no futuro', 'ex-4', { type: 'APPLY', date: '2026-10-07' }, 'DATE_IN_FUTURE'],
-    [
-      'cancelar sem confirmar',
-      'ex-4',
-      { type: 'CANCEL', confirmed: false },
-      'CONFIRMATION_REQUIRED',
-    ],
-  ] as const)('CT-API-V04: %s viola a regra', async (_nome, id, event, reason) => {
-    const service = build();
-    const result = await service.applyEvent(id, event);
-    expect(result).toMatchObject({ ok: false, error: { code: 'GUARD_VIOLATION', reason } });
-    expect(await service.getDose(id)).toMatchObject({ dose: { status: 'PENDING' } });
+    ['agendar no passado', 'crianca-scr-1', { type: 'SCHEDULE', date: '2026-10-05' }],
+    ['aplicar no futuro', 'crianca-scr-1', { type: 'APPLY', date: '2026-10-07' }],
+    ['cancelar sem confirmar', 'crianca-scr-1', { type: 'CANCEL', confirmed: false }],
+  ] as const)('CT-API-V06: %s viola a regra', async (_nome, ruleId, event) => {
+    const { app, dose } = await setup();
+    const target = await dose(ruleId);
+    expect(await app.doses.applyEvent(OWNER, target.id, event)).toMatchObject({
+      ok: false,
+      error: { code: 'GUARD_VIOLATION' },
+    });
+    expect((await dose(ruleId)).status).toBe('PENDING');
   });
 
-  test('CT-API-V05: evento em dose inexistente devolve NOT_FOUND', async () => {
-    expect(await build().applyEvent('zzz', { type: 'UNSCHEDULE' })).toEqual({
+  test('CT-API-V07: não altera dose de outro dono nem de membro inexistente', async () => {
+    const { app, dose, memberId } = await setup();
+    const target = await dose('crianca-scr-1');
+    expect(
+      await app.doses.applyEvent(OTHER_OWNER, target.id, { type: 'APPLY', date: '2026-10-06' }),
+    ).toEqual({ ok: false, error: { code: 'NOT_FOUND' } });
+    expect(await app.doses.applyEvent(OWNER, 'nao-existe', { type: 'UNSCHEDULE' })).toEqual({
       ok: false,
       error: { code: 'NOT_FOUND' },
     });
+    expect((await app.doses.listForMember(OTHER_OWNER, memberId)).ok).toBe(false);
   });
 
-  test('CT-API-V06: usa o dia civil de Brasília para validar datas', async () => {
-    const service = createDoseService({
-      repository: createInMemoryDoseRepository(createSampleDoses()),
-      clock: () => '2026-10-07T02:30:00.000Z', // ainda é 06/10 em Brasília
-      source: SAMPLE_CALENDAR_SOURCE,
-    });
-    expect(await service.applyEvent('ex-4', { type: 'APPLY', date: '2026-10-06' })).toMatchObject({
-      ok: true,
-    });
-    expect(await service.applyEvent('ex-3', { type: 'APPLY', date: '2026-10-07' })).toMatchObject({
+  test('CT-API-V08: dose de uma linha que saiu do calendário não é exibida', async () => {
+    const { app, memberId, list } = await setup();
+    await app.store.doses.saveMany(OWNER, [
+      {
+        id: 'orfa',
+        memberId,
+        ruleId: 'regra-que-nao-existe',
+        status: 'PENDING',
+        dueDate: '2026-10-01',
+        scheduledDate: null,
+        appliedDate: null,
+      },
+    ]);
+    expect((await list()).items.some((d) => d.id === 'orfa')).toBe(false);
+    expect(await app.doses.get(OWNER, 'orfa')).toEqual({ ok: false, error: { code: 'NOT_FOUND' } });
+    expect(
+      await app.doses.applyEvent(OWNER, 'orfa', { type: 'SCHEDULE', date: '2026-10-10' }),
+    ).toMatchObject({
       ok: false,
-      error: { reason: 'DATE_IN_FUTURE' },
     });
   });
 });
