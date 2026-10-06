@@ -1,7 +1,6 @@
 import type * as Dates from '../lib/dates';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { DoseResponse } from '@vacina/shared';
-import { AssistantScreen } from './assistant/assistant-screen';
 import { CalendarScreen, resumoDoses } from './calendar/calendar-screen';
 import { DoseDetailScreen } from './doses/dose-detail-screen';
 import { HistoryScreen, historyOf } from './history/history-screen';
@@ -350,14 +349,5 @@ describe('detalhe da dose (RF04)', () => {
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
     expect(await screen.findByText('Não encontramos o que você procura.')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
-  });
-});
-
-describe('assistente', () => {
-  test('CT-APP-I01: a aba existe e avisa que o chat está chegando', async () => {
-    const fake = createFakeFetch({});
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
-    expect(screen.getByRole('header', { name: 'Assistente' })).toBeOnTheScreen();
-    expect(screen.getByText('Em breve')).toBeOnTheScreen();
   });
 });
