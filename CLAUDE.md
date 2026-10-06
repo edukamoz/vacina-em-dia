@@ -197,11 +197,16 @@ Dados de vacinação são dados pessoais sobre saúde, portanto **sensíveis** (
 
 ## 14. Decisões em aberto (não assuma)
 
-- **Entra External ID:** confirmar disponibilidade e condições no portal da Azure antes de implementar o login (ADR-005).
-- **Azure SQL:** confirmar a camada gratuita ou de menor custo antes de provisionar.
-- **Context API + TanStack Query:** proposta de separar estado global leve e cache de servidor (ADR-006); aguarda confirmação do autor.
-- **Token na web:** estratégia de armazenamento seguro (o `expo-secure-store` não cobre a web).
-- **Rate limiting:** mecanismo (ADR).
+Decididas em 06/10/2026 (ver `docs/05-adrs/`):
+
+- **Entra External ID** (ADR-005): aceito; 50.000 usuários ativos por mês gratuitos. Pendente no SCRUM-22: criar o tenant externo (o diretório é do Centro Paula Souza) e tratar a ausência de região no Brasil na política de privacidade.
+- **Azure SQL** (ADR-004): aceito, na oferta gratuita (a assinatura Azure for Students é compatível), região Brazil South, pausa automática ao esgotar a franquia.
+- **Context API + TanStack Query** (ADR-006): aceito.
+- **Token na web** (ADR-009): `expo-secure-store` no nativo e `sessionStorage` com CSP na web; validar no SCRUM-13.
+- **Rate limiting** (ADR-010): contador por usuário no Table Storage; login delegado ao Entra.
+
+Ainda em aberto:
+
 - **Jest versus JUnit:** o PI-VI cita JUnit/Selenium; o autor decidiu usar Jest, e deve registrar a confirmação do professor.
 - **Data da entrega de Computação em Nuvem II.**
 
