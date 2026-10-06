@@ -62,6 +62,11 @@ export const apiErrorSchema = z
       'GUARDIAN_DECLARATION_REQUIRED',
       'INVALID_BIRTH_DATE',
       'LIMIT_REACHED',
+      'RATE_LIMITED',
+      'ASSISTANT_UNAVAILABLE',
+      'SPEECH_NOT_RECOGNIZED',
+      'UNSUPPORTED_AUDIO',
+      'AUDIO_TOO_LARGE',
       'INTERNAL_ERROR',
     ]),
     message: z
