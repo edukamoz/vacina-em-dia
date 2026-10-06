@@ -1,0 +1,16 @@
+stateDiagram-v2
+    direction LR
+    [*] --> Pendente : T1 gerar dose do calendário
+    Pendente --> Agendada : T2 agendar
+    Pendente --> Aplicada : T3 registrar aplicação
+    Pendente --> Atrasada : T4 prazo vencido
+    Pendente --> Cancelada : T5 cancelar
+    Agendada --> Aplicada : T6 registrar aplicação
+    Agendada --> Atrasada : T7 agendamento vencido
+    Agendada --> Pendente : T8 desagendar
+    Agendada --> Cancelada : T9 cancelar
+    Atrasada --> Agendada : T10 reagendar
+    Atrasada --> Aplicada : T11 registrar aplicação
+    Atrasada --> Cancelada : T12 cancelar
+    Aplicada --> [*]
+    Cancelada --> [*]
