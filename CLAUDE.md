@@ -99,7 +99,7 @@ npm run typecheck           # tsc --noEmit em todos os workspaces
 npm test                    # Jest (todos os workspaces)
 npm run test:coverage       # Jest com cobertura; falha abaixo do limite
 npm run docs                # TypeDoc
-docker compose up           # sobe API, PLN e dependências locais
+docker compose up --build   # sobe API, app web, Azurite (e PLN quando existir)
 # nlp: dentro de apps/nlp -> pytest
 ```
 
