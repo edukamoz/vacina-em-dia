@@ -1,6 +1,8 @@
 import { OpenAPIRegistry, OpenApiGeneratorV31 } from '@asteasolutions/zod-to-openapi';
 import {
   apiErrorSchema,
+  assistantMessageInputSchema,
+  assistantResponseSchema,
   consentInputSchema,
   consentResponseSchema,
   doseEventInputSchema,
@@ -15,7 +17,7 @@ import {
 import { z } from 'zod';
 
 /** Versão da API (acompanha o `package.json` do `apps/api`). */
-const API_VERSION = '0.2.0';
+const API_VERSION = '0.3.0';
 
 const jsonContent = (schema: z.ZodType) => ({ 'application/json': { schema } });
 const errorResponse = (description: string) => ({
@@ -359,6 +361,74 @@ export function buildOpenApiDocument(): object {
     },
   });
 
+  const assistantErrors = {
+    401: unauthorized,
+    429: errorResponse(
+      '`RATE_LIMITED`: limite de uso atingido (cabeçalho `Retry-After` com os segundos de espera).',
+    ),
+    500: internalError,
+    503: errorResponse('`ASSISTANT_UNAVAILABLE`: o serviço de PLN ou de voz não respondeu.'),
+  };
+
+  registry.registerPath({
+    method: 'post',
+    path: '/assistant/message',
+    tags: ['Assistente'],
+    summary: 'Perguntar ao assistente por texto',
+    description:
+      'Chatbot por regras com classificação de intenções (TF-IDF e SVM), sem IA generativa (RF07). Responde dúvidas sobre o aplicativo e sobre o Calendário Nacional de Vacinação, sempre com a fonte citada. Perguntas sobre saúde individual são encaminhadas a um profissional (`safety: true`); abaixo do limiar de confiança, devolve a resposta padrão (`fallback: true`). Devolve também as vacinas parecidas com a pergunta. O texto não é guardado nem registrado em log. Limite: 60 perguntas por hora por usuário.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: assistantMessageInputSchema,
+            examples: {
+              pergunta: { summary: 'Pergunta', value: { text: 'Para que serve a BCG?' } },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'A resposta do assistente.',
+        content: jsonContent(assistantResponseSchema),
+      },
+      400: validationError,
+      ...assistantErrors,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/assistant/voice',
+    tags: ['Assistente'],
+    summary: 'Perguntar ao assistente por voz',
+    description:
+      'Recebe o áudio da pergunta (WAV PCM de 16 kHz, mono, até 60 s, enviado como `audio/wav` no corpo), transcreve com o Azure AI Speech em português do Brasil (RF06) e responde como em `/assistant/message`, incluindo a transcrição e a busca por vacinas. O áudio é processado em memória e descartado: nunca é gravado. Limite: 20 por hora e 60 por dia por usuário.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: { 'audio/wav': { schema: z.string().meta({ format: 'binary' }) } },
+      },
+    },
+    responses: {
+      200: {
+        description: 'A transcrição e a resposta do assistente.',
+        content: jsonContent(assistantResponseSchema),
+      },
+      413: errorResponse('`AUDIO_TOO_LARGE`: áudio maior que o limite.'),
+      415: errorResponse('`UNSUPPORTED_AUDIO`: o corpo não é um WAV aceito.'),
+      422: errorResponse(
+        '`SPEECH_NOT_RECOGNIZED`: a fala não foi entendida; peça para tentar de novo ou digitar.',
+      ),
+      ...assistantErrors,
+    },
+  });
+
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
     openapi: '3.1.0',
     info: {
@@ -372,6 +442,7 @@ export function buildOpenApiDocument(): object {
       { name: 'Sistema', description: 'Verificação e documentação.' },
       { name: 'Conta e privacidade', description: 'Consentimento e exclusão de dados (RF09).' },
       { name: 'Família', description: 'Membros da família (RF02).' },
+      { name: 'Assistente', description: 'Chatbot e busca por voz (RF06 e RF07).' },
       {
         name: 'Calendário e doses',
         description: 'Calendário vacinal e ciclo de vida da dose (RF03 e RF04).',

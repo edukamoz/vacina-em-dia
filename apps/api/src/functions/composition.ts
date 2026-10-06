@@ -1,7 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import type { HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
 import { PNI_2026 } from '@vacina/shared';
+import { createHttpNlpClient, unavailableNlpClient } from '../clients/nlp-http-client';
+import { createHttpSpeechClient, unavailableSpeechClient } from '../clients/speech-http-client';
 import { createAccountHandlers } from '../handlers/account';
+import { createAssistantHandlers } from '../handlers/assistant';
 import { createConsentHandlers } from '../handlers/consent';
 import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
@@ -10,9 +13,11 @@ import type { HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveDemoOwner } from '../identity';
 import { createInMemoryStore } from '../repositories/in-memory-store';
 import { createAccountService } from '../services/account-service';
+import { createAssistantService } from '../services/assistant-service';
 import { createConsentService } from '../services/consent-service';
 import { createDoseService } from '../services/dose-service';
 import { createMemberService } from '../services/member-service';
+import { createFixedWindowLimiter } from '../services/rate-limiter';
 
 /**
  * Ponto de montagem (borda): cria o relógio real, o gerador de identificadores e liga repositórios,
@@ -46,6 +51,23 @@ export const consentHandlers = createConsentHandlers(
   createConsentService({ consents: store.consents, clock }),
 );
 export const accountHandlers = createAccountHandlers(createAccountService(store.accounts));
+
+/**
+ * Assistente: PLN e voz vêm de variáveis de ambiente (as chaves ficam no Key Vault, nunca no
+ * repositório). Sem configuração, o assistente responde "indisponível" em vez de falhar.
+ */
+const env = process.env;
+const nlp =
+  env['NLP_BASE_URL'] && env['NLP_FUNCTION_KEY']
+    ? createHttpNlpClient({ baseUrl: env['NLP_BASE_URL'], functionKey: env['NLP_FUNCTION_KEY'] })
+    : unavailableNlpClient;
+const speech =
+  env['SPEECH_ENDPOINT'] && env['SPEECH_KEY']
+    ? createHttpSpeechClient({ endpoint: env['SPEECH_ENDPOINT'], key: env['SPEECH_KEY'] })
+    : unavailableSpeechClient;
+export const assistantHandlers = createAssistantHandlers(
+  createAssistantService({ nlp, speech, limiter: createFixedWindowLimiter(clock) }),
+);
 
 /**
  * Executa um handler e garante que uma falha inesperada vire HTTP 500 genérico. Só o tipo do erro

@@ -39,6 +39,35 @@ export function toErrorResult(error: ServiceError): HttpResult {
         code: 'LIMIT_REACHED',
         message: 'Você chegou ao limite de pessoas cadastradas.',
       });
+    case 'RATE_LIMITED':
+      return {
+        ...json(429, {
+          code: 'RATE_LIMITED',
+          message: 'Você fez muitas perguntas em pouco tempo. Tente de novo mais tarde.',
+        }),
+        headers: { 'retry-after': String(error.retryAfterSeconds) },
+      };
+    case 'ASSISTANT_UNAVAILABLE':
+      return json(503, {
+        code: 'ASSISTANT_UNAVAILABLE',
+        message: 'O assistente não está disponível agora. Tente de novo em instantes.',
+      });
+    case 'SPEECH_NOT_RECOGNIZED':
+      return json(422, {
+        code: 'SPEECH_NOT_RECOGNIZED',
+        message:
+          'Não consegui entender o áudio. Fale mais perto do microfone ou digite a sua pergunta.',
+      });
+    case 'UNSUPPORTED_AUDIO':
+      return json(415, {
+        code: 'UNSUPPORTED_AUDIO',
+        message: 'O áudio não está em um formato aceito. Digite a sua pergunta.',
+      });
+    case 'AUDIO_TOO_LARGE':
+      return json(413, {
+        code: 'AUDIO_TOO_LARGE',
+        message: 'O áudio é longo demais. Fale por até 30 segundos ou digite a sua pergunta.',
+      });
   }
 }
 
