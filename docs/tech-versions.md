@@ -9,7 +9,7 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | Node.js | 24.21.0 LTS (mínimo 22.13.0) | `.nvmrc` (24) e `engines`. O Azure Functions v4 suporta Node 22 e 24; o Node 20 saiu de suporte em abril de 2026. Migração testada em 06/10/2026 (lint, tipos, build, testes, TypeDoc, API local, web do Expo e `npm audit`) |
 | npm | 11.19.0 | gerenciador, com workspaces |
 | Docker | 29.7.2 | contêineres (SCRUM-25) |
-| Python | 3.14.6 (local) | serviço de PLN (SCRUM-21); versão do `scikit-learn` a confirmar |
+| Python | 3.13 (Azure Functions, CI e Docker); 3.14.7 no computador de desenvolvimento | serviço de PLN (SCRUM-21). O Flex Consumption da Azure oferece 3.10 a 3.14 (consulta de 07/10/2026) |
 
 ## App (`apps/mobile`)
 
@@ -77,3 +77,20 @@ Em 06/10/2026, o `npm audit` apontou vulnerabilidades somente na cadeia de **fer
 - falhar em vulnerabilidade **crítica** no app, e listar as altas para acompanhamento.
 
 Reavaliar a cada atualização do Expo.
+
+## Serviço de PLN (Python, `apps/nlp`)
+
+Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `apps/nlp/requirements*.txt`.
+
+| Pacote | Versão | Uso |
+|---|---|---|
+| scikit-learn | 1.9.1 | TF-IDF, SVM e calibração (classificador de intenções e busca) |
+| numpy | 2.5.3 | dependência do scikit-learn |
+| scipy | 1.18.1 | dependência do scikit-learn |
+| joblib | 1.6.0 | dependência do scikit-learn |
+| threadpoolctl | 3.7.0 | dependência do scikit-learn |
+| azure-functions | 2.3.0 | modelo de programação Python v2 |
+| pytest | 9.1.1 | testes (somente desenvolvimento) |
+| pytest-cov | 7.1.0 | cobertura (somente desenvolvimento) |
+| mcr.microsoft.com/azure-functions/python | 4-python3.13 | host oficial das Functions no contêiner do PLN (só `linux/amd64`) |
+
