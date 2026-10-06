@@ -58,6 +58,7 @@ Consulte sempre estes arquivos antes de implementar algo (se não existirem, avi
 | Testes | **Jest** (+ Supertest na API, React Native Testing Library no app); **pytest** no serviço Python |
 | Qualidade | ESLint, Prettier, Husky, commitlint, TypeScript **strict** |
 | Docs de código | **TSDoc** + **TypeDoc** |
+| Docs da API | **OpenAPI 3.1** gerado dos esquemas Zod (`@asteasolutions/zod-to-openapi`) + **Swagger UI** em `/api/docs`; ver ADR-012 |
 | CI/CD | **GitHub Actions** |
 | Contêineres | **Docker** (com Azurite para armazenamento local das Functions) |
 | Gerenciador | **npm** com workspaces |
@@ -109,6 +110,7 @@ docker compose up           # sobe API, PLN e dependências locais
 - **TSDoc** em todo símbolo exportado (funções, tipos, classes, módulos), explicando o quê, parâmetros, retorno e erros. É o que o TypeDoc publica.
 - **Camadas na API:** `handlers` (HTTP, finos) → `services` (casos de uso) → `domain` (regras puras) → `repositories` (acesso a dados). Regras de negócio nunca ficam no handler.
 - **Validação nas bordas:** toda entrada externa (HTTP, formulário, resposta de serviço externo) passa por esquema Zod do `packages/shared`.
+- **Documentação da API (Swagger):** todo endpoint novo ou alterado é registrado na especificação OpenAPI da API, com os **mesmos esquemas Zod** da validação, descrição em português, exemplos e todos os códigos de resposta (inclusive erros 401, 403, 404, 409, 422 e 429). A especificação sai em `GET /api/openapi.json` e a interface Swagger UI em `GET /api/docs`. Endpoint sem registro na especificação não está pronto. Não escreva a documentação à mão em outro lugar.
 - **Erros:** tipos de erro de domínio explícitos, mapeados para códigos HTTP em um único ponto. Nunca engula exceção; nunca devolva mensagem interna ao cliente.
 - **Funções pequenas e puras** sempre que possível; injete dependências (relógio, repositórios, clientes Azure) para testar sem rede.
 - **Data e hora:** nunca chame `new Date()` dentro de regra de negócio; receba o "agora" por parâmetro ou por um relógio injetável.
@@ -233,6 +235,7 @@ Um item só está pronto para ir a **Em análise** quando:
 - [ ] Testes escritos e passando (incluindo erros e limites); cobertura sem cair abaixo do limite.
 - [ ] `lint`, `typecheck` e `build` limpos; pipeline verde.
 - [ ] TSDoc nos símbolos exportados novos; `npm run docs` sem erro.
+- [ ] Endpoints novos ou alterados documentados no OpenAPI/Swagger (`/api/docs`), com teste que garante que toda rota está registrada.
 - [ ] Sem segredo, dado pessoal ou log sensível; regras de segurança e LGPD respeitadas.
 - [ ] Acessibilidade verificada nas telas afetadas (contraste, toque, rótulos).
 - [ ] Documentação e, se houver decisão, ADR atualizados.
