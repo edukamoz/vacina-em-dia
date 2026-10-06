@@ -18,7 +18,7 @@ Este arquivo é lido a cada sessão. Siga-o à risca. Quando algo aqui conflitar
 |---|---|
 | 12/11 | Qualidade e Testes: plano de teste, caixa preta, UML de estados, pipeline no GitHub, Jest |
 | 16/11 | PLN: busca por voz e chatbot (TF-IDF + SVM) |
-| 19/11 | Entrega total (Laboratório): projeto na Azure, Docker, 3 documentações em PDF, panfleto, zip, apresentação |
+| 19/11 | Entrega total (Laboratório): projeto na Azure, Docker, 3 documentações (Word durante o desenvolvimento, PDF na entrega), panfleto, zip, apresentação |
 
 A data de Computação em Nuvem II ainda será confirmada.
 
@@ -72,7 +72,7 @@ vacina-em-dia/
 ├── README.md
 ├── docker-compose.yml
 ├── .github/workflows/ci.yml
-├── doctos/                  # PDFs finais: técnica, desenvolvimento, usuário + panfleto A4
+├── doctos/                  # técnica, desenvolvimento, usuário (.docx; PDF só na entrega) + panfleto A4
 ├── docs/                    # fonte em Markdown (visão, requisitos, UML, ADRs, testes...)
 ├── apps/
 │   ├── mobile/              # Expo (Android, iOS e web)
@@ -188,7 +188,7 @@ Dados de vacinação são dados pessoais sobre saúde, portanto **sensíveis** (
 
 ## 13. Documentação e entregas
 
-- **Três documentações em PDF** em `doctos/`: Técnica (modelo do PI-VI, com tecnologias e versões, DER, APIs, serviços Azure, custos, testes, PLN, riscos), de Desenvolvimento (horas, atividades, reuniões e aprendizados, Scrum) e do Usuário (linguagem simples, passo a passo, FAQ). Mais o **panfleto A4**.
+- **Três documentações** em `doctos/`, **editadas em Word (`.docx`) durante o desenvolvimento**, formatadas fielmente pela norma ABNT e atualizadas junto com o projeto. **A entrega é em PDF**, convertido do Word apenas no momento da entrega (não versione PDF intermediário). Conteúdo: Técnica (modelo do PI-VI, com tecnologias e versões, DER, APIs, serviços Azure, custos, testes, PLN, riscos), de Desenvolvimento (horas, atividades, reuniões e aprendizados, Scrum) e do Usuário (linguagem simples, passo a passo, FAQ). Mais o **panfleto A4**.
 - **Nunca invente horas, datas de reunião ou atividades** na Documentação de Desenvolvimento: tempos e registros são do autor. Você pode preparar o texto e o formato, deixando os valores para ele preencher.
 - Mantenha a documentação **atualizada junto com o código**: mudou comportamento, mudou doc e, se for decisão, ADR.
 - Referências em ABNT; a Fase 0 já existe em Word (`docs/Fase0_Documento_de_Visao_e_Escopo.docx`) e em Markdown (`docs/01-visao-e-escopo.md`).
