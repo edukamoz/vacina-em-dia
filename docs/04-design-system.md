@@ -168,6 +168,10 @@ Implementado em `apps/mobile`:
 3. A fonte Atkinson Hyperlegible é carregada com `expo-font` (pacote `@expo-google-fonts`); **verificado na web** (as duas fontes carregam e o título usa a negrito).
 4. Componentes base já criados: Texto, Botão, Cartão, Selo de estado da dose e Aviso de fonte, mais o cartão de dose. Os testes (Jest + React Native Testing Library) verificam papéis, rótulos, estados, dica de leitura e o aviso de fonte; um teste confere que os três temas têm os mesmos tokens e que os contrastes mínimos (4,5:1; 7:1 no Alto contraste) valem.
 
+Estados de carregando, erro e vazio já existem (`src/components/estados.tsx`) e a tela de doses os usa. O erro nunca mostra mensagem técnica e oferece "Tentar de novo".
+
+Lição de implementação: duas classes de cor no mesmo elemento (por exemplo `text-texto` e `text-sobrePrimaria`) disputam pela ordem do CSS gerado, não pela ordem escrita. O componente Texto só aplica a cor padrão quando quem chama não escolheu outra. Contraste dos botões verificado no navegador nos três temas (mínimo de 6,5:1).
+
 Limitações conhecidas: os ícones do selo são símbolos de texto (sem biblioteca de ícones); o aviso de "texto a 200%" e o teste com leitores de tela ainda precisam ser feitos à mão.
 
 As versões exatas de NativeWind, Expo e da fonte estão em `docs/tech-versions.md`.
