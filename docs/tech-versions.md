@@ -30,6 +30,10 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | react-native-reanimated / react-native-worklets | 4.5.1 / 0.10.1 | exigidos pelo NativeWind; versões do SDK 57 |
 | expo-font | 57.0.4 | carrega a fonte |
 | @expo-google-fonts/atkinson-hyperlegible | 0.4.1 | fonte Atkinson Hyperlegible (regular e negrito) |
+| Docker / Compose (testado) | 29.7.2 / 5.4.0 | `docker compose up --build` |
+| mcr.microsoft.com/azure-functions/node | 4-node24 | host oficial das Functions no contêiner da API (só `linux/amd64`) |
+| mcr.microsoft.com/azure-storage/azurite | 3.37.0 | emulador do Armazenamento do Azure |
+| node (imagem de build) / nginx | 24.21.0-slim / 1.31.6-alpine | compilam o app e servem o app web |
 | @tanstack/react-query | 5.104.1 | dados do servidor no app (ADR-006) |
 | jest-expo / @testing-library/react-native / test-renderer | 57.0.5 / 14.0.1 / 1.3.0 | testes do app (o RNTL 14 usa o `test-renderer`) |
 

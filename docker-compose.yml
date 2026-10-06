@@ -1,0 +1,53 @@
+# Ambiente local do Vacina em Dia: `docker compose up --build`
+#   app web:  http://localhost:8080
+#   API:      http://localhost:7071/api/health  (Swagger em /api/docs)
+# As portas só aceitam conexões do próprio computador (127.0.0.1).
+# O serviço de PLN (Python) entra aqui quando existir (SCRUM-20 e SCRUM-21).
+name: vacina-em-dia
+
+services:
+  azurite:
+    # Emulador local do Armazenamento do Azure (exigido pelo host das Functions).
+    image: mcr.microsoft.com/azure-storage/azurite:3.37.0
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --location /data
+    ports:
+      - '127.0.0.1:10000:10000'
+      - '127.0.0.1:10001:10001'
+      - '127.0.0.1:10002:10002'
+    volumes:
+      - azurite-data:/data
+
+  api:
+    # A imagem oficial do host das Functions só existe para amd64 (emulada em Mac com Apple Silicon).
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    depends_on:
+      - azurite
+    environment:
+      FUNCTIONS_WORKER_RUNTIME: node
+      # Conta de desenvolvimento do Azurite; o endereço do serviço é o nome dele no compose.
+      AzureWebJobsStorage: UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite
+      DOCS_ENABLED: 'true'
+    ports:
+      - '127.0.0.1:7071:80'
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://localhost:80/api/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/mobile/Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:8080:80'
+
+volumes:
+  azurite-data:

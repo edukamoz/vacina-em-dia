@@ -28,6 +28,25 @@ npm run dev:api        # API local (Azure Functions Core Tools)
 
 Para a API local, copie `apps/api/local.settings.example.json` para `apps/api/local.settings.json`.
 
+### Tudo em contêineres (um comando)
+
+Requer o Docker (Docker Desktop ou Docker Engine com Compose). Na raiz do projeto:
+
+```bash
+docker compose up --build
+```
+
+Sobe três serviços: o **Azurite** (emulador local do Armazenamento do Azure), a **API** (host oficial do Azure Functions) e o **app web**. Quando terminar de iniciar:
+
+- App web: http://localhost:8080 (o nginx repassa `/api` para a API, então não há CORS)
+- API: http://localhost:7071/api/health e Swagger em http://localhost:7071/api/docs
+
+Para parar, `Ctrl+C` e depois `docker compose down` (use `docker compose down -v` para apagar também os dados do Azurite). As portas só aceitam conexões do próprio computador. O serviço de PLN (Python) será adicionado quando existir (SCRUM-20 e SCRUM-21).
+
+Em Mac com Apple Silicon, a imagem oficial do host das Functions só existe para `amd64` e roda emulada, então a primeira subida é mais lenta.
+
+### Modo desenvolvimento (sem contêiner)
+
 O app busca as doses na API; suba a API antes (`npm run dev:api`) e o app depois (`npm run dev:mobile`). O endereço da API vem de `EXPO_PUBLIC_API_URL` (copie `.env.example` para `apps/mobile/.env` se precisar mudar; o padrão é `http://localhost:7071/api`, que serve para a web e para o simulador de iOS). No emulador de Android use `http://10.0.2.2:7071/api`. No celular real, suba a API com `npm run dev:api:rede` (ela passa a aceitar conexões da rede local, só com dados fictícios) e use o IP do computador. Reinicie o Expo depois de mudar a variável.
 
 Com a API no ar (`npm run dev:api`), a documentação interativa (Swagger UI) fica em http://localhost:7071/api/docs e a especificação OpenAPI em http://localhost:7071/api/openapi.json. Ela só responde com `DOCS_ENABLED=true` (já ligado no arquivo de exemplo).

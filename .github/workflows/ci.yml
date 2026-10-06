@@ -89,3 +89,29 @@ jobs:
       - name: Listar as vulnerabilidades altas para acompanhamento
         if: always()
         run: npm audit --omit=dev || true
+
+  docker:
+    name: Imagens Docker e teste de fumaça
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      # Constrói as imagens, sobe API, Azurite e app web e confere que respondem (SCRUM-25).
+      - name: Subir o ambiente com Docker Compose
+        run: docker compose up -d --build --wait
+
+      - name: Testar a API e o app web (pela mesma origem)
+        run: |
+          curl -fsS http://localhost:7071/api/health
+          curl -fsS http://localhost:8080/api/doses > /dev/null
+          curl -fsS http://localhost:8080/ > /dev/null
+
+      - name: Mostrar os logs se algo falhar
+        if: failure()
+        run: docker compose logs --no-color --tail=100
+
+      - name: Derrubar o ambiente
+        if: always()
+        run: docker compose down -v
