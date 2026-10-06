@@ -1,0 +1,97 @@
+name: Deploy
+
+# Publica a API (Azure Functions) e o app web (Static Web Apps) na Azure (SCRUM-22).
+# Roda ao integrar na main ou manualmente. Os segredos ficam em Settings > Secrets do GitHub,
+# nunca no repositório: AZURE_FUNCTIONAPP_PUBLISH_PROFILE e AZURE_STATIC_WEB_APPS_API_TOKEN.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  FUNCTIONAPP_NAME: func-vacinaemdia-vedia6398
+  API_URL: https://func-vacinaemdia-vedia6398.azurewebsites.net/api
+
+jobs:
+  api:
+    name: Publicar a API
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Compilar o domínio compartilhado e a API
+        run: |
+          npm ci --ignore-scripts
+          npm run build -w @vacina/shared -w @vacina/api
+
+      - name: Montar o pacote de produção
+        run: |
+          rm -rf node_modules
+          npm ci --omit=dev --ignore-scripts -w @vacina/api -w @vacina/shared
+          mkdir -p pacote
+          cp apps/api/host.json apps/api/package.json pacote/
+          cp -r apps/api/dist pacote/dist
+          # -L resolve o link do workspace @vacina/shared para os arquivos reais.
+          cp -rL node_modules pacote/node_modules
+
+      - name: Publicar na Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.FUNCTIONAPP_NAME }}
+          package: pacote
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
+      - name: Teste de fumaça
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS "$API_URL/health"; then exit 0; fi
+            sleep 10
+          done
+          exit 1
+
+  web:
+    name: Publicar o app web
+    runs-on: ubuntu-latest
+    needs: api
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Gerar o app web
+        env:
+          # Valor público (endereço da API), nunca um segredo.
+          EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
+        run: |
+          npm ci --ignore-scripts
+          npm run build -w @vacina/shared
+          npm run build -w @vacina/mobile
+
+      - name: Publicar no Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: apps/mobile/dist
+          skip_app_build: true
