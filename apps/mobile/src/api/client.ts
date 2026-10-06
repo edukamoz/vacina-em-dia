@@ -41,24 +41,32 @@ export interface RequestOptions {
   readonly path: string;
   readonly method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   readonly body?: unknown;
+  /** Corpo binário (por exemplo, áudio); no lugar de `body`, com o `contentType` informado. */
+  readonly binary?: { readonly data: Uint8Array; readonly contentType: string };
   /** Sinal para cancelar a chamada (o TanStack Query o fornece). */
   readonly signal?: AbortSignal;
 }
 
 async function send(
   { baseUrl, sessionId, fetchFn = fetch }: ApiContext,
-  { path, method = 'GET', body, signal }: RequestOptions,
+  { path, method = 'GET', body, binary, signal }: RequestOptions,
 ): Promise<Response> {
   let response: Response;
+  const contentType = binary?.contentType ?? (body === undefined ? undefined : 'application/json');
+  const payload = binary
+    ? (binary.data as BodyInit)
+    : body === undefined
+      ? undefined
+      : JSON.stringify(body);
   try {
     response = await fetchFn(`${baseUrl}${path}`, {
       method,
       headers: {
         Accept: 'application/json',
         'x-demo-session': sessionId,
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+        ...(contentType ? { 'Content-Type': contentType } : {}),
       },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      ...(payload === undefined ? {} : { body: payload }),
       ...(signal ? { signal } : {}),
     });
   } catch {

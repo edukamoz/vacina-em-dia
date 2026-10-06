@@ -1,10 +1,12 @@
 import {
+  assistantResponseSchema,
   consentInputSchema,
   consentResponseSchema,
   doseResponseSchema,
   memberDosesResponseSchema,
   memberListResponseSchema,
   memberResponseSchema,
+  type AssistantMessageInput,
   type ConsentInput,
   type DoseEventInput,
   type MemberInput,
@@ -64,5 +66,23 @@ export const endpoints = {
       ctx,
       { path: `/doses/${encodeURIComponent(id)}/events`, method: 'POST', body: event },
       doseResponseSchema,
+    ),
+
+  sendAssistantMessage: (ctx: ApiContext, input: AssistantMessageInput) =>
+    apiRequest(
+      ctx,
+      { path: '/assistant/message', method: 'POST', body: input },
+      assistantResponseSchema,
+    ),
+
+  sendAssistantVoice: (ctx: ApiContext, wav: Uint8Array) =>
+    apiRequest(
+      ctx,
+      {
+        path: '/assistant/voice',
+        method: 'POST',
+        binary: { data: wav, contentType: 'audio/wav' },
+      },
+      assistantResponseSchema,
     ),
 } as const;
