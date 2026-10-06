@@ -25,7 +25,12 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | react-native-screens | 4.26.2 | |
 | expo-linking / expo-constants / expo-status-bar | 57.0.12 / 57.0.21 / 57.0.1 | |
 | @expo/metro-runtime | 57.0.16 | |
-| NativeWind / Tailwind CSS | a definir no SCRUM-32/C | O NativeWind 4 exige o **Tailwind 3.4.x** (a 4.x ainda não é suportada); versões entram aqui quando instaladas |
+| NativeWind | 4.2.7 | estilos com classes no app (Android, iOS e web) |
+| Tailwind CSS | 3.4.19 | o NativeWind 4 exige a série 3.4 (a 4.x ainda não é suportada) |
+| react-native-reanimated / react-native-worklets | 4.5.1 / 0.10.1 | exigidos pelo NativeWind; versões do SDK 57 |
+| expo-font | 57.0.4 | carrega a fonte |
+| @expo-google-fonts/atkinson-hyperlegible | 0.4.1 | fonte Atkinson Hyperlegible (regular e negrito) |
+| jest-expo / @testing-library/react-native / test-renderer | 57.0.5 / 14.0.1 / 1.3.0 | testes do app (o RNTL 14 usa o `test-renderer`) |
 
 ## API (`apps/api`)
 

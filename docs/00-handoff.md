@@ -32,6 +32,11 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - Decisões de modelagem adotadas por padrão (autor delegou): lembrete por push do Expo + sinalização no app (sem e-mail); doses gravadas no banco ao cadastrar o membro; só a data de aplicação (sem lote e local); tabela de eventos da dose; exclusão em cascata; consentimento com versão do termo e declaração de responsável para menores.
 - **Pendências do autor:** fornecer ou confirmar os dados oficiais do calendário do PNI (até lá, o seed é `FICTITIOUS`); validar a antecedência dos lembretes e a lista de grupos específicos.
 
+**Atualização de 06/10/2026 (SCRUM-23, Fase C, app):**
+- Branch `feature/SCRUM-23-app-temas-e-tokens`: NativeWind 4.2.7 + Tailwind 3.4.19 lendo `tokens.json`, `ThemeProvider` com 3 temas, fonte Atkinson (verificada na web), componentes base, tela provisória com doses de exemplo `FICTITIOUS` e testes do app (jest-expo + Testing Library, cobertura de linhas 100%). Detalhes em `docs/04-design-system.md` §6.
+- **Falta da Fase C:** API de doses de exemplo + OpenAPI/Swagger (ADR-012; depende do PR da branch `docs/SCRUM-23-openapi-swagger` estar na `main`), depois `docker-compose.yml` (SCRUM-25) e a Fase D (Azure, SCRUM-22).
+- Para o app achar `@vacina/shared`, rode `npm run build` na raiz antes de `npm run dev:mobile` (o pacote aponta para `dist`); nos testes o Jest lê o código-fonte direto.
+
 **Lembretes por item (revisar com o autor quando o item começar):**
 
 | Item | O que revisar |
