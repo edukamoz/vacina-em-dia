@@ -1,0 +1,91 @@
+name: CI
+
+# Executa em todo push e em todo pull request (SCRUM-24). O pipeline falha se algum teste falhar,
+# se a cobertura ficar abaixo de 80% ou se houver vulnerabilidade grave nas dependências.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualidade:
+    name: Lint, tipos, build, testes e cobertura
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar as dependências
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Formatação (Prettier)
+        run: npm run format:check
+
+      - name: Verificação de tipos (TypeScript estrito)
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Testes com cobertura (mínimo de 80%)
+        run: npm run test:coverage
+
+      - name: Documentação do código (TypeDoc)
+        run: npm run docs
+
+      - name: Guardar os relatórios de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cobertura
+          path: |
+            packages/shared/coverage
+            apps/api/coverage
+          if-no-files-found: ignore
+          retention-days: 14
+
+  seguranca:
+    name: Auditoria de dependências (npm audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar as dependências
+        run: npm ci
+
+      # A API e o pacote compartilhado rodam na nuvem: qualquer vulnerabilidade alta ou crítica falha.
+      - name: Auditar API e pacote compartilhado (alta ou crítica falha)
+        run: npm audit --omit=dev --audit-level=high --workspace apps/api --workspace packages/shared
+
+      # O app usa ferramentas de build do Expo com avisos conhecidos (docs/tech-versions.md):
+      # só falha em vulnerabilidade crítica.
+      - name: Auditar o conjunto todo (crítica falha)
+        run: npm audit --omit=dev --audit-level=critical
+
+      - name: Listar as vulnerabilidades altas para acompanhamento
+        if: always()
+        run: npm audit --omit=dev || true
