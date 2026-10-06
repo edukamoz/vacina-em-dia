@@ -11,6 +11,9 @@ const { espacamento, raios, bordas, toque, tipografia, breakpoints, layout } = t
 const px = (mapa) => Object.fromEntries(Object.entries(mapa).map(([k, v]) => [k, `${v}px`]));
 
 module.exports = {
+  // Os temas vêm das variáveis do ThemeProvider, não do `dark:`. Com o padrão (`media`) o NativeWind
+  // lança erro na web em desenvolvimento ao tentar fixar o esquema de cores.
+  darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
