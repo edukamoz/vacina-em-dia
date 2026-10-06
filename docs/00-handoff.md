@@ -2,6 +2,30 @@
 
 Estado em **06/10/2026** (terça-feira). Este arquivo resume o que foi decidido e produzido no chat de planejamento, para que uma sessão nova do Claude Code continue do ponto certo. Leia junto com `CLAUDE.md`. Em caso de conflito, `CLAUDE.md` e os ADRs valem mais do que este resumo.
 
+## 0. Estado da última sessão (leia primeiro; atualize ao pausar)
+
+Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
+
+**Última atualização:** 06/10/2026, computador do trabalho/faculdade.
+
+**Feito:**
+- Commit inicial na `main` (`0f64b2c`): `CLAUDE.md`, `README.md`, `.gitignore`, `LICENSE` e `docs/` (sem os PDFs de referência).
+- Branch `docs/SCRUM-5-claude-md-word-e-pdf`: `CLAUDE.md` atualizado com a regra "Word (ABNT) durante o desenvolvimento, PDF só na entrega".
+- Jira SCRUM-5: comentário com o commit e worklog de 2h 17m lançados. Status **não** alterado.
+
+**Pendente (em andamento): converter os 3 modelos de documentação para Word**
+- Arquivos: `docs/referencias-disciplinas/Modelo-Documentacao_tecnica.pdf`, `..._desenvolvimento.pdf` e `..._usuario.pdf`.
+- Objetivo: gerar `.docx` editáveis em `doctos/`, formatados fielmente pela ABNT (a formatação do PDF original pode ser perdida), já com a estrutura do modelo para preencher. Horas, datas e reuniões da Documentação de Desenvolvimento ficam em branco (são do autor).
+- Só apagar os 3 PDFs de modelo depois que o autor conferir os Word. Os outros 3 PDFs de `referencias-disciplinas/` permanecem como PDF.
+- Ferramentas que faltavam na máquina onde isso foi tentado (autor decide instalar): `poppler` (ler PDF), `pandoc` e `libreoffice` (renderizar e conferir o Word), via Homebrew.
+- Atenção: `docs/referencias-disciplinas/` **ainda não está commitada** (os PDFs existem só no computador original). Para o outro computador, o autor deve commitá-la (decisão: versionar os PDFs de referência) ou copiá-la manualmente.
+
+**Próximo passo depois disso:** abrir PR da branch `docs/SCRUM-5-...` para a `main` e seguir a Sprint 1 (ver §4).
+
+**Regras do autor desta fase:** nunca se incluir como coautor em commits/PRs; a partir de agora, uma branch por tarefa (`feature/SCRUM-n-...`, `docs/SCRUM-n-...`); nunca marcar Jira como Concluído; não inventar horas.
+
+**Como retomar em outro computador:** `git fetch`, trocar para a branch indicada acima, ler `CLAUDE.md` e este arquivo, e confirmar o estado com `git status` e `git log --oneline -5`. Ao pausar: atualizar esta seção, commitar e dar push da branch.
+
 ## 1. Onde estamos
 
 - Projeto: **Vacina em Dia** (carteira de vacinação digital com lembretes, busca por voz e chatbot), solo, na Azure. PI-VI da Fatec Votorantim.
