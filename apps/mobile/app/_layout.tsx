@@ -9,9 +9,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import '../global.css';
 import { createQueryClient } from '../src/api/query-client';
+import { SessionProvider } from '../src/session/session-provider';
 import { ThemeProvider } from '../src/theme/theme-provider';
 
-/** Layout raiz: carrega a fonte Atkinson Hyperlegible, cria o cliente de dados, aplica o tema e monta a navegação em pilha. */
+/**
+ * Layout raiz: carrega a fonte Atkinson Hyperlegible, cria o cliente de dados, guarda a sessão,
+ * aplica o tema e monta a navegação em pilha (as abas ficam em `(tabs)`).
+ */
 export default function RootLayout() {
   const [queryClient] = useState(createQueryClient);
   const [fontsLoaded, fontError] = useFonts({
@@ -24,10 +28,12 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }} />
-      </ThemeProvider>
+      <SessionProvider>
+        <ThemeProvider>
+          <StatusBar style="auto" />
+          <Stack screenOptions={{ headerShown: false }} />
+        </ThemeProvider>
+      </SessionProvider>
     </QueryClientProvider>
   );
 }

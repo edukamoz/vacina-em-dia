@@ -15,7 +15,7 @@ export function SeletorDeTema() {
           key={name}
           titulo={THEME_LABELS[name]}
           variante={name === theme ? 'principal' : 'secundario'}
-          accessibilityState={{ selected: name === theme }}
+          selecionado={name === theme}
           onPress={() => setPreference(name)}
         />
       ))}
