@@ -30,6 +30,7 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | react-native-reanimated / react-native-worklets | 4.5.1 / 0.10.1 | exigidos pelo NativeWind; versões do SDK 57 |
 | expo-font | 57.0.4 | carrega a fonte |
 | @expo-google-fonts/atkinson-hyperlegible | 0.4.1 | fonte Atkinson Hyperlegible (regular e negrito) |
+| @tanstack/react-query | 5.104.1 | dados do servidor no app (ADR-006) |
 | jest-expo / @testing-library/react-native / test-renderer | 57.0.5 / 14.0.1 / 1.3.0 | testes do app (o RNTL 14 usa o `test-renderer`) |
 
 ## API (`apps/api`)

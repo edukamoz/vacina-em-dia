@@ -10,7 +10,8 @@
     "start": "npm run build && func start",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "start:rede": "npm run build && func start --address 0.0.0.0"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "9.1.0",

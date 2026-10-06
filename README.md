@@ -28,6 +28,8 @@ npm run dev:api        # API local (Azure Functions Core Tools)
 
 Para a API local, copie `apps/api/local.settings.example.json` para `apps/api/local.settings.json`.
 
+O app busca as doses na API; suba a API antes (`npm run dev:api`) e o app depois (`npm run dev:mobile`). O endereço da API vem de `EXPO_PUBLIC_API_URL` (copie `.env.example` para `apps/mobile/.env` se precisar mudar; o padrão é `http://localhost:7071/api`, que serve para a web e para o simulador de iOS). No emulador de Android use `http://10.0.2.2:7071/api`. No celular real, suba a API com `npm run dev:api:rede` (ela passa a aceitar conexões da rede local, só com dados fictícios) e use o IP do computador. Reinicie o Expo depois de mudar a variável.
+
 Com a API no ar (`npm run dev:api`), a documentação interativa (Swagger UI) fica em http://localhost:7071/api/docs e a especificação OpenAPI em http://localhost:7071/api/openapi.json. Ela só responde com `DOCS_ENABLED=true` (já ligado no arquivo de exemplo).
 
 ## Escopo

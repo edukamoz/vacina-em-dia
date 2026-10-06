@@ -2,7 +2,7 @@
   "name": "vacina-em-dia",
   "version": "0.1.0",
   "private": true,
-  "description": "Carteira de vacinação digital com lembretes e assistente por voz (PI-VI, Fatec Votorantim).",
+  "description": "Carteira de vacina\u00e7\u00e3o digital com lembretes e assistente por voz (PI-VI, Fatec Votorantim).",
   "license": "MIT",
   "engines": {
     "node": ">=22.13.0"
@@ -17,6 +17,7 @@
     "build": "npm run build --workspaces --if-present",
     "dev:mobile": "npm run start --workspace apps/mobile",
     "dev:api": "npm run start --workspace apps/api",
+    "dev:api:rede": "npm run start:rede --workspace apps/api",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
