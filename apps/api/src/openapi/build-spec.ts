@@ -1,15 +1,21 @@
 import { OpenAPIRegistry, OpenApiGeneratorV31 } from '@asteasolutions/zod-to-openapi';
 import {
   apiErrorSchema,
+  consentInputSchema,
+  consentResponseSchema,
   doseEventInputSchema,
   doseIdSchema,
-  doseListResponseSchema,
   doseResponseSchema,
+  memberDosesResponseSchema,
+  memberIdSchema,
+  memberInputSchema,
+  memberListResponseSchema,
+  memberResponseSchema,
 } from '@vacina/shared';
 import { z } from 'zod';
 
 /** Versão da API (acompanha o `package.json` do `apps/api`). */
-const API_VERSION = '0.1.0';
+const API_VERSION = '0.2.0';
 
 const jsonContent = (schema: z.ZodType) => ({ 'application/json': { schema } });
 const errorResponse = (description: string) => ({
@@ -26,12 +32,25 @@ const errorResponse = (description: string) => ({
  */
 export function buildOpenApiDocument(): object {
   const registry = new OpenAPIRegistry();
-  // Os esquemas do `shared` levam `.meta({ id })`, que vira componente nomeado (`#/components/schemas`).
-  const Dose = doseResponseSchema;
-  const DoseList = doseListResponseSchema;
 
-  const pathParams = z.object({ id: doseIdSchema });
+  const dosePathParams = z.object({ id: doseIdSchema });
+  const memberPathParams = z.object({ id: memberIdSchema });
   const internalError = errorResponse('Falha interna. A mensagem não traz detalhes técnicos.');
+  const unauthorized = errorResponse(
+    '`UNAUTHORIZED`: o cabeçalho `x-demo-session` não foi enviado ou está fora do formato.',
+  );
+  const secured = [{ demoSession: [] }];
+  const validationError = errorResponse(
+    'Corpo inválido (a resposta lista só os nomes dos campos).',
+  );
+
+  registry.registerComponent('securitySchemes', 'demoSession', {
+    type: 'apiKey',
+    in: 'header',
+    name: 'x-demo-session',
+    description:
+      'Provisório (sessão de demonstração): identificador aleatório gerado pelo navegador. Não é autenticação; será trocado pelo login do Microsoft Entra External ID (SCRUM-13).',
+  });
 
   registry.registerPath({
     method: 'get',
@@ -72,13 +91,200 @@ export function buildOpenApiDocument(): object {
 
   registry.registerPath({
     method: 'get',
-    path: '/doses',
-    tags: ['Doses'],
-    summary: 'Listar as doses',
+    path: '/consent',
+    tags: ['Conta e privacidade'],
+    summary: 'Consultar o consentimento',
     description:
-      'Lista as doses de exemplo, junto com a fonte e a versão do calendário. Enquanto não houver dado oficial do PNI, o conjunto é fictício (`isFictitious: true`). O aplicativo não substitui a caderneta oficial.',
+      'Informa se o usuário já aceitou o termo de consentimento (RF09), com a versão e o horário. Sem registro, devolve `accepted: false`.',
+    security: secured,
     responses: {
-      200: { description: 'Lista de doses.', content: jsonContent(DoseList) },
+      200: {
+        description: 'Situação do consentimento.',
+        content: jsonContent(consentResponseSchema),
+      },
+      401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'put',
+    path: '/consent',
+    tags: ['Conta e privacidade'],
+    summary: 'Registrar o consentimento',
+    description:
+      'Registra o aceite explícito do termo (LGPD), com a versão do termo e, se for o caso, a declaração de que a pessoa é responsável legal pelos menores que cadastrar. Sem esse registro, a API não cadastra membros.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: consentInputSchema,
+            examples: {
+              aceite: {
+                summary: 'Aceite com declaração de responsável',
+                value: {
+                  acceptedTerms: true,
+                  termVersion: '2026-10-06',
+                  guardianDeclaration: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Consentimento registrado.',
+        content: jsonContent(consentResponseSchema),
+      },
+      400: validationError,
+      401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'delete',
+    path: '/account',
+    tags: ['Conta e privacidade'],
+    summary: 'Excluir a conta e todos os dados',
+    description:
+      'Remove de forma definitiva todos os dados do usuário: membros, doses e consentimento (RF09). Não há como desfazer.',
+    security: secured,
+    responses: {
+      204: { description: 'Dados excluídos.' },
+      401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/members',
+    tags: ['Família'],
+    summary: 'Listar os membros da família',
+    description: 'Lista as pessoas cadastradas pelo usuário, na ordem de cadastro (RF02).',
+    security: secured,
+    responses: {
+      200: { description: 'Lista de membros.', content: jsonContent(memberListResponseSchema) },
+      401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/members',
+    tags: ['Família'],
+    summary: 'Cadastrar um membro da família',
+    description:
+      'Cadastra uma pessoa (nome ou apelido e data de nascimento; opcionalmente, gestante) e gera as doses do calendário oficial para a faixa etária dela (RF02 e RF03). Exige o consentimento; para menores de 18 anos, exige a declaração de responsável. Coleta só o mínimo: não pede documentos de identificação nem o cartão de saúde.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: memberInputSchema,
+            examples: {
+              crianca: {
+                summary: 'Criança',
+                value: { name: 'Maria', birthDate: '2025-05-20', isPregnant: false },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      201: { description: 'Membro cadastrado.', content: jsonContent(memberResponseSchema) },
+      400: validationError,
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED`: o consentimento ainda não foi dado.'),
+      422: errorResponse(
+        '`INVALID_BIRTH_DATE`, `GUARDIAN_DECLARATION_REQUIRED` ou `LIMIT_REACHED` (máximo de 20 pessoas).',
+      ),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/members/{id}',
+    tags: ['Família'],
+    summary: 'Consultar um membro',
+    description: 'Devolve um membro do usuário pelo identificador.',
+    security: secured,
+    request: { params: memberPathParams },
+    responses: {
+      200: { description: 'O membro.', content: jsonContent(memberResponseSchema) },
+      400: errorResponse('Identificador inválido.'),
+      401: unauthorized,
+      404: errorResponse('Membro não encontrado (ou de outro usuário).'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'put',
+    path: '/members/{id}',
+    tags: ['Família'],
+    summary: 'Editar um membro',
+    description:
+      'Altera nome, data de nascimento e grupo gestante. As doses já registradas são mantidas; as que passarem a ser indicadas pela nova situação são geradas.',
+    security: secured,
+    request: {
+      params: memberPathParams,
+      body: { required: true, content: jsonContent(memberInputSchema) },
+    },
+    responses: {
+      200: { description: 'Membro atualizado.', content: jsonContent(memberResponseSchema) },
+      400: errorResponse('Identificador ou corpo inválido.'),
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED`: o consentimento ainda não foi dado.'),
+      404: errorResponse('Membro não encontrado (ou de outro usuário).'),
+      422: errorResponse('`INVALID_BIRTH_DATE` ou `GUARDIAN_DECLARATION_REQUIRED`.'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'delete',
+    path: '/members/{id}',
+    tags: ['Família'],
+    summary: 'Excluir um membro',
+    description: 'Remove o membro e, em cascata, todas as doses dele.',
+    security: secured,
+    request: { params: memberPathParams },
+    responses: {
+      204: { description: 'Membro excluído.' },
+      400: errorResponse('Identificador inválido.'),
+      401: unauthorized,
+      404: errorResponse('Membro não encontrado (ou de outro usuário).'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/members/{id}/doses',
+    tags: ['Calendário e doses'],
+    summary: 'Calendário vacinal do membro',
+    description:
+      'Devolve as doses do membro, ordenadas pela data prevista, com a fonte e a versão do calendário oficial (RF03, RF04 e RF08). As doses vencidas aparecem como atrasadas. O aplicativo não substitui a caderneta oficial.',
+    security: secured,
+    request: { params: memberPathParams },
+    responses: {
+      200: {
+        description: 'Calendário do membro.',
+        content: jsonContent(memberDosesResponseSchema),
+      },
+      400: errorResponse('Identificador inválido.'),
+      401: unauthorized,
+      404: errorResponse('Membro não encontrado (ou de outro usuário).'),
       500: internalError,
     },
   });
@@ -86,14 +292,16 @@ export function buildOpenApiDocument(): object {
   registry.registerPath({
     method: 'get',
     path: '/doses/{id}',
-    tags: ['Doses'],
+    tags: ['Calendário e doses'],
     summary: 'Consultar uma dose',
-    description: 'Devolve uma dose pelo identificador.',
-    request: { params: pathParams },
+    description: 'Devolve uma dose do usuário pelo identificador.',
+    security: secured,
+    request: { params: dosePathParams },
     responses: {
-      200: { description: 'A dose.', content: jsonContent(Dose) },
+      200: { description: 'A dose.', content: jsonContent(doseResponseSchema) },
       400: errorResponse('Identificador inválido.'),
-      404: errorResponse('Dose não encontrada.'),
+      401: unauthorized,
+      404: errorResponse('Dose não encontrada (ou de outro usuário).'),
       500: internalError,
     },
   });
@@ -101,12 +309,13 @@ export function buildOpenApiDocument(): object {
   registry.registerPath({
     method: 'post',
     path: '/doses/{id}/events',
-    tags: ['Doses'],
+    tags: ['Calendário e doses'],
     summary: 'Mudar o estado de uma dose',
     description:
       'Aplica um evento do usuário à dose pela máquina de estados do ciclo de vida (RF04): agendar, desmarcar, reagendar, registrar a aplicação ou cancelar. O atraso não é um evento do cliente: só a rotina de prazo o aplica. Em caso de erro, o estado da dose permanece o mesmo.',
+    security: secured,
     request: {
-      params: pathParams,
+      params: dosePathParams,
       body: {
         required: true,
         content: {
@@ -136,11 +345,12 @@ export function buildOpenApiDocument(): object {
       },
     },
     responses: {
-      200: { description: 'A dose com o novo estado.', content: jsonContent(Dose) },
+      200: { description: 'A dose com o novo estado.', content: jsonContent(doseResponseSchema) },
       400: errorResponse(
         'Identificador ou corpo inválido (a resposta lista só os nomes dos campos).',
       ),
-      404: errorResponse('Dose não encontrada.'),
+      401: unauthorized,
+      404: errorResponse('Dose não encontrada (ou de outro usuário).'),
       409: errorResponse('`INVALID_TRANSITION`: a ação não é possível no estado atual da dose.'),
       422: errorResponse(
         '`GUARD_VIOLATION`: regra de data ou de confirmação violada (agendar no passado, aplicar no futuro, cancelar sem confirmar).',
@@ -155,12 +365,17 @@ export function buildOpenApiDocument(): object {
       title: 'Vacina em Dia: API',
       version: API_VERSION,
       description:
-        'API do Vacina em Dia. Esqueleto com doses de exemplo (FICTITIOUS), sem login e sem dados pessoais. Autenticação, rate limit (429) e acesso por usuário (401 e 403) entram com o SCRUM-13.',
+        'API do Vacina em Dia: membros da família, calendário vacinal oficial (PNI 2026), ciclo de vida das doses e consentimento. Os dados ficam em memória (demonstração) e o acesso usa uma sessão de demonstração provisória; login do Entra External ID, banco e limite de taxa (429) entram nos próximos itens.',
     },
     servers: [{ url: '/api', description: 'Prefixo das Azure Functions' }],
     tags: [
       { name: 'Sistema', description: 'Verificação e documentação.' },
-      { name: 'Doses', description: 'Ciclo de vida da dose (RF04).' },
+      { name: 'Conta e privacidade', description: 'Consentimento e exclusão de dados (RF09).' },
+      { name: 'Família', description: 'Membros da família (RF02).' },
+      {
+        name: 'Calendário e doses',
+        description: 'Calendário vacinal e ciclo de vida da dose (RF03 e RF04).',
+      },
     ],
   });
 }

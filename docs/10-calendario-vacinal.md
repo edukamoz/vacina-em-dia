@@ -1,4 +1,6 @@
-# Calendário vacinal (RF03, SCRUM-16)
+# Calendário vacinal, família e doses (RF02, RF03, RF04, RF08 e RF09)
+
+Itens do Jira: SCRUM-16 (calendário), SCRUM-15 (família) e SCRUM-18 (doses). Este documento é a referência rápida; a especificação completa da API está em `GET /api/docs` (Swagger).
 
 O app usa o **Calendário Nacional de Vacinação 2026**, do Ministério da Saúde (PNI), transcrito dos cinco arquivos oficiais obtidos em 06/10/2026 em <https://www.gov.br/saude/pt-br/vacinacao/calendario>:
 
@@ -42,3 +44,42 @@ Automatizados em `packages/shared/src/calendar/rules.test.ts` e `packages/shared
 | CT-CAL-15 | Quais regras podem atrasar |
 | CT-CAL-16 e 17 | Notas de rodapé de cada regra |
 | CT-CAL-D01 a D04 | Soma de meses e idade em meses (limites, fim de mês, ano bissexto, data inválida) |
+
+## API (registrada no OpenAPI, em `/api/docs`)
+
+| Método e rota | O que faz | Códigos de erro |
+|---|---|---|
+| `GET /api/consent`, `PUT /api/consent` | Consulta e registra o consentimento (versão do termo, horário e declaração de responsável) | 400, 401 |
+| `DELETE /api/account` | Exclui a conta e **todos** os dados do usuário | 401 |
+| `GET /api/members`, `POST /api/members` | Lista e cadastra pessoas; o cadastro gera as doses do calendário | 400, 401, 403 (sem consentimento), 422 (nascimento no futuro, sem declaração de responsável para menor, limite de 20 pessoas) |
+| `GET`, `PUT`, `DELETE /api/members/{id}` | Consulta, edita (gera as doses que passarem a ser indicadas, sem duplicar) e exclui (em cascata) | 400, 401, 403, 404, 422 |
+| `GET /api/members/{id}/doses` | Calendário da pessoa, com fonte e versão; aplica a rotina de prazo (atraso) ao ler | 400, 401, 404 |
+| `GET /api/doses/{id}`, `POST /api/doses/{id}/events` | Consulta e muda o estado da dose pela máquina de estados (RF04) | 400, 401, 404, 409 (transição inválida), 422 (regra de data ou de confirmação) |
+
+- **Propriedade:** todo acesso confere o dono; recurso de outro usuário responde 404 (ADR-013).
+- **Rotina de prazo:** o atraso (T4 e T7) é aplicado pelo ator `SCHEDULER` do domínio sempre que as doses são lidas. O cliente nunca envia `MARK_OVERDUE` (o esquema o recusa). Uma rotina agendada por tempo, para sinalizar atrasos com o app fechado, entra com os lembretes (SCRUM-19).
+- **Provisório:** dados em memória e sessão de demonstração (ADR-013) até o banco e o login.
+
+## Telas do app (Expo, web, Android e iOS)
+
+| Tela | Rota | Requisito |
+|---|---|---|
+| Consentimento (termo em linguagem simples, aceite, declaração de responsável) | `/consentimento` | RF09 |
+| Família (lista, adicionar, editar, excluir pessoa) | aba Família, `/membro/novo`, `/membro/[id]` | RF02 |
+| Calendário (atrasadas, agendadas, a fazer; fonte e versão) | aba Calendário | RF03, RF04 |
+| Detalhe da dose (para que serve, quando, notas oficiais, registrar, agendar, reagendar, desmarcar, cancelar com confirmação) | `/dose/[id]` | RF04 |
+| Histórico (aplicadas e canceladas) | aba Histórico | RF08 |
+| Assistente | aba Assistente (chatbot e voz no próximo item) | RF06, RF07 |
+| Conta (aparência, privacidade, excluir tudo) | aba Conta | RF09 |
+
+## Casos de teste automatizados (resumo)
+
+| IDs | Onde | O que verifica |
+|---|---|---|
+| CT-FAM-01 a 10 | `apps/api/src/services/member-service.test.ts` | Consentimento, declaração de responsável, limites, propriedade, edição sem duplicar, exclusão em cascata |
+| CT-API-V01 a V08, CT-T02 a T12 via API | `apps/api/src/services/dose-service.test.ts` | Calendário do membro, rotina de prazo, transições, guardas e propriedade |
+| CT-API-H01 a H12 | `apps/api/src/handlers/handlers.test.ts` | Validação de entrada (400), códigos HTTP e esquemas de resposta |
+| CT-PRIV-01 a 04 | `apps/api/src/services/consent-account.test.ts` | Consentimento e exclusão da conta |
+| CT-REP-01 a 04, CT-SEG-01 a 03 | `apps/api/src/repositories`, `identity.test.ts` | Isolamento por dono, limite de donos e formato da sessão |
+| CT-API-O01 a O08 | `apps/api/src/openapi/build-spec.test.ts` | Toda rota registrada e documentada com seus códigos de erro |
+| CT-APP-A, E, C, F, M, X, K, H, D, I e CT-T02, T03, T05, T08, T10 no app | `apps/mobile/src` | Cliente da API, fluxos de cada tela e ações do ciclo de vida da dose |

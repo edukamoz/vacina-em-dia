@@ -38,16 +38,26 @@ describe('SeloEstadoDose', () => {
 });
 
 const FONTE = {
-  name: 'conjunto de exemplo do projeto (FICTITIOUS)',
-  version: '0.0-exemplo',
-  isFictitious: true,
+  name: 'Calendário Nacional de Vacinação 2026',
+  publisher: 'Ministério da Saúde (PNI)',
+  version: '2026',
+  url: 'https://www.gov.br/saude/pt-br/vacinacao/calendario',
+  retrievedAt: '2026-10-06',
+  isFictitious: false,
   notice:
     'O aplicativo não substitui a caderneta oficial nem a orientação de profissionais de saúde.',
 };
 const DOSE: DoseResponse = {
-  id: 'ex-2',
-  vaccine: 'Vacina de exemplo B',
+  id: 'd-1',
+  memberId: 'm-1',
+  ruleId: 'crianca-penta-2',
+  vaccine: 'penta (DTP+Hib+HB)',
   doseLabel: '2ª dose',
+  diseases: 'difteria, tétano',
+  timingKind: 'AGE',
+  timingLabel: '4 meses',
+  conditional: false,
+  notes: [],
   status: 'OVERDUE',
   dueDate: '2026-09-15',
   scheduledDate: null,
@@ -56,7 +66,7 @@ const DOSE: DoseResponse = {
 
 describe('DoseCard', () => {
   test.each([
-    ['PENDING', {}, 'Ainda sem data marcada'],
+    ['PENDING', {}, 'Prevista para 15/09/2026'],
     ['SCHEDULED', { scheduledDate: '2026-11-04' }, 'Marcada para 04/11/2026'],
     ['OVERDUE', { dueDate: '2026-09-15' }, 'Era para 15/09/2026'],
     ['APPLIED', { appliedDate: '2026-03-10' }, 'Aplicada em 10/03/2026'],
@@ -65,25 +75,42 @@ describe('DoseCard', () => {
     expect(doseHint({ ...DOSE, status, ...dates })).toBe(expected);
   });
 
-  test('CT-UI-05: mostra vacina, dose, selo e dica', async () => {
+  test('CT-UI-04b: dose sem idade fixa manda conferir a caderneta', () => {
+    expect(doseHint({ ...DOSE, status: 'PENDING', timingKind: 'HISTORY' })).toBe(
+      'Confira na sua caderneta',
+    );
+  });
+
+  test('CT-UI-05: mostra vacina, dose, quando, selo e dica', async () => {
     await render(<DoseCard dose={DOSE} />);
-    expect(screen.getByText('Vacina de exemplo B, 2ª dose')).toBeOnTheScreen();
+    expect(screen.getByText('penta (DTP+Hib+HB), 2ª dose')).toBeOnTheScreen();
+    expect(screen.getByText('4 meses')).toBeOnTheScreen();
     expect(screen.getByLabelText('Dose atrasada')).toBeOnTheScreen();
     expect(screen.getByText('Era para 15/09/2026')).toBeOnTheScreen();
+  });
+
+  test('CT-UI-06: com aoAbrir o cartão vira botão e indica quando depende de condições', async () => {
+    const aoAbrir = jest.fn();
+    await render(<DoseCard dose={{ ...DOSE, conditional: true }} aoAbrir={aoAbrir} />);
+    expect(screen.getByText(/depende de condições/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: /Abrir detalhes/ }));
+    expect(aoAbrir).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('AvisoFonte', () => {
-  test('CT-UI-07: dados fictícios são marcados como calendário de exemplo e citam fonte e versão', async () => {
+  test('CT-UI-07: cita fonte, órgão, versão e que não substitui a caderneta', async () => {
     await render(<AvisoFonte fonte={FONTE} />);
-    expect(screen.getByText(/Calendário de exemplo/)).toBeOnTheScreen();
-    expect(screen.getByText(/versão 0\.0-exemplo/)).toBeOnTheScreen();
+    expect(screen.getByText(/Calendário Nacional de Vacinação 2026/)).toBeOnTheScreen();
+    expect(screen.getByText(/Ministério da Saúde/)).toBeOnTheScreen();
+    expect(screen.getByText(/versão 2026/)).toBeOnTheScreen();
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
+    expect(screen.queryByText(/Calendário de exemplo/)).not.toBeOnTheScreen();
   });
 
-  test('CT-UI-08: dados reais não levam a marca de exemplo', async () => {
-    await render(<AvisoFonte fonte={{ ...FONTE, isFictitious: false }} />);
-    expect(screen.queryByText(/Calendário de exemplo/)).not.toBeOnTheScreen();
+  test('CT-UI-08: dados fictícios são marcados como calendário de exemplo', async () => {
+    await render(<AvisoFonte fonte={{ ...FONTE, isFictitious: true }} />);
+    expect(screen.getByText(/Calendário de exemplo/)).toBeOnTheScreen();
   });
 });
 

@@ -16,19 +16,30 @@ const ESTILOS: Readonly<Record<BotaoVariante, { caixa: string; texto: string }>>
  *
  * @param props.titulo - Texto do botão (também é o rótulo de acessibilidade).
  * @param props.variante - Tipo de botão; por padrão `principal`.
+ * @param props.selecionado - Para botões de escolha (tema, pessoa): anuncia o item escolhido.
  */
 export function Botao({
   titulo,
   variante = 'principal',
+  selecionado,
   disabled,
   ...rest
-}: Omit<PressableProps, 'children'> & { titulo: string; variante?: BotaoVariante }) {
+}: Omit<PressableProps, 'children'> & {
+  titulo: string;
+  variante?: BotaoVariante;
+  selecionado?: boolean;
+}) {
   const estilo = ESTILOS[variante];
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={titulo}
-      accessibilityState={{ disabled: Boolean(disabled) }}
+      accessibilityState={{
+        disabled: Boolean(disabled),
+        ...(selecionado === undefined ? {} : { selected: selecionado }),
+      }}
+      // Na web, o estado de seleção só chega ao leitor de tela pela propriedade `aria-selected`.
+      {...(selecionado === undefined ? {} : { 'aria-selected': selecionado })}
       disabled={disabled}
       className={`items-center justify-center rounded-botao border-padrao px-xl py-md ${estilo.caixa}`}
       {...rest}
