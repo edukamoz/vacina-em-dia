@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "Vacina em Dia",
+    "slug": "vacina-em-dia",
+    "version": "0.1.0",
+    "scheme": "vacinaemdia",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

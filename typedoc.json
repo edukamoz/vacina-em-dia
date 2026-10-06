@@ -1,0 +1,9 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Vacina em Dia",
+  "entryPoints": ["packages/shared/src/index.ts", "apps/api/src/index.ts"],
+  "tsconfig": "tsconfig.docs.json",
+  "out": "docs/api",
+  "excludePrivate": true,
+  "readme": "none"
+}
