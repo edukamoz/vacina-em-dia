@@ -1,11 +1,5 @@
-/** Relógio injetável: devolve o instante atual em texto ISO 8601 (UTC). */
-export type Clock = () => string;
-
-/** Resposta HTTP simples, independente do SDK das Functions para facilitar os testes. */
-export interface HttpResult {
-  readonly status: number;
-  readonly jsonBody: unknown;
-}
+import type { Clock } from '../clock';
+import type { HttpResult } from '../http';
 
 /**
  * Monta a resposta do endpoint de saúde, usado para conferir se a API está no ar.

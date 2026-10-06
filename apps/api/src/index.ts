@@ -7,3 +7,11 @@
  * @packageDocumentation
  */
 export * from './handlers/health';
+export * from './clock';
+export * from './http';
+export * from './handlers/doses';
+export * from './handlers/docs';
+export * from './services/dose-service';
+export * from './repositories/dose-repository';
+export * from './repositories/in-memory-dose-repository';
+export * from './openapi/build-spec';
