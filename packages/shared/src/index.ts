@@ -4,6 +4,7 @@
  *
  * @packageDocumentation
  */
+export * from './calendar';
 export * from './domain';
 export * from './schemas/dose';
 export * from './schemas/dose-api';

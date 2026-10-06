@@ -1,4 +1,4 @@
-import { addDays, compareCivilDates, isValidCivilDate } from './civil-date';
+import { addDays, addMonths, ageInMonths, compareCivilDates, isValidCivilDate } from './civil-date';
 
 describe('isValidCivilDate', () => {
   test.each(['2026-10-15', '2024-02-29', '2000-01-01', '1999-12-31'])('aceita %s', (value) => {
@@ -40,5 +40,37 @@ describe('addDays', () => {
     ['2026-10-15', 0, '2026-10-15'],
   ])('%s + %i dia(s) = %s', (date, days, expected) => {
     expect(addDays(date, days)).toBe(expected);
+  });
+});
+
+describe('addMonths e ageInMonths', () => {
+  test.each([
+    ['2026-01-31', 1, '2026-02-28'],
+    ['2024-01-31', 1, '2024-02-29'],
+    ['2026-10-06', 2, '2026-12-06'],
+    ['2026-11-15', 3, '2027-02-15'],
+    ['2026-03-10', -3, '2025-12-10'],
+    ['2026-10-06', 0, '2026-10-06'],
+  ])('CT-CAL-D01 addMonths(%s, %i) = %s', (date, months, expected) => {
+    expect(addMonths(date, months)).toBe(expected);
+  });
+
+  test('CT-CAL-D02 addMonths rejeita data inválida', () => {
+    expect(() => addMonths('2026-02-30', 1)).toThrow(RangeError);
+  });
+
+  test.each([
+    ['2026-10-06', '2026-10-06', 0],
+    ['2026-10-06', '2026-11-05', 0],
+    ['2026-10-06', '2026-11-06', 1],
+    ['2026-01-31', '2026-02-28', 1],
+    ['2000-02-29', '2026-02-28', 312],
+    ['2026-10-06', '2026-01-01', 0],
+  ])('CT-CAL-D03 ageInMonths(%s, %s) = %i', (birth, today, expected) => {
+    expect(ageInMonths(birth, today)).toBe(expected);
+  });
+
+  test('CT-CAL-D04 ageInMonths rejeita data inválida', () => {
+    expect(() => ageInMonths('x', '2026-10-06')).toThrow(RangeError);
   });
 });
