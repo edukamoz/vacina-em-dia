@@ -1,0 +1,15 @@
+# Mantém o contexto de build pequeno e sem arquivos locais ou segredos.
+**/node_modules
+**/dist
+**/coverage
+**/.expo
+.git
+.github
+.husky
+docs/api
+doctos
+*.log
+.env
+.env.*
+!.env.example
+apps/api/local.settings.json
