@@ -44,6 +44,13 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - O app **ainda não chama a API** (decisão do autor: PR separado). Próximo passo: TanStack Query + `EXPO_PUBLIC_API_URL` + CORS, depois `docker-compose` (SCRUM-25) e Azure mínimo (SCRUM-22).
 - Node 24 LTS adotado (`.nvmrc`); no computador de casa, `nvm install 24 && nvm use`.
 
+**Atualização de 06/10/2026 (SCRUM-18, app consome a API):**
+- Branch `feature/SCRUM-18-app-consome-api`: a tela de doses busca `GET /api/doses` com TanStack Query (`src/api`, `src/features/doses`), valida a resposta com o mesmo esquema Zod, mostra carregando, erro (com "Tentar de novo") e vazio, e exibe fonte e versão do calendário vindas da API. O conjunto de exemplo interno do app foi removido.
+- `EXPO_PUBLIC_API_URL` define a API (padrão `http://localhost:7071/api`). Para celular real: `npm run dev:api:rede` (a API escuta em `0.0.0.0`) e o IP do computador. Emulador de Android: `10.0.2.2`.
+- Corrigido bug de contraste: `text-texto` e `text-sobrePrimaria` disputavam no CSS e o botão selecionado ficava com texto quase invisível (cerca de 1,6:1 no tema Escuro). Agora o mínimo medido é 6,5:1.
+- Verificado no navegador com API e app reais (dados ao vivo, erro com a API desligada, recuperação). Nota: o TanStack Query pausa tentativas em aba oculta; ao testar o erro, deixe a aba visível.
+- Ainda **não** verificado: celular real e emuladores com esta versão. Próximos passos: `docker-compose` (SCRUM-25) e Azure mínimo (SCRUM-22).
+
 **Lembretes por item (revisar com o autor quando o item começar):**
 
 | Item | O que revisar |
