@@ -6,7 +6,7 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 
 | Tecnologia | Versão | Observação |
 |---|---|---|
-| Node.js | 20.20.0 (mínimo 20.19.0) | `.nvmrc` e `engines`; exigência do ESLint 10 |
+| Node.js | 24.21.0 LTS (mínimo 22.13.0) | `.nvmrc` (24) e `engines`. O Azure Functions v4 suporta Node 22 e 24; o Node 20 saiu de suporte em abril de 2026. Migração testada em 06/10/2026 (lint, tipos, build, testes, TypeDoc, API local, web do Expo e `npm audit`) |
 | npm | 11.19.0 | gerenciador, com workspaces |
 | Docker | 29.7.2 | contêineres (SCRUM-25) |
 | Python | 3.14.6 (local) | serviço de PLN (SCRUM-21); versão do `scikit-learn` a confirmar |
@@ -47,7 +47,7 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | Zod | 4.6.5 | esquemas compartilhados |
 | Jest | 30.5.2 | testes e cobertura (limite de 80% por pacote) |
 | ts-jest | 29.4.14 | |
-| @types/jest / @types/node | 30.0.0 / 20.19.43 | tipos de Node alinhados ao Node 20 |
+| @types/jest / @types/node | 30.0.0 / 24.19.1 | tipos de Node alinhados ao Node 24 |
 | ESLint / @eslint/js | 10.12.0 / 10.0.1 | configuração plana em `eslint.config.mjs` |
 | typescript-eslint | 8.71.1 | |
 | eslint-config-prettier | 10.1.8 | |
