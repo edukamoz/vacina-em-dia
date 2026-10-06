@@ -1,0 +1,26 @@
+digraph G {
+  rankdir=LR; bgcolor="white"; nodesep=0.7; ranksep=1.1; pad=0.3;
+  node [fontname="Arial", fontsize=13];
+  edge [fontname="Arial", fontsize=11];
+  INI [shape=circle, style=filled, fillcolor=black, label="", width=0.25];
+  FIM [shape=doublecircle, style=filled, fillcolor=black, label="", width=0.2];
+  Pendente [shape=box, style="rounded,filled", fillcolor="#EEF3FB", color="#2F5597", width=1.3, height=0.6];
+  Agendada [shape=box, style="rounded,filled", fillcolor="#EEF3FB", color="#2F5597", width=1.3, height=0.6];
+  Atrasada [shape=box, style="rounded,filled", fillcolor="#EEF3FB", color="#2F5597", width=1.3, height=0.6];
+  Aplicada [shape=box, style="rounded,filled", fillcolor="#EEF3FB", color="#2F5597", width=1.3, height=0.6];
+  Cancelada [shape=box, style="rounded,filled", fillcolor="#EEF3FB", color="#2F5597", width=1.3, height=0.6];
+  INI -> Pendente [label="T1 gerar dose do calendário"];
+  Pendente -> Agendada [label="T2 agendar"];
+  Pendente -> Aplicada [label="T3 registrar aplicação"];
+  Pendente -> Atrasada [label="T4 prazo vencido"];
+  Pendente -> Cancelada [label="T5 cancelar"];
+  Agendada -> Aplicada [label="T6 registrar aplicação"];
+  Agendada -> Atrasada [label="T7 agendamento vencido"];
+  Agendada -> Pendente [label="T8 desagendar"];
+  Agendada -> Cancelada [label="T9 cancelar"];
+  Atrasada -> Agendada [label="T10 reagendar"];
+  Atrasada -> Aplicada [label="T11 registrar aplicação"];
+  Atrasada -> Cancelada [label="T12 cancelar"];
+  Aplicada -> FIM;
+  Cancelada -> FIM;
+}
