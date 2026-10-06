@@ -24,7 +24,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
     "test:coverage": "npm run test:coverage --workspaces --if-present",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "export:calendar": "node scripts/export-calendar.mjs && prettier --write apps/nlp/vacina_nlp/data/pni-2026.json"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.3",
