@@ -13,8 +13,10 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "9.1.0",
     "@azure/functions": "4.16.5",
-    "@vacina/shared": "0.1.0"
+    "@vacina/shared": "0.1.0",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "azure-functions-core-tools": "4.15.2"
