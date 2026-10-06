@@ -28,6 +28,8 @@ npm run dev:api        # API local (Azure Functions Core Tools)
 
 Para a API local, copie `apps/api/local.settings.example.json` para `apps/api/local.settings.json`.
 
+Com a API no ar (`npm run dev:api`), a documentação interativa (Swagger UI) fica em http://localhost:7071/api/docs e a especificação OpenAPI em http://localhost:7071/api/openapi.json. Ela só responde com `DOCS_ENABLED=true` (já ligado no arquivo de exemplo).
+
 ## Escopo
 
 - **MVP (RF01 a RF09):** cadastro e login, membros da família, calendário vacinal por faixa etária, registro e ciclo de vida das doses, lembretes, busca por voz, chatbot, histórico, consentimento e exclusão de dados.

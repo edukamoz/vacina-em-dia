@@ -3,6 +3,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
+  // Em teste o domínio compartilhado vem do código-fonte, sem exigir `npm run build`.
+  moduleNameMapper: { '^@vacina/shared$': '<rootDir>/../../packages/shared/src/index.ts' },
   testMatch: ['**/*.test.ts'],
   // As funções em src/functions só registram o handler no SDK; a regra está em src/handlers.
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts', '!src/index.ts', '!src/functions/**'],
