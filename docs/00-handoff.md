@@ -18,7 +18,7 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - Objetivo: gerar `.docx` editáveis em `doctos/`, formatados fielmente pela ABNT (a formatação do PDF original pode ser perdida), já com a estrutura do modelo para preencher. Horas, datas e reuniões da Documentação de Desenvolvimento ficam em branco (são do autor).
 - Só apagar os 3 PDFs de modelo depois que o autor conferir os Word. Os outros 3 PDFs de `referencias-disciplinas/` permanecem como PDF.
 - Ferramentas que faltavam na máquina onde isso foi tentado (autor decide instalar): `poppler` (ler PDF), `pandoc` e `libreoffice` (renderizar e conferir o Word), via Homebrew.
-- Atenção: `docs/referencias-disciplinas/` **ainda não está commitada** (os PDFs existem só no computador original). Para o outro computador, o autor deve commitá-la (decisão: versionar os PDFs de referência) ou copiá-la manualmente.
+- Os 6 PDFs de `docs/referencias-disciplinas/` estão versionados na branch `docs/SCRUM-5-claude-md-word-e-pdf`, então chegam ao outro computador com `git pull`.
 
 **Próximo passo depois disso:** abrir PR da branch `docs/SCRUM-5-...` para a `main` e seguir a Sprint 1 (ver §4).
 
