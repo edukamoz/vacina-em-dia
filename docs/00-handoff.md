@@ -13,6 +13,14 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - Branch `docs/SCRUM-5-claude-md-word-e-pdf`: `CLAUDE.md` atualizado com a regra "Word (ABNT) durante o desenvolvimento, PDF só na entrega".
 - Jira SCRUM-5: comentário com o commit e worklog de 2h 17m lançados. Status **não** alterado.
 
+**Atualização de 06/10/2026 (fim da sessão):**
+- SCRUM-5: PR #1 já mesclado na `main`.
+- SCRUM-27 (plano de teste): `docs/07-testes/plano-de-teste.md`, branch `docs/SCRUM-27-plano-de-teste`, enviada ao GitHub; PR a abrir pelo autor.
+- SCRUM-33 (ADRs): `docs/05-adrs/` com ADR-001 a ADR-010, todos **Aceita**, branch `docs/SCRUM-33-adrs`, enviada ao GitHub; PR a abrir pelo autor. O autor deve revisar os ADRs (em especial os valores iniciais de limite de taxa no ADR-010 e a nota de residência de dados no ADR-005).
+- Verificações no Azure (somente leitura, via `az`): assinatura `Azure for Students` compatível com o SQL gratuito; política de regiões permitidas (Central US, Brazil South, Chile Central, South Africa North, North Central US); provedores `Microsoft.Sql`, `Microsoft.CognitiveServices` e `Microsoft.AzureActiveDirectory` ainda **não registrados** (registrar no SCRUM-22). O `az login` expira a cada 3 dias por acesso condicional do diretório (Centro Paula Souza); o autor refaz o login no navegador.
+- Nenhum recurso foi criado no Azure. Jira: SCRUM-27 e SCRUM-33 estão "Em andamento"; nada marcado como Concluído.
+- Próximo item da ordem da Sprint 1: SCRUM-31 (UML restante e DER), depois SCRUM-32 (design system) e SCRUM-35.
+
 **Pendente (em andamento): converter os 3 modelos de documentação para Word**
 - Arquivos: `docs/referencias-disciplinas/Modelo-Documentacao_tecnica.pdf`, `..._desenvolvimento.pdf` e `..._usuario.pdf`.
 - Objetivo: gerar `.docx` editáveis em `doctos/`, formatados fielmente pela ABNT (a formatação do PDF original pode ser perdida), já com a estrutura do modelo para preencher. Horas, datas e reuniões da Documentação de Desenvolvimento ficam em branco (são do autor).
