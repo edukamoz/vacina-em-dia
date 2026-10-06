@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.expo
+web-build
+package-lock.json
+docs/
+doctos/
+*.md
+expo-env.d.ts

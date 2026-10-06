@@ -1,0 +1,22 @@
+{
+  "name": "@vacina/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API do Vacina em Dia (Azure Functions, Node.js e TypeScript).",
+  "license": "MIT",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "npm run build && func start",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@azure/functions": "4.16.5",
+    "@vacina/shared": "0.1.0"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "4.15.2"
+  }
+}

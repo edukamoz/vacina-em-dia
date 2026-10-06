@@ -8,16 +8,34 @@ Projeto Interdisciplinar VI (PI-VI) da Fatec Votorantim, curso de Desenvolviment
 
 ## Estado atual
 
-Fase de planejamento: por enquanto o repositório contém **apenas documentação**. O código de aplicação ainda não existe. O estado detalhado e os próximos passos estão em [`docs/00-handoff.md`](docs/00-handoff.md).
+Fase inicial de construção. Já existem o monorepo com qualidade configurada, a **máquina de estados da dose** (com testes dos casos de teste do `docs/07-testes`), uma API mínima (`/api/health`) e o esqueleto do app Expo. O estado detalhado e os próximos passos estão em [`docs/00-handoff.md`](docs/00-handoff.md).
+
+## Como rodar
+
+Requer Node 20.19 ou mais novo (veja `.nvmrc`).
+
+```bash
+npm install            # instala todos os workspaces
+npm run build          # compila shared, API e exporta a versão web do app
+npm test               # testes (Jest)
+npm run test:coverage  # testes com cobertura (mínimo de 80%)
+npm run lint           # ESLint
+npm run typecheck      # TypeScript estrito
+npm run docs           # documentação do código (TypeDoc), gerada em docs/api
+npm run dev:mobile     # app Expo (celular e web)
+npm run dev:api        # API local (Azure Functions Core Tools)
+```
+
+Para a API local, copie `apps/api/local.settings.example.json` para `apps/api/local.settings.json`.
 
 ## Escopo
 
 - **MVP (RF01 a RF09):** cadastro e login, membros da família, calendário vacinal por faixa etária, registro e ciclo de vida das doses, lembretes, busca por voz, chatbot, histórico, consentimento e exclusão de dados.
 - **Versão completa (RF10 a RF12):** mapa de UBS, exportar PDF e compartilhar com cuidador, apenas se o cronograma permitir.
 
-## Tecnologias previstas
+## Tecnologias
 
-React Native com Expo e TypeScript no app; Azure Functions (Node.js) na API; Azure Function em Python (scikit-learn, TF-IDF + SVM) no chatbot; Azure AI Speech, Azure SQL, Key Vault, Application Insights e Entra External ID; Jest e pytest nos testes; GitHub Actions e Docker. A lista completa e as versões ficam em `docs/tech-versions.md` (a criar junto com o setup).
+React Native com Expo e TypeScript no app; Azure Functions (Node.js) na API; Azure Function em Python (scikit-learn, TF-IDF + SVM) no chatbot; Azure AI Speech, Azure SQL, Key Vault, Application Insights e Entra External ID; Jest e pytest nos testes; GitHub Actions e Docker. A lista completa e as versões exatas ficam em [`docs/tech-versions.md`](docs/tech-versions.md).
 
 ## Estrutura de pastas
 
@@ -30,11 +48,11 @@ vacina-em-dia/
 ├── docs/                 # documentação-fonte (visão, requisitos, UML, testes)
 ├── doctos/               # (planejado) documentações finais e panfleto
 ├── apps/
-│   ├── mobile/           # (planejado) Expo: Android, iOS e web
-│   ├── api/              # (planejado) Azure Functions em TypeScript
+│   ├── mobile/           # Expo: Android, iOS e web
+│   ├── api/              # Azure Functions em TypeScript
 │   └── nlp/              # (planejado) Azure Function em Python: chatbot e intenções
 └── packages/
-    └── shared/           # (planejado) tipos, esquemas Zod e domínio puro
+    └── shared/           # tipos, esquemas Zod e domínio puro (máquina de estados da dose)
 ```
 
 ## Como contribuir

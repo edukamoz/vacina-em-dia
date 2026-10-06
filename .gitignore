@@ -75,3 +75,6 @@ Thumbs.db
 !.vscode/settings.json
 !.vscode/extensions.json
 *.swp
+
+# Gerado pelo Expo
+expo-env.d.ts
