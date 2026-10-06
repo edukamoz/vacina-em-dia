@@ -12,7 +12,7 @@ Fase inicial de construção. Já existem o monorepo com qualidade configurada, 
 
 ## Como rodar
 
-Requer Node 20.19 ou mais novo (veja `.nvmrc`).
+Requer Node 22.13 ou mais novo; o projeto usa o Node 24 LTS (veja `.nvmrc`).
 
 ```bash
 npm install            # instala todos os workspaces
