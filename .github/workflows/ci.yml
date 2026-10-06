@@ -105,7 +105,9 @@ jobs:
       - name: Testar a API e o app web (pela mesma origem)
         run: |
           curl -fsS http://localhost:7071/api/health
-          curl -fsS http://localhost:8080/api/doses > /dev/null
+          curl -fsS http://localhost:8080/api/health > /dev/null
+          # Sem sessão, a API recusa (401): prova que o proxy chega à API e que o acesso é conferido.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/members)" = "401"
           curl -fsS http://localhost:8080/ > /dev/null
 
       - name: Mostrar os logs se algo falhar
