@@ -13,6 +13,12 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - Branch `docs/SCRUM-5-claude-md-word-e-pdf`: `CLAUDE.md` atualizado com a regra "Word (ABNT) durante o desenvolvimento, PDF só na entrega".
 - Jira SCRUM-5: comentário com o commit e worklog de 2h 17m lançados. Status **não** alterado.
 
+**Atualização de 06/10/2026 (SCRUM-35 e status do Jira):**
+- Itens movidos para **Em análise** pelo Claude, a pedido do autor, por terem cumprido os critérios de pronto: SCRUM-27, SCRUM-29, SCRUM-31 e SCRUM-33. SCRUM-32 segue em andamento (protótipo do Figma incompleto). Nada está Concluído; isso só ocorre na reunião de encerramento da Sprint 1 (até 12/10).
+- `docs/09-documentacao-de-desenvolvimento.md` criado com a estrutura do modelo (o modelo pula da seção 3 para a 6; a numeração aqui é contínua). Foram preenchidos só os fatos verificáveis. **Tempos, horários e durações ficam `[a informar]`**: o autor precisa informá-los; o Claude não os inventa (CLAUDE.md §13 e critério "tempos reais" do SCRUM-35). Já registrado de verdade: 2 h 17 min no SCRUM-5. Custo de nuvem: zero, confirmado pelo autor.
+- `poppler` instalado via Homebrew (`pdftotext` e `pdftoppm` disponíveis).
+- Pendências do autor para o SCRUM-35: RA; tempo por item (SCRUM-27, 29, 31, 32, 33 e 35); data, horário e duração das reuniões de planejamento, diárias e encerramento; quais estudos entram em 3.3. O Claude lança os worklogs no Jira depois que o autor informar os tempos reais.
+
 **Atualização de 06/10/2026 (SCRUM-32, Figma):**
 - Doc do design system e `tokens.json` já estão na `main`. O arquivo do Figma (chave `lZboLAlTDtA2cJQRyKtcdW`, link em `docs/04-design-system.md` §8) foi construído até o limite de chamadas do Figma MCP no plano Starter (também só 1 modo por coleção e 3 páginas).
 - **Feito no Figma:** coleções de cor por tema (Claro `4:2`, Escuro `4:24`, Alto contraste `4:46`) e Medidas (`4:68`); 8 estilos de texto Atkinson; 14 componentes na página `0:1`: Selo `5:32`, Botão `6:20` (props `Texto#6:0`, `Tipo`, `Estado`), Campo `6:36` (`Rotulo#6:10`, `Valor#6:14`, `Estado`), Cartão de dose `7:77` (`Vacina#7:0`, `Detalhe#7:6`, `Estado`), Voz `7:96`, Aviso `7:103`, Vazio `8:27`, Erro `8:37`, Carregando `8:46`, Navegação `8:149`, Membro `9:65` (`Nome#9:0`, `Idade#9:3`, `Situacao`) e Mensagem `9:72` (`Mensagem#9:6`, `Autor`). Nomes de variantes são em ASCII (por exemplo `Tipo=Principal, Estado=Padrao`).
