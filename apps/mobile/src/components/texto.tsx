@@ -1,4 +1,5 @@
 import { Text, type TextProps } from 'react-native';
+import { getThemeColors } from '../theme/tokens';
 
 /** Estilos de texto do design system (`tokens.json`, `tipografia.estilos`). */
 export type TextoVariante =
@@ -16,6 +17,22 @@ const CLASSES: Readonly<Record<TextoVariante, string>> = {
   botao: 'text-botao font-negrito',
 };
 
+const COLOR_CLASS = new RegExp(
+  `(^|\\s)text-(${Object.keys(getThemeColors('light')).join('|')})(\\s|$)`,
+);
+
+/**
+ * Cor padrão do texto, só quando quem chama não escolheu outra. Duas classes de cor no mesmo
+ * elemento disputam pela ordem do CSS gerado (não pela ordem escrita), o que já deixou texto
+ * claro sobre botão claro; por isso a padrão só entra se não houver outra.
+ *
+ * @param className - Classes extras recebidas pelo componente.
+ * @returns `text-texto` ou texto vazio.
+ */
+export function textColorClass(className: string): string {
+  return COLOR_CLASS.test(className) ? '' : 'text-texto';
+}
+
 /**
  * Texto com a fonte e o tamanho do design system. Escala com o tamanho de fonte do sistema.
  *
@@ -27,5 +44,7 @@ export function Texto({
   className = '',
   ...rest
 }: TextProps & { variante?: TextoVariante; className?: string }) {
-  return <Text className={`text-texto ${CLASSES[variante]} ${className}`} {...rest} />;
+  return (
+    <Text className={`${textColorClass(className)} ${CLASSES[variante]} ${className}`} {...rest} />
+  );
 }
