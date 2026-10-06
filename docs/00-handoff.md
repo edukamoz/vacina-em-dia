@@ -51,6 +51,12 @@ Este arquivo é o canal de continuidade entre computadores e sessões. A memóri
 - Verificado no navegador com API e app reais (dados ao vivo, erro com a API desligada, recuperação). Nota: o TanStack Query pausa tentativas em aba oculta; ao testar o erro, deixe a aba visível.
 - Ainda **não** verificado: celular real e emuladores com esta versão. Próximos passos: `docker-compose` (SCRUM-25) e Azure mínimo (SCRUM-22).
 
+**Atualização de 06/10/2026 (SCRUM-25, Docker):**
+- Branch `feature/SCRUM-25-docker`: `docker compose up --build` sobe Azurite 3.37.0, a API (host oficial `azure-functions/node:4-node24`, só amd64, emulada em Mac M1/M2) e o app web (build do Expo servido por nginx 1.31.6, que repassa `/api` para a API: mesma origem, sem CORS). Dockerfiles em `apps/api/` e `apps/mobile/`, contexto de build é a raiz. Portas só em `127.0.0.1`: web 8080, API 7071, Azurite 10000 a 10002.
+- O app aceita `EXPO_PUBLIC_API_URL=/api` (caminho na mesma origem; `//host` é rejeitado). A imagem web usa esse valor por padrão.
+- Validado aqui: build das duas imagens, subida do zero com `down -v` e `up --build --wait`, API direta, via nginx, Swagger, POST, Azurite recebendo requisições do host e o app aberto no navegador pelo contêiner. Novo job `docker` no CI faz o mesmo (em amd64 nativo); ainda não rodou no GitHub.
+- **O SCRUM-25 ainda não está completo:** o critério pede o serviço de PLN no compose, que só existe com SCRUM-20 e SCRUM-21. Não mover para "Em análise" antes disso (ou combinar com o autor a divisão do item).
+
 **Lembretes por item (revisar com o autor quando o item começar):**
 
 | Item | O que revisar |
