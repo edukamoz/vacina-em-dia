@@ -1,6 +1,6 @@
 # Registros de decisão de arquitetura (ADRs)
 
-Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, decisão, alternativas e consequências. Item do Jira: SCRUM-33 (requisito RNF06). As decisões ADR-001 a ADR-008 vêm do Quadro 6 do documento de Fase 0; ADR-009 e ADR-010 resolvem pendências do `CLAUDE.md` §14.
+Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, decisão, alternativas e consequências. Item do Jira: SCRUM-33 (requisito RNF06). As decisões ADR-001 a ADR-008 vêm do Quadro 6 do documento de Fase 0; ADR-009 e ADR-010 resolvem pendências do `CLAUDE.md` §14; ADR-011 registra as decisões do design system (SCRUM-32).
 
 ## Índice
 
@@ -16,6 +16,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-008](ADR-008-key-vault-e-application-insights.md) | Segredos no Key Vault e monitoramento no Application Insights | Aceita |
 | [ADR-009](ADR-009-armazenamento-de-token-na-web.md) | Armazenamento do token de sessão no app (nativo e web) | Aceita |
 | [ADR-010](ADR-010-limitacao-de-taxa.md) | Limitação de taxa nos endpoints sensíveis | Aceita |
+| [ADR-011](ADR-011-design-system-universal-e-acessivel.md) | Design system universal (celular e web), três temas e fonte Atkinson | Aceita |
 
 ## Estados possíveis
 
