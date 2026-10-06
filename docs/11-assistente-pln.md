@@ -67,4 +67,40 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 
 - Dataset pequeno (R4 da Fase 0): os números do teste são otimistas; relatar sempre com as limitações.
 - Partida a frio da Function Python (treino na partida): medir contra a meta de 3 s da voz (RNF01).
-- Integração com a API principal, voz (Azure AI Speech) e a aba Assistente do app: próximo PR.
+- Voz no celular (Android e iOS): ainda não; a gravação existe só na web (ver abaixo).
+- Segredos (chave do PLN e da voz) estão como configuração da Function App; mover para o Key Vault (ADR-008) assim que a conta do autor tiver o papel de escrita no cofre.
+
+## Integração: API, voz e app (SCRUM-20)
+
+Fluxo da pergunta por voz: **app (web)** grava e converte para WAV PCM 16 kHz mono no próprio aparelho → `POST /api/assistant/voice` (corpo `audio/wav`) → **API** → **Azure AI Speech** (reconhecimento de fala curta, pt-BR) → transcrição → **serviço de PLN** (`/chat` e `/search`, em paralelo) → resposta com fonte, transcrição e vacinas encontradas. O áudio fica só em memória, durante a chamada: nunca é gravado.
+
+| Rota da API | Corpo | Limites | Erros |
+|---|---|---|---|
+| `POST /api/assistant/message` | `{"text": "..."}` (até 300 caracteres) | 60 por hora por usuário | 400, 401, 429, 503 |
+| `POST /api/assistant/voice` | WAV PCM 16 kHz, mono, até 60 s (o app grava até 30 s) | 20 por hora e 60 por dia por usuário | 401, 413, 415, 422 (fala não entendida), 429, 503 |
+
+- **Limite de uso (ADR-010):** janela fixa em memória, com `Retry-After` no 429. A versão com Table Storage do ADR entra com o banco; com uma instância só, o efeito é o mesmo.
+- **Sem configuração** (`NLP_BASE_URL`, `NLP_FUNCTION_KEY`, `SPEECH_ENDPOINT`, `SPEECH_KEY`), a API responde 503 "assistente indisponível" em vez de falhar.
+- **Voz na web:** `MediaRecorder` grava (WebM ou MP4, conforme o navegador), `AudioContext` decodifica e o app converte para o WAV que a API de fala curta aceita. Exige **https** ou `localhost` e a permissão do microfone; negada, o app orienta a digitar.
+- **Voz no celular:** ainda não. Depende de validar o módulo de áudio do Expo em aparelho real; hoje o app mostra só o campo de texto.
+- **Verificado:** áudio sintetizado com o próprio Azure ("Para que serve a vacina BCG?") foi reconhecido em 0,64 s e respondido de ponta a ponta. **Não** foi testado com microfone real nem em Android/iOS.
+
+### Desempenho e custo (medidos em 07/10/2026)
+
+- Serviço de PLN na nuvem, instância já ativa: 0,05 a 0,16 s por pergunta (uma amostra isolada de 3,7 s).
+- **Partida a frio do serviço Python: cerca de 50 s** (carrega as bibliotecas de ML). Por isso a Function de PLN usa **uma instância sempre pronta** (Flex Consumption, 512 MB), que custa uma pequena quantia fixa por mês (conferir na calculadora de preços, SCRUM-26). Também é necessário o paralelismo por instância em 8: com o padrão, chamadas em sequência esperavam ~5 s.
+- Cada nova publicação reinicia a instância e a primeira chamada depois dela pode levar cerca de 50 s.
+- O tempo de espera da API pelo PLN é de 15 s; se estourar, o app mostra "assistente indisponível".
+
+### Testes da integração
+
+| IDs | O que verifica |
+|---|---|
+| CT-AST-01 a 08 | Serviço do assistente: texto, voz, limite, áudio inválido, fala não entendida, falhas externas |
+| CT-AST-H01 a H06 | Handlers: validação, tipo de áudio e mapeamento de erros HTTP |
+| CT-RL-01 a 06 | Limitador de uso: janela, vários donos, várias regras, limpeza |
+| CT-CLI-01 a 14 | Clientes do PLN e da voz (chave, endereço, formato do áudio, erros sem detalhe) |
+| CT-WAV-01 a 07 | Conversão do áudio (WAV, mono, 16 kHz, 16 bits) |
+| CT-VOZ-01 a 11 | Gravador web e erros de microfone |
+| CT-APP-I01 a I06, V01 a V08 | Tela do assistente: chat, sugestões, aviso de saúde, erros e fluxo de voz |
+
