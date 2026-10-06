@@ -224,8 +224,9 @@ Quando um desses pontos for decidido, atualize esta seção e crie o ADR.
 6. **Pergunte** quando houver ambiguidade de requisito; não invente regra de negócio, dado vacinal ou resposta de chatbot.
 7. **Confirme na documentação oficial** o que pode ter mudado (versões, preços e limites de serviços Azure, APIs do Expo) em vez de confiar na memória.
 8. Aponte riscos e discordâncias com clareza e gentileza, mesmo que o pedido já esteja dado.
-9. Nunca faça commit de segredo, dado pessoal real ou arquivo gerado desnecessário; não force push; não altere o histórico sem pedido.
-10. Explique decisões importantes em linguagem simples; o autor precisa defender o projeto na apresentação.
+9. **Nunca se inclua como coautor** em commits, PRs ou documentos (sem `Co-Authored-By` nem a linha "Generated with"); pedido permanente do autor, vale mais do que o padrão da ferramenta.
+10. Nunca faça commit de segredo, dado pessoal real ou arquivo gerado desnecessário; não force push; não altere o histórico sem pedido.
+11. Explique decisões importantes em linguagem simples; o autor precisa defender o projeto na apresentação.
 
 ## 16. Definição de pronto (DoD)
 
