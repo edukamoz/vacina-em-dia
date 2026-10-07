@@ -1421,6 +1421,686 @@ const assistente: Caso[] = [
   ),
 ];
 
+// ---------------------------------------------------------------------------------------------
+// Parentesco do membro (RF02)
+// ---------------------------------------------------------------------------------------------
+const par = grupo('Parentesco do membro', 'RF02');
+const PARENTESCOS = [
+  'SELF',
+  'MOTHER',
+  'FATHER',
+  'SON',
+  'DAUGHTER',
+  'GRANDMOTHER',
+  'GRANDFATHER',
+  'SISTER',
+  'BROTHER',
+  'SPOUSE',
+  'OTHER',
+] as const;
+const base = { name: 'Ana', birthDate: '1990-01-10', isPregnant: false };
+
+/** Lê um campo do corpo da resposta como texto, para o "detalhe" conferido na tabela. */
+function campo(resposta: { jsonBody?: unknown }, nome: string): string {
+  return String((resposta.jsonBody as Record<string, unknown> | undefined)?.[nome]);
+}
+
+const comParentesco = (corpo: Record<string, unknown>) => async (a: Ambiente) => {
+  await a.consentir();
+  const r = await a.app.handlers.members.create(a.owner, corpo);
+  return saida(r, r.status === 201 ? campo(r, 'relationship') : undefined);
+};
+
+const parentescos: Caso[] = [
+  par(
+    {
+      id: 'CT-CP-P01',
+      tecnica: 'PE',
+      classe: 'Parentesco válido: o próprio usuário',
+      entrada: 'SELF',
+    },
+    { status: 201, detalhe: 'SELF' },
+    comParentesco({ ...base, relationship: 'SELF' }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P02',
+      tecnica: 'PE',
+      classe: 'Parentesco válido: parente (filha)',
+      entrada: 'DAUGHTER',
+    },
+    { status: 201, detalhe: 'DAUGHTER' },
+    comParentesco({ ...base, relationship: 'DAUGHTER' }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P03',
+      tecnica: 'PE',
+      classe: 'Parentesco válido: outro parente ou pessoa cuidada',
+      entrada: 'OTHER',
+    },
+    { status: 201, detalhe: 'OTHER' },
+    comParentesco({ ...base, relationship: 'OTHER' }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P04',
+      tecnica: 'PE',
+      classe: 'Parentesco omitido (opcional, vale "não informado")',
+      entrada: 'sem o campo',
+    },
+    { status: 201, detalhe: 'null' },
+    comParentesco(base),
+  ),
+  par(
+    {
+      id: 'CT-CP-P05',
+      tecnica: 'PE',
+      classe: 'Parentesco nulo (prefiro não informar)',
+      entrada: 'relationship = null',
+    },
+    { status: 201, detalhe: 'null' },
+    comParentesco({ ...base, relationship: null }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P06',
+      tecnica: 'PE',
+      classe: 'Todos os 11 parentescos da lista são aceitos',
+      entrada: 'os 11 códigos, um por pessoa',
+    },
+    { status: 201 },
+    async (a) => {
+      await a.consentir();
+      let ultima = 201;
+      for (const relationship of PARENTESCOS) {
+        const r = await a.app.handlers.members.create(a.owner, { ...base, relationship });
+        if (r.status !== 201) return saida(r);
+        ultima = r.status;
+      }
+      return { status: ultima };
+    },
+  ),
+  par(
+    {
+      id: 'CT-CP-P07',
+      tecnica: 'PE',
+      classe: 'Parentesco fora da lista',
+      entrada: 'VIZINHO',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    comParentesco({ ...base, relationship: 'VIZINHO' }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P08',
+      tecnica: 'VL',
+      classe: 'Código em minúsculas (a lista é sensível à caixa)',
+      entrada: 'self',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    comParentesco({ ...base, relationship: 'self' }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P09',
+      tecnica: 'VL',
+      classe: 'Parentesco vazio',
+      entrada: 'texto vazio',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    comParentesco({ ...base, relationship: '' }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P10',
+      tecnica: 'PE',
+      classe: 'Parentesco de tipo errado',
+      entrada: 'número 7',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    comParentesco({ ...base, relationship: 7 }),
+  ),
+  par(
+    {
+      id: 'CT-CP-P11',
+      tecnica: 'PE',
+      classe: 'Trocar o parentesco na edição',
+      entrada: 'DAUGHTER para FATHER',
+    },
+    { status: 200, detalhe: 'FATHER' },
+    async (a) => {
+      await a.consentir();
+      const criada = await a.app.handlers.members.create(a.owner, {
+        ...base,
+        relationship: 'DAUGHTER',
+      });
+      const id = (criada.jsonBody as { id: string }).id;
+      const r = await a.app.handlers.members.update(a.owner, id, {
+        ...base,
+        relationship: 'FATHER',
+      });
+      return saida(r, campo(r, 'relationship'));
+    },
+  ),
+  par(
+    {
+      id: 'CT-CP-P12',
+      tecnica: 'PE',
+      classe: 'Limpar o parentesco na edição',
+      entrada: 'MOTHER para nulo',
+    },
+    { status: 200, detalhe: 'null' },
+    async (a) => {
+      await a.consentir();
+      const criada = await a.app.handlers.members.create(a.owner, {
+        ...base,
+        relationship: 'MOTHER',
+      });
+      const id = (criada.jsonBody as { id: string }).id;
+      const r = await a.app.handlers.members.update(a.owner, id, {
+        ...base,
+        relationship: null,
+      });
+      return saida(r, campo(r, 'relationship'));
+    },
+  ),
+];
+
+// ---------------------------------------------------------------------------------------------
+// Dose avulsa (RF04, ADR-016)
+// ---------------------------------------------------------------------------------------------
+const avu = grupo('Dose avulsa', 'RF04');
+const AVULSA = { vaccine: 'Febre tifoide', doseLabel: '1ª dose', dueDate: somarDias(HOJE, 28) };
+
+/** Cadastra uma pessoa adulta com consentimento e devolve o id dela. */
+async function pessoaAdulta(a: Ambiente, dono: string = a.owner): Promise<string> {
+  await a.consentir(true, dono);
+  const m = await a.cadastrar('1990-01-10', 'Ana', dono);
+  return (m.jsonBody as { id: string }).id;
+}
+
+const criarAvulsa =
+  (corpo: unknown, detalhe: string | null = null) =>
+  async (a: Ambiente) => {
+    const id = await pessoaAdulta(a);
+    const r = await a.app.handlers.members.addCustomDose(a.owner, id, corpo);
+    return saida(r, detalhe && r.status === 201 ? campo(r, detalhe) : undefined);
+  };
+
+/** Cria uma dose avulsa e devolve o id da dose, para os casos do ciclo de estados. */
+async function doseAvulsa(a: Ambiente, dueDate = AVULSA.dueDate): Promise<string> {
+  const id = await pessoaAdulta(a);
+  const r = await a.app.handlers.members.addCustomDose(a.owner, id, { ...AVULSA, dueDate });
+  return (r.jsonBody as { id: string }).id;
+}
+
+const avulsas: Caso[] = [
+  avu(
+    {
+      id: 'CT-CP-V01',
+      tecnica: 'PE',
+      classe: 'Dados válidos: nasce Pendente e com origem avulsa',
+      entrada: 'Febre tifoide, 1ª dose, daqui a 28 dias',
+    },
+    { status: 201, detalhe: 'CUSTOM' },
+    criarAvulsa(AVULSA, 'origin'),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V02',
+      tecnica: 'PE',
+      classe: 'Estado inicial da dose avulsa (T1)',
+      entrada: 'dados válidos',
+    },
+    { status: 201, detalhe: 'PENDING' },
+    criarAvulsa(AVULSA, 'status'),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V03',
+      tecnica: 'PE',
+      classe: 'Nome com acento e espaços nas pontas (removidos)',
+      entrada: '"  Raiva (pré-exposição)  "',
+    },
+    { status: 201, detalhe: 'Raiva (pré-exposição)' },
+    criarAvulsa({ ...AVULSA, vaccine: '  Raiva (pré-exposição)  ' }, 'vaccine'),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V04',
+      tecnica: 'VL',
+      classe: 'Nome com 1 caractere (abaixo do mínimo de 2)',
+      entrada: 'nome de 1 caractere',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, vaccine: 'A' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V05',
+      tecnica: 'VL',
+      classe: 'Nome com 2 caracteres (mínimo)',
+      entrada: 'nome de 2 caracteres',
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, vaccine: 'AB' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V06',
+      tecnica: 'VL',
+      classe: 'Nome com 80 caracteres (máximo)',
+      entrada: 'nome de 80 caracteres',
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, vaccine: 'v'.repeat(80) }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V07',
+      tecnica: 'VL',
+      classe: 'Nome com 81 caracteres',
+      entrada: 'nome de 81 caracteres',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, vaccine: 'v'.repeat(81) }),
+  ),
+  avu(
+    { id: 'CT-CP-V08', tecnica: 'PE', classe: 'Nome só com espaços', entrada: 'nome "     "' },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, vaccine: '     ' }),
+  ),
+  avu(
+    { id: 'CT-CP-V09', tecnica: 'PE', classe: 'Nome ausente', entrada: 'sem nome' },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ doseLabel: AVULSA.doseLabel, dueDate: AVULSA.dueDate }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V10',
+      tecnica: 'PE',
+      classe: 'Nome com caractere de controle',
+      entrada: 'nome com quebra de linha',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, vaccine: 'Raiva\nB' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V11',
+      tecnica: 'PE',
+      classe: 'Nome com tipo errado',
+      entrada: 'número 123',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, vaccine: 123 }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V12',
+      tecnica: 'VL',
+      classe: 'Dose vazia (abaixo do mínimo de 1)',
+      entrada: 'dose vazia',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, doseLabel: '' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V13',
+      tecnica: 'VL',
+      classe: 'Dose com 1 caractere (mínimo)',
+      entrada: 'dose "1"',
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, doseLabel: '1' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V14',
+      tecnica: 'VL',
+      classe: 'Dose com 40 caracteres (máximo)',
+      entrada: 'dose de 40 caracteres',
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, doseLabel: 'd'.repeat(40) }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V15',
+      tecnica: 'VL',
+      classe: 'Dose com 41 caracteres',
+      entrada: 'dose de 41 caracteres',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, doseLabel: 'd'.repeat(41) }),
+  ),
+  avu(
+    { id: 'CT-CP-V16', tecnica: 'PE', classe: 'Dose ausente', entrada: 'sem a dose' },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ vaccine: AVULSA.vaccine, dueDate: AVULSA.dueDate }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V17',
+      tecnica: 'VL',
+      classe: 'Data prevista ontem (D-1, abaixo do limite)',
+      entrada: somarDias(HOJE, -1),
+    },
+    { status: 422, code: 'INVALID_DOSE_DATE' },
+    criarAvulsa({ ...AVULSA, dueDate: somarDias(HOJE, -1) }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V18',
+      tecnica: 'VL',
+      classe: 'Data prevista hoje (D, limite inferior válido)',
+      entrada: HOJE,
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, dueDate: HOJE }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V19',
+      tecnica: 'VL',
+      classe: 'Data prevista amanhã (D+1)',
+      entrada: somarDias(HOJE, 1),
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, dueDate: somarDias(HOJE, 1) }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V20',
+      tecnica: 'VL',
+      classe: 'Último dia do 10º ano à frente (limite superior válido)',
+      entrada: '2036-12-31',
+    },
+    { status: 201 },
+    criarAvulsa({ ...AVULSA, dueDate: '2036-12-31' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V21',
+      tecnica: 'VL',
+      classe: 'Primeiro dia do 11º ano à frente (acima do limite)',
+      entrada: '2037-01-01',
+    },
+    { status: 422, code: 'INVALID_DOSE_DATE' },
+    criarAvulsa({ ...AVULSA, dueDate: '2037-01-01' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V22',
+      tecnica: 'PE',
+      classe: 'Data inexistente no calendário',
+      entrada: '2026-02-30',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, dueDate: '2026-02-30' }),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V23',
+      tecnica: 'PE',
+      classe: 'Data em formato brasileiro',
+      entrada: '04/11/2026',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ ...AVULSA, dueDate: '04/11/2026' }),
+  ),
+  avu(
+    { id: 'CT-CP-V24', tecnica: 'PE', classe: 'Data ausente', entrada: 'sem data' },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa({ vaccine: AVULSA.vaccine, doseLabel: AVULSA.doseLabel }),
+  ),
+  avu(
+    { id: 'CT-CP-V25', tecnica: 'PE', classe: 'Corpo ausente', entrada: 'sem corpo' },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    criarAvulsa(undefined),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V26',
+      tecnica: 'VL',
+      classe: '30ª dose avulsa da pessoa (limite)',
+      entrada: '30ª dose avulsa',
+    },
+    { status: 201 },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      let r = await a.app.handlers.members.addCustomDose(a.owner, id, AVULSA);
+      for (let i = 1; i < 30; i += 1)
+        r = await a.app.handlers.members.addCustomDose(a.owner, id, AVULSA);
+      return saida(r);
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V27',
+      tecnica: 'VL',
+      classe: '31ª dose avulsa da pessoa',
+      entrada: '31ª dose avulsa',
+    },
+    { status: 422, code: 'LIMIT_REACHED' },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      for (let i = 0; i < 30; i += 1)
+        await a.app.handlers.members.addCustomDose(a.owner, id, AVULSA);
+      return saida(await a.app.handlers.members.addCustomDose(a.owner, id, AVULSA));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V28',
+      tecnica: 'PE',
+      classe: 'Sem consentimento prévio',
+      entrada: 'cadastrar a dose sem aceitar o termo',
+    },
+    { status: 403, code: 'CONSENT_REQUIRED' },
+    async (a) =>
+      saida(
+        await a.app.handlers.members.addCustomDose(a.owner, 'membro-sem-consentimento', AVULSA),
+      ),
+  ),
+  avu(
+    {
+      id: 'CT-CP-V29',
+      tecnica: 'PE',
+      classe: 'Pessoa inexistente',
+      entrada: 'id de pessoa que não existe',
+    },
+    { status: 404, code: 'NOT_FOUND' },
+    async (a) => {
+      await a.consentir();
+      return saida(await a.app.handlers.members.addCustomDose(a.owner, 'nao-existe', AVULSA));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V30',
+      tecnica: 'PE',
+      classe: 'Pessoa de outro usuário',
+      entrada: 'id de pessoa de outro dono',
+    },
+    { status: 404, code: 'NOT_FOUND' },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      await a.consentir(true, a.outroDono);
+      return saida(await a.app.handlers.members.addCustomDose(a.outroDono, id, AVULSA));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V31',
+      tecnica: 'PE',
+      classe: 'Identificador de pessoa inválido',
+      entrada: 'id "../x"',
+    },
+    { status: 400, code: 'VALIDATION_ERROR' },
+    async (a) => {
+      await a.consentir();
+      return saida(await a.app.handlers.members.addCustomDose(a.owner, '../x', AVULSA));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V32',
+      tecnica: 'PE',
+      classe: 'Ciclo de estados: agendar a dose avulsa (T2)',
+      entrada: `SCHEDULE ${HOJE}`,
+    },
+    { status: 200, detalhe: 'SCHEDULED' },
+    async (a) => {
+      const dose = await doseAvulsa(a);
+      const r = await a.app.handlers.doses.applyEvent(a.owner, dose, {
+        type: 'SCHEDULE',
+        date: HOJE,
+      });
+      return saida(r, campo(r, 'status'));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V33',
+      tecnica: 'PE',
+      classe: 'Ciclo de estados: registrar a aplicação da dose avulsa (T3)',
+      entrada: `APPLY ${somarDias(HOJE, -30)}`,
+    },
+    { status: 200, detalhe: 'APPLIED' },
+    async (a) => {
+      const dose = await doseAvulsa(a);
+      const r = await a.app.handlers.doses.applyEvent(a.owner, dose, {
+        type: 'APPLY',
+        date: somarDias(HOJE, -30),
+      });
+      return saida(r, campo(r, 'status'));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V34',
+      tecnica: 'VL',
+      classe: 'Aplicar a dose avulsa com data de amanhã (acima do limite)',
+      entrada: `APPLY ${somarDias(HOJE, 1)}`,
+    },
+    { status: 422, code: 'GUARD_VIOLATION' },
+    async (a) => {
+      const dose = await doseAvulsa(a);
+      return saida(
+        await a.app.handlers.doses.applyEvent(a.owner, dose, {
+          type: 'APPLY',
+          date: somarDias(HOJE, 1),
+        }),
+      );
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V35',
+      tecnica: 'PE',
+      classe: 'Ciclo de estados: cancelar a dose avulsa confirmando (T5)',
+      entrada: 'CANCEL confirmado',
+    },
+    { status: 200, detalhe: 'CANCELLED' },
+    async (a) => {
+      const dose = await doseAvulsa(a);
+      const r = await a.app.handlers.doses.applyEvent(a.owner, dose, {
+        type: 'CANCEL',
+        confirmed: true,
+      });
+      return saida(r, campo(r, 'status'));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V36',
+      tecnica: 'PE',
+      classe: 'Cancelar a dose avulsa sem confirmar',
+      entrada: 'CANCEL confirmed = false',
+    },
+    { status: 422, code: 'GUARD_VIOLATION' },
+    async (a) => {
+      const dose = await doseAvulsa(a);
+      return saida(
+        await a.app.handlers.doses.applyEvent(a.owner, dose, { type: 'CANCEL', confirmed: false }),
+      );
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V37',
+      tecnica: 'VL',
+      classe: 'Rotina de prazo: no próprio dia da data prevista a dose segue Pendente',
+      entrada: 'data prevista hoje; lida hoje',
+    },
+    { status: 200, detalhe: 'PENDING' },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      await a.app.handlers.members.addCustomDose(a.owner, id, { ...AVULSA, dueDate: HOJE });
+      const r = await a.app.handlers.members.listDoses(a.owner, id);
+      const itens = (r.jsonBody as { items: { origin: string; status: string }[] }).items;
+      return saida(r, itens.find((d) => d.origin === 'CUSTOM')?.status);
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V38',
+      tecnica: 'VL',
+      classe: 'Rotina de prazo: no dia seguinte à data prevista a dose vira Atrasada (T4)',
+      entrada: 'data prevista hoje; lida amanhã',
+    },
+    { status: 200, detalhe: 'OVERDUE' },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      await a.app.handlers.members.addCustomDose(a.owner, id, { ...AVULSA, dueDate: HOJE });
+      a.app.setNow('2026-10-07T15:00:00.000Z');
+      const r = await a.app.handlers.members.listDoses(a.owner, id);
+      const itens = (r.jsonBody as { items: { origin: string; status: string }[] }).items;
+      return saida(r, itens.find((d) => d.origin === 'CUSTOM')?.status);
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V39',
+      tecnica: 'PE',
+      classe: 'Dose avulsa aparece na lista da pessoa junto das oficiais',
+      entrada: 'listar as doses depois de cadastrar uma avulsa',
+    },
+    { status: 200, detalhe: '1' },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      await a.app.handlers.members.addCustomDose(a.owner, id, AVULSA);
+      const r = await a.app.handlers.members.listDoses(a.owner, id);
+      const itens = (r.jsonBody as { items: { origin: string }[] }).items;
+      return saida(r, String(itens.filter((d) => d.origin === 'CUSTOM').length));
+    },
+  ),
+  avu(
+    {
+      id: 'CT-CP-V40',
+      tecnica: 'PE',
+      classe: 'Editar a pessoa não apaga nem duplica a dose avulsa',
+      entrada: 'editar o nome depois de cadastrar uma avulsa',
+    },
+    { status: 200, detalhe: '1' },
+    async (a) => {
+      const id = await pessoaAdulta(a);
+      await a.app.handlers.members.addCustomDose(a.owner, id, AVULSA);
+      await a.app.handlers.members.update(a.owner, id, {
+        name: 'Ana Maria',
+        birthDate: '1990-01-10',
+        isPregnant: false,
+      });
+      const r = await a.app.handlers.members.listDoses(a.owner, id);
+      const itens = (r.jsonBody as { items: { origin: string }[] }).items;
+      return saida(r, String(itens.filter((d) => d.origin === 'CUSTOM').length));
+    },
+  ),
+];
+
 /** Todos os casos de caixa preta, na ordem em que aparecem na tabela de execução. */
 export const CASOS: readonly Caso[] = [
   ...contas,
@@ -1428,7 +2108,9 @@ export const CASOS: readonly Caso[] = [
   ...recuperacao,
   ...consentimento,
   ...membros,
+  ...parentescos,
   ...faixas,
   ...doses,
+  ...avulsas,
   ...assistente,
 ];
