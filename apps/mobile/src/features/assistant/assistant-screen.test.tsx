@@ -8,7 +8,7 @@ const mockRecorder = { start: jest.fn(), stop: jest.fn(), cancel: jest.fn() };
 let mockSupported = true;
 jest.mock('./voice-recorder', () => ({
   isVoiceSupported: () => mockSupported,
-  createVoiceRecorder: () => mockRecorder,
+  useVoiceRecorder: () => mockRecorder,
 }));
 
 const REPLY: AssistantResponse['reply'] = {
@@ -160,7 +160,9 @@ describe('assistente: pergunta por voz (RF06)', () => {
     mockSupported = false;
     await renderScreen(<AssistantScreen />, api().fetchFn);
     expect(screen.queryByRole('button', { name: 'Falar a pergunta' })).not.toBeOnTheScreen();
-    expect(screen.getByText(/pergunta por voz está disponível no navegador/)).toBeOnTheScreen();
+    expect(
+      screen.getByText(/pergunta por voz não está disponível neste navegador/),
+    ).toBeOnTheScreen();
     expect(screen.getByLabelText('Sua pergunta')).toBeOnTheScreen();
   });
 

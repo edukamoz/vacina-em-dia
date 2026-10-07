@@ -1,6 +1,5 @@
 import { createVoiceRecorder, isVoiceSupported } from './voice-recorder.web';
 import { VoiceError } from './voice-types';
-import * as native from './voice-recorder';
 
 type G = Record<string, unknown>;
 const g = globalThis as unknown as G;
@@ -151,15 +150,7 @@ describe('gravador de voz (web)', () => {
   });
 });
 
-describe('gravador de voz (celular)', () => {
-  test('CT-VOZ-10: ainda não suportado, mas os erros são claros e cancelar é seguro', async () => {
-    expect(native.isVoiceSupported()).toBe(false);
-    const recorder = native.createVoiceRecorder();
-    await expect(recorder.start()).rejects.toMatchObject({ kind: 'UNSUPPORTED' });
-    await expect(recorder.stop()).rejects.toMatchObject({ kind: 'UNSUPPORTED' });
-    expect(recorder.cancel()).toBeUndefined();
-  });
-
+describe('mensagens de erro da voz', () => {
   test('CT-VOZ-11: as mensagens de erro estão em linguagem simples e sempre oferecem digitar', () => {
     for (const kind of [
       'UNSUPPORTED',

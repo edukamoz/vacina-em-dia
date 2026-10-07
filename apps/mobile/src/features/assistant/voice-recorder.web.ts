@@ -1,3 +1,4 @@
+import { useMemo, useRef } from 'react';
 import { toSpeechWav } from '../../lib/wav';
 import { VoiceError, type VoiceRecorder } from './voice-types';
 
@@ -107,4 +108,31 @@ export function createVoiceRecorder(): VoiceRecorder {
       chunks = [];
     },
   };
+}
+
+/**
+ * Gravador para a tela do assistente: na web, cada gravação usa um {@link createVoiceRecorder}
+ * novo. Tem o mesmo formato do gancho do celular (`voice-recorder.ts`), que precisa ser um hook.
+ */
+export function useVoiceRecorder(): VoiceRecorder {
+  const current = useRef<VoiceRecorder | null>(null);
+  return useMemo<VoiceRecorder>(
+    () => ({
+      async start() {
+        current.current?.cancel();
+        current.current = createVoiceRecorder();
+        await current.current.start();
+      },
+      async stop() {
+        const active = current.current;
+        if (!active) throw new VoiceError('FAILED');
+        return active.stop();
+      },
+      cancel() {
+        current.current?.cancel();
+        current.current = null;
+      },
+    }),
+    [],
+  );
 }

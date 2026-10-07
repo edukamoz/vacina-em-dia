@@ -6,7 +6,7 @@ const MESSAGES: Readonly<Record<VoiceErrorKind, string>> = {
   UNSUPPORTED:
     'A pergunta por voz ainda não está disponível neste aparelho. Digite a sua pergunta.',
   PERMISSION_DENIED:
-    'Para falar, permita o uso do microfone nas configurações do navegador. Se preferir, digite a sua pergunta.',
+    'Para falar, permita o uso do microfone nas configurações do aparelho ou do navegador. Se preferir, digite a sua pergunta.',
   NO_MICROPHONE: 'Não encontramos um microfone. Digite a sua pergunta.',
   EMPTY_RECORDING: 'Não ouvimos nada. Toque em Falar e tente de novo, ou digite a sua pergunta.',
   FAILED: 'Não foi possível gravar o áudio. Tente de novo ou digite a sua pergunta.',

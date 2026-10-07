@@ -74,7 +74,7 @@ Nota mínima de 0,35 (abaixo disso não devolve). Índice montado na partida em 
 
 - Dataset pequeno (R4 da Fase 0): os números do teste são otimistas; relatar sempre com as limitações.
 - Partida a frio da Function Python (treino na partida): medir contra a meta de 3 s da voz (RNF01).
-- Voz no celular (Android e iOS): ainda não; a gravação existe só na web (ver abaixo).
+- Voz no celular (Android e iOS): implementada em 07/10/2026 com `expo-audio`; testada no emulador Android, **falta celular físico e iOS** (ver abaixo).
 - Segredos (chave do PLN e da voz) estão como configuração da Function App; mover para o Key Vault (ADR-008) assim que a conta do autor tiver o papel de escrita no cofre.
 
 ## Integração: API, voz e app (SCRUM-20)
@@ -89,8 +89,8 @@ Fluxo da pergunta por voz: **app (web)** grava e converte para WAV PCM 16 kHz mo
 - **Limite de uso (ADR-010):** janela fixa em memória, com `Retry-After` no 429. A versão com Table Storage do ADR entra com o banco; com uma instância só, o efeito é o mesmo.
 - **Sem configuração** (`NLP_BASE_URL`, `NLP_FUNCTION_KEY`, `SPEECH_ENDPOINT`, `SPEECH_KEY`), a API responde 503 "assistente indisponível" em vez de falhar.
 - **Voz na web:** `MediaRecorder` grava (WebM ou MP4, conforme o navegador), `AudioContext` decodifica e o app converte para o WAV que a API de fala curta aceita. Exige **https** ou `localhost` e a permissão do microfone; negada, o app orienta a digitar.
-- **Voz no celular:** ainda não. Depende de validar o módulo de áudio do Expo em aparelho real; hoje o app mostra só o campo de texto.
-- **Verificado:** áudio sintetizado com o próprio Azure ("Para que serve a vacina BCG?") foi reconhecido em 0,64 s e respondido de ponta a ponta. **Não** foi testado com microfone real nem em Android/iOS.
+- **Voz no celular (Android e iOS):** o app captura o microfone em **PCM** com o `AudioStream` do `expo-audio` (pedido de 16 kHz, mono, `float32`), junta os blocos e usa o **mesmo conversor da web** (`toSpeechWav`: mono, 16 kHz, WAV de 16 bits). Assim a API e o Azure AI Speech recebem o mesmo WAV de sempre, sem mudança no servidor e sem arquivo de áudio no aparelho. Por que não gravar em arquivo: o Android não grava WAV nem PCM em arquivo pelo `expo-audio` (só AAC, AMR e WebM), e a API de áudio curto do Azure só lê WAV e Ogg. O gravador é um hook (`useVoiceRecorder`) porque o módulo entrega o microfone por um objeto ligado ao componente. A permissão do microfone é pedida ao tocar em Falar; negada, o app orienta a digitar. O texto da permissão no iOS vem do plugin `expo-audio` em `app.json`.
+- **Verificado:** áudio sintetizado com o próprio Azure ("Para que serve a vacina BCG?") foi reconhecido em 0,64 s e respondido de ponta a ponta (web). Os testes automatizados do gravador do celular usam o `expo-audio` simulado (permissão, conversão de 48 kHz para 16 kHz, estéreo, gravação vazia ou curta, cancelamento). Em 07/10/2026 o autor testou a voz no **emulador Android** (microfone virtual do computador): a fala foi reconhecida e respondida. Falta testar em celular físico e em iOS. Para rodar a API local com voz, são necessários o Azurite e o PLN (`docker compose up -d azurite nlp`) e `NLP_BASE_URL`, `NLP_FUNCTION_KEY`, `SPEECH_ENDPOINT` e `SPEECH_KEY` no `local.settings.json`.
 
 ### Desempenho e custo (medidos em 07/10/2026)
 
