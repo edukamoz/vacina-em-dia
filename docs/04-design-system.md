@@ -133,7 +133,7 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 
 | Tela | Requisito | Celular | Web |
 |---|---|---|---|
-| Entrar e criar conta | RF01 | Uma coluna, botão de largura total | Cartão centralizado de até 480 |
+| Entrar e criar conta | RF01 | Uma coluna, botão de largura total | Duas colunas: lateral de 560 com a marca e formulário de 440 (implementado em 07/10/2026, ver `docs/14-login-proprio.md`) |
 | Consentimento | RF09 | Texto em linguagem simples, botão "Aceito" | Mesmo, em coluna de leitura |
 | Início: pessoas da família | RF02 | Lista de cartões de membro | Grade de cartões ao lado da barra lateral |
 | Calendário do membro | RF03 e RF04 | Lista de cartões de dose, mais atrasadas primeiro | Duas colunas, filtro por estado |

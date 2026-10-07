@@ -7,6 +7,7 @@ import type {
   MemberResponse,
 } from '@vacina/shared';
 import type { ReactElement } from 'react';
+import type { SessionStore, StoredSession } from './session/auth-storage';
 import { SessionProvider } from './session/session-provider';
 import { ThemeProvider } from './theme/theme-provider';
 
@@ -54,24 +55,73 @@ export function createFakeFetch(routes: FakeRoutes) {
   return { fetchFn: fetchFn as unknown as typeof fetch, calls, mock: fetchFn };
 }
 
-/**
- * Renderiza uma tela com tudo de que ela depende: dados do servidor (TanStack Query), sessão e
- * tema. O cache não tenta de novo nem expira, para o teste ser determinístico.
- *
- * @param ui - Tela a renderizar.
- * @param fetchFn - `fetch` falso.
- */
-export async function renderScreen(ui: ReactElement, fetchFn: typeof fetch) {
-  const client = new QueryClient({
-    // gcTime infinito evita o temporizador de limpeza de cache, que deixaria o Jest aberto.
+/** Sessão de login de teste (o token de acesso vence em 2026-10-06T16:00:00Z). */
+export const STORED_SESSION: StoredSession = {
+  accessToken: 'token-de-acesso-1',
+  refreshToken: 'token-de-renovacao-1',
+  expiresAt: Date.parse('2026-10-06T16:00:00.000Z'),
+  account: { id: 'conta-1', email: 'mariana@exemplo.com.br' },
+};
+
+/** Armazenamento de sessão em memória, que guarda o que foi salvo e conta as chamadas. */
+export function memorySessionStore(initial: StoredSession | null = null) {
+  const box = { saved: initial, saves: 0, clears: 0 };
+  const store: SessionStore = {
+    load: async () => box.saved,
+    save: async (session) => {
+      box.saved = session;
+      box.saves += 1;
+    },
+    clear: async () => {
+      box.saved = null;
+      box.clears += 1;
+    },
+  };
+  return { store, box };
+}
+
+/** Opções de renderização de uma tela. */
+export interface RenderOptions {
+  /** Com `store`, a tela roda com login de verdade (sem a sessão de demonstração). */
+  readonly store?: SessionStore;
+  /** Relógio do provedor de sessão, em milissegundos. */
+  readonly now?: () => number;
+}
+
+/** Cliente de dados de teste: sem tentativas e sem expirar o cache, para ser determinístico. */
+export function createTestQueryClient() {
+  // gcTime infinito evita o temporizador de limpeza de cache, que deixaria o Jest aberto.
+  return new QueryClient({
     defaultOptions: {
       queries: { retry: false, gcTime: Infinity },
       mutations: { gcTime: Infinity },
     },
   });
+}
+
+/**
+ * Renderiza uma tela com tudo de que ela depende: dados do servidor (TanStack Query), sessão e
+ * tema. Por padrão usa a sessão de demonstração; com `options.store`, usa o login.
+ *
+ * @param ui - Tela a renderizar.
+ * @param fetchFn - `fetch` falso.
+ * @param options - Armazenamento da sessão e relógio, para testar o login.
+ */
+export async function renderScreen(
+  ui: ReactElement,
+  fetchFn: typeof fetch,
+  options: RenderOptions = {},
+) {
+  const client = createTestQueryClient();
   return render(
     <QueryClientProvider client={client}>
-      <SessionProvider baseUrl={TEST_BASE_URL} sessionId={TEST_SESSION} fetchFn={fetchFn}>
+      <SessionProvider
+        baseUrl={TEST_BASE_URL}
+        fetchFn={fetchFn}
+        {...(options.store
+          ? { store: options.store, ...(options.now ? { now: options.now } : {}) }
+          : { sessionId: TEST_SESSION })}
+      >
         <ThemeProvider>{ui}</ThemeProvider>
       </SessionProvider>
     </QueryClientProvider>,

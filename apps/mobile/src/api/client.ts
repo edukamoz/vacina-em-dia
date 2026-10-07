@@ -27,12 +27,19 @@ export class ApiRequestError extends Error {
   }
 }
 
-/** Contexto de toda chamada: endereço da API, sessão e `fetch` (injetável para testar sem rede). */
+/** Contexto de toda chamada: endereço da API, identificação do usuário e `fetch` injetável. */
 export interface ApiContext {
   /** URL base da API, sem barra final. */
   readonly baseUrl: string;
-  /** Identificador da sessão de demonstração (cabeçalho `x-demo-session`). */
-  readonly sessionId: string;
+  /** Sessão de demonstração (cabeçalho `x-demo-session`): só para testes e desenvolvimento. */
+  readonly sessionId?: string;
+  /** Token de acesso atual do login (cabeçalho `Authorization: Bearer`), se houver sessão. */
+  readonly getAccessToken?: () => Promise<string | undefined>;
+  /**
+   * Renova a sessão quando a API responde 401 e devolve o novo token de acesso, ou `undefined`
+   * se não foi possível (a sessão terminou). A chamada é repetida uma única vez.
+   */
+  readonly refreshAccessToken?: () => Promise<string | undefined>;
   readonly fetchFn?: typeof fetch;
 }
 
@@ -45,25 +52,35 @@ export interface RequestOptions {
   readonly binary?: { readonly data: Uint8Array; readonly contentType: string };
   /** Sinal para cancelar a chamada (o TanStack Query o fornece). */
   readonly signal?: AbortSignal;
+  /** Chamadas de login e cadastro não levam token nem tentam renovar a sessão. */
+  readonly anonymous?: boolean;
 }
 
-async function send(
-  { baseUrl, sessionId, fetchFn = fetch }: ApiContext,
-  { path, method = 'GET', body, binary, signal }: RequestOptions,
+async function sendOnce(
+  context: ApiContext,
+  { path, method = 'GET', body, binary, signal, anonymous }: RequestOptions,
+  accessToken: string | undefined,
 ): Promise<Response> {
-  let response: Response;
+  const { baseUrl, sessionId, fetchFn = fetch } = context;
   const contentType = binary?.contentType ?? (body === undefined ? undefined : 'application/json');
   const payload = binary
     ? (binary.data as BodyInit)
     : body === undefined
       ? undefined
       : JSON.stringify(body);
+  const identity: Record<string, string> = anonymous
+    ? {}
+    : accessToken
+      ? { Authorization: `Bearer ${accessToken}` }
+      : sessionId
+        ? { 'x-demo-session': sessionId }
+        : {};
   try {
-    response = await fetchFn(`${baseUrl}${path}`, {
+    return await fetchFn(`${baseUrl}${path}`, {
       method,
       headers: {
         Accept: 'application/json',
-        'x-demo-session': sessionId,
+        ...identity,
         ...(contentType ? { 'Content-Type': contentType } : {}),
       },
       ...(payload === undefined ? {} : { body: payload }),
@@ -71,6 +88,15 @@ async function send(
     });
   } catch {
     throw new ApiRequestError('network');
+  }
+}
+
+async function send(context: ApiContext, options: RequestOptions): Promise<Response> {
+  let token = options.anonymous ? undefined : await context.getAccessToken?.();
+  let response = await sendOnce(context, options, token);
+  if (response.status === 401 && !options.anonymous && context.refreshAccessToken) {
+    token = await context.refreshAccessToken();
+    if (token) response = await sendOnce(context, options, token);
   }
   if (response.ok) return response;
 

@@ -41,7 +41,7 @@ describe('navegação principal', () => {
     await render(<BarraDeNavegacao largura={1280} />);
     expect(screen.getByRole('header', { name: 'Vacina em Dia' })).toBeOnTheScreen();
     expect(screen.getByText('Carteira de vacinação da família')).toBeOnTheScreen();
-    expect(screen.getByText(/Versão de demonstração, sem login/)).toBeOnTheScreen();
+    expect(screen.getByText(/Projeto acadêmico, versão de demonstração/)).toBeOnTheScreen();
   });
 
   test.each([390, 800])(
