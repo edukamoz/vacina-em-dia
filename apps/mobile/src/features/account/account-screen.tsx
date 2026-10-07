@@ -1,24 +1,34 @@
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
+import { useSession } from '../../session/session-provider';
 import { useConsent, useDeleteAccount } from '../data/hooks';
 
 /**
- * Aba "Conta" (RF09): aparência, dados do consentimento e exclusão da conta com todos os dados.
- * A exclusão sempre pede uma confirmação.
+ * Aba "Conta" (RF09): e-mail da conta, aparência, dados do consentimento, saída da conta e
+ * exclusão da conta com todos os dados. A exclusão sempre pede uma confirmação.
  */
 export function AccountScreen() {
-  const router = useRouter();
+  const { account, logout, endSession } = useSession();
   const consent = useConsent();
   const remove = useDeleteAccount();
   const [confirmando, setConfirmando] = useState(false);
 
   return (
     <Tela titulo="Conta" subtitulo="Aparência, privacidade e seus dados.">
+      {account ? (
+        <Cartao className="gap-sm">
+          <Texto variante="titulo3" accessibilityRole="header">
+            Sua conta
+          </Texto>
+          <Texto>{account.email}</Texto>
+          <Botao titulo="Sair da conta" variante="secundario" onPress={() => void logout()} />
+        </Cartao>
+      ) : null}
+
       <SeletorDeTema />
 
       <Cartao className="gap-sm">
@@ -43,7 +53,6 @@ export function AccountScreen() {
         <Texto className="text-textoSecundario">
           O calendário segue o Calendário Nacional de Vacinação 2026, do Ministério da Saúde. O
           aplicativo não substitui a caderneta oficial nem a orientação de profissionais de saúde.
-          Esta é uma versão de demonstração, sem login.
         </Texto>
       </Cartao>
 
@@ -71,7 +80,7 @@ export function AccountScreen() {
             disabled={remove.isPending}
             onPress={() =>
               remove.mutate(undefined, {
-                onSuccess: () => router.replace('/consentimento'),
+                onSuccess: () => void endSession(),
               })
             }
           />

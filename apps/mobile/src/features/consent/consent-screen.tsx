@@ -60,8 +60,8 @@ export function ConsentScreen() {
         }
       />
       <Texto variante="apoio" className="text-textoSecundario">
-        Esta é uma versão de demonstração: ainda não há login. Não cadastre dados de pessoas reais
-        sem a autorização delas.
+        Esta é uma versão de demonstração de um projeto acadêmico. Não cadastre dados de pessoas sem
+        a autorização delas.
       </Texto>
     </Tela>
   );

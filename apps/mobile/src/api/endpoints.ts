@@ -1,5 +1,7 @@
 import {
+  accountInfoSchema,
   assistantResponseSchema,
+  authSessionSchema,
   consentInputSchema,
   consentResponseSchema,
   doseResponseSchema,
@@ -8,6 +10,8 @@ import {
   memberResponseSchema,
   type AssistantMessageInput,
   type ConsentInput,
+  type LoginInput,
+  type RegisterInput,
   type DoseEventInput,
   type MemberInput,
 } from '@vacina/shared';
@@ -18,6 +22,38 @@ import { apiRequest, apiRequestNoContent, type ApiContext } from './client';
  * `@vacina/shared` e as respostas são validadas pelo cliente (CLAUDE.md §7).
  */
 export const endpoints = {
+  register: (ctx: ApiContext, input: RegisterInput) =>
+    apiRequest(
+      ctx,
+      { path: '/auth/register', method: 'POST', body: input, anonymous: true },
+      authSessionSchema,
+    ),
+
+  login: (ctx: ApiContext, input: LoginInput) =>
+    apiRequest(
+      ctx,
+      { path: '/auth/login', method: 'POST', body: input, anonymous: true },
+      authSessionSchema,
+    ),
+
+  refreshSession: (ctx: ApiContext, refreshToken: string) =>
+    apiRequest(
+      ctx,
+      { path: '/auth/refresh', method: 'POST', body: { refreshToken }, anonymous: true },
+      authSessionSchema,
+    ),
+
+  logout: (ctx: ApiContext, refreshToken: string) =>
+    apiRequestNoContent(ctx, {
+      path: '/auth/logout',
+      method: 'POST',
+      body: { refreshToken },
+      anonymous: true,
+    }),
+
+  getMe: (ctx: ApiContext, signal?: AbortSignal) =>
+    apiRequest(ctx, { path: '/auth/me', ...(signal ? { signal } : {}) }, accountInfoSchema),
+
   getConsent: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(ctx, { path: '/consent', ...(signal ? { signal } : {}) }, consentResponseSchema),
 
