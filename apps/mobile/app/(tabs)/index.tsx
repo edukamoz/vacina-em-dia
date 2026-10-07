@@ -1,4 +1,4 @@
-import { FamilyScreen } from '../../src/features/family/family-screen';
+import { DosesScreen } from '../../src/features/doses/doses-screen';
 
-/** Aba Família: a lógica fica em `src/features/family`, para poder ser testada. */
-export default FamilyScreen;
+/** Aba Doses (a primeira do app): a lógica fica em `src/features/doses`, para poder ser testada. */
+export default DosesScreen;

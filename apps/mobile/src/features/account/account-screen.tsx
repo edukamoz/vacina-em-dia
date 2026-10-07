@@ -18,7 +18,7 @@ export function AccountScreen() {
   const [confirmando, setConfirmando] = useState(false);
 
   return (
-    <Tela titulo="Conta" subtitulo="Aparência, privacidade e seus dados.">
+    <Tela reservaBalao titulo="Conta" subtitulo="Aparência, privacidade e seus dados.">
       {account ? (
         <Cartao className="gap-sm">
           <Texto variante="titulo3" accessibilityRole="header">

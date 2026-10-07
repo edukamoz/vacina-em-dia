@@ -1,8 +1,8 @@
 import type * as Dates from '../lib/dates';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { DoseResponse } from '@vacina/shared';
-import { CalendarScreen, resumoDoses } from './calendar/calendar-screen';
 import { DoseDetailScreen } from './doses/dose-detail-screen';
+import { DosesScreen, LIMITE_APLICADAS, agruparDoses } from './doses/doses-screen';
 import { HistoryScreen, historyOf } from './history/history-screen';
 import {
   MEMBER,
@@ -61,8 +61,8 @@ const CANCELLED = dose({ id: 'd-can', vaccine: 'covid-19', status: 'CANCELLED' }
 
 const FAMILY = { 'GET /members': { status: 200, body: { items: [MEMBER, OTHER_MEMBER] } } };
 
-describe('calendário (RF03 e RF04)', () => {
-  test('CT-APP-K01: separa atrasadas, agendadas e a fazer, resume e cita a fonte oficial', async () => {
+describe('doses (RF03 e RF04)', () => {
+  test('CT-APP-K01: separa atenção, próximas e aplicadas, esconde as canceladas e cita a fonte', async () => {
     const fake = createFakeFetch({
       ...FAMILY,
       'GET /members/m-1/doses': {
@@ -70,13 +70,13 @@ describe('calendário (RF03 e RF04)', () => {
         body: memberDoses([OVERDUE, SCHEDULED, PENDING, APPLIED, CANCELLED]),
       },
     });
-    await renderScreen(<CalendarScreen />, fake.fetchFn);
-    expect(await screen.findByText('1 atrasada, 1 agendada, 1 a fazer')).toBeOnTheScreen();
-    for (const titulo of ['Atrasadas', 'Agendadas', 'A fazer']) {
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    expect(await screen.findByRole('header', { name: 'Doses de Maria' })).toBeOnTheScreen();
+    for (const titulo of ['Precisam de atenção', 'Próximas', 'Aplicadas']) {
       expect(screen.getByRole('header', { name: titulo })).toBeOnTheScreen();
     }
     expect(screen.getByText('hepatite B, 1 dose')).toBeOnTheScreen();
-    expect(screen.queryByText('BCG, dose única')).not.toBeOnTheScreen();
+    expect(screen.getByText('BCG, dose única')).toBeOnTheScreen();
     expect(screen.queryByText('covid-19, 2ª dose')).not.toBeOnTheScreen();
     expect(screen.getByText(/Calendário Nacional de Vacinação 2026/)).toBeOnTheScreen();
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
@@ -85,39 +85,31 @@ describe('calendário (RF03 e RF04)', () => {
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/dose/[id]', params: { id: 'd-over' } });
   });
 
-  test('CT-APP-K02: troca de pessoa pelo seletor e busca o calendário dela', async () => {
+  test('CT-APP-K02: "Trocar pessoa" leva à aba Família', async () => {
     const fake = createFakeFetch({
       ...FAMILY,
       'GET /members/m-1/doses': { status: 200, body: memberDoses([PENDING]) },
-      'GET /members/m-2/doses': {
-        status: 200,
-        body: memberDoses(
-          [dose({ id: 'd-adulto', vaccine: 'dT', doseLabel: '3 doses' })],
-          OTHER_MEMBER,
-        ),
-      },
     });
-    await renderScreen(<CalendarScreen />, fake.fetchFn);
+    await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByText('tríplice viral SCR, 1ª dose')).toBeOnTheScreen();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'João' }));
-    expect(await screen.findByText('dT, 3 doses')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'João' })).toBeSelected();
+    await fireEvent.press(screen.getByRole('link', { name: 'Trocar pessoa' }));
+    expect(mockPush).toHaveBeenCalledWith('/familia');
   });
 
-  test('CT-APP-K03: quando não há dose aberta, diz que está tudo em dia', async () => {
+  test('CT-APP-K03: quando não há dose aberta, diz que está tudo em dia e mostra as aplicadas', async () => {
     const fake = createFakeFetch({
       'GET /members': { status: 200, body: { items: [MEMBER] } },
       'GET /members/m-1/doses': { status: 200, body: memberDoses([APPLIED]) },
     });
-    await renderScreen(<CalendarScreen />, fake.fetchFn);
+    await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByText('Tudo em dia por aqui')).toBeOnTheScreen();
-    expect(screen.getByText('Carteira de Maria')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Doses de Maria' })).toBeOnTheScreen();
+    expect(screen.getByText('BCG, dose única')).toBeOnTheScreen();
   });
 
   test('CT-APP-K04: sem ninguém cadastrado, leva a adicionar uma pessoa', async () => {
     const fake = createFakeFetch({ 'GET /members': { status: 200, body: { items: [] } } });
-    await renderScreen(<CalendarScreen />, fake.fetchFn);
+    await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByText('Nenhuma pessoa cadastrada')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Adicionar pessoa' }));
     expect(mockPush).toHaveBeenCalledWith('/membro/novo');
@@ -125,7 +117,7 @@ describe('calendário (RF03 e RF04)', () => {
 
   test('CT-APP-K05: falha ao carregar a família permite tentar de novo', async () => {
     const fake = createFakeFetch({ 'GET /members': { status: 503, body: undefined } });
-    await renderScreen(<CalendarScreen />, fake.fetchFn);
+    await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
   });
 
@@ -134,15 +126,41 @@ describe('calendário (RF03 e RF04)', () => {
       'GET /members': { status: 200, body: { items: [MEMBER] } },
       'GET /members/m-1/doses': { status: 500, body: undefined },
     });
-    await renderScreen(<CalendarScreen />, fake.fetchFn);
+    await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
   });
 
-  test('CT-APP-K06: resumoDoses concorda singular e plural', () => {
-    expect(resumoDoses([])).toBe('0 atrasadas, 0 agendadas, 0 a fazer');
-    expect(resumoDoses([{ status: 'OVERDUE' }, { status: 'OVERDUE' }])).toBe(
-      '2 atrasadas, 0 agendadas, 0 a fazer',
+  test('CT-APP-K06: agruparDoses ordena por data, põe as agendadas antes das pendentes e as aplicadas da mais recente', () => {
+    const cedo = dose({ id: 'a', status: 'SCHEDULED', scheduledDate: '2026-10-20' });
+    const tarde = dose({ id: 'b', status: 'SCHEDULED', scheduledDate: '2026-12-01' });
+    const pendente = dose({ id: 'c', dueDate: '2026-10-10' });
+    const semData = dose({ id: 'd', dueDate: undefined });
+    const antiga = dose({ id: 'e', status: 'APPLIED', appliedDate: '2026-01-01' });
+    const recente = dose({ id: 'f', status: 'APPLIED', appliedDate: '2026-06-01' });
+    const grupos = agruparDoses([tarde, semData, pendente, cedo, antiga, recente, CANCELLED]);
+    expect(grupos.proximas.map((d) => d.id)).toEqual(['a', 'b', 'c', 'd']);
+    expect(grupos.aplicadas.map((d) => d.id)).toEqual(['f', 'e']);
+    expect(grupos.atencao).toEqual([]);
+  });
+
+  test('CT-APP-K07: com muitas aplicadas, mostra só as mais recentes e leva ao Histórico', async () => {
+    const muitas = Array.from({ length: LIMITE_APLICADAS + 2 }, (_, i) =>
+      dose({
+        id: `ap-${i}`,
+        vaccine: `vacina ${i}`,
+        status: 'APPLIED',
+        appliedDate: `2026-0${i + 1}-01`,
+      }),
     );
+    const fake = createFakeFetch({
+      'GET /members': { status: 200, body: { items: [MEMBER] } },
+      'GET /members/m-1/doses': { status: 200, body: memberDoses(muitas) },
+    });
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    expect(await screen.findByText('vacina 6, 1ª dose')).toBeOnTheScreen();
+    expect(screen.queryByText('vacina 0, 1ª dose')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('link', { name: 'Ver todas no Histórico' }));
+    expect(mockPush).toHaveBeenCalledWith('/historico');
   });
 });
 
