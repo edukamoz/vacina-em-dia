@@ -82,6 +82,8 @@ Reavaliar a cada atualização do Expo.
 
 Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `apps/nlp/requirements*.txt`.
 
+**Auditoria:** o CI roda `pip-audit 2.10.1` sobre `requirements.txt` (só produção) e falha se alguma versão fixada tiver vulnerabilidade conhecida. Em 07/10/2026 a execução local não encontrou nenhuma. Quando falhar, atualizar o pacote e registrar aqui.
+
 | Pacote | Versão | Uso |
 |---|---|---|
 | scikit-learn | 1.9.1 | TF-IDF, SVM e calibração (classificador de intenções e busca) |
