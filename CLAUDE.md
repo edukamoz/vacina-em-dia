@@ -51,7 +51,7 @@ Consulte sempre estes arquivos antes de implementar algo (se não existirem, avi
 | API | **Azure Functions** (Node.js + TypeScript), **sem Express** |
 | PLN | Azure Function em **Python** (scikit-learn, TF-IDF + SVM); voz com **Azure AI Speech** |
 | Banco | **Azure SQL Database** |
-| Identidade | **Microsoft Entra External ID** (ver §14) |
+| Identidade | **Login próprio** (e-mail e senha no Azure SQL; ADR-014) |
 | Segredos | **Azure Key Vault** (acesso por identidade gerenciada) |
 | Observabilidade | **Application Insights** |
 | Validação | **Zod**, compartilhado entre app e API |
@@ -201,11 +201,11 @@ Dados de vacinação são dados pessoais sobre saúde, portanto **sensíveis** (
 
 Decididas em 06/10/2026 (ver `docs/05-adrs/`):
 
-- **Entra External ID** (ADR-005): aceito; 50.000 usuários ativos por mês gratuitos. Pendente no SCRUM-22: criar o tenant externo (o diretório é do Centro Paula Souza) e tratar a ausência de região no Brasil na política de privacidade.
+- **Login próprio** (ADR-014, substitui a ADR-005 em 07/10/2026): o diretório do Centro Paula Souza não permite criar tenant do Entra External ID. Contas e hash scrypt no Azure SQL, JWT de 15 minutos e token de renovação com rotação; recuperação de senha fica para depois (exige serviço de e-mail, a aprovar).
 - **Azure SQL** (ADR-004): aceito, na oferta gratuita (a assinatura Azure for Students é compatível), região Brazil South, pausa automática ao esgotar a franquia.
 - **Context API + TanStack Query** (ADR-006): aceito.
 - **Token na web** (ADR-009): `expo-secure-store` no nativo e `sessionStorage` com CSP na web; validar no SCRUM-13.
-- **Rate limiting** (ADR-010): contador por usuário no Table Storage; login delegado ao Entra.
+- **Rate limiting** (ADR-010): contador por usuário no Table Storage; o login tem limite próprio por e-mail e origem (ADR-014).
 
 Ainda em aberto:
 

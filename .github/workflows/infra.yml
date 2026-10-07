@@ -1,0 +1,27 @@
+name: Infraestrutura (Bicep)
+
+on:
+  push:
+    paths:
+      - 'infra/**'
+      - '.github/workflows/infra.yml'
+  pull_request:
+    paths:
+      - 'infra/**'
+      - '.github/workflows/infra.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bicep:
+    name: Compilar e checar os templates Bicep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Compilar (falha em erro de sintaxe ou de tipo)
+        run: az bicep build --file infra/main.bicep --stdout > /dev/null
+      - name: Linter (falha em aviso)
+        run: |
+          az bicep lint --file infra/main.bicep 2>&1 | tee lint.txt
+          ! grep -qiE "(warning|error) " lint.txt
