@@ -49,8 +49,16 @@ describe('tela de apresentação', () => {
     }
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
-    expect(mockPush).toHaveBeenCalledWith('/criar-conta');
+    expect(screen.getByText('Exemplo com dados inventados.')).toBeOnTheScreen();
+    expect(screen.getByText('Comece a acompanhar suas doses.')).toBeOnTheScreen();
+
+    const criar = screen.getAllByRole('button', { name: 'Criar conta' });
+    expect(criar).toHaveLength(2);
+    for (const botao of criar) {
+      mockPush.mockClear();
+      await fireEvent.press(botao);
+      expect(mockPush).toHaveBeenCalledWith('/criar-conta');
+    }
     await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
     expect(mockPush).toHaveBeenCalledWith('/entrar');
   });
@@ -157,14 +165,14 @@ describe('tela "Entrar"', () => {
   test('CT-APP-L16: "Esqueci minha senha" leva à tela de recuperação', async () => {
     const { store } = memorySessionStore();
     await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn, { store });
-    await fireEvent.press(screen.getByRole('button', { name: 'Esqueci minha senha' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Esqueci minha senha' }));
     expect(mockPush).toHaveBeenCalledWith('/esqueci-senha');
   });
 
   test('CT-APP-L17: "Criar conta" leva à tela de cadastro', async () => {
     const { store } = memorySessionStore();
     await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn, { store });
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Criar conta' }));
     expect(mockReplace).toHaveBeenCalledWith('/criar-conta');
   });
 
@@ -237,7 +245,7 @@ describe('tela "Criar conta"', () => {
     const { store } = memorySessionStore();
     const fetchFn = jest.fn().mockRejectedValue(new Error('x'));
     await renderScreen(<RegisterScreen />, fetchFn as unknown as typeof fetch, { store });
-    await fireEvent.press(screen.getByRole('button', { name: 'Já tenho conta. Entrar' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Já tenho conta. Entrar' }));
     expect(mockReplace).toHaveBeenCalledWith('/entrar');
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);

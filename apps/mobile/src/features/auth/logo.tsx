@@ -11,7 +11,7 @@ import { useThemeColors } from '../../theme/theme-provider';
  */
 export function Logo({ grande = false }: { grande?: boolean }) {
   const cores = useThemeColors();
-  const lado = grande ? 56 : 40;
+  const lado = grande ? 64 : 40;
   return (
     <View className="flex-row items-center gap-sm" accessibilityRole="header">
       <Svg width={lado} height={lado} viewBox="0 0 48 48" aria-hidden>

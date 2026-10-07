@@ -26,6 +26,7 @@ module.exports = {
       minWidth: { toque: `${toque.minimo}px` },
       maxWidth: {
         conteudo: `${layout.larguraMaximaConteudo}px`,
+        pagina: `${layout.larguraMaximaPagina}px`,
         // Conteúdo de 960 px mais a margem de cada lado: a margem fica fora da largura máxima.
         conteudoComMargem: `${layout.larguraMaximaConteudo + 2 * layout.margemExpandido}px`,
         form: `${layout.larguraFormulario}px`,

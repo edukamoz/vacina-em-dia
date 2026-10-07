@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ApiRequestError } from '../../api/client';
 import { Botao } from '../../components/botao';
 import { CampoTexto } from '../../components/campo-texto';
+import { LinkTexto } from '../../components/link-texto';
 import { Texto } from '../../components/texto';
 import { useSession } from '../../session/session-provider';
 import { AuthFrame } from './auth-frame';
@@ -80,11 +81,7 @@ export function RegisterScreen() {
         disabled={pending}
         onPress={() => void submit()}
       />
-      <Botao
-        titulo="Já tenho conta. Entrar"
-        variante="secundario"
-        onPress={() => router.replace('/entrar')}
-      />
+      <LinkTexto titulo="Já tenho conta. Entrar" onPress={() => router.replace('/entrar')} />
     </AuthFrame>
   );
 }
