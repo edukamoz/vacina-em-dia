@@ -79,6 +79,15 @@ export interface StoredRefreshToken {
   readonly revokedAt?: string;
 }
 
+/** Token de redefinição de senha guardado: só o hash, nunca o valor enviado por e-mail. */
+export interface StoredPasswordResetToken {
+  readonly tokenHash: string;
+  readonly accountId: string;
+  readonly expiresAt: string;
+  /** Quando foi usado; presente significa que não vale mais. */
+  readonly usedAt?: string;
+}
+
 /** Acesso às contas de login e aos tokens de renovação. */
 export interface AuthRepository {
   /** Cria a conta; `false` quando o e-mail já existe (a unicidade é do repositório, sem corrida). */
@@ -95,6 +104,14 @@ export interface AuthRepository {
   revokeRefreshToken(tokenHash: string, at: string): Promise<void>;
   /** Revoga todos os tokens da conta (reuso suspeito ou saída de todos os aparelhos). */
   revokeAllRefreshTokens(accountId: string, at: string): Promise<void>;
+  /** Guarda um token de redefinição de senha. */
+  savePasswordResetToken(token: StoredPasswordResetToken): Promise<void>;
+  /** Busca um token de redefinição pelo hash. */
+  findPasswordResetToken(tokenHash: string): Promise<StoredPasswordResetToken | undefined>;
+  /** Marca o token como usado; `true` só para quem o usou primeiro (atômico, uso único). */
+  consumePasswordResetToken(tokenHash: string, at: string): Promise<boolean>;
+  /** Troca o hash da senha da conta. */
+  updatePasswordHash(accountId: string, passwordHash: string): Promise<void>;
   /** Apaga a conta e os tokens dela (exclusão de conta, RF09). */
   deleteAccount(id: string): Promise<void>;
 }

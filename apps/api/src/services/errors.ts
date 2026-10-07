@@ -29,7 +29,7 @@ export interface LimitReachedError {
 export interface RateLimitedError {
   readonly code: 'RATE_LIMITED';
   /** O que foi limitado; muda só a mensagem. Sem valor, é o assistente. */
-  readonly scope?: 'assistant' | 'login' | 'register';
+  readonly scope?: 'assistant' | 'login' | 'register' | 'reset';
   /** Segundos até a próxima janela livre. */
   readonly retryAfterSeconds: number;
 }
@@ -74,6 +74,11 @@ export interface InvalidTokenError {
   readonly code: 'INVALID_TOKEN';
 }
 
+/** Link de redefinição de senha inválido, vencido ou já usado. */
+export interface InvalidResetTokenError {
+  readonly code: 'INVALID_RESET_TOKEN';
+}
+
 /** O login não está configurado neste ambiente (falta a chave de assinatura). */
 export interface AuthUnavailableError {
   readonly code: 'AUTH_UNAVAILABLE';
@@ -95,6 +100,7 @@ export type ServiceError =
   | EmailAlreadyRegisteredError
   | WeakPasswordError
   | InvalidTokenError
+  | InvalidResetTokenError
   | AuthUnavailableError
   | TransitionError;
 
