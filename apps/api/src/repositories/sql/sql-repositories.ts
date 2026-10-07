@@ -81,10 +81,10 @@ function toDose(row: SqlRow): StoredDose {
     id: text(row, 'id'),
     memberId: text(row, 'member_id'),
     ruleId,
-    custom:
-      ruleId === null && customVaccine !== null
-        ? { vaccine: customVaccine, doseLabel: text(row, 'custom_dose_label') }
-        : null,
+    // Só a dose avulsa tem `custom`; a oficial não traz a chave, como no repositório em memória.
+    ...(ruleId === null && customVaccine !== null
+      ? { custom: { vaccine: customVaccine, doseLabel: text(row, 'custom_dose_label') } }
+      : {}),
     status: status as DoseStatus,
     dueDate: text(row, 'due_date'),
     scheduledDate: nullableText(row, 'scheduled_date'),
