@@ -1,40 +1,49 @@
-import type { DoseEventInput, DoseResponse } from '@vacina/shared';
+import type { CivilDate, DoseEventInput, DoseResponse } from '@vacina/shared';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Botao } from '../../components/botao';
-import { CampoTexto } from '../../components/campo-texto';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro } from '../../components/estados';
+import { LinkTexto } from '../../components/link-texto';
+import { SeletorDeData } from '../../components/seletor-de-data';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
-import { maskBrDate, parseBrDate, todayCivil } from '../../lib/dates';
-import { useDose, useDoseEvent } from '../data/hooks';
-import { doseHint } from './dose-card';
+import { todayCivil } from '../../lib/dates';
+import { useDose, useDoseEvent, useMembers } from '../data/hooks';
+import { doseDateRow, doseHint } from './dose-card';
 import { formatCivilDate } from './format-date';
+
+/** O que a pessoa está fazendo agora na tela: escolhendo a data de uma ação ou confirmando o cancelamento. */
+type Acao = 'APPLY' | 'SCHEDULE' | 'CANCEL';
 
 /** Ações disponíveis em cada estado, conforme o ciclo de vida da dose (RF04). */
 function acoesDoEstado(status: DoseResponse['status']) {
   switch (status) {
     case 'PENDING':
-      return { agendar: 'Agendar', desmarcar: false, cancelar: true } as const;
+      return { agendar: 'Agendar', desmarcar: false, aplicar: true, cancelar: true } as const;
     case 'SCHEDULED':
-      return { agendar: null, desmarcar: true, cancelar: true } as const;
+      return { agendar: null, desmarcar: true, aplicar: true, cancelar: true } as const;
     case 'OVERDUE':
-      return { agendar: 'Reagendar', desmarcar: false, cancelar: true } as const;
+      return { agendar: 'Reagendar', desmarcar: false, aplicar: true, cancelar: true } as const;
     case 'APPLIED':
     case 'CANCELLED':
       return null;
   }
 }
 
+/** Texto de cada painel de data: pergunta, limite da data e rótulo do botão de confirmar. */
+const PAINEL = {
+  APPLY: { pergunta: 'Em que dia foi aplicada?', confirmar: 'Confirmar aplicação' },
+  SCHEDULE: { pergunta: 'Para que dia?', confirmar: 'Confirmar agendamento' },
+} as const;
+
 function DoseActions({ dose }: { dose: DoseResponse }) {
   const mutation = useDoseEvent(dose.id);
-  const [data, setData] = useState(() => formatCivilDate(todayCivil()));
-  const [confirmando, setConfirmando] = useState(false);
-  const [tentou, setTentou] = useState(false);
+  const [acao, setAcao] = useState<Acao | null>(null);
+  const [data, setData] = useState<CivilDate>(() => todayCivil());
   const acoes = acoesDoEstado(dose.status);
-  const date = parseBrDate(data);
 
   if (!acoes) {
     return (
@@ -47,44 +56,67 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
   }
 
   function enviar(evento: DoseEventInput) {
-    mutation.mutate(evento, { onSuccess: () => setConfirmando(false) });
+    mutation.mutate(evento, { onSuccess: () => setAcao(null) });
   }
-  function comData(tipo: 'APPLY' | 'SCHEDULE' | 'RESCHEDULE') {
-    setTentou(true);
-    if (date) enviar({ type: tipo, date });
+  function escolher(nova: Acao) {
+    mutation.reset();
+    setData(todayCivil());
+    setAcao(nova);
+  }
+  const erro = mutation.error ? (
+    <Texto className="text-erro" accessibilityRole="alert">
+      {mutation.error.message}
+    </Texto>
+  ) : null;
+
+  if (acao === 'CANCEL') {
+    return (
+      <Cartao className="gap-md border-erro">
+        <Texto variante="corpoNegrito">Cancelar esta dose?</Texto>
+        <Texto>
+          Ela deixa de aparecer como necessária. Cancele só se um profissional de saúde orientou.
+        </Texto>
+        {erro}
+        <Botao
+          titulo="Sim, cancelar a dose"
+          variante="perigo"
+          disabled={mutation.isPending}
+          onPress={() => enviar({ type: 'CANCEL', confirmed: true })}
+        />
+        <Botao titulo="Não, voltar" variante="secundario" onPress={() => setAcao(null)} />
+      </Cartao>
+    );
+  }
+
+  if (acao === 'APPLY' || acao === 'SCHEDULE') {
+    const hoje = todayCivil();
+    const textos = PAINEL[acao];
+    const tipo = acao === 'APPLY' ? 'APPLY' : dose.status === 'OVERDUE' ? 'RESCHEDULE' : 'SCHEDULE';
+    return (
+      <Cartao className="gap-md">
+        <Texto variante="corpoNegrito">{textos.pergunta}</Texto>
+        <SeletorDeData
+          rotulo={textos.pergunta}
+          valor={data}
+          aoEscolher={setData}
+          {...(acao === 'APPLY' ? { maximo: hoje } : { minimo: hoje })}
+        />
+        <Texto accessibilityLiveRegion="polite">{`Data escolhida: ${formatCivilDate(data)}`}</Texto>
+        {erro}
+        <Botao
+          titulo={textos.confirmar}
+          disabled={mutation.isPending}
+          onPress={() => enviar({ type: tipo, date: data })}
+        />
+        <Botao titulo="Voltar" variante="secundario" onPress={() => setAcao(null)} />
+      </Cartao>
+    );
   }
 
   return (
     <View className="gap-md">
-      <CampoTexto
-        rotulo="Data"
-        value={data}
-        onChangeText={(texto) => setData(maskBrDate(texto))}
-        keyboardType="number-pad"
-        placeholder="DD/MM/AAAA"
-        maxLength={10}
-        ajuda="Para registrar a aplicação, use o dia em que tomou. Para agendar, o dia marcado."
-        erro={tentou && !date ? 'Digite a data completa, por exemplo 06/10/2026.' : undefined}
-      />
-      {mutation.error ? (
-        <Texto className="text-erro" accessibilityRole="alert">
-          {mutation.error.message}
-        </Texto>
-      ) : null}
-
-      <Botao
-        titulo="Registrar que foi aplicada"
-        disabled={mutation.isPending}
-        onPress={() => comData('APPLY')}
-      />
-      {acoes.agendar ? (
-        <Botao
-          titulo={acoes.agendar}
-          variante="secundario"
-          disabled={mutation.isPending}
-          onPress={() => comData(dose.status === 'OVERDUE' ? 'RESCHEDULE' : 'SCHEDULE')}
-        />
-      ) : null}
+      {erro}
+      {acoes.agendar ? <Botao titulo={acoes.agendar} onPress={() => escolher('SCHEDULE')} /> : null}
       {acoes.desmarcar ? (
         <Botao
           titulo="Desmarcar o agendamento"
@@ -93,38 +125,39 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
           onPress={() => enviar({ type: 'UNSCHEDULE' })}
         />
       ) : null}
+      <Botao
+        titulo="Registrar aplicação"
+        variante={acoes.agendar ? 'secundario' : 'principal'}
+        onPress={() => escolher('APPLY')}
+      />
+      <Botao titulo="Cancelar dose" variante="perigo" onPress={() => escolher('CANCEL')} />
+    </View>
+  );
+}
 
-      {acoes.cancelar && !confirmando ? (
-        <Botao titulo="Cancelar esta dose" variante="perigo" onPress={() => setConfirmando(true)} />
-      ) : null}
-      {acoes.cancelar && confirmando ? (
-        <Cartao className="gap-md border-erro">
-          <Texto variante="corpoNegrito">Cancelar esta dose?</Texto>
-          <Texto>
-            Ela deixa de aparecer como necessária. Cancele só se um profissional de saúde orientou.
-          </Texto>
-          <Botao
-            titulo="Sim, cancelar a dose"
-            variante="perigo"
-            disabled={mutation.isPending}
-            onPress={() => enviar({ type: 'CANCEL', confirmed: true })}
-          />
-          <Botao titulo="Não, voltar" variante="secundario" onPress={() => setConfirmando(false)} />
-        </Cartao>
-      ) : null}
+function Linha({ rotulo, valor }: { rotulo: string; valor: string }) {
+  return (
+    <View className="gap-xs">
+      <Texto variante="rotulo" className="text-textoSecundario">
+        {rotulo}
+      </Texto>
+      <Texto variante="corpoNegrito">{valor}</Texto>
     </View>
   );
 }
 
 /**
- * Detalhe de uma dose (RF04): o que é, para que serve, quando é indicada, as notas oficiais e as
- * ações permitidas no estado atual (registrar aplicação, agendar, reagendar, desmarcar, cancelar).
- * O cancelamento sempre pede confirmação.
+ * Detalhe de uma dose (RF04): para quem é, a data que importa, quando é indicada, o que evita, as
+ * notas oficiais e as ações permitidas no estado atual (agendar ou reagendar, registrar a
+ * aplicação, desmarcar e cancelar). As datas se escolhem em um calendário e o cancelamento sempre
+ * pede confirmação.
  *
  * @param props.id - Identificador da dose.
  */
 export function DoseDetailScreen({ id }: { id: string }) {
+  const router = useRouter();
   const { data: dose, error, isPending, refetch } = useDose(id);
+  const members = useMembers();
 
   if (isPending) {
     return (
@@ -144,19 +177,25 @@ export function DoseDetailScreen({ id }: { id: string }) {
     );
   }
 
+  const paraQuem = members.data?.items.find((pessoa) => pessoa.id === dose.memberId)?.name;
+  const linhaDeData = doseDateRow(dose);
+
   return (
-    <Tela titulo={dose.vaccine} subtitulo={dose.doseLabel} voltar>
+    <Tela titulo={`${dose.vaccine}, ${dose.doseLabel}`}>
+      <LinkTexto
+        titulo="Voltar para Doses"
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+      />
       <SeloEstadoDose status={dose.status} />
       <Cartao className="gap-md">
-        <View className="gap-xs">
-          <Texto variante="rotulo">Protege contra</Texto>
-          <Texto>{dose.diseases}</Texto>
-        </View>
-        <View className="gap-xs">
-          <Texto variante="rotulo">Quando</Texto>
-          <Texto>{dose.timingLabel}</Texto>
-          <Texto className="text-textoSecundario">{doseHint(dose)}</Texto>
-        </View>
+        {paraQuem ? <Linha rotulo="Para quem" valor={paraQuem} /> : null}
+        {linhaDeData ? (
+          <Linha rotulo={linhaDeData.rotulo} valor={linhaDeData.valor} />
+        ) : (
+          <Linha rotulo="Data" valor={doseHint(dose)} />
+        )}
+        <Linha rotulo="Quando é indicada" valor={dose.timingLabel} />
+        <Linha rotulo="Protege contra" valor={dose.diseases} />
         {dose.conditional ? (
           <Texto className="text-textoSecundario">
             Esta vacina só é indicada em algumas situações. Leia as notas abaixo e converse com um

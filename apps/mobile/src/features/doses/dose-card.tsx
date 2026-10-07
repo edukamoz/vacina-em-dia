@@ -29,6 +29,18 @@ export function doseHint(
   dose: Pick<DoseResponse, 'status' | 'dueDate' | 'scheduledDate' | 'appliedDate' | 'timingKind'>,
 ): string {
   if (dose.status === 'PENDING' && dose.timingKind !== 'AGE') return 'Confira na sua caderneta';
+  const linha = doseDateRow(dose);
+  return linha ? `${linha.rotulo} ${linha.valor}` : DICA[dose.status];
+}
+
+/**
+ * A data que importa no estado atual, separada em rótulo e valor ("Prevista para" e "20/09/2026"),
+ * para o detalhe da dose. `null` quando não há data (dose cancelada ou sem idade fixa).
+ */
+export function doseDateRow(
+  dose: Pick<DoseResponse, 'status' | 'dueDate' | 'scheduledDate' | 'appliedDate' | 'timingKind'>,
+): { rotulo: string; valor: string } | null {
+  if (dose.status === 'PENDING' && dose.timingKind !== 'AGE') return null;
   const date = {
     SCHEDULED: dose.scheduledDate,
     OVERDUE: dose.dueDate,
@@ -36,7 +48,7 @@ export function doseHint(
     PENDING: dose.dueDate,
     CANCELLED: null,
   }[dose.status];
-  return date ? `${DICA[dose.status]} ${formatCivilDate(date)}` : DICA[dose.status];
+  return date ? { rotulo: DICA[dose.status], valor: formatCivilDate(date) } : null;
 }
 
 /**
