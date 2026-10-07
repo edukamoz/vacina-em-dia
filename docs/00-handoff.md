@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 07/10/2026 (fim do dia, computador de casa; **leia a seção 0.10 primeiro**, que está em dia; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Há 5 PRs abertos (#45 a #49) a mesclar**: ver 0.10.
+**Última atualização:** 07/10/2026 (fim do dia, computador de casa; **leia a seção 0.10 primeiro**, que está em dia; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -102,21 +102,11 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 
 ### 0.10 Estado em 07/10/2026 (fim do dia): o que está pronto, o que está aberto e o que falta
 
-**Na `main` (mesclado):** login próprio e recuperação de senha (Brevo, **funcionando em produção**); Azure SQL; Bicep, custos e equivalência AWS para Azure; caixa preta (127 casos); busca com LSA; Docker com manutenção documentada; **telas no padrão do design:** 4 abas (Doses, Família, Histórico, Conta), balão flutuante do assistente, tela Doses (atenção, próximas, aplicadas), Família com resumo e **parentesco** (select, migração 003 **aplicada**), Detalhe da dose com **calendário** para escolher datas (`SeletorDeData`), **dose avulsa** (ADR-016) com etiqueta "Oficial" ou "Adicionada por você".
+**Na `main`:** login próprio e recuperação de senha (Brevo, **funcionando em produção**); Azure SQL; Bicep, custos e equivalência AWS para Azure; caixa preta (127 casos); busca com LSA; Docker com manutenção documentada; **telas no padrão do design:** 4 abas (Doses, Família, Histórico, Conta), balão flutuante do assistente, tela Doses (atenção, próximas, aplicadas), Família com resumo e **parentesco** (select, migração 003 **aplicada**), Detalhe da dose com **calendário** para escolher datas (`SeletorDeData`), **dose avulsa** (ADR-016) com etiqueta "Oficial" ou "Adicionada por você".
 
-**PRs abertos, a mesclar nesta ordem (o autor mescla; o Claude mantém a descrição):**
+**PRs de 07/10/2026 (todos mesclados na `main`; o Claude abre e mescla a pedido do autor):** #45 contrato do repositório SQL (liberou a dose avulsa), #46 web fiel ao design, #47 Histórico e Conta, #49 Apresentação, Entrar e Criar conta, #50 correção de um teste instável da tela Doses (`CT-APP-K01`, que reprovava PRs sem relação) e #48 este handoff. As branches foram apagadas.
 
-| Ordem | PR | Branch | O que é |
-|---|---|---|---|
-| 1 | #45 | `fix/SCRUM-18-contrato-dose-avulsa` | Corrige o contrato do repositório SQL; **é o que libera a publicação da dose avulsa** |
-| 2 | #46 | `fix/SCRUM-32-fidelidade-web` | Web fiel ao design (conteúdo de 960 px, botão à direita do título, barra lateral, espaços) |
-| 3 | #47 | `feature/SCRUM-32-historico-e-conta` | Histórico da família por ano (tabela na web) e Conta no padrão (partiu da branch 1; some o commit repetido ao mesclar a 1) |
-| 4 | #49 | `fix/SCRUM-13-fidelidade-telas-de-entrada` | Apresentação, Entrar e Criar conta no padrão; novos estilos `exibicao` e `destaque` |
-| 5 | #48 | `docs/SCRUM-35-handoff-e-regras-de-pr` | Este handoff e a regra de que o Claude abre os PRs |
-
-Conflitos prováveis entre 2, 3 e 4 são só de contexto (`dose-card.tsx`, `Tela`, `icone.tsx`): resolva mantendo as duas versões. Os botões secundários só ficam com 56 px depois do PR 3.
-
-**Publicação da dose avulsa:** a migração `004-dose-avulsa.sql` **já foi aplicada** no `sqldb-vacinaemdia`. O deploy do PR #44 foi **cancelado de propósito** (rodaria antes do banco); ao mesclar o PR 1, o deploy da `main` publica a API com a dose avulsa. Confira depois no site publicado (cadastrar uma dose avulsa).
+**Publicação da dose avulsa:** a migração `004-dose-avulsa.sql` **já foi aplicada** no `sqldb-vacinaemdia`; o deploy do PR #44 foi cancelado de propósito (rodaria antes do banco) e a publicação veio com o PR #45. **Confira no site publicado** (cadastrar uma dose avulsa e abrir o Histórico).
 
 **Pendências do autor:**
 1. **Apagar a regra de firewall do SQL** (`az sql server firewall-rule delete -g rg-vacinaemdia -s sql-vacinaemdia-vedia6398 -n migracao-temporaria`); conferir com `az sql server firewall-rule list ... --query "[].name" -o tsv`. Para rodar migrações de novo, a regra é recriada com o IP do computador.
@@ -124,7 +114,7 @@ Conflitos prováveis entre 2, 3 e 4 são só de contexto (`dose-card.tsx`, `Tela
 3. Itens antigos: o Douglas mover o `rg-delbicos`; Key Vault (papel de escrita); voz com microfone real; revisar dataset do chatbot e o termo de consentimento; tempos reais no Jira; apagar `D:\c`.
 
 **Próximos passos do Claude, em ordem sugerida:**
-1. Conferir o CI dos PRs #45 a #49 (Prettier, Docker) e corrigir o que falhar.
+1. Conferir o deploy da `main` no site publicado (dose avulsa, parentesco, telas novas) e o CI da `main`.
 2. Fidelidade ao design que ainda falta: **Criar conta** (campo Nome e aceite de termos, que dependem de escrever os Termos de uso e a Política de privacidade com o autor), tablet (600 a 1023 px, não desenhado) e os temas Escuro e Alto contraste.
 3. **Caixa preta:** acrescentar casos de parentesco e de dose avulsa e regenerar as tabelas (`scripts/gerar-execucao-estados.mjs` e `caixa-preta`).
 4. Telas ainda sem referência no design: Assistente, Consentimento, Membro (formulário), Redefinir senha; temas Escuro e Alto contraste ainda não vistos em nenhuma tela nova.
