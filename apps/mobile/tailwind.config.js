@@ -24,7 +24,11 @@ module.exports = {
       borderWidth: Object.fromEntries(Object.entries(bordas).map(([k, v]) => [k, `${v}px`])),
       minHeight: { toque: `${toque.minimo}px`, principal: `${toque.principal}px` },
       minWidth: { toque: `${toque.minimo}px` },
-      maxWidth: { conteudo: `${layout.larguraMaximaConteudo}px` },
+      maxWidth: {
+        conteudo: `${layout.larguraMaximaConteudo}px`,
+        form: `${layout.larguraFormulario}px`,
+      },
+      width: { lateral: `${layout.larguraLateralEntrada}px` },
       screens: { medio: `${breakpoints.medio}px`, expandido: `${breakpoints.expandido}px` },
       fontFamily: {
         regular: ['AtkinsonHyperlegible_400Regular'],

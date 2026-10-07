@@ -1,0 +1,12 @@
+# Dependências de produção (versões exatas; ver docs/tech-versions.md).
+azure-functions==2.3.0
+scikit-learn==1.9.1
+numpy==2.5.3
+scipy==1.18.1
+joblib==1.6.0
+threadpoolctl==3.7.0
+# Dependências transitivas fixadas para o build ser reproduzível.
+cloudpickle==3.1.2
+MarkupSafe==3.0.4
+narwhals==2.26.0
+Werkzeug==3.1.9

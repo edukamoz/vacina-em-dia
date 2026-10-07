@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 06/10/2026, ao fim da sessão no computador do trabalho/faculdade. A `main` está em dia (último PR mesclado: #16, Docker). Nenhuma branch aberta.
+**Última atualização:** 07/10/2026 (noite; ver 0.7). Na `main`: calendário oficial, família, doses, consentimento, layout web e deploy no Azure. **Branches abertas para PR:** `feature/SCRUM-21-chatbot-pln` (serviço Python, avaliação, CI, guia do tenant) e `feature/SCRUM-20-assistente-voz` (empilhada sobre a anterior: API do assistente, voz, chat no app, deploy do PLN). Mesclar nessa ordem.
 
 ### 0.1 Como retomar em casa
 
@@ -27,14 +27,14 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 
 | Parte | Estado |
 |---|---|
-| Monorepo | npm workspaces (`packages/shared`, `apps/api`, `apps/mobile`); TypeScript 6 estrito; ESLint, Prettier, Husky, commitlint, Jest, TypeDoc; Node 24 |
-| `packages/shared` | Máquina de estados da dose (T1 a T12), datas civis, geração de doses, esquemas Zod de entrada e de resposta (98 testes) |
-| `apps/api` | Azure Functions: `GET /api/health`, `GET /api/doses`, `GET /api/doses/{id}`, `POST /api/doses/{id}/events`, `GET /api/openapi.json`, `GET /api/docs` (Swagger). Dados **em memória** com seed `FICTITIOUS`, sem login (64 testes) |
-| `apps/mobile` | Expo (Android, iOS e web), NativeWind com os tokens, 3 temas, fonte Atkinson, componentes base e estados de carregando, erro e vazio; a tela busca as doses na API (77 testes). Android e iOS foram verificados pelo autor só até o esqueleto de temas; a tela que consome a API foi verificada **só na web** |
-| Docker | `docker compose up --build`: Azurite, API (host oficial das Functions, só `amd64`, emulado em Mac com Apple Silicon) e app web em nginx |
-| CI (GitHub Actions) | lint, formatação, tipos, build, testes com cobertura (mínimo 80%), TypeDoc, `npm audit` e o job `docker` (teste de fumaça) |
-| Documentação | `docs/` completo da Sprint 1: visão, requisitos, ADR-001 a 012, UML, DER, dicionário, design system, plano de teste, versões. Documentação de Desenvolvimento em Markdown (`docs/09-...`), com lacunas `[a informar]` |
-| Azure | **Nenhum recurso criado ainda** (SCRUM-22). Só verificações de leitura |
+| Monorepo | npm workspaces (`packages/shared`, `apps/api`, `apps/mobile`) mais `apps/nlp` (Python, fora do npm); TypeScript estrito; ESLint, Prettier, Husky, commitlint, Jest, pytest, TypeDoc; Node 24 |
+| `packages/shared` | Máquina de estados da dose, datas civis, **Calendário Nacional de Vacinação 2026** (5 PDFs oficiais, `docs/10-calendario-vacinal.md`), esquemas Zod (família, doses, consentimento, assistente) |
+| `apps/api` | Azure Functions: membros, calendário por pessoa, doses (ciclo de vida), consentimento, exclusão de conta, **assistente (texto e voz)**, Swagger. Dados **em memória**; sessão de demonstração por cabeçalho (ADR-013), sem login |
+| `apps/mobile` | Expo (Android, iOS e web): consentimento, família, calendário, detalhe da dose, histórico, **assistente (chat e voz na web)**, conta; layout de computador (barra lateral). Voz no celular ainda não |
+| `apps/nlp` | Function Python: chatbot TF-IDF + SVM (20 intenções, F1 macro 0,93 no teste separado) e busca por similaridade; ver `docs/11-assistente-pln.md` e `docs/07-testes/avaliacao-chatbot.md` |
+| Docker | `docker compose up --build`: Azurite, API, PLN (porta 7072) e app web |
+| CI (GitHub Actions) | qualidade, **pytest do PLN**, segurança, Docker; deploy (`deploy.yml`) da API, do PLN e do app web por OIDC |
+| Azure | **Criado** (`rg-vacinaemdia`, Brazil South): Function App da API, Function App do PLN (1 instância sempre pronta), Static Web Apps, SQL gratuito (vazio), Key Vault, Application Insights, Azure AI Speech F0. Ver `docs/08-infraestrutura-azure.md` |
 
 ### 0.3 Jira (situação no último conferido, 06/10/2026)
 
@@ -65,14 +65,26 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 
 ### 0.6 Próximos passos, em ordem sugerida
 
-1. **Autor:** (a) decidir se SCRUM-23 e SCRUM-24 vão a "Em análise"; (b) informar o tempo de SCRUM-18 e SCRUM-25; (c) decidir o que fazer com os recursos do DelBicos no Azure; (d) conferir o plano Education do Figma; (e) informar a fonte oficial do calendário do PNI (links em `https://www.gov.br/saude/pt-br/vacinacao/calendario`) para o Claude extrair um seed "pendente de validação"; até lá tudo é `FICTITIOUS`.
-2. **SCRUM-22, Azure mínimo** (próximo item técnico): `az login`; registrar os provedores `Microsoft.Sql`, `Microsoft.CognitiveServices` e `Microsoft.AzureActiveDirectory`; grupo `rg-vacinaemdia` na Brazil South; Static Web Apps Free (Central US, pois a Brazil South não tem), Function App, Key Vault, Application Insights, SQL gratuito; o **Claude gera o token de deploy do Static Web Apps e o autor cola nos secrets do GitHub** (o Claude não guarda segredo). Depois, o fluxo de deploy no GitHub Actions. O tenant do Entra External ID fica para o SCRUM-13.
-3. **Figma (SCRUM-32):** terminar telas restantes, tablet e web, temas Escuro e Alto contraste, dentro do limite de créditos (150 de 500 já usados na conta do autor).
-4. **Sprint 2 (13/10 a 19/10):** SCRUM-22, 23, 24, 13 (23 e 24 já adiantados). Depois, pelo quadro do §3: SCRUM-15, 16, 18 (banco, propriedade por usuário e rotina de atraso), 28; e assim por diante. O **SCRUM-25** só fecha quando o serviço de PLN entrar no compose (SCRUM-20 e 21).
-5. **SCRUM-35:** atualizar a cada 2 dias, só com datas e tempos reais informados pelo autor (planejamento da Sprint 1, estudos diários, reuniões).
-6. **Word:** converter os 3 modelos (ver 0.4, item 2) e, mais adiante, montar a Documentação Técnica a partir do Markdown e da especificação OpenAPI.
+1. **Autor:** (a) mesclar os PRs na ordem acima; (b) **criar o tenant do Entra External ID** (`docs/12-guia-tenant-entra.md`) e enviar o ID, o nome e o domínio primário; (c) conceder a si o papel "Key Vault Secrets Officer" no `kv-vedia6398` para o Claude mover as chaves do assistente para o cofre; (d) **revisar** `apps/nlp/vacina_nlp/data/intents.json` e `responses.json` e o texto do termo de consentimento (`apps/mobile/src/features/consent/terms.ts`); (e) testar a voz com um microfone real (Chrome, https) e conferir o visual do site; (f) apagar a pasta solta `D:\c` (resíduo de um erro de caminho; só contém arquivos temporários); (g) informar tempos reais do SCRUM-18, 20, 21 e 25 e decidir quais itens vão a "Em análise".
+2. **SCRUM-13, login:** com o tenant, registrar o app, criar o fluxo de entrada, validar o token na API (trocar `resolveDemoOwner`) e remover o cabeçalho de demonstração. Depois, **banco Azure SQL** (SCRUM-15/18) para os dados persistirem.
+3. **Lembretes (SCRUM-19)** e rotina de atraso agendada; **voz no celular** (módulo de áudio do Expo validado em aparelho).
+4. **SCRUM-26:** confirmar custos na calculadora (inclui a instância sempre pronta do PLN). **SCRUM-35, 34, 36, 37:** documentações em Word e panfleto; só com dados reais informados pelo autor.
+5. **Figma (SCRUM-32):** terminar telas restantes, tablet e web.
+
+### 0.7 Estado de 07/10/2026 (noite): login, banco e infraestrutura como código
+
+**Branches empilhadas, a mesclar nesta ordem** (cada uma sobre a anterior; o autor abre os PRs): `docs/SCRUM-13-adr-login-proprio` (ADR-014; a branch `feature/SCRUM-22-bicep` já vai junto com o Bicep) → `feature/SCRUM-13-login-api` (rotas `/auth/*`) → `feature/SCRUM-15-persistencia-sql` (Azure SQL) → `feature/SCRUM-13-telas-login` (telas e sessão no app). Em separado: `docs/SCRUM-26-custos-azure`.
+
+- **Decisão:** login próprio (ADR-014 substitui o Entra, bloqueado pelo diretório da faculdade). Docs: `14-login-proprio.md`, `15-persistencia-sql.md`, `16-custos-azure.md`, `13-avaliacao-criterios-banca.md` (avaliação contra os critérios da banca) e `infra/README.md` (Bicep).
+- **No Azure já feito:** `AUTH_TOKEN_SECRET` na Function App; esquema no `sqldb-vacinaemdia`; usuário do banco para a identidade da API; `httpsOnly` do PLN corrigido. **Ainda não ligado:** `SQL_SERVER`, `SQL_DATABASE` e `DEMO_SESSION_ENABLED=false` na API (ligar **depois** de publicar o app com as telas de login).
+- **Pendências do autor:** o Douglas mover o `rg-delbicos` para a assinatura dele (já é Owner); mover chaves ao Key Vault (papel de escrita); testar a voz com microfone real; revisar o dataset do chatbot e o termo de consentimento; tempos reais no Jira.
+- **Próximos passos do Claude:** ligar o banco na API publicada e conferir o ponto a ponto na nuvem; recuperação de senha com e-mail (a decidir: Brevo ou Azure Communication Services, ver `16-custos-azure.md`); Bicep: adicionar `AUTH_TOKEN_SECRET`, `SQL_SERVER` e `SQL_DATABASE` à API; tabela de execução dos testes (caixa preta), busca semântica com LSA, seção de manutenção do Docker; telas restantes conforme `design-vacina-em-dia`.
+- **Armadilhas novas:** `.expo/types` desatualizado quebra o typecheck local (mover para `types.old`); heredoc do shell com aspas falha (usar a ferramenta de escrita); a porta 7071 pode estar ocupada por um `func` do autor (usar outra porta); o navegador embutido não tira captura com o painel oculto (medir pelo DOM); a API de preços da Azure limita a taxa (429).
 
 ### 0.9 Histórico detalhado das sessões (referência; a retomada está em 0.1 a 0.6)
+
+**Atualização de 07/10/2026 (sessão de entrega acelerada):** deploy no Azure funcionando por OIDC (`docs/08`); calendário oficial; família, doses, consentimento e exclusão (ADR-013); layout web em computador; serviço de PLN e voz com Azure AI Speech; chat com voz na web. Armadilhas novas: o plano Linux Consumption (Y1) travou em 503, por isso o Flex Consumption; o PLN precisa de instância sempre pronta e paralelismo HTTP 8 (senão ~5 s de espera entre chamadas); o subject do OIDC deste repositório leva IDs numéricos; o `npm run lint` só passa com `.venv` ignorado; o shell do Claude trava com textos longos com aspas (usar a ferramenta de arquivos).
+
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 

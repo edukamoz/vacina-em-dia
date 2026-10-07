@@ -8,3 +8,6 @@ docs/
 doctos/
 *.md
 expo-env.d.ts
+.venv
+__pycache__
+.pytest_cache

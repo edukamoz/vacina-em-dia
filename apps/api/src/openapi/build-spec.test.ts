@@ -48,7 +48,7 @@ describe('especificação OpenAPI', () => {
 
   test('CT-API-O02: toda função HTTP registrada está documentada (e vice-versa)', () => {
     const routes = registeredRoutes().filter((r) => !NOT_IN_SPEC.has(r.name));
-    expect(routes.length).toBeGreaterThanOrEqual(12);
+    expect(routes.length).toBeGreaterThanOrEqual(14);
     for (const r of routes) {
       expect(doc.paths[r.path]?.[r.method]).toBeDefined();
     }
@@ -82,13 +82,27 @@ describe('especificação OpenAPI', () => {
     ['get', '/members/{id}/doses', ['200', '400', '401', '404', '500']],
     ['get', '/doses/{id}', ['200', '400', '401', '404', '500']],
     ['post', '/doses/{id}/events', ['200', '400', '401', '404', '409', '422', '500']],
+    ['post', '/assistant/message', ['200', '400', '401', '429', '500', '503']],
+    ['post', '/auth/register', ['201', '400', '409', '422', '429', '503']],
+    ['post', '/auth/login', ['200', '400', '401', '429', '503']],
+    ['post', '/auth/refresh', ['200', '400', '401', '503']],
+    ['post', '/auth/logout', ['204', '400']],
+    ['get', '/auth/me', ['200', '401']],
+    ['post', '/assistant/voice', ['200', '401', '413', '415', '422', '429', '500', '503']],
   ])('CT-API-O04: %s %s documenta os códigos %j', (method, path, codes) => {
     const responses = Object.keys(doc.paths[path]?.[method]?.responses ?? {});
     expect(responses).toEqual(expect.arrayContaining(codes));
   });
 
   test('CT-API-O08: toda rota de dados exige a sessão e declara o esquema de segurança', () => {
-    const open = new Set(['/health', '/openapi.json']);
+    const open = new Set([
+      '/health',
+      '/openapi.json',
+      '/auth/register',
+      '/auth/login',
+      '/auth/refresh',
+      '/auth/logout',
+    ]);
     for (const [path, ops] of Object.entries(doc.paths)) {
       if (open.has(path)) continue;
       for (const [method, op] of Object.entries(ops)) {
@@ -112,12 +126,19 @@ describe('especificação OpenAPI', () => {
 
   test('CT-API-O06: as respostas de dose referenciam componentes nomeados', () => {
     const json = JSON.stringify(doc);
-    for (const name of ['Dose', 'Member', 'MemberDoses', 'Consent', 'ApiError']) {
+    for (const name of [
+      'Dose',
+      'Member',
+      'MemberDoses',
+      'Consent',
+      'ApiError',
+      'AssistantResponse',
+    ]) {
       expect(json).toContain(`#/components/schemas/${name}`);
     }
   });
 
   test('CT-API-O07: não expõe segredos nem dados pessoais', () => {
-    expect(JSON.stringify(doc)).not.toMatch(/password|secret|connection ?string|@gmail|CPF/i);
+    expect(JSON.stringify(doc)).not.toMatch(/secret|connection ?string|@gmail|CPF/i);
   });
 });

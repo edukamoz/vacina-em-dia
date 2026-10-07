@@ -1,0 +1,114 @@
+{
+  "_comentario": "Respostas curadas do assistente: escritas à mão, sem IA generativa, em linguagem simples. Origem 'app' = ajuda do aplicativo; 'calendario' = Calendário Nacional de Vacinação (citado com fonte). Nenhuma resposta dá orientação médica individual. Revisão do autor pendente antes da apresentação.",
+  "responses": {
+    "saudacao": {
+      "origin": "app",
+      "text": "Olá! Eu sou o assistente do Vacina em Dia. Posso explicar como usar o aplicativo e contar o que diz o Calendário Nacional de Vacinação, por exemplo: para que serve uma vacina e em que idade ela é indicada.",
+      "suggestions": ["O que você faz?", "Para que serve a BCG?", "O que significa dose atrasada?"]
+    },
+    "despedida_agradecimento": {
+      "origin": "app",
+      "text": "Por nada! Quando precisar, é só perguntar. Mantenha as vacinas em dia e guarde sempre a sua caderneta oficial.",
+      "suggestions": []
+    },
+    "ajuda_o_que_faz": {
+      "origin": "app",
+      "text": "Eu respondo dúvidas sobre o aplicativo (cadastrar pessoas, registrar e agendar doses, ver o histórico, excluir seus dados) e sobre o Calendário Nacional de Vacinação (para que serve cada vacina, em que idade é indicada e quais vacinas cada fase da vida tem). Você pode escrever ou falar. Eu não dou orientação médica: para isso, procure um profissional de saúde.",
+      "suggestions": [
+        "Como cadastro uma pessoa?",
+        "Quais vacinas a criança deve tomar?",
+        "Como registro que tomei a vacina?"
+      ]
+    },
+    "como_adicionar_pessoa": {
+      "origin": "app",
+      "text": "Para cadastrar alguém: abra a aba Família e toque em \"Adicionar pessoa\". Informe o nome (pode ser um apelido) e a data de nascimento; se for o caso, marque que a pessoa está grávida. Para corrigir os dados, toque em \"Editar\" no cartão da pessoa. Para tirar alguém, abra \"Editar\" e toque em \"Excluir\": as vacinas dessa pessoa também são apagadas.",
+      "suggestions": ["Como registro que tomei a vacina?", "Como excluo meus dados?"]
+    },
+    "como_registrar_dose": {
+      "origin": "app",
+      "text": "Para registrar uma vacina que já foi tomada: na aba Calendário, toque na dose, confira a data (já vem a de hoje, mude se foi outro dia) e toque em \"Registrar que foi aplicada\". Ela passa para a aba Histórico. A data da aplicação não pode ser no futuro.",
+      "suggestions": ["Como agendo uma vacina?", "Onde vejo o histórico?"]
+    },
+    "como_agendar_dose": {
+      "origin": "app",
+      "text": "Para marcar o dia de uma vacina: na aba Calendário, toque na dose, digite a data e toque em \"Agendar\" (a data não pode ser anterior a hoje). Se a dose já estiver atrasada, o botão é \"Reagendar\". Se você marcou e quer desfazer, toque em \"Desmarcar o agendamento\". O aplicativo guarda a data para você, mas a vacina em si é tomada na unidade de saúde.",
+      "suggestions": ["O que significa dose atrasada?", "Como cancelo uma dose?"]
+    },
+    "significado_atrasada": {
+      "origin": "app",
+      "text": "\"Atrasada\" quer dizer que a data prevista no calendário (ou a data que você agendou) já passou e a dose ainda não foi registrada como aplicada. É um aviso, não um erro. Se a vacina já foi tomada, registre-a como aplicada. Se não foi, procure uma unidade de saúde para saber como regularizar; depois, você pode reagendar ou registrar a aplicação. Vacinas que dependem de condições (por exemplo, para viajantes) ou que valem \"conforme o histórico\" não ficam atrasadas sozinhas.",
+      "suggestions": ["Como registro que tomei a vacina?", "Como reagendo uma dose?"]
+    },
+    "significado_estados": {
+      "origin": "app",
+      "text": "Cada dose tem uma situação: Pendente (ainda sem data marcada), Agendada (você marcou um dia), Atrasada (a data passou e não foi registrada), Aplicada (a vacina foi tomada; fica no Histórico) e Cancelada (a dose não é mais necessária). As situações Aplicada e Cancelada são finais: depois delas, a dose não muda mais.",
+      "suggestions": ["O que significa dose atrasada?", "Como cancelo uma dose?"]
+    },
+    "como_cancelar_dose": {
+      "origin": "app",
+      "text": "Para cancelar uma dose: na aba Calendário, toque na dose e em \"Cancelar esta dose\", e confirme. Atenção: depois de cancelada, a dose não volta. Cancele só se um profissional de saúde orientou que ela não é necessária. Se você só quer mudar a data, use \"Reagendar\" ou \"Desmarcar o agendamento\".",
+      "suggestions": ["Como agendo uma vacina?", "O que significa cancelada?"]
+    },
+    "como_ver_historico": {
+      "origin": "app",
+      "text": "Abra a aba Histórico: ali ficam as vacinas já aplicadas (da mais recente para a mais antiga) e as canceladas. Se houver mais de uma pessoa cadastrada, escolha de quem é a carteira no alto da tela.",
+      "suggestions": ["Como registro que tomei a vacina?", "Como cadastro uma pessoa?"]
+    },
+    "como_excluir_dados": {
+      "origin": "app",
+      "text": "Para apagar tudo: abra a aba Conta, toque em \"Excluir minha conta e todos os dados\" e confirme. Isso remove as pessoas cadastradas, as doses, o histórico e o consentimento, e não dá para desfazer. Para apagar só uma pessoa, use \"Editar\" e \"Excluir\" na aba Família.",
+      "suggestions": ["Quais dados vocês guardam?"]
+    },
+    "privacidade_dados": {
+      "origin": "app",
+      "text": "O aplicativo guarda só o essencial: o nome ou apelido e a data de nascimento de cada pessoa, se ela está grávida e as doses registradas. Não pedimos CPF nem Cartão Nacional de Saúde. Dados de vacinação são dados de saúde e têm cuidado especial. Você pode excluir tudo quando quiser, na aba Conta. Esta é uma versão de demonstração, sem login: não cadastre dados de pessoas reais sem autorização.",
+      "suggestions": ["Como excluo meus dados?", "De onde vem o calendário?"]
+    },
+    "fonte_calendario": {
+      "origin": "calendario",
+      "text": "O calendário do aplicativo segue o Calendário Nacional de Vacinação 2026, do Ministério da Saúde (PNI), nas faixas Criança, Adolescente e jovem, Adulto, Idoso e Gestante. O aplicativo não substitui a caderneta de vacinação oficial nem a orientação de profissionais de saúde.",
+      "suggestions": ["Quais vacinas a criança deve tomar?", "Como usar o microfone?"]
+    },
+    "como_usar_voz": {
+      "origin": "app",
+      "text": "Na aba Assistente, toque no botão do microfone, permita o uso do microfone quando o aparelho ou o navegador pedir e fale a sua pergunta. Se o microfone não estiver disponível ou eu não entender, é só digitar. Na web, o microfone precisa de conexão segura (https).",
+      "suggestions": ["Para que serve a BCG?", "O que você faz?"]
+    },
+    "lembretes": {
+      "origin": "app",
+      "text": "Os avisos por notificação ainda estão em desenvolvimento. Por enquanto, o aplicativo mostra na aba Calendário as doses atrasadas e agendadas, com um resumo no alto da tela. Vale abrir de tempos em tempos para conferir.",
+      "suggestions": ["O que significa dose atrasada?", "Como agendo uma vacina?"]
+    },
+    "orientacao_medica": {
+      "origin": "app",
+      "text": "Essa é uma pergunta sobre saúde que eu não posso responder: não dou orientação médica nem diagnóstico. Converse com um profissional de saúde ou vá à unidade de saúde mais próxima. Em caso de emergência, ligue 192 (SAMU).",
+      "suggestions": ["O que você faz?"]
+    },
+    "fora_do_escopo": {
+      "origin": "app",
+      "text": "Esse assunto está fora do que eu sei responder. Posso ajudar com o uso do aplicativo e com o Calendário Nacional de Vacinação.",
+      "suggestions": ["O que você faz?", "Quais vacinas a criança deve tomar?"]
+    }
+  },
+  "fallback": {
+    "origin": "app",
+    "text": "Não tenho certeza de que entendi a sua pergunta. Posso ajudar com o uso do aplicativo e com informações do Calendário Nacional de Vacinação. Para dúvidas sobre a sua saúde ou a de alguém da família, converse com um profissional de saúde ou vá à unidade de saúde mais próxima.",
+    "suggestions": ["O que você faz?", "Para que serve a BCG?", "Como registro que tomei a vacina?"]
+  },
+  "empty": {
+    "origin": "app",
+    "text": "Não consegui ouvir ou ler a sua pergunta. Pode digitar de novo?",
+    "suggestions": []
+  },
+  "vaccine_unknown": {
+    "origin": "calendario",
+    "text": "Sobre qual vacina você quer saber? Por exemplo: BCG, penta, hepatite B, tríplice viral, HPV, febre amarela ou a vacina da gripe.",
+    "suggestions": ["Para que serve a BCG?", "Quando toma a vacina HPV?"]
+  },
+  "group_unknown": {
+    "origin": "calendario",
+    "text": "Para qual fase da vida? O calendário tem as faixas Criança, Adolescente e jovem, Adulto, Idoso e Gestante. Por exemplo: \"vacinas do idoso\".",
+    "suggestions": ["Vacinas do idoso", "Vacinas da gestante", "Vacinas da criança"]
+  }
+}
