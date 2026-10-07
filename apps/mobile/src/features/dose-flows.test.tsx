@@ -232,49 +232,66 @@ function detailRoutes(initial: DoseResponse, onEvent?: (body: unknown) => DoseRe
       return { status: 200, body: current };
     },
     'GET /members/m-1/doses': { status: 200, body: memberDoses([current]) },
+    'GET /members': { status: 200, body: { items: [MEMBER] } },
   });
 }
 
 describe('detalhe da dose (RF04)', () => {
-  test('CT-APP-D01: mostra para que serve, quando, as notas oficiais e o aviso', async () => {
+  test('CT-APP-D01: mostra para quem, a data, o que evita, as notas oficiais e o aviso', async () => {
     const fake = detailRoutes(
-      dose({ conditional: true, notes: ['Somente para povos indígenas.'], timingLabel: '5 anos' }),
+      dose({
+        conditional: true,
+        notes: ['Somente para povos indígenas.'],
+        timingLabel: '5 anos',
+        dueDate: '2026-09-20',
+      }),
     );
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
     expect(await screen.findByText('difteria, tétano, coqueluche')).toBeOnTheScreen();
+    expect(screen.getByText('Para quem')).toBeOnTheScreen();
+    expect(screen.getByText('Maria')).toBeOnTheScreen();
+    expect(screen.getByText('Prevista para')).toBeOnTheScreen();
+    expect(screen.getByText('20/09/2026')).toBeOnTheScreen();
     expect(screen.getByText('5 anos')).toBeOnTheScreen();
     expect(screen.getByText(/só é indicada em algumas situações/)).toBeOnTheScreen();
     expect(screen.getByText('Somente para povos indígenas.')).toBeOnTheScreen();
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
   });
 
-  test('CT-T03 no app: registra a aplicação com a data de hoje e passa a mostrar como aplicada', async () => {
+  test('CT-APP-D05: o link "Voltar para Doses" volta à tela anterior', async () => {
+    const fake = detailRoutes(dose());
+    await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
+    await fireEvent.press(await screen.findByRole('link', { name: 'Voltar para Doses' }));
+    expect(mockBack).toHaveBeenCalled();
+  });
+
+  test('CT-T03 no app: registra a aplicação no calendário e passa a mostrar como aplicada', async () => {
     const fake = detailRoutes(dose(), (body) =>
       dose({ status: 'APPLIED', appliedDate: (body as { date: string }).date }),
     );
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    await fireEvent.press(
-      await screen.findByRole('button', { name: 'Registrar que foi aplicada' }),
-    );
+    await fireEvent.press(await screen.findByRole('button', { name: 'Registrar aplicação' }));
+    expect(screen.getAllByText('Em que dia foi aplicada?').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: '7 de outubro de 2026' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: '1 de outubro de 2026' }));
+    expect(screen.getByText('Data escolhida: 01/10/2026')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar aplicação' }));
     expect(await screen.findByText(/Esta dose já foi aplicada/)).toBeOnTheScreen();
     expect(fake.calls.find((c) => c.key === 'POST /doses/d-1/events')?.body).toEqual({
       type: 'APPLY',
-      date: '2026-10-06',
+      date: '2026-10-01',
     });
-    expect(
-      screen.queryByRole('button', { name: 'Registrar que foi aplicada' }),
-    ).not.toBeOnTheScreen();
   });
 
-  test('CT-T02 no app: agenda para a data digitada', async () => {
+  test('CT-T02 no app: agenda para o dia escolhido no calendário', async () => {
     const fake = detailRoutes(dose(), () =>
       dose({ status: 'SCHEDULED', scheduledDate: '2026-10-20' }),
     );
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    const campo = await screen.findByLabelText('Data');
-    expect(campo.props.value).toBe('06/10/2026');
-    await fireEvent.changeText(campo, '20102026');
-    await fireEvent.press(screen.getByRole('button', { name: 'Agendar' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Agendar' }));
+    expect(screen.getByRole('button', { name: '5 de outubro de 2026' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: '20 de outubro de 2026' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar agendamento' }));
     expect(
       await screen.findByRole('button', { name: 'Desmarcar o agendamento' }),
     ).toBeOnTheScreen();
@@ -290,6 +307,7 @@ describe('detalhe da dose (RF04)', () => {
     );
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
     await fireEvent.press(await screen.findByRole('button', { name: 'Reagendar' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar agendamento' }));
     await waitFor(() =>
       expect(fake.calls.find((c) => c.key === 'POST /doses/d-1/events')?.body).toEqual({
         type: 'RESCHEDULE',
@@ -303,7 +321,7 @@ describe('detalhe da dose (RF04)', () => {
       dose(),
     );
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    expect(await screen.findByText('Marcada para 04/11/2026')).toBeOnTheScreen();
+    expect(await screen.findByText('04/11/2026')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Agendar' })).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Desmarcar o agendamento' }));
     expect(await screen.findByRole('button', { name: 'Agendar' })).toBeOnTheScreen();
@@ -315,13 +333,13 @@ describe('detalhe da dose (RF04)', () => {
   test('CT-T05 no app: cancelar pede confirmação e só envia depois dela', async () => {
     const fake = detailRoutes(dose(), () => dose({ status: 'CANCELLED' }));
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Cancelar esta dose' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Cancelar dose' }));
     expect(fake.calls.some((c) => c.key.startsWith('POST'))).toBe(false);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Não, voltar' }));
     expect(screen.queryByText('Cancelar esta dose?')).not.toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar esta dose' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar dose' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Sim, cancelar a dose' }));
     expect(await screen.findByText(/foi cancelada e não precisa mais/)).toBeOnTheScreen();
     expect(fake.calls.find((c) => c.key === 'POST /doses/d-1/events')?.body).toEqual({
@@ -330,31 +348,31 @@ describe('detalhe da dose (RF04)', () => {
     });
   });
 
-  test('CT-APP-D02: data incompleta não é enviada e mostra o erro', async () => {
+  test('CT-APP-D02: "Voltar" do painel de data fecha o calendário sem enviar nada', async () => {
     const fake = detailRoutes(dose());
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    await fireEvent.changeText(await screen.findByLabelText('Data'), '0610');
-    await fireEvent.press(screen.getByRole('button', { name: 'Registrar que foi aplicada' }));
-    expect(screen.getByText(/Digite a data completa/)).toBeOnTheScreen();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Registrar aplicação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    expect(screen.getByRole('button', { name: 'Registrar aplicação' })).toBeOnTheScreen();
     expect(fake.calls.some((c) => c.key.startsWith('POST'))).toBe(false);
   });
 
   test('CT-APP-D03: regra violada no servidor aparece em linguagem simples', async () => {
     const fake = createFakeFetch({
       'GET /doses/d-1': { status: 200, body: dose() },
+      'GET /members': { status: 200, body: { items: [MEMBER] } },
       'POST /doses/d-1/events': {
         status: 422,
         body: { code: 'GUARD_VIOLATION', message: 'A data da aplicação não pode ser no futuro.' },
       },
     });
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    await fireEvent.press(
-      await screen.findByRole('button', { name: 'Registrar que foi aplicada' }),
-    );
+    await fireEvent.press(await screen.findByRole('button', { name: 'Registrar aplicação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar aplicação' }));
     expect(
       await screen.findByText('A data da aplicação não pode ser no futuro.'),
     ).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Registrar que foi aplicada' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Confirmar aplicação' })).toBeOnTheScreen();
   });
 
   test('CT-APP-D04: dose inexistente ou falha de rede mostram erro com nova tentativa', async () => {
