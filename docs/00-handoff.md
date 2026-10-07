@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 07/10/2026 (noite; ver 0.7). Na `main`: calendário oficial, família, doses, consentimento, layout web e deploy no Azure. **Branches abertas para PR:** `feature/SCRUM-21-chatbot-pln` (serviço Python, avaliação, CI, guia do tenant) e `feature/SCRUM-20-assistente-voz` (empilhada sobre a anterior: API do assistente, voz, chat no app, deploy do PLN). Mesclar nessa ordem.
+**Última atualização:** 07/10/2026 (fim do dia, computador de casa; ver 0.7 e 0.8). Na `main` (PRs até o #34): calendário oficial, família, doses, consentimento, layout web, assistente (texto e voz), PLN com busca LSA, login próprio, recuperação de senha por e-mail (código pronto, e-mail **desligado** na nuvem), Azure SQL, Bicep, custos, caixa preta. **Única branch aberta para PR:** `docs/SCRUM-25-docker-manutencao` (manutenção do Docker, login e chatbot no compose, teste de fumaça no CI, correção do Prettier do `search_test_set.json` e esta atualização do handoff). As demais branches já foram mescladas e podem ser apagadas.
 
 ### 0.1 Como retomar em casa
 
@@ -18,7 +18,8 @@ npm run build                      # o app e a API leem o @vacina/shared compila
 cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo local, fora do Git
 ```
 
-- Rodar sem contêiner: `npm run dev:api` (terminal 1) e `npm run dev:mobile` (terminal 2). Rodar tudo em contêineres: `docker compose up --build` (app web em http://localhost:8080, API em http://localhost:7071/api/docs). Detalhes no `README.md`.
+- Rodar sem contêiner: `npm run dev:api` (terminal 1) e `npm run dev:mobile` (terminal 2). Rodar tudo em contêineres: `docker compose up --build` (app web em http://localhost:8080, API em http://localhost:7071/api/docs); portas mudam com `API_PORT`, `NLP_PORT`, `WEB_PORT`. Detalhes no `README.md` e em `docs/17-docker-manutencao.md`.
+- **Não vão pelo Git** (copie à mão se precisar): a pasta `design-vacina-em-dia/` (referência visual das telas, **nunca commitar**), a pasta `assets/` (não versionada) e o `apps/api/local.settings.json`. O PLN local precisa de ambiente Python próprio (`apps/nlp`, `pip install -r requirements.txt`, `pytest`).
 - Para falar com o Azure: `az login` no navegador (o acesso condicional do diretório expira o login a cada 3 dias). Para o Jira, o Claude usa o conector (site `vacinaemdia.atlassian.net`; transição "Em análise" tem id `31`).
 - Ferramentas que o Claude pode precisar em casa (o autor decide instalar): Docker Desktop, `poppler`, `pandoc` e `libreoffice` (Word e PDF), `gh` (opcional; o autor abre e mescla os PRs).
 - Peça ao Claude de casa para **ler o `CLAUDE.md` e este arquivo** e, **antes de mexer em qualquer coisa**, salvar na memória dele as "Regras permanentes do autor" (0.4), porque a memória não veio junto.
@@ -31,7 +32,7 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 | `packages/shared` | Máquina de estados da dose, datas civis, **Calendário Nacional de Vacinação 2026** (5 PDFs oficiais, `docs/10-calendario-vacinal.md`), esquemas Zod (família, doses, consentimento, assistente) |
 | `apps/api` | Azure Functions: membros, calendário por pessoa, doses (ciclo de vida), consentimento, exclusão de conta, **assistente (texto e voz)**, Swagger. Dados **em memória**; sessão de demonstração por cabeçalho (ADR-013), sem login |
 | `apps/mobile` | Expo (Android, iOS e web): consentimento, família, calendário, detalhe da dose, histórico, **assistente (chat e voz na web)**, conta; layout de computador (barra lateral). Voz no celular ainda não |
-| `apps/nlp` | Function Python: chatbot TF-IDF + SVM (20 intenções, F1 macro 0,93 no teste separado) e busca por similaridade; ver `docs/11-assistente-pln.md` e `docs/07-testes/avaliacao-chatbot.md` |
+| `apps/nlp` | Function Python: chatbot TF-IDF + SVM (20 intenções, F1 macro 0,93 no teste separado) e busca (n-gramas de caracteres + LSA); ver `docs/11-assistente-pln.md`, `docs/07-testes/avaliacao-chatbot.md` e `avaliacao-busca-semantica.md` |
 | Docker | `docker compose up --build`: Azurite, API, PLN (porta 7072) e app web |
 | CI (GitHub Actions) | qualidade, **pytest do PLN**, segurança, Docker; deploy (`deploy.yml`) da API, do PLN e do app web por OIDC |
 | Azure | **Criado** (`rg-vacinaemdia`, Brazil South): Function App da API, Function App do PLN (1 instância sempre pronta), Static Web Apps, SQL gratuito (vazio), Key Vault, Application Insights, Azure AI Speech F0. Ver `docs/08-infraestrutura-azure.md` |
@@ -80,6 +81,28 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 - **Pendências do autor:** o Douglas mover o `rg-delbicos` para a assinatura dele (já é Owner); mover chaves ao Key Vault (papel de escrita); testar a voz com microfone real; revisar o dataset do chatbot e o termo de consentimento; tempos reais no Jira.
 - **Próximos passos do Claude:** ligar o banco na API publicada e conferir o ponto a ponto na nuvem; recuperação de senha com e-mail (a decidir: Brevo ou Azure Communication Services, ver `16-custos-azure.md`); Bicep: adicionar `AUTH_TOKEN_SECRET`, `SQL_SERVER` e `SQL_DATABASE` à API; tabela de execução dos testes (caixa preta), busca semântica com LSA, seção de manutenção do Docker; telas restantes conforme `design-vacina-em-dia`.
 - **Armadilhas novas:** `.expo/types` desatualizado quebra o typecheck local (mover para `types.old`); heredoc do shell com aspas falha (usar a ferramenta de escrita); a porta 7071 pode estar ocupada por um `func` do autor (usar outra porta); o navegador embutido não tira captura com o painel oculto (medir pelo DOM); a API de preços da Azure limita a taxa (429).
+
+### 0.8 Estado de 07/10/2026 (fim do dia): o que mudou desde o 0.7 e por onde seguir
+
+**Feito e na `main`:** telas de apresentação, entrar, criar conta, esqueci a senha e redefinir (SCRUM-13); recuperação de senha com Brevo (ADR-015, `docs/14-login-proprio.md`); Azure SQL ligado e API na nuvem com login ponta a ponta; caixa preta com 127 casos e tabelas de execução (`docs/07-testes/caixa-preta-*.md`, `execucao-estados-dose.md`, gerada por `scripts/gerar-execucao-estados.mjs`); busca com LSA e n-gramas, avaliada em 63 consultas (`docs/07-testes/avaliacao-busca-semantica.md`; o LSA isolado tem efeito pequeno com 22 documentos, e o relatório diz isso); Bicep em `infra/` e tabela AWS para Azure em `docs/08`; custos em `docs/16-custos-azure.md` (só o PLN com instância sempre pronta pesa, cerca de US$ 6,48 por mês).
+
+**Na branch `docs/SCRUM-25-docker-manutencao` (abrir PR e mesclar):** `docs/17-docker-manutencao.md`; compose com login e chatbot funcionando localmente (chaves locais públicas de desenvolvimento, `docker/nlp-host-secrets.json`); teste de fumaça do CI com cadastro e pergunta ao chatbot (**ainda não rodou no GitHub**; se o job `docker` falhar, ver os registros na execução); formatação do `search_test_set.json` (o Prettier do CI reprovava).
+
+**Pendências que dependem do autor (nenhuma é feita pelo Claude):**
+1. **E-mail de recuperação desligado em produção.** As chaves do Brevo coladas no chat ficaram expostas (SMTP, API v3 e a "MCP", que é a mesma chave em base64): **revogar as três**, criar uma chave de API v3 nova, **verificar o remetente** no Brevo e rodar (trocando os valores; nunca colar a chave no chat nem gravar no repositório):
+   `az functionapp config appsettings set -g rg-vacinaemdia -n func-vacinaemdia-vedia6398 --settings "BREVO_API_KEY=..." "EMAIL_SENDER_ADDRESS=..." "WEB_BASE_URL=https://blue-rock-0d7abc710.4.azurestaticapps.net"`. Depois o Claude testa o fluxo no site publicado.
+2. O Douglas (douglas.nunes2@aluno.cps.sp.gov.br, assinatura `a19676d5-2ed0-4482-a6bf-c98a08eb01b3`, já Owner) mover o `rg-delbicos` com `az resource move`.
+3. Papel Key Vault Secrets Officer no `kv-vedia6398` para mover chaves ao cofre; testar a voz com microfone real; revisar o dataset do chatbot, o termo de consentimento e as consultas de teste da busca; tempos reais no Jira (SCRUM-18, 20, 21, 22, 25, 26, 28 e 13); apagar `D:\c`.
+4. Itens que só o autor fornece (critérios da banca, `docs/13`): estado inicial (CN2), definição do Product Owner, datas e tempos das reuniões, confirmação da tabela AWS para Azure com o professor.
+
+**Próximos passos do Claude, em ordem sugerida:**
+1. Conferir se o CI do PR do Docker ficou verde.
+2. **Telas restantes conforme `design-vacina-em-dia/`** (ler o `LEIA-ME.md`, usar `telas/` e `tokens.json` só como referência): Doses, Detalhe da dose, Família, Histórico e Conta. Começar por Doses.
+3. Testar o e-mail real assim que o item 1 acima for feito.
+4. Documentações em Word (SCRUM-34, 35, 36), panfleto (SCRUM-37), lembretes (SCRUM-19), voz no celular, confirmação de e-mail no cadastro (não implementada). Embeddings na busca só com custo aprovado.
+5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
+
+**Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
 
 ### 0.9 Histórico detalhado das sessões (referência; a retomada está em 0.1 a 0.6)
 

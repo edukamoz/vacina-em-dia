@@ -14,15 +14,15 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 | 8 | Expectativa das próximas sprints | PI | Cronograma em `docs/09` | 4 | Slide com as sprints 2 a 6 |
 | 9 | Documentação técnica (Docker, manutenção) | PI | **Feito em 07/10/2026:** `docs/17-docker-manutencao.md` (serviços, operação, dados, configuração, atualização de versões, problemas comuns, verificação e diferenças com a nuvem), verificado com o ambiente rodando; teste de fumaça no CI com login e chatbot | 5 | Nada essencial |
 | 10 | Documentação de desenvolvimento (totalização categorizada) | LDM | Esqueleto em `docs/09` | 2 | Totais por categoria; **depende dos tempos reais do autor** |
-| 11 | Conversão de serviços (AWS para Azure) | CN2 | **Não existe** | 0 | Tabela AWS → Azure com o que o projeto usa (ver §2) |
-| 12 | Custos dos serviços no Azure | CN2 | Só menção (SCRUM-26) | 1 | Estimativa na calculadora de preços, por serviço e total mensal |
-| 13 | Infraestrutura como código (Bicep) | CN2 | **Não existe** (recursos criados por CLI) | 0 | Templates Bicep dos recursos reais, validados com `az bicep build` e `what-if` |
+| 11 | Conversão de serviços (AWS para Azure) | CN2 | **Feito:** tabela de equivalências em `docs/08-infraestrutura-azure.md` | 4 | Confirmar com o professor se pede os serviços da arquitetura anterior |
+| 12 | Custos dos serviços no Azure | CN2 | **Feito:** `docs/16-custos-azure.md`, preços da API oficial (PLN ≈ US$ 6,48/mês; resto na franquia gratuita) | 4 | Itens marcados "a confirmar" na calculadora |
+| 13 | Infraestrutura como código (Bicep) | CN2 | **Feito:** `infra/` validado por `infra.yml` (compila e lint); `what-if` não aplicado no grupo atual | 4 | Rodar `what-if` num grupo novo, se a banca pedir demonstração |
 | 14 | Teste da aplicação e tabela de execução | QTS | **Feito em 07/10/2026:** 127 casos de caixa preta (partição de equivalência e valor limite) e tabela de execução com resultado obtido (`docs/07-testes/caixa-preta-execucao.md`) | 4 | Revisão por outra pessoa; tabela de execução dos testes de estados |
 | 15 | UML de estados de uma funcionalidade | QTS | `docs/03-uml/estados-dose.md` (5 estados, 12 transições) | 5 | Nada essencial |
 | 16 | Casos de teste (estados, transições, sequências) | QTS | 42 casos em `docs/07-testes/casos-teste-estados-dose.md`, automatizados | 4 | Gerar a tabela de execução a partir do Jest (resultado real) |
 | 17 | **PLN: sistema de busca semântica (0–20)** | PLN | **Feito em 07/10/2026:** busca por n-gramas de caracteres + LSA sobre documentos enriquecidos, com avaliação em 63 consultas (acerto na 1ª posição de 68,3% para 88,9%); voz com Azure AI Speech; chatbot TF-IDF + SVM (F1 macro 0,93). Relatório honesto: o LSA isolado tem efeito pequeno | 15 | Revisão das consultas de teste; embeddings só com custo aprovado |
 
-Soma estimada: cerca de **51 de 100**. Os maiores ganhos por esforço: Bicep, AWS→Azure e custos (15 pontos hoje zerados ou quase), a tabela de execução (3), e a busca semântica (até 8).
+Soma estimada atual: cerca de **72 de 100** (era 51 no início; Bicep, equivalência AWS para Azure, custos, caixa preta, busca com LSA e Docker foram feitos). Faltam sobretudo os itens que dependem do autor: estado inicial, Product Owner, reuniões e tempos reais.
 
 ## 1. PLN, o critério de 20 pontos
 
