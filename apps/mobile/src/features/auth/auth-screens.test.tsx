@@ -49,8 +49,16 @@ describe('tela de apresentação', () => {
     }
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
-    expect(mockPush).toHaveBeenCalledWith('/criar-conta');
+    expect(screen.getByText('Exemplo com dados inventados.')).toBeOnTheScreen();
+    expect(screen.getByText('Comece a acompanhar suas doses.')).toBeOnTheScreen();
+
+    const criar = screen.getAllByRole('button', { name: 'Criar conta' });
+    expect(criar).toHaveLength(2);
+    for (const botao of criar) {
+      mockPush.mockClear();
+      await fireEvent.press(botao);
+      expect(mockPush).toHaveBeenCalledWith('/criar-conta');
+    }
     await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
     expect(mockPush).toHaveBeenCalledWith('/entrar');
   });

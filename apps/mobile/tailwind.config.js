@@ -26,6 +26,7 @@ module.exports = {
       minWidth: { toque: `${toque.minimo}px` },
       maxWidth: {
         conteudo: `${layout.larguraMaximaConteudo}px`,
+        pagina: `${layout.larguraMaximaPagina}px`,
         form: `${layout.larguraFormulario}px`,
       },
       width: { lateral: `${layout.larguraLateralEntrada}px` },

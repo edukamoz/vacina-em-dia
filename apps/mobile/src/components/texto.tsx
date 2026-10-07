@@ -3,10 +3,21 @@ import { getThemeColors } from '../theme/tokens';
 
 /** Estilos de texto do design system (`tokens.json`, `tipografia.estilos`). */
 export type TextoVariante =
-  'titulo1' | 'titulo2' | 'titulo3' | 'corpo' | 'corpoNegrito' | 'rotulo' | 'apoio' | 'botao';
+  | 'exibicao'
+  | 'destaque'
+  | 'titulo1'
+  | 'titulo2'
+  | 'titulo3'
+  | 'corpo'
+  | 'corpoNegrito'
+  | 'rotulo'
+  | 'apoio'
+  | 'botao';
 
 // Classes por extenso: o Tailwind só gera o que encontra escrito no código.
 const CLASSES: Readonly<Record<TextoVariante, string>> = {
+  exibicao: 'text-exibicao font-negrito',
+  destaque: 'text-destaque font-regular',
   titulo1: 'text-titulo1 font-negrito',
   titulo2: 'text-titulo2 font-negrito',
   titulo3: 'text-titulo3 font-negrito',
