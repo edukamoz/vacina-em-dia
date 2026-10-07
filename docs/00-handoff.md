@@ -102,7 +102,7 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 
 ### 0.10 Estado em 07/10/2026 (fim do dia): o que está pronto, o que está aberto e o que falta
 
-**Na `main`:** login próprio e recuperação de senha (Brevo, **funcionando em produção**); Azure SQL; Bicep, custos e equivalência AWS para Azure; caixa preta (127 casos); busca com LSA; Docker com manutenção documentada; **telas no padrão do design:** 4 abas (Doses, Família, Histórico, Conta), balão flutuante do assistente, tela Doses (atenção, próximas, aplicadas), Família com resumo e **parentesco** (select, migração 003 **aplicada**), Detalhe da dose com **calendário** para escolher datas (`SeletorDeData`), **dose avulsa** (ADR-016) com etiqueta "Oficial" ou "Adicionada por você".
+**Na `main`:** login próprio e recuperação de senha (Brevo, **funcionando em produção**); Azure SQL; Bicep, custos e equivalência AWS para Azure; caixa preta (179 casos, inclui parentesco e dose avulsa); busca com LSA; Docker com manutenção documentada; **telas no padrão do design:** 4 abas (Doses, Família, Histórico, Conta), balão flutuante do assistente, tela Doses (atenção, próximas, aplicadas), Família com resumo e **parentesco** (select, migração 003 **aplicada**), Detalhe da dose com **calendário** para escolher datas (`SeletorDeData`), **dose avulsa** (ADR-016) com etiqueta "Oficial" ou "Adicionada por você".
 
 **PRs de 07/10/2026 (todos mesclados na `main`; o Claude abre e mescla a pedido do autor):** #45 contrato do repositório SQL (liberou a dose avulsa), #46 web fiel ao design, #47 Histórico e Conta, #49 Apresentação, Entrar e Criar conta, #50 correção de um teste instável da tela Doses (`CT-APP-K01`, que reprovava PRs sem relação) e #48 este handoff. As branches foram apagadas.
 
@@ -116,7 +116,7 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 **Próximos passos do Claude, em ordem sugerida:**
 1. Conferir o deploy da `main` no site publicado (dose avulsa, parentesco, telas novas) e o CI da `main`.
 2. Fidelidade ao design que ainda falta: **Criar conta** (campo Nome e aceite de termos, que dependem de escrever os Termos de uso e a Política de privacidade com o autor), tablet (600 a 1023 px, não desenhado) e os temas Escuro e Alto contraste.
-3. **Caixa preta:** acrescentar casos de parentesco e de dose avulsa e regenerar as tabelas (`scripts/gerar-execucao-estados.mjs` e `caixa-preta`).
+3. Caixa preta de parentesco e dose avulsa: **feita** (179 casos no total, `docs/07-testes/caixa-preta-execucao.md`); falta revisão por outra pessoa (por exemplo, o professor).
 4. Telas ainda sem referência no design: Assistente, Consentimento, Membro (formulário), Redefinir senha; temas Escuro e Alto contraste ainda não vistos em nenhuma tela nova.
 5. Lembretes (SCRUM-19); voz no celular; confirmação de e-mail no cadastro (não existe); documentações em Word (SCRUM-34, 35, 36) e panfleto (SCRUM-37), só com dados reais do autor; estado inicial (CN2) e Product Owner dependem do autor.
 
