@@ -138,10 +138,10 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 | Início: pessoas da família | RF02 | Lista de cartões de membro | Grade de cartões ao lado da barra lateral |
 | Doses | RF03 e RF04 | Cartões de dose em três grupos ("Precisam de atenção", "Próximas", "Aplicadas", até 5 aplicadas), "Trocar pessoa" leva à Família | Duas colunas |
 | Detalhe da dose | RF04 | Ações: agendar, registrar aplicação, cancelar | Painel ao lado da lista |
-| Histórico | RF08 | Doses aplicadas por data | Tabela simples com cabeçalhos |
+| Histórico | RF08 | Doses aplicadas e canceladas da **família inteira**, agrupadas por ano; cada cartão mostra "Pessoa, data" | Tabela (Vacina, Pessoa, Data, Estado) |
 | Perguntar por voz | RF06 | Botão grande de voz e resultado | Mesmo, com atalho de teclado |
 | Assistente (chatbot) | RF07 | Conversa com respostas e fonte; abre pelo **balão flutuante** no canto inferior direito de todas as abas (fora da barra de navegação) | Coluna central |
-| Conta e privacidade | RF09 | Exportar e **excluir conta** com confirmação | Mesmo |
+| Conta e privacidade | RF09 | "Seus dados" (e-mail), tema em botões de rádio (seguir o aparelho, Claro, Escuro, Alto contraste), privacidade, **sair** e **excluir conta** com confirmação | Cartões lado a lado; botões em linha |
 
 ## 5. Acessibilidade: checklist (RNF04)
 
@@ -182,7 +182,7 @@ A seção 2.5 está implementada no app (`src/lib/layout.ts`, `src/components/ba
 
 - **Compacto** (menos de 600 px): barra de abas **embaixo**, uma coluna.
 - **Médio** (600 a 1023 px): barra **lateral compacta** de 96 px (ícone e texto), uma coluna.
-- **Expandido** (1024 px ou mais): barra **lateral fixa** de 248 px, com nome do app, texto de cada item e aviso de demonstração; conteúdo com no máximo 960 px, margem de 32 px e **listas de cartões em duas colunas**.
+- **Expandido** (1024 px ou mais): barra **lateral fixa** de 248 px, com o logo e o texto de cada item (itens de 56 px, raio 12); conteúdo com no máximo 960 px **mais** a margem de 32 px de cada lado, espaço de 32 px entre blocos (24 px no celular), **ação principal à direita do título** e **listas de cartões em duas colunas** com 16 px de espaço.
 - Cada item de navegação é um **link** de verdade (`role=link`, `aria-current=page` na página atual), com destaque que não depende só da cor e estado de passar o mouse.
 - Verificado no navegador em 390, 800 e 1280 px. Ao arrastar a janela, o navegador avisa o app do novo tamanho; nas telas de celular e tablet o layout é decidido pela largura na carga e a cada redimensionamento.
 
