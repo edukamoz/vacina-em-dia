@@ -1,13 +1,14 @@
 import { app } from '@azure/functions';
 import type { HttpResponseInit } from '@azure/functions';
 import { buildHealthResponse } from '../handlers/health';
+import { withSecurityHeaders } from '../http';
 
 /**
  * Endpoint HTTP `GET /api/health`. Handler fino: só adapta o HTTP e delega à regra.
  * O relógio real é criado aqui, na borda, e injetado na regra.
  */
 export async function health(): Promise<HttpResponseInit> {
-  return buildHealthResponse(() => new Date().toISOString());
+  return withSecurityHeaders(buildHealthResponse(() => new Date().toISOString()));
 }
 
 app.http('health', {
