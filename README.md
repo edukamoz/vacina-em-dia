@@ -8,7 +8,7 @@ Projeto Interdisciplinar VI (PI-VI) da Fatec Votorantim, curso de Desenvolviment
 
 ## Estado atual
 
-Fase inicial de construção. Já existem o monorepo com qualidade configurada, a **máquina de estados da dose** (com testes dos casos de teste do `docs/07-testes`), uma API mínima (`/api/health`) e o esqueleto do app Expo. O estado detalhado e os próximos passos estão em [`docs/00-handoff.md`](docs/00-handoff.md).
+Em construção para a entrega de 19/11/2026. Já funcionam: login próprio com recuperação de senha, família, calendário vacinal oficial (PNI 2026), ciclo de vida das doses, consentimento e exclusão de dados, chatbot e busca por voz, deploy na Azure e testes automatizados. O estado detalhado e os próximos passos estão em [`docs/00-handoff.md`](docs/00-handoff.md).
 
 ## Como rodar
 
@@ -36,12 +36,15 @@ Requer o Docker (Docker Desktop ou Docker Engine com Compose). Na raiz do projet
 docker compose up --build
 ```
 
-Sobe três serviços: o **Azurite** (emulador local do Armazenamento do Azure), a **API** (host oficial do Azure Functions) e o **app web**. Quando terminar de iniciar:
+Sobe quatro serviços: o **Azurite** (emulador local do Armazenamento do Azure), a **API** e o **PLN** (chatbot e busca; hosts oficiais do Azure Functions) e o **app web**. Quando terminar de iniciar:
 
 - App web: http://localhost:8080 (o nginx repassa `/api` para a API, então não há CORS)
 - API: http://localhost:7071/api/health e Swagger em http://localhost:7071/api/docs
+- PLN: http://localhost:7072/api/health
 
-Para parar, `Ctrl+C` e depois `docker compose down` (use `docker compose down -v` para apagar também os dados do Azurite). As portas só aceitam conexões do próprio computador. O serviço de PLN (Python) será adicionado quando existir (SCRUM-20 e SCRUM-21).
+Crie uma conta na tela inicial para entrar (o login funciona no ambiente local; os dados ficam **em memória** e somem ao reiniciar a API). A pergunta por voz e o e-mail de recuperação de senha ficam desligados localmente (precisam de chaves do Azure AI Speech e do Brevo).
+
+Para parar, `Ctrl+C` e depois `docker compose down` (use `docker compose down -v` para apagar também os dados do Azurite). As portas só aceitam conexões do próprio computador e mudam com `API_PORT`, `NLP_PORT` e `WEB_PORT` se estiverem em uso. Manutenção, configuração, atualização de versões e solução de problemas: [`docs/17-docker-manutencao.md`](docs/17-docker-manutencao.md).
 
 Em Mac com Apple Silicon, a imagem oficial do host das Functions só existe para `amd64` e roda emulada, então a primeira subida é mais lenta.
 
