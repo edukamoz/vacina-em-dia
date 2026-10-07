@@ -87,10 +87,14 @@ export function DosesScreen() {
     : [];
 
   return (
-    <Tela reservaBalao titulo={`Doses de ${selected.name.split(' ')[0] ?? selected.name}`}>
-      <LinkTexto titulo="Trocar pessoa" onPress={() => router.push('/familia')} />
-      <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
-
+    <Tela
+      reservaBalao
+      titulo={`Doses de ${selected.name.split(' ')[0] ?? selected.name}`}
+      abaixoDoTitulo={<LinkTexto titulo="Trocar pessoa" onPress={() => router.push('/familia')} />}
+      acao={
+        <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
+      }
+    >
       {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
       {doses.error && (
         <EstadoErro mensagem={doses.error.message} onTentarDeNovo={() => void doses.refetch()} />
@@ -103,7 +107,7 @@ export function DosesScreen() {
       )}
       {secoes.map(({ titulo, lista }) =>
         lista.length === 0 ? null : (
-          <View key={titulo} className="gap-md">
+          <View key={titulo} className="gap-lg">
             <Texto variante="titulo2" accessibilityRole="header">
               {titulo}
             </Texto>
