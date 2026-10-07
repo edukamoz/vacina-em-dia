@@ -231,5 +231,33 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       expect(await repos.auth.findAccountById(id)).toBeUndefined();
       expect(await repos.auth.findRefreshToken(hash(2))).toBeUndefined();
     });
+
+    test('CT-DB-11: token de redefinição: guarda só o hash, uso único atômico, troca a senha e some com a conta', async () => {
+      const id = await newOwner();
+      const hash = 'b'.repeat(64);
+      const expiresAt = '2026-10-07T13:00:00.000Z';
+      await repos.auth.savePasswordResetToken({ tokenHash: hash, accountId: id, expiresAt });
+      expect(await repos.auth.findPasswordResetToken(hash)).toEqual({
+        tokenHash: hash,
+        accountId: id,
+        expiresAt,
+      });
+      expect(await repos.auth.findPasswordResetToken('c'.repeat(64))).toBeUndefined();
+      const [first, second] = await Promise.all([
+        repos.auth.consumePasswordResetToken(hash, '2026-10-07T12:30:00.000Z'),
+        repos.auth.consumePasswordResetToken(hash, '2026-10-07T12:30:01.000Z'),
+      ]);
+      expect([first, second].filter(Boolean)).toHaveLength(1);
+      expect((await repos.auth.findPasswordResetToken(hash))?.usedAt).toMatch(
+        /^2026-10-07T12:30:0[01]\.000Z$/,
+      );
+      expect(await repos.auth.consumePasswordResetToken('c'.repeat(64), expiresAt)).toBe(false);
+      await repos.auth.updatePasswordHash(id, 'scrypt$16$8$1$bm92bw$novo');
+      expect((await repos.auth.findAccountById(id))?.passwordHash).toBe(
+        'scrypt$16$8$1$bm92bw$novo',
+      );
+      await repos.auth.deleteAccount(id);
+      expect(await repos.auth.findPasswordResetToken(hash)).toBeUndefined();
+    });
   });
 });

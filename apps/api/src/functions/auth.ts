@@ -46,6 +46,28 @@ export async function logout(
   });
 }
 
+/** `POST /api/auth/forgot-password`: pede o e-mail de recuperação de senha. */
+export async function forgotPassword(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  return guarded(context, async () => {
+    const body: unknown = await request.json().catch(() => undefined);
+    return authHandlers.forgotPassword(originOf(request), body);
+  });
+}
+
+/** `POST /api/auth/reset-password`: cria a nova senha com o token do e-mail. */
+export async function resetPassword(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  return guarded(context, async () => {
+    const body: unknown = await request.json().catch(() => undefined);
+    return authHandlers.resetPassword(body);
+  });
+}
+
 /** `GET /api/auth/me`: dados da conta da sessão atual. */
 export async function me(
   request: HttpRequest,
@@ -87,4 +109,18 @@ app.http('authMe', {
   authLevel: 'anonymous',
   route: 'auth/me',
   handler: me,
+});
+
+app.http('authForgotPassword', {
+  methods: ['POST'],
+  authLevel: 'anonymous',
+  route: 'auth/forgot-password',
+  handler: forgotPassword,
+});
+
+app.http('authResetPassword', {
+  methods: ['POST'],
+  authLevel: 'anonymous',
+  route: 'auth/reset-password',
+  handler: resetPassword,
 });

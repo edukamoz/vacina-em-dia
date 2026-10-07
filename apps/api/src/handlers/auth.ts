@@ -1,7 +1,9 @@
 import {
+  forgotPasswordInputSchema,
   loginInputSchema,
   refreshInputSchema,
   registerInputSchema,
+  resetPasswordInputSchema,
   type AuthSession,
 } from '@vacina/shared';
 import type { HttpResult } from '../http';
@@ -20,6 +22,10 @@ export interface AuthHandlers {
   refresh(body: unknown): Promise<HttpResult>;
   /** `POST /api/auth/logout`. */
   logout(body: unknown): Promise<HttpResult>;
+  /** `POST /api/auth/forgot-password`: pede o e-mail de recuperação (sempre 202). */
+  forgotPassword(origin: RequestOrigin, body: unknown): Promise<HttpResult>;
+  /** `POST /api/auth/reset-password`: cria a nova senha com o token do e-mail. */
+  resetPassword(body: unknown): Promise<HttpResult>;
   /** `GET /api/auth/me`: dados da conta da sessão atual. */
   me(accountId: string): Promise<HttpResult>;
 }
@@ -59,6 +65,18 @@ export function createAuthHandlers(service: AuthService): AuthHandlers {
       await service.logout(parsed.data.refreshToken);
       return { status: 204 };
     },
+    async forgotPassword(origin, body) {
+      const parsed = forgotPasswordInputSchema.safeParse(body);
+      if (!parsed.success) return validationErrorResult(fieldsOf(parsed.error, 'body'));
+      const result = await service.requestPasswordReset(parsed.data, origin);
+      return result.ok ? { status: 202 } : toErrorResult(result.error);
+    },
+    async resetPassword(body) {
+      const parsed = resetPasswordInputSchema.safeParse(body);
+      if (!parsed.success) return validationErrorResult(fieldsOf(parsed.error, 'body'));
+      const result = await service.resetPassword(parsed.data);
+      return result.ok ? { status: 204 } : toErrorResult(result.error);
+    },
     async me(accountId) {
       const account = await service.describe(accountId);
       return account ? { status: 200, jsonBody: account } : unauthorizedResult();
@@ -71,6 +89,8 @@ export const unavailableAuthHandlers: AuthHandlers = {
   register: async () => toErrorResult({ code: 'AUTH_UNAVAILABLE' }),
   login: async () => toErrorResult({ code: 'AUTH_UNAVAILABLE' }),
   refresh: async () => toErrorResult({ code: 'AUTH_UNAVAILABLE' }),
+  forgotPassword: async () => toErrorResult({ code: 'AUTH_UNAVAILABLE' }),
+  resetPassword: async () => toErrorResult({ code: 'AUTH_UNAVAILABLE' }),
   logout: async () => ({ status: 204 }),
   me: async () => unauthorizedResult(),
 };

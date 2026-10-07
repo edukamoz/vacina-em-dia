@@ -24,7 +24,7 @@ Critério da banca de CN2 ("Apresentação dos custos de serviços no Azure") e 
 | **Key Vault** | Standard | US$ 0,03 por 10 mil operações | ~US$ 0 (poucas leituras de segredo) |
 | **Application Insights + Log Analytics** | Por uso, retenção de 30 dias, **teto diário de 0,1 GB** | Ingestão: os primeiros 5 GB por mês são gratuitos; depois US$ 4,60 por GB | US$ 0 (0,1 GB por dia dá no máximo ~3 GB por mês) |
 | **Armazenamento (Storage, LRS)** | Standard, para o pacote das Functions | US$ 0,0326 por GB por mês (blob quente) | < US$ 0,01 |
-| **E-mail transacional** (recuperação de senha, ainda não implementado) | Brevo ou Azure Communication Services | **A confirmar**: a consulta de preços não devolveu o Azure Communication Services Email; o plano gratuito do Brevo não foi conferido | A definir |
+| **E-mail transacional** (recuperação de senha, ADR-015) | Brevo, plano gratuito (serviço externo, fora da Azure) | 300 e-mails por dia no plano gratuito, segundo a página de produto do Brevo (07/10/2026); limites e regras de remetente: **a confirmar** na conta | US$ 0 |
 | **Tráfego de saída (internet)** | n/a | **A confirmar** (a Azure tem franquia mensal de saída) | ~US$ 0 |
 
 ## O que mais pesa e por quê

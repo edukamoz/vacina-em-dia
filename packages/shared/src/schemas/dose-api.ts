@@ -67,6 +67,7 @@ export const apiErrorSchema = z
       'EMAIL_ALREADY_REGISTERED',
       'WEAK_PASSWORD',
       'INVALID_TOKEN',
+      'INVALID_RESET_TOKEN',
       'AUTH_UNAVAILABLE',
       'ASSISTANT_UNAVAILABLE',
       'SPEECH_NOT_RECOGNIZED',
