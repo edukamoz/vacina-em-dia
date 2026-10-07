@@ -363,7 +363,12 @@ export function buildOpenApiDocument(): object {
             examples: {
               crianca: {
                 summary: 'Criança',
-                value: { name: 'Maria', birthDate: '2025-05-20', isPregnant: false },
+                value: {
+                  name: 'Maria',
+                  birthDate: '2025-05-20',
+                  isPregnant: false,
+                  relationship: 'DAUGHTER',
+                },
               },
             },
           },

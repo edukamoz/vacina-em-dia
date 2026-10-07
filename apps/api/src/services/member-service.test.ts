@@ -156,4 +156,20 @@ describe('serviço de membros da família (RF02)', () => {
       error: { code: 'NOT_FOUND' },
     });
   });
+
+  test('CT-FAM-REL-01: guarda o parentesco, troca na edição e aceita não informar', async () => {
+    const app = buildApp();
+    await app.consent();
+    const created = await app.members.create(OWNER, { ...ADULT, relationship: 'MOTHER' });
+    if (!created.ok) throw new Error('falhou');
+    expect(created.value.relationship).toBe('MOTHER');
+    const updated = await app.members.update(OWNER, created.value.id, {
+      ...ADULT,
+      relationship: 'SELF',
+    });
+    expect(updated.ok && updated.value.relationship).toBe('SELF');
+    const cleared = await app.members.update(OWNER, created.value.id, ADULT);
+    expect(cleared.ok && cleared.value.relationship).toBeNull();
+    expect((await app.members.list(OWNER))[0]?.relationship).toBeNull();
+  });
 });

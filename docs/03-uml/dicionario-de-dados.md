@@ -35,6 +35,7 @@ Pessoa cujo calendário vacinal é acompanhado (o próprio usuário, filhos, ido
 | `user_id` | `UNIQUEIDENTIFIER` | não | FK → `app_user.id` (cascata) | Usuário dono do cadastro; base da verificação de propriedade. |
 | `display_name` | `NVARCHAR(80)` | não | | Nome ou apelido (minimização de dados). |
 | `birth_date` | `DATE` | não | | Data de nascimento, usada para a faixa etária. |
+| `relationship` | `VARCHAR(20)` | sim | CHECK nos códigos conhecidos | Parentesco com o dono da conta (`SELF`, `MOTHER`, `FATHER`, `SON`, `DAUGHTER`, `GRANDMOTHER`, `GRANDFATHER`, `SISTER`, `BROTHER`, `SPOUSE`, `OTHER`); vazio se a pessoa preferiu não informar. Escolhido em lista no app. |
 | `guardian_declared_at` | `DATETIME2(0)` | sim | | Quando o usuário declarou ser responsável por um membro menor de idade; vazio para adultos. |
 | `created_at` | `DATETIME2(0)` | não | padrão: agora (UTC) | Criação do cadastro. |
 

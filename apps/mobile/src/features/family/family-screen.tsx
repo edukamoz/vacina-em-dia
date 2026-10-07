@@ -12,6 +12,7 @@ import { Texto } from '../../components/texto';
 import { describeAge, todayCivil } from '../../lib/dates';
 import { useSession } from '../../session/session-provider';
 import { useDosesOfMembers, useMembers } from '../data/hooks';
+import { PARENTESCO_ROTULO } from './parentesco';
 
 /** Rótulo de cada faixa etária, em linguagem simples. */
 export const GRUPO_ROTULO: Readonly<Record<MemberResponse['ageGroup'], string>> = {
@@ -93,6 +94,15 @@ export function FamilyScreen() {
                   <Texto variante="titulo3" importantForAccessibility="no">
                     {membro.name}
                   </Texto>
+                  {membro.relationship ? (
+                    <Texto
+                      variante="corpoNegrito"
+                      className="text-primaria"
+                      importantForAccessibility="no"
+                    >
+                      {PARENTESCO_ROTULO[membro.relationship]}
+                    </Texto>
+                  ) : null}
                   <Texto className="text-textoSecundario" importantForAccessibility="no">
                     {`${describeAge(membro.birthDate, today)} · ${GRUPO_ROTULO[membro.ageGroup]}${
                       membro.isPregnant ? ' · gestante' : ''
