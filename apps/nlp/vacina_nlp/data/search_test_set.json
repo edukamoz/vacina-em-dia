@@ -8,64 +8,136 @@
     "vocabulario_ausente": "Palavras que não existem nos dados do calendário (limite esperado do método)"
   },
   "queries": [
-    {"q": "vacina bcg", "ok": ["BCG"], "c": "nome"},
-    {"q": "vacina pentavalente", "ok": ["penta (DTP+Hib+HB)"], "c": "nome"},
-    {"q": "vacina tríplice viral", "ok": ["tríplice viral SCR"], "c": "nome"},
-    {"q": "vacina do hpv", "ok": ["HPV4"], "c": "nome"},
-    {"q": "vacina da pólio", "ok": ["poliomielite inativada VIP"], "c": "nome"},
-    {"q": "vacina da gripe", "ok": ["influenza trivalente"], "c": "nome"},
-    {"q": "vacina da febre amarela", "ok": ["febre amarela"], "c": "nome"},
-    {"q": "vacina contra covid", "ok": ["covid-19"], "c": "nome"},
-    {"q": "vacina dtpa", "ok": ["dTpa"], "c": "nome"},
-    {"q": "vacina rotavírus", "ok": ["rotavírus humano"], "c": "nome"},
-    {"q": "vacina contra tuberculose", "ok": ["BCG"], "c": "doenca"},
-    {"q": "vacina contra hanseníase", "ok": ["BCG"], "c": "doenca"},
-    {"q": "vacina contra poliomielite", "ok": ["poliomielite inativada VIP"], "c": "doenca"},
-    {"q": "vacina contra influenza", "ok": ["influenza trivalente"], "c": "doenca"},
-    {"q": "vacina contra catapora", "ok": ["varicela"], "c": "doenca"},
-    {"q": "vacina contra sarampo", "ok": ["tríplice viral SCR"], "c": "doenca"},
-    {"q": "vacina contra caxumba", "ok": ["tríplice viral SCR"], "c": "doenca"},
-    {"q": "vacina contra rubéola", "ok": ["tríplice viral SCR"], "c": "doenca"},
-    {"q": "vacina contra papilomavírus", "ok": ["HPV4"], "c": "doenca"},
-    {"q": "vacina contra a dengue", "ok": ["DNG4"], "c": "doenca"},
-    {"q": "vacina contra hepatite A", "ok": ["hepatite A"], "c": "doenca"},
-    {"q": "vacina contra hepatite B", "ok": ["hepatite B", "penta (DTP+Hib+HB)"], "c": "doenca"},
-    {"q": "vacina contra coqueluche", "ok": ["penta (DTP+Hib+HB)", "DTP", "dTpa"], "c": "doenca"},
-    {"q": "vacina contra tétano", "ok": ["penta (DTP+Hib+HB)", "DTP", "dT", "dTpa"], "c": "doenca"},
-    {"q": "vacina contra difteria", "ok": ["penta (DTP+Hib+HB)", "DTP", "dT", "dTpa"], "c": "doenca"},
-    {"q": "vacina contra diarreia", "ok": ["rotavírus humano"], "c": "doenca"},
-    {"q": "vacina contra meningite", "ok": ["meningocócica C", "meningocócica ACWY"], "c": "doenca"},
-    {"q": "vacina contra pneumonia", "ok": ["pneumocócica 10-valente", "pneumocócica 20-valente", "vírus sincicial respiratório (VVSR)"], "c": "doenca"},
-    {"q": "vacina contra bronquiolite", "ok": ["vírus sincicial respiratório (VVSR)"], "c": "doenca"},
-    {"q": "vacina contra o coronavírus", "ok": ["covid-19"], "c": "doenca"},
-    {"q": "vacina contra haemophilus influenzae", "ok": ["penta (DTP+Hib+HB)"], "c": "doenca"},
-    {"q": "qual vacina previne a catapora", "ok": ["varicela"], "c": "parafrase"},
-    {"q": "preciso me proteger do sarampo", "ok": ["tríplice viral SCR"], "c": "parafrase"},
-    {"q": "como evitar o tétano", "ok": ["penta (DTP+Hib+HB)", "DTP", "dT", "dTpa"], "c": "parafrase"},
-    {"q": "qual vacina evita a paralisia infantil", "ok": ["poliomielite inativada VIP"], "c": "parafrase"},
-    {"q": "quero me proteger contra a gripe", "ok": ["influenza trivalente"], "c": "parafrase"},
-    {"q": "qual vacina serve para a coqueluche", "ok": ["penta (DTP+Hib+HB)", "DTP", "dTpa"], "c": "parafrase"},
-    {"q": "o que toma para não pegar hepatite", "ok": ["hepatite A", "hepatite B", "penta (DTP+Hib+HB)"], "c": "parafrase"},
-    {"q": "vacina para o vírus do sarampo e da rubéola", "ok": ["tríplice viral SCR"], "c": "parafrase"},
-    {"q": "vacina que protege contra a diarreia do bebê", "ok": ["rotavírus humano"], "c": "parafrase"},
-    {"q": "vacina para quem vai viajar para área de febre amarela", "ok": ["febre amarela"], "c": "parafrase"},
-    {"q": "vacina contra a doença causada pelo hpv", "ok": ["HPV4"], "c": "parafrase"},
-    {"q": "vacina para gestante contra coqueluche", "ok": ["dTpa"], "c": "parafrase"},
-    {"q": "vacina contra tuberculoze", "ok": ["BCG"], "c": "voz"},
-    {"q": "vassina da gripe", "ok": ["influenza trivalente"], "c": "voz"},
-    {"q": "vacina contra cacumba", "ok": ["tríplice viral SCR"], "c": "voz"},
-    {"q": "vacina contra sarampo e rubeola", "ok": ["tríplice viral SCR"], "c": "voz"},
-    {"q": "vacina de hepatite be", "ok": ["hepatite B", "penta (DTP+Hib+HB)"], "c": "voz"},
-    {"q": "vacina de febre amarella", "ok": ["febre amarela"], "c": "voz"},
-    {"q": "vacina contra poliomielite infantil", "ok": ["poliomielite inativada VIP"], "c": "voz"},
-    {"q": "vacina contra o papiloma virus", "ok": ["HPV4"], "c": "voz"},
-    {"q": "vacina contra dengi", "ok": ["DNG4"], "c": "voz"},
-    {"q": "vacina da catapura", "ok": ["varicela"], "c": "voz"},
-    {"q": "vacina para proteger o fígado", "ok": ["hepatite A", "hepatite B", "penta (DTP+Hib+HB)"], "c": "vocabulario_ausente"},
-    {"q": "vacina da bochecha inchada", "ok": ["tríplice viral SCR"], "c": "vocabulario_ausente"},
-    {"q": "vacina da tosse comprida", "ok": ["penta (DTP+Hib+HB)", "DTP", "dTpa"], "c": "vocabulario_ausente"},
-    {"q": "vacina que evita a criança ficar paralítica", "ok": ["poliomielite inativada VIP"], "c": "vocabulario_ausente"},
-    {"q": "vacina contra o mosquito aedes", "ok": ["DNG4", "febre amarela"], "c": "vocabulario_ausente"}
+    { "q": "vacina bcg", "ok": ["BCG"], "c": "nome" },
+    { "q": "vacina pentavalente", "ok": ["penta (DTP+Hib+HB)"], "c": "nome" },
+    { "q": "vacina tríplice viral", "ok": ["tríplice viral SCR"], "c": "nome" },
+    { "q": "vacina do hpv", "ok": ["HPV4"], "c": "nome" },
+    { "q": "vacina da pólio", "ok": ["poliomielite inativada VIP"], "c": "nome" },
+    { "q": "vacina da gripe", "ok": ["influenza trivalente"], "c": "nome" },
+    { "q": "vacina da febre amarela", "ok": ["febre amarela"], "c": "nome" },
+    { "q": "vacina contra covid", "ok": ["covid-19"], "c": "nome" },
+    { "q": "vacina dtpa", "ok": ["dTpa"], "c": "nome" },
+    { "q": "vacina rotavírus", "ok": ["rotavírus humano"], "c": "nome" },
+    { "q": "vacina contra tuberculose", "ok": ["BCG"], "c": "doenca" },
+    { "q": "vacina contra hanseníase", "ok": ["BCG"], "c": "doenca" },
+    { "q": "vacina contra poliomielite", "ok": ["poliomielite inativada VIP"], "c": "doenca" },
+    { "q": "vacina contra influenza", "ok": ["influenza trivalente"], "c": "doenca" },
+    { "q": "vacina contra catapora", "ok": ["varicela"], "c": "doenca" },
+    { "q": "vacina contra sarampo", "ok": ["tríplice viral SCR"], "c": "doenca" },
+    { "q": "vacina contra caxumba", "ok": ["tríplice viral SCR"], "c": "doenca" },
+    { "q": "vacina contra rubéola", "ok": ["tríplice viral SCR"], "c": "doenca" },
+    { "q": "vacina contra papilomavírus", "ok": ["HPV4"], "c": "doenca" },
+    { "q": "vacina contra a dengue", "ok": ["DNG4"], "c": "doenca" },
+    { "q": "vacina contra hepatite A", "ok": ["hepatite A"], "c": "doenca" },
+    { "q": "vacina contra hepatite B", "ok": ["hepatite B", "penta (DTP+Hib+HB)"], "c": "doenca" },
+    { "q": "vacina contra coqueluche", "ok": ["penta (DTP+Hib+HB)", "DTP", "dTpa"], "c": "doenca" },
+    {
+      "q": "vacina contra tétano",
+      "ok": ["penta (DTP+Hib+HB)", "DTP", "dT", "dTpa"],
+      "c": "doenca"
+    },
+    {
+      "q": "vacina contra difteria",
+      "ok": ["penta (DTP+Hib+HB)", "DTP", "dT", "dTpa"],
+      "c": "doenca"
+    },
+    { "q": "vacina contra diarreia", "ok": ["rotavírus humano"], "c": "doenca" },
+    {
+      "q": "vacina contra meningite",
+      "ok": ["meningocócica C", "meningocócica ACWY"],
+      "c": "doenca"
+    },
+    {
+      "q": "vacina contra pneumonia",
+      "ok": [
+        "pneumocócica 10-valente",
+        "pneumocócica 20-valente",
+        "vírus sincicial respiratório (VVSR)"
+      ],
+      "c": "doenca"
+    },
+    {
+      "q": "vacina contra bronquiolite",
+      "ok": ["vírus sincicial respiratório (VVSR)"],
+      "c": "doenca"
+    },
+    { "q": "vacina contra o coronavírus", "ok": ["covid-19"], "c": "doenca" },
+    { "q": "vacina contra haemophilus influenzae", "ok": ["penta (DTP+Hib+HB)"], "c": "doenca" },
+    { "q": "qual vacina previne a catapora", "ok": ["varicela"], "c": "parafrase" },
+    { "q": "preciso me proteger do sarampo", "ok": ["tríplice viral SCR"], "c": "parafrase" },
+    {
+      "q": "como evitar o tétano",
+      "ok": ["penta (DTP+Hib+HB)", "DTP", "dT", "dTpa"],
+      "c": "parafrase"
+    },
+    {
+      "q": "qual vacina evita a paralisia infantil",
+      "ok": ["poliomielite inativada VIP"],
+      "c": "parafrase"
+    },
+    { "q": "quero me proteger contra a gripe", "ok": ["influenza trivalente"], "c": "parafrase" },
+    {
+      "q": "qual vacina serve para a coqueluche",
+      "ok": ["penta (DTP+Hib+HB)", "DTP", "dTpa"],
+      "c": "parafrase"
+    },
+    {
+      "q": "o que toma para não pegar hepatite",
+      "ok": ["hepatite A", "hepatite B", "penta (DTP+Hib+HB)"],
+      "c": "parafrase"
+    },
+    {
+      "q": "vacina para o vírus do sarampo e da rubéola",
+      "ok": ["tríplice viral SCR"],
+      "c": "parafrase"
+    },
+    {
+      "q": "vacina que protege contra a diarreia do bebê",
+      "ok": ["rotavírus humano"],
+      "c": "parafrase"
+    },
+    {
+      "q": "vacina para quem vai viajar para área de febre amarela",
+      "ok": ["febre amarela"],
+      "c": "parafrase"
+    },
+    { "q": "vacina contra a doença causada pelo hpv", "ok": ["HPV4"], "c": "parafrase" },
+    { "q": "vacina para gestante contra coqueluche", "ok": ["dTpa"], "c": "parafrase" },
+    { "q": "vacina contra tuberculoze", "ok": ["BCG"], "c": "voz" },
+    { "q": "vassina da gripe", "ok": ["influenza trivalente"], "c": "voz" },
+    { "q": "vacina contra cacumba", "ok": ["tríplice viral SCR"], "c": "voz" },
+    { "q": "vacina contra sarampo e rubeola", "ok": ["tríplice viral SCR"], "c": "voz" },
+    { "q": "vacina de hepatite be", "ok": ["hepatite B", "penta (DTP+Hib+HB)"], "c": "voz" },
+    { "q": "vacina de febre amarella", "ok": ["febre amarela"], "c": "voz" },
+    {
+      "q": "vacina contra poliomielite infantil",
+      "ok": ["poliomielite inativada VIP"],
+      "c": "voz"
+    },
+    { "q": "vacina contra o papiloma virus", "ok": ["HPV4"], "c": "voz" },
+    { "q": "vacina contra dengi", "ok": ["DNG4"], "c": "voz" },
+    { "q": "vacina da catapura", "ok": ["varicela"], "c": "voz" },
+    {
+      "q": "vacina para proteger o fígado",
+      "ok": ["hepatite A", "hepatite B", "penta (DTP+Hib+HB)"],
+      "c": "vocabulario_ausente"
+    },
+    { "q": "vacina da bochecha inchada", "ok": ["tríplice viral SCR"], "c": "vocabulario_ausente" },
+    {
+      "q": "vacina da tosse comprida",
+      "ok": ["penta (DTP+Hib+HB)", "DTP", "dTpa"],
+      "c": "vocabulario_ausente"
+    },
+    {
+      "q": "vacina que evita a criança ficar paralítica",
+      "ok": ["poliomielite inativada VIP"],
+      "c": "vocabulario_ausente"
+    },
+    {
+      "q": "vacina contra o mosquito aedes",
+      "ok": ["DNG4", "febre amarela"],
+      "c": "vocabulario_ausente"
+    }
   ],
   "off_topic": [
     "qual o horário do ônibus",
@@ -84,11 +156,11 @@
   "derived": {
     "description": "Consultas de grupo; a resposta certa vem do próprio calendário (vacinas com alguma linha no grupo), sem escolha minha.",
     "queries": [
-      {"q": "vacinas para gestante", "group": "PREGNANT"},
-      {"q": "vacinas para idoso", "group": "ELDERLY"},
-      {"q": "vacinas para adulto", "group": "ADULT"},
-      {"q": "vacinas para adolescente", "group": "ADOLESCENT_YOUTH"},
-      {"q": "vacinas para criança", "group": "CHILD"}
+      { "q": "vacinas para gestante", "group": "PREGNANT" },
+      { "q": "vacinas para idoso", "group": "ELDERLY" },
+      { "q": "vacinas para adulto", "group": "ADULT" },
+      { "q": "vacinas para adolescente", "group": "ADOLESCENT_YOUTH" },
+      { "q": "vacinas para criança", "group": "CHILD" }
     ]
   }
 }
