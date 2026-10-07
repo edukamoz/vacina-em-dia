@@ -7,8 +7,8 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 | 1 | Estado inicial (semestres anteriores) | CN2 | Não documentado | 0 | Descrever o ponto de partida (o que existia antes do semestre). **Depende do autor** |
 | 2 | Proposta para o semestre (problemas e expectativas) | LDM | `docs/01-visao-e-escopo.md` (Fase 0) completo | 4 | Resumo de 1 slide |
 | 3 | Relacionamento com o Product Owner | LDM | Reuniões simuladas, autor nos dois papéis (`docs/09`) | 2 | Definir quem é o PO e registrar as interações reais. **Depende do autor** |
-| 4 | Requisitos funcionais e não funcionais mais relevantes | QTS | `docs/02-requisitos.md` (RF01–RF12, RNF01–RNF10) | 4 | Mapa de rastreio requisito → tela → teste |
-| 5 | Funcionalidades por persona | PI | Personas na Fase 0; app navegável | 3 | Roteiro de demonstração por persona (Mariana, Sr. José, Carla) |
+| 4 | Requisitos funcionais e não funcionais mais relevantes | QTS | `docs/02-requisitos.md` (RF01–RF12, RNF01–RNF10) | 4 | **Feito em 07/10/2026:** `docs/19-rastreabilidade.md` (requisito → tela → API → teste). Falta o checklist OWASP e o teste de carga |
+| 5 | Funcionalidades por persona | PI | Personas na Fase 0; app navegável | 3 | **Feito em 07/10/2026:** `docs/20-roteiro-de-demonstracao.md` (um caminho por persona). Falta ensaiar a apresentação |
 | 6 | Product Backlog (Kanban) | LDM | Jira com épicos e itens | 3 | Exportar o quadro (print) e conferir status |
 | 7 | Reuniões de planejamento e encerramento (sprints feitas) | PI | Sprint 1 em curso; registros com `[a informar]` | 2 | Registrar datas e tempos reais. **Depende do autor** |
 | 8 | Expectativa das próximas sprints | PI | Cronograma em `docs/09` | 4 | Slide com as sprints 2 a 6 |
