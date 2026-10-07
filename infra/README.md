@@ -38,6 +38,7 @@ O SQL usa só autenticação Microsoft Entra, então **não há senha** de banco
 
 - **Não implante este template no grupo `rg-vacinaemdia` atual.** Os recursos de lá foram criados pela linha de comando; os planos têm nomes gerados (`ASP-rgvacinaemdia-...`) e o template usa `asp-api-vacinaemdia` e `asp-nlp-vacinaemdia`, então criaria planos novos. O `what-if` mostra isso. Use-o para reproduzir o ambiente em um grupo novo ou para recriar tudo.
 - **Limites da oferta gratuita:** uma assinatura só pode ter um Azure SQL gratuito e um Speech F0 por região; em um grupo de teste na mesma assinatura, a implantação deles falha.
+- **Diferença deliberada:** a API ativa na nuvem está com **1 instância sempre pronta** (`alwaysReadyHttp = 1`) desde 07/10/2026, para evitar 503 intermitentes (`docs/21`); o modelo usa 0 por padrão. Ajustar o parâmetro antes de aplicar o Bicep.
 - **Diferença deliberada:** o PLN ativo na nuvem está com `httpsOnly: false`; o template usa `true` (a ser corrigido no ambiente real).
 - **Papéis (RBAC):** a atribuição "Key Vault Secrets User" para a API só é criada com `assignRoles=true`, e exige que quem implanta seja Owner (a conta de implantação do CI tem só Contributor). Os segredos já são gravados no cofre pelo plano de gerenciamento do ARM.
 - **Banco:** só o servidor e o banco; as tabelas entram com a persistência (SCRUM-15/18).

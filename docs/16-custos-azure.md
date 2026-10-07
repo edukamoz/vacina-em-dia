@@ -8,7 +8,7 @@ Critério da banca de CN2 ("Apresentação dos custos de serviços no Azure") e 
 
 | Cenário | Custo mensal estimado |
 |---|---|
-| **Hoje** (demonstração, tráfego baixo, créditos do Azure for Students) | **cerca de US$ 6,50** (quase tudo é a instância sempre pronta do serviço de PLN) |
+| **Hoje** (demonstração, tráfego baixo, créditos do Azure for Students) | **cerca de US$ 13** desde 07/10/2026: uma instância sempre pronta para o PLN e outra para a API (a da API elimina os 503 intermitentes; ver `docs/21`). Antes disso eram cerca de US$ 6,50 |
 | Mesmo cenário **sem** a instância sempre pronta | **cerca de US$ 0**, mas a primeira pergunta ao assistente depois de ociosidade leva ~50 s (partida a frio) |
 | Se o banco gratuito esgotar a franquia | O banco **pausa** (configurado como `AutoPause`): não gera cobrança, mas fica indisponível até o mês virar |
 
