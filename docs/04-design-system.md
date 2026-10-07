@@ -138,10 +138,10 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 | Início: pessoas da família | RF02 | Lista de cartões de membro | Grade de cartões ao lado da barra lateral |
 | Doses | RF03 e RF04 | Cartões de dose em três grupos ("Precisam de atenção", "Próximas", "Aplicadas", até 5 aplicadas), "Trocar pessoa" leva à Família | Duas colunas |
 | Detalhe da dose | RF04 | Ações: agendar, registrar aplicação, cancelar | Painel ao lado da lista |
-| Histórico | RF08 | Doses aplicadas por data | Tabela simples com cabeçalhos |
+| Histórico | RF08 | Doses aplicadas e canceladas da **família inteira**, agrupadas por ano; cada cartão mostra "Pessoa, data" | Tabela (Vacina, Pessoa, Data, Estado) |
 | Perguntar por voz | RF06 | Botão grande de voz e resultado | Mesmo, com atalho de teclado |
 | Assistente (chatbot) | RF07 | Conversa com respostas e fonte; abre pelo **balão flutuante** no canto inferior direito de todas as abas (fora da barra de navegação) | Coluna central |
-| Conta e privacidade | RF09 | Exportar e **excluir conta** com confirmação | Mesmo |
+| Conta e privacidade | RF09 | "Seus dados" (e-mail), tema em botões de rádio (seguir o aparelho, Claro, Escuro, Alto contraste), privacidade, **sair** e **excluir conta** com confirmação | Cartões lado a lado; botões em linha |
 
 ## 5. Acessibilidade: checklist (RNF04)
 
