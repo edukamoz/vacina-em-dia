@@ -1,10 +1,11 @@
 import type * as Dates from '../lib/dates';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { Dimensions } from 'react-native';
 import type { DoseResponse } from '@vacina/shared';
 import { DoseDetailScreen } from './doses/dose-detail-screen';
 import { DosesScreen, LIMITE_APLICADAS, agruparDoses } from './doses/doses-screen';
 import { NewDoseScreen } from './doses/new-dose-screen';
-import { HistoryScreen, historyOf } from './history/history-screen';
+import { HistoryScreen, agruparHistorico } from './history/history-screen';
 import {
   MEMBER,
   OTHER_MEMBER,
@@ -166,24 +167,58 @@ describe('doses (RF03 e RF04)', () => {
 });
 
 describe('histórico (RF08)', () => {
-  test('CT-APP-H01: ordena as aplicadas da mais recente para a mais antiga e põe as canceladas no fim', () => {
-    const ordem = historyOf([APPLIED_OLD, CANCELLED, PENDING, APPLIED]).map((d) => d.id);
-    expect(ordem).toEqual(['d-app', 'd-app2', 'd-can']);
+  test('CT-APP-H01: agrupa por ano, do mais recente, ordena por data e traz canceladas pelo dia previsto', () => {
+    const velha = dose({ id: 'v', status: 'APPLIED', appliedDate: '2025-11-10' });
+    const nova = dose({ id: 'n', status: 'APPLIED', appliedDate: '2026-05-18' });
+    const meio = dose({ id: 'm', status: 'APPLIED', appliedDate: '2026-02-03' });
+    const cancelada = dose({ id: 'c', status: 'CANCELLED', dueDate: '2025-08-22' });
+    const anos = agruparHistorico(
+      [{ name: 'Maria' }, { name: 'João' }],
+      [
+        [velha, meio, PENDING],
+        [nova, cancelada],
+      ],
+    );
+    expect(anos.map((a) => a.ano)).toEqual(['2026', '2025']);
+    expect(anos[0]?.linhas.map((l) => [l.dose.id, l.pessoa])).toEqual([
+      ['n', 'João'],
+      ['m', 'Maria'],
+    ]);
+    expect(anos[1]?.linhas.map((l) => l.dose.id)).toEqual(['v', 'c']);
   });
 
-  test('CT-APP-H02: mostra só o que foi aplicado ou cancelado, com a fonte', async () => {
+  test('CT-APP-H02: mostra a família inteira por ano, com "Pessoa, data", só aplicadas e canceladas, e a fonte', async () => {
     const fake = createFakeFetch({
-      ...FAMILY,
+      'GET /members': { status: 200, body: { items: [MEMBER, OTHER_MEMBER] } },
       'GET /members/m-1/doses': {
         status: 200,
         body: memberDoses([PENDING, APPLIED, APPLIED_OLD, CANCELLED]),
       },
+      'GET /members/m-2/doses': {
+        status: 200,
+        body: memberDoses(
+          [
+            dose({
+              id: 'd-j',
+              vaccine: 'dT',
+              doseLabel: 'reforço',
+              status: 'APPLIED',
+              appliedDate: '2025-03-04',
+            }),
+          ],
+          OTHER_MEMBER,
+        ),
+      },
     });
     await renderScreen(<HistoryScreen />, fake.fetchFn);
     expect(await screen.findByText('BCG, dose única')).toBeOnTheScreen();
-    expect(screen.getByText('Aplicada em 01/08/2026')).toBeOnTheScreen();
+    expect(screen.getByText('Maria, 01/08/2026')).toBeOnTheScreen();
+    expect(screen.getByText('João, 04/03/2025')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: '2026' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: '2025' })).toBeOnTheScreen();
     expect(screen.getByText('rotavírus humano, 1ª dose')).toBeOnTheScreen();
     expect(screen.getByText('covid-19, 1ª dose')).toBeOnTheScreen();
+    expect(screen.getByText('Maria, prevista para 01/12/2026')).toBeOnTheScreen();
     expect(screen.queryByText('tríplice viral SCR, 1ª dose')).not.toBeOnTheScreen();
     expect(screen.getByText(/Fonte: Calendário Nacional/)).toBeOnTheScreen();
 
@@ -213,14 +248,30 @@ describe('histórico (RF08)', () => {
     expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
   });
 
-  test('CT-APP-H06: falha ao carregar as doses mantém o seletor e permite tentar de novo', async () => {
+  test('CT-APP-H06: falha ao carregar as doses de alguém mostra o erro e permite tentar de novo', async () => {
     const fake = createFakeFetch({
       'GET /members': { status: 200, body: { items: [MEMBER, OTHER_MEMBER] } },
       'GET /members/m-1/doses': { status: 500, body: undefined },
+      'GET /members/m-2/doses': { status: 200, body: memberDoses([APPLIED], OTHER_MEMBER) },
     });
     await renderScreen(<HistoryScreen />, fake.fetchFn);
     expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'João' })).toBeOnTheScreen();
+  });
+
+  test('CT-APP-H07: no computador o histórico vira tabela com Vacina, Pessoa, Data e Estado', async () => {
+    const original = Dimensions.get('window');
+    jest.spyOn(Dimensions, 'get').mockReturnValue({ ...original, width: 1440 });
+    const fake = createFakeFetch({
+      'GET /members': { status: 200, body: { items: [MEMBER] } },
+      'GET /members/m-1/doses': { status: 200, body: memberDoses([APPLIED]) },
+    });
+    await renderScreen(<HistoryScreen />, fake.fetchFn);
+    expect(await screen.findByText('BCG, dose única')).toBeOnTheScreen();
+    for (const coluna of ['Vacina', 'Pessoa', 'Data', 'Estado']) {
+      expect(screen.getByText(coluna)).toBeOnTheScreen();
+    }
+    expect(screen.getByText('01/08/2026')).toBeOnTheScreen();
+    jest.restoreAllMocks();
   });
 });
 
