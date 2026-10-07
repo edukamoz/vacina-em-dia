@@ -154,12 +154,11 @@ describe('tela "Entrar"', () => {
     expect(screen.getByLabelText('Senha').props.secureTextEntry).toBe(true);
   });
 
-  test('CT-APP-L16: "Esqueci minha senha" explica que a recuperação ainda não existe', async () => {
+  test('CT-APP-L16: "Esqueci minha senha" leva à tela de recuperação', async () => {
     const { store } = memorySessionStore();
     await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn, { store });
-    expect(screen.queryByText(/recuperação de senha ainda não/)).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Esqueci minha senha' }));
-    expect(screen.getByText(/recuperação de senha ainda não/)).toBeOnTheScreen();
+    expect(mockPush).toHaveBeenCalledWith('/esqueci-senha');
   });
 
   test('CT-APP-L17: "Criar conta" leva à tela de cadastro', async () => {

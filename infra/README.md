@@ -41,4 +41,5 @@ O SQL usa só autenticação Microsoft Entra, então **não há senha** de banco
 - **Diferença deliberada:** o PLN ativo na nuvem está com `httpsOnly: false`; o template usa `true` (a ser corrigido no ambiente real).
 - **Papéis (RBAC):** a atribuição "Key Vault Secrets User" para a API só é criada com `assignRoles=true`, e exige que quem implanta seja Owner (a conta de implantação do CI tem só Contributor). Os segredos já são gravados no cofre pelo plano de gerenciamento do ARM.
 - **Banco:** só o servidor e o banco; as tabelas entram com a persistência (SCRUM-15/18).
+- **Login, e-mail e banco na API:** `authTokenSecret`, `brevoApiKey` (segredos), `emailSenderAddress`, `webBaseUrl` e `useSqlInApi` (liga o Azure SQL e desliga a sessão de demonstração). Passe os segredos por parâmetro seguro; as migrações do banco rodam à parte (`scripts/db-migrate.mjs`).
 - Chaves nas configurações da aplicação (`SPEECH_KEY`, `NLP_FUNCTION_KEY`) são lidas na implantação e ficam só no Azure; nada vai ao Git.

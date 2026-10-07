@@ -29,6 +29,23 @@ param assignRoles bool = false
 @secure()
 param nlpFunctionKey string = ''
 
+@description('Chave de assinatura dos tokens de login (32 caracteres ou mais). Sem ela, o login responde 503.')
+@secure()
+param authTokenSecret string = ''
+
+@description('Chave da API do Brevo (e-mail de recuperação de senha). Vazia = nenhum e-mail sai.')
+@secure()
+param brevoApiKey string = ''
+
+@description('Remetente verificado no Brevo.')
+param emailSenderAddress string = ''
+
+@description('Endereço do app web (usado no link do e-mail), sem barra final.')
+param webBaseUrl string = ''
+
+@description('Liga o Azure SQL na API (e desliga a sessão de demonstração). O app precisa ter o login.')
+param useSqlInApi bool = false
+
 var tags = {
   projeto: 'vacina-em-dia'
 }
@@ -137,6 +154,18 @@ module api 'modules/function-app.bicep' = {
       NLP_FUNCTION_KEY: nlpFunctionKey
       SPEECH_ENDPOINT: speech.outputs.endpoint
       SPEECH_KEY: speechAccount.listKeys().key1
+      EMAIL_SENDER_NAME: 'Vacina em Dia'
+      DEMO_SESSION_ENABLED: useSqlInApi ? 'false' : 'true'
+      ...(empty(authTokenSecret) ? {} : { AUTH_TOKEN_SECRET: authTokenSecret })
+      ...(empty(brevoApiKey) ? {} : { BREVO_API_KEY: brevoApiKey })
+      ...(empty(emailSenderAddress) ? {} : { EMAIL_SENDER_ADDRESS: emailSenderAddress })
+      ...(empty(webBaseUrl) ? {} : { WEB_BASE_URL: webBaseUrl })
+      ...(useSqlInApi
+        ? {
+            SQL_SERVER: '${sql.outputs.serverName}${environment().suffixes.sqlServerHostname}'
+            SQL_DATABASE: 'sqldb-vacinaemdia'
+          }
+        : {})
     }
     tags: tags
   }

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
 import { PNI_2026 } from '@vacina/shared';
+import { createBrevoEmailClient, unavailableEmailClient } from '../clients/brevo-email-client';
 import { createHttpNlpClient, unavailableNlpClient } from '../clients/nlp-http-client';
 import { createHttpSpeechClient, unavailableSpeechClient } from '../clients/speech-http-client';
 import { createAccountHandlers } from '../handlers/account';
@@ -84,6 +85,21 @@ const tokens =
   authSecret && authSecret.length >= MIN_SECRET_LENGTH
     ? createTokenService({ secret: authSecret, clock })
     : undefined;
+/**
+ * E-mail de recuperação de senha (Brevo): chave, remetente verificado e endereço do app web vêm do
+ * ambiente. Sem eles, o pedido de recuperação é aceito mas nenhum e-mail sai.
+ */
+const brevoKey = process.env['BREVO_API_KEY'];
+const senderEmail = process.env['EMAIL_SENDER_ADDRESS'];
+const webBaseUrl = process.env['WEB_BASE_URL'];
+const email =
+  brevoKey && senderEmail
+    ? createBrevoEmailClient({
+        apiKey: brevoKey,
+        senderEmail,
+        senderName: process.env['EMAIL_SENDER_NAME'] ?? 'Vacina em Dia',
+      })
+    : unavailableEmailClient;
 const authService = tokens
   ? createAuthService({
       accounts: authRepository,
@@ -92,6 +108,9 @@ const authService = tokens
       clock,
       newId: randomUUID,
       limiter: createFixedWindowLimiter(clock),
+      email,
+      ...(webBaseUrl ? { webBaseUrl } : {}),
+      reportError: (kind) => console.error(`Falha: ${kind}.`),
       ...(memoryAuth ? { maxAccounts: MAX_ACCOUNTS, countAccounts: memoryAuth.size } : {}),
     })
   : undefined;
