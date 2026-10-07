@@ -62,6 +62,24 @@ Só a rota pública foi medida na produção; as rotas autenticadas não foram, 
 - **Causa não determinada.** Hipóteses, nenhuma confirmada: reinício ou troca da instância do plano Flex Consumption (a API está com zero instâncias sempre prontas e o `maximumInstanceCount` do modelo é 1); efeito da função agendada de lembretes, que acorda o host às 8h de Brasília; ou limite de concorrência do plano. Sem telemetria legível no Application Insights, não foi possível investigar a fundo.
 - **Como investigar:** (a) conferir a telemetria (hoje vazia); (b) repetir a medição com o `sendDailyReminders` desabilitado, para isolar o efeito; (c) avaliar `alwaysReady` de 1 instância para a API, **que tem custo mensal e depende de aprovação do autor** (`docs/16-custos-azure.md`).
 
+### Resultado C: com uma instância sempre pronta (teste do autor e do Claude)
+
+Depois do deploy de 07/10/2026 (21h39 UTC), a configuração real do plano estava com `maximumInstanceCount: 1` e **nenhuma instância sempre pronta**. Medição de linha de base (3 rodadas de 100 requisições, 5 simultâneas): 94% a 96% abaixo de 3 s e **503 em todas as rodadas** (3, 2 e 3 falhas, cada uma após cerca de 60 s).
+
+O autor ligou **1 instância sempre pronta** (`az functionapp scale config always-ready set --settings http=1`). Mesma medição depois:
+
+| Execução (`GET /health` real) | p50 (ms) | p95 (ms) | Abaixo de 3 s | Falhas |
+|---|---|---|---|---|
+| 3 rodadas de 100, 5 simultâneas | 36 a 99 | 89 a 394 | 96% a 99% | **0, 0 e 0** |
+| 1 rodada de 400, 5 simultâneas | 69 | 183 | 99,3% | **0** |
+| 1 rodada de 200, sequencial | 36 | 79 | 100% | **0** |
+
+**Leitura:** os 503 sumiram (0 falhas em cerca de 1.000 requisições, contra 8 falhas em 300 antes). A causa mais provável é a instância única desligando por ociosidade e demorando a voltar; a hipótese do efeito da função de lembretes não foi isolada, mas deixou de ser necessária para resolver. **Sobra um resíduo:** em rajadas, cerca de 1% das requisições ainda levam de 10 a 20 s (máximo de 20 s), sem falhar. O requisito de 90% abaixo de 3 s é atendido com folga.
+
+**Custo:** cerca de US$ 6,50 por mês pela instância da API (512 MB, mesmo cálculo do PLN em `docs/16-custos-azure.md`), somados aos US$ 6,50 do PLN. O saldo do crédito do Azure for Students deve ser conferido no portal.
+
+**Diferença entre o ambiente real e o Bicep:** o modelo (`infra/modules/function-app.bicep`) mantém `alwaysReadyHttp = 0` por padrão. O ambiente real está com 1 desde 07/10/2026. Se o Bicep for aplicado, essa configuração volta a zero, a menos que o parâmetro seja ajustado.
+
 ### Conclusão para o RNF01
 
-Cumprido no que foi medido (código local e rota pública da produção), com **ressalva**: as falhas 503 intermitentes na produção precisam ser investigadas antes da apresentação, e as rotas autenticadas reais ainda não foram medidas.
+Cumprido: a API local responde em até 21 ms e a produção, com uma instância sempre pronta, atende o requisito sem falhas na rota pública medida. **Ressalvas:** as rotas autenticadas reais não foram medidas (exigiriam conta de teste no ambiente real), e restam poucos casos isolados de 10 a 20 s em rajadas. Sem a instância sempre pronta, a produção devolve 503 intermitente.
