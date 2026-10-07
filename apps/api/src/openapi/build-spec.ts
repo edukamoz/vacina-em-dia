@@ -12,6 +12,7 @@ import {
   doseResponseSchema,
   forgotPasswordInputSchema,
   loginInputSchema,
+  customDoseInputSchema,
   memberDosesResponseSchema,
   memberIdSchema,
   memberInputSchema,
@@ -461,6 +462,44 @@ export function buildOpenApiDocument(): object {
       400: errorResponse('Identificador inválido.'),
       401: unauthorized,
       404: errorResponse('Membro não encontrado (ou de outro usuário).'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/members/{id}/doses',
+    tags: ['Calendário e doses'],
+    summary: 'Cadastrar uma dose avulsa',
+    description:
+      'Cadastra uma dose que não consta no calendário oficial, mas que a pessoa precisa acompanhar (por exemplo, por indicação de um profissional). O nome da vacina e a dose são texto livre e a data prevista é de hoje em diante. A dose nasce Pendente (T1), segue o mesmo ciclo de estados das oficiais e aparece com origem `CUSTOM`. Para o que já foi tomado, cadastre e depois registre a aplicação. Máximo de 30 doses avulsas por pessoa.',
+    security: secured,
+    request: {
+      params: memberPathParams,
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: customDoseInputSchema,
+            examples: {
+              viagem: {
+                summary: 'Vacina indicada para uma viagem',
+                value: { vaccine: 'Febre tifoide', doseLabel: '1ª dose', dueDate: '2026-11-04' },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      201: { description: 'Dose cadastrada.', content: jsonContent(doseResponseSchema) },
+      400: validationError,
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED`: o consentimento ainda não foi dado.'),
+      404: errorResponse('Membro não encontrado (ou de outro usuário).'),
+      422: errorResponse(
+        '`INVALID_DOSE_DATE` (data anterior a hoje ou distante demais) ou `LIMIT_REACHED` (máximo de 30 doses avulsas por pessoa).',
+      ),
       500: internalError,
     },
   });

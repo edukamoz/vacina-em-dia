@@ -1,6 +1,6 @@
 # Registros de decisão de arquitetura (ADRs)
 
-Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, decisão, alternativas e consequências. Item do Jira: SCRUM-33 (requisito RNF06). As decisões ADR-001 a ADR-008 vêm do Quadro 6 do documento de Fase 0; ADR-009 e ADR-010 resolvem pendências do `CLAUDE.md` §14; ADR-011 registra as decisões do design system (SCRUM-32); ADR-012 registra a documentação da API (OpenAPI e Swagger); ADR-013 registra a sessão de demonstração provisória, usada até o login do SCRUM-13; ADR-014 substitui a ADR-005 por autenticação própria; ADR-015 adota o Brevo para o e-mail de recuperação de senha.
+Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, decisão, alternativas e consequências. Item do Jira: SCRUM-33 (requisito RNF06). As decisões ADR-001 a ADR-008 vêm do Quadro 6 do documento de Fase 0; ADR-009 e ADR-010 resolvem pendências do `CLAUDE.md` §14; ADR-011 registra as decisões do design system (SCRUM-32); ADR-012 registra a documentação da API (OpenAPI e Swagger); ADR-013 registra a sessão de demonstração provisória, usada até o login do SCRUM-13; ADR-014 substitui a ADR-005 por autenticação própria; ADR-015 adota o Brevo para o e-mail de recuperação de senha; ADR-016 cria a dose avulsa (vacina cadastrada à mão, com etiqueta de origem).
 
 ## Índice
 
@@ -21,6 +21,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-013](ADR-013-sessao-de-demonstracao-provisoria.md) | Sessão de demonstração provisória (antes do login) | Aceita (provisória) |
 | [ADR-014](ADR-014-autenticacao-propria.md) | Autenticação própria (e-mail e senha no Azure SQL) | Aceita |
 | [ADR-015](ADR-015-email-transacional-brevo.md) | E-mail transacional com o Brevo (recuperação de senha) | Aceita |
+| [ADR-016](ADR-016-dose-avulsa.md) | Dose avulsa (vacina cadastrada à mão, fora do calendário oficial) | Aceita |
 
 ## Estados possíveis
 
