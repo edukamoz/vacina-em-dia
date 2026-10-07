@@ -14,6 +14,8 @@ import type { HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
 import { createInMemoryStore } from '../repositories/in-memory-store';
+import { createMssqlExecutor } from '../repositories/sql/mssql-executor';
+import { createSqlRepositories } from '../repositories/sql/sql-repositories';
 import { createAccountService } from '../services/account-service';
 import { createAssistantService } from '../services/assistant-service';
 import { createAuthService } from '../services/auth-service';
@@ -30,7 +32,19 @@ import { createTokenService, MIN_SECRET_LENGTH } from '../services/token-service
  * recebem por injeção. Quando o banco entrar, só o `store` muda.
  */
 const clock = () => new Date().toISOString();
-const store = createInMemoryStore();
+
+/**
+ * Persistência: com `SQL_SERVER` e `SQL_DATABASE`, tudo vai para o Azure SQL (autenticação Entra pela
+ * identidade gerenciada, sem senha). Sem eles, os dados ficam em memória (desenvolvimento e testes).
+ */
+const sqlServer = process.env['SQL_SERVER'];
+const sqlDatabase = process.env['SQL_DATABASE'];
+const sql =
+  sqlServer && sqlDatabase
+    ? createSqlRepositories(createMssqlExecutor({ server: sqlServer, database: sqlDatabase }))
+    : undefined;
+const memory = sql ? undefined : createInMemoryStore();
+const store = sql ?? (memory as ReturnType<typeof createInMemoryStore>);
 const calendar = PNI_2026;
 
 const doseService = createDoseService({
@@ -55,7 +69,8 @@ export const doseHandlers = createDoseHandlers(doseService);
 export const consentHandlers = createConsentHandlers(
   createConsentService({ consents: store.consents, clock }),
 );
-const authRepository = createInMemoryAuthRepository();
+const memoryAuth = sql ? undefined : createInMemoryAuthRepository();
+const authRepository = sql?.auth ?? (memoryAuth as ReturnType<typeof createInMemoryAuthRepository>);
 export const accountHandlers = createAccountHandlers(
   createAccountService(store.accounts, authRepository),
 );
@@ -77,8 +92,7 @@ const authService = tokens
       clock,
       newId: randomUUID,
       limiter: createFixedWindowLimiter(clock),
-      maxAccounts: MAX_ACCOUNTS,
-      countAccounts: authRepository.size,
+      ...(memoryAuth ? { maxAccounts: MAX_ACCOUNTS, countAccounts: memoryAuth.size } : {}),
     })
   : undefined;
 export const authHandlers = authService ? createAuthHandlers(authService) : unavailableAuthHandlers;
