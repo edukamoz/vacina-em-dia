@@ -115,7 +115,7 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 
 **Próximos passos do Claude, em ordem sugerida:**
 1. Conferir o deploy da `main` no site publicado (dose avulsa, parentesco, telas novas) e o CI da `main`.
-2. Fidelidade ao design que ainda falta: **Criar conta** (campo Nome e aceite de termos, que dependem de escrever os Termos de uso e a Política de privacidade com o autor), tablet (600 a 1023 px, não desenhado) e os temas Escuro e Alto contraste.
+2. Fidelidade ao design que ainda falta: **Criar conta** (Termos de uso e Política de privacidade escritos em 07/10/2026, com aceite obrigatório e rascunho a validar: `docs/18-termos-e-privacidade.md`; o campo Nome do design **não** foi implementado, por decisão do autor, para guardar só e-mail e senha), tablet (600 a 1023 px, não desenhado) e os temas Escuro e Alto contraste.
 3. Caixa preta de parentesco e dose avulsa: **feita** (179 casos no total, `docs/07-testes/caixa-preta-execucao.md`); falta revisão por outra pessoa (por exemplo, o professor).
 4. Telas ainda sem referência no design: Assistente, Consentimento, Membro (formulário), Redefinir senha; temas Escuro e Alto contraste ainda não vistos em nenhuma tela nova.
 5. Lembretes (SCRUM-19); voz no celular; confirmação de e-mail no cadastro (não existe); documentações em Word (SCRUM-34, 35, 36) e panfleto (SCRUM-37), só com dados reais do autor; estado inicial (CN2) e Product Owner dependem do autor.
