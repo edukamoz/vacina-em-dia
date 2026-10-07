@@ -1,21 +1,28 @@
 import { OpenAPIRegistry, OpenApiGeneratorV31 } from '@asteasolutions/zod-to-openapi';
 import {
+  accountInfoSchema,
   apiErrorSchema,
+  assistantMessageInputSchema,
+  assistantResponseSchema,
+  authSessionSchema,
   consentInputSchema,
   consentResponseSchema,
   doseEventInputSchema,
   doseIdSchema,
   doseResponseSchema,
+  loginInputSchema,
   memberDosesResponseSchema,
   memberIdSchema,
   memberInputSchema,
   memberListResponseSchema,
   memberResponseSchema,
+  refreshInputSchema,
+  registerInputSchema,
 } from '@vacina/shared';
 import { z } from 'zod';
 
 /** Versão da API (acompanha o `package.json` do `apps/api`). */
-const API_VERSION = '0.2.0';
+const API_VERSION = '0.4.0';
 
 const jsonContent = (schema: z.ZodType) => ({ 'application/json': { schema } });
 const errorResponse = (description: string) => ({
@@ -37,19 +44,27 @@ export function buildOpenApiDocument(): object {
   const memberPathParams = z.object({ id: memberIdSchema });
   const internalError = errorResponse('Falha interna. A mensagem não traz detalhes técnicos.');
   const unauthorized = errorResponse(
-    '`UNAUTHORIZED`: o cabeçalho `x-demo-session` não foi enviado ou está fora do formato.',
+    '`UNAUTHORIZED`: falta o cabeçalho `Authorization: Bearer` ou o token é inválido ou venceu.',
   );
-  const secured = [{ demoSession: [] }];
+  const secured = [{ bearerAuth: [] }, { demoSession: [] }];
   const validationError = errorResponse(
     'Corpo inválido (a resposta lista só os nomes dos campos).',
   );
+
+  registry.registerComponent('securitySchemes', 'bearerAuth', {
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT',
+    description:
+      'Token de acesso (15 minutos) obtido em `/auth/login` ou `/auth/register`. Renove com `/auth/refresh` (ADR-014).',
+  });
 
   registry.registerComponent('securitySchemes', 'demoSession', {
     type: 'apiKey',
     in: 'header',
     name: 'x-demo-session',
     description:
-      'Provisório (sessão de demonstração): identificador aleatório gerado pelo navegador. Não é autenticação; será trocado pelo login do Microsoft Entra External ID (SCRUM-13).',
+      'Provisório (sessão de demonstração): identificador aleatório gerado pelo navegador. Não é autenticação; só vale enquanto `DEMO_SESSION_ENABLED` não for `false` e será removido quando o app usar o login (ADR-014).',
   });
 
   registry.registerPath({
@@ -86,6 +101,120 @@ export function buildOpenApiDocument(): object {
         content: jsonContent(z.object({}).loose()),
       },
       404: errorResponse('A documentação está desligada neste ambiente.'),
+    },
+  });
+
+  const tooMany = errorResponse(
+    '`RATE_LIMITED`: muitas tentativas. O cabeçalho `Retry-After` diz em quantos segundos tentar de novo.',
+  );
+  const unavailable = errorResponse(
+    '`AUTH_UNAVAILABLE`: o login não está configurado neste ambiente.',
+  );
+  const sessionOk = (description: string) => ({
+    description,
+    content: jsonContent(authSessionSchema),
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/auth/register',
+    tags: ['Login'],
+    summary: 'Criar conta',
+    description:
+      'Cria a conta com e-mail e senha (RF01) e já abre a sessão. A senha nunca é guardada, só o hash (scrypt). Recusa senhas comuns. Limite de 10 cadastros por hora por origem.',
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: registerInputSchema,
+            examples: {
+              cadastro: {
+                summary: 'Cadastro',
+                value: { email: 'mariana@exemplo.com.br', password: 'uma frase longa é melhor' },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      201: sessionOk('Conta criada e sessão aberta.'),
+      400: validationError,
+      409: errorResponse('`EMAIL_ALREADY_REGISTERED`: já existe uma conta com este e-mail.'),
+      422: errorResponse('`WEAK_PASSWORD`: senha comum demais ou igual ao e-mail.'),
+      429: tooMany,
+      500: internalError,
+      503: unavailable,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/auth/login',
+    tags: ['Login'],
+    summary: 'Entrar',
+    description:
+      'Confere e-mail e senha e abre a sessão. Conta inexistente e senha errada têm a mesma resposta. Depois de 5 falhas em 15 minutos, o e-mail fica bloqueado até o fim da janela.',
+    request: {
+      body: { required: true, content: jsonContent(loginInputSchema) },
+    },
+    responses: {
+      200: sessionOk('Sessão aberta.'),
+      400: validationError,
+      401: errorResponse('`INVALID_CREDENTIALS`: e-mail ou senha incorretos.'),
+      429: tooMany,
+      500: internalError,
+      503: unavailable,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/auth/refresh',
+    tags: ['Login'],
+    summary: 'Renovar a sessão',
+    description:
+      'Troca o token de renovação por uma sessão nova. Cada token só vale uma vez; apresentar um token já usado encerra todas as sessões da conta.',
+    request: {
+      body: { required: true, content: jsonContent(refreshInputSchema) },
+    },
+    responses: {
+      200: sessionOk('Sessão renovada.'),
+      400: validationError,
+      401: errorResponse('`INVALID_TOKEN`: token inválido, vencido ou já usado.'),
+      500: internalError,
+      503: unavailable,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/auth/logout',
+    tags: ['Login'],
+    summary: 'Sair',
+    description: 'Revoga o token de renovação. Responde 204 mesmo que o token já não valha.',
+    request: {
+      body: { required: true, content: jsonContent(refreshInputSchema) },
+    },
+    responses: {
+      204: { description: 'Sessão encerrada.' },
+      400: validationError,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/auth/me',
+    tags: ['Login'],
+    summary: 'Consultar a conta da sessão',
+    description: 'Devolve o identificador e o e-mail da conta dona do token.',
+    security: secured,
+    responses: {
+      200: { description: 'Dados da conta.', content: jsonContent(accountInfoSchema) },
+      401: unauthorized,
+      500: internalError,
     },
   });
 
@@ -359,19 +488,88 @@ export function buildOpenApiDocument(): object {
     },
   });
 
+  const assistantErrors = {
+    401: unauthorized,
+    429: errorResponse(
+      '`RATE_LIMITED`: limite de uso atingido (cabeçalho `Retry-After` com os segundos de espera).',
+    ),
+    500: internalError,
+    503: errorResponse('`ASSISTANT_UNAVAILABLE`: o serviço de PLN ou de voz não respondeu.'),
+  };
+
+  registry.registerPath({
+    method: 'post',
+    path: '/assistant/message',
+    tags: ['Assistente'],
+    summary: 'Perguntar ao assistente por texto',
+    description:
+      'Chatbot por regras com classificação de intenções (TF-IDF e SVM), sem IA generativa (RF07). Responde dúvidas sobre o aplicativo e sobre o Calendário Nacional de Vacinação, sempre com a fonte citada. Perguntas sobre saúde individual são encaminhadas a um profissional (`safety: true`); abaixo do limiar de confiança, devolve a resposta padrão (`fallback: true`). Devolve também as vacinas parecidas com a pergunta. O texto não é guardado nem registrado em log. Limite: 60 perguntas por hora por usuário.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: assistantMessageInputSchema,
+            examples: {
+              pergunta: { summary: 'Pergunta', value: { text: 'Para que serve a BCG?' } },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'A resposta do assistente.',
+        content: jsonContent(assistantResponseSchema),
+      },
+      400: validationError,
+      ...assistantErrors,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/assistant/voice',
+    tags: ['Assistente'],
+    summary: 'Perguntar ao assistente por voz',
+    description:
+      'Recebe o áudio da pergunta (WAV PCM de 16 kHz, mono, até 60 s, enviado como `audio/wav` no corpo), transcreve com o Azure AI Speech em português do Brasil (RF06) e responde como em `/assistant/message`, incluindo a transcrição e a busca por vacinas. O áudio é processado em memória e descartado: nunca é gravado. Limite: 20 por hora e 60 por dia por usuário.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: { 'audio/wav': { schema: z.string().meta({ format: 'binary' }) } },
+      },
+    },
+    responses: {
+      200: {
+        description: 'A transcrição e a resposta do assistente.',
+        content: jsonContent(assistantResponseSchema),
+      },
+      413: errorResponse('`AUDIO_TOO_LARGE`: áudio maior que o limite.'),
+      415: errorResponse('`UNSUPPORTED_AUDIO`: o corpo não é um WAV aceito.'),
+      422: errorResponse(
+        '`SPEECH_NOT_RECOGNIZED`: a fala não foi entendida; peça para tentar de novo ou digitar.',
+      ),
+      ...assistantErrors,
+    },
+  });
+
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
     openapi: '3.1.0',
     info: {
       title: 'Vacina em Dia: API',
       version: API_VERSION,
       description:
-        'API do Vacina em Dia: membros da família, calendário vacinal oficial (PNI 2026), ciclo de vida das doses e consentimento. Os dados ficam em memória (demonstração) e o acesso usa uma sessão de demonstração provisória; login do Entra External ID, banco e limite de taxa (429) entram nos próximos itens.',
+        'API do Vacina em Dia: membros da família, calendário vacinal oficial (PNI 2026), ciclo de vida das doses e consentimento. Os dados ficam em memória (demonstração) e o acesso usa o login próprio (e-mail e senha, ADR-014) ou, enquanto estiver habilitada, a sessão de demonstração provisória; o banco entra no próximo item.',
     },
     servers: [{ url: '/api', description: 'Prefixo das Azure Functions' }],
     tags: [
       { name: 'Sistema', description: 'Verificação e documentação.' },
       { name: 'Conta e privacidade', description: 'Consentimento e exclusão de dados (RF09).' },
       { name: 'Família', description: 'Membros da família (RF02).' },
+      { name: 'Assistente', description: 'Chatbot e busca por voz (RF06 e RF07).' },
       {
         name: 'Calendário e doses',
         description: 'Calendário vacinal e ciclo de vida da dose (RF03 e RF04).',

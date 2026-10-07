@@ -133,7 +133,7 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 
 | Tela | Requisito | Celular | Web |
 |---|---|---|---|
-| Entrar e criar conta | RF01 | Uma coluna, botão de largura total | Cartão centralizado de até 480 |
+| Entrar e criar conta | RF01 | Uma coluna, botão de largura total | Duas colunas: lateral de 560 com a marca e formulário de 440 (implementado em 07/10/2026, ver `docs/14-login-proprio.md`) |
 | Consentimento | RF09 | Texto em linguagem simples, botão "Aceito" | Mesmo, em coluna de leitura |
 | Início: pessoas da família | RF02 | Lista de cartões de membro | Grade de cartões ao lado da barra lateral |
 | Calendário do membro | RF03 e RF04 | Lista de cartões de dose, mais atrasadas primeiro | Duas colunas, filtro por estado |
@@ -175,6 +175,16 @@ Lição de implementação: duas classes de cor no mesmo elemento (por exemplo `
 Limitações conhecidas: os ícones do selo são símbolos de texto (sem biblioteca de ícones); o aviso de "texto a 200%" e o teste com leitores de tela ainda precisam ser feitos à mão.
 
 As versões exatas de NativeWind, Expo e da fonte estão em `docs/tech-versions.md`.
+
+### 6.1 Responsividade implementada (web em computador)
+
+A seção 2.5 está implementada no app (`src/lib/layout.ts`, `src/components/barra-de-navegacao.tsx` e `src/components/grade.tsx`):
+
+- **Compacto** (menos de 600 px): barra de abas **embaixo**, uma coluna.
+- **Médio** (600 a 1023 px): barra **lateral compacta** de 96 px (ícone e texto), uma coluna.
+- **Expandido** (1024 px ou mais): barra **lateral fixa** de 248 px, com nome do app, texto de cada item e aviso de demonstração; conteúdo com no máximo 960 px, margem de 32 px e **listas de cartões em duas colunas**.
+- Cada item de navegação é um **link** de verdade (`role=link`, `aria-current=page` na página atual), com destaque que não depende só da cor e estado de passar o mouse.
+- Verificado no navegador em 390, 800 e 1280 px. Ao arrastar a janela, o navegador avisa o app do novo tamanho; nas telas de celular e tablet o layout é decidido pela largura na carga e a cada redimensionamento.
 
 ## 7. Linguagem e microcopy
 

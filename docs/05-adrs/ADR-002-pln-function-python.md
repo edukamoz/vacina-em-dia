@@ -35,3 +35,11 @@ O chatbot usa regras e classificação de intenções com **TF-IDF e SVM** (exig
 ## Verificações e fontes
 
 - Exigência de TF-IDF e SVM: enunciado da disciplina de PLN (`docs/referencias-disciplinas/pln_aula-introducao.pdf`) e `docs/01-visao-e-escopo.md`.
+
+## Atualização de 07/10/2026 (implementação, SCRUM-21)
+
+- **O modelo é treinado na partida do serviço**, a partir do dataset versionado, e não carregado de um arquivo binário (pickle). O treino leva menos de 1 s com cerca de 500 frases; evita depender da versão exata das bibliotecas e de carregar binário. Substitui, nesse ponto, a frase "guardado como artefato versionado" acima.
+- Calendário compartilhado: o JSON `apps/nlp/vacina_nlp/data/pni-2026.json` é gerado do `@vacina/shared`; um teste impede divergência.
+- A chave da função (nível `function`) protege `/chat` e `/search`; só a API principal as conhece.
+- Versões: Python 3.13 na nuvem, no CI e no Docker; scikit-learn 1.9.1 (ver `docs/tech-versions.md`).
+

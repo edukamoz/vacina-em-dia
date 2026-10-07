@@ -21,6 +21,7 @@ concurrency:
 env:
   FUNCTIONAPP_NAME: func-vacinaemdia-vedia6398
   API_URL: https://func-vacinaemdia-vedia6398.azurewebsites.net/api
+  NLP_FUNCTIONAPP_NAME: func-nlp-vacinaemdia-vedia6398
 
 jobs:
   api:
@@ -71,6 +72,51 @@ jobs:
           for i in 1 2 3 4 5 6; do
             if curl -fsS "$API_URL/health"; then exit 0; fi
             sleep 10
+          done
+          exit 1
+
+  nlp:
+    name: Publicar o serviço de PLN
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      # As bibliotecas vão dentro do pacote (.python_packages), compiladas para Linux, como o
+      # Flex Consumption espera. O modelo é treinado na partida do serviço.
+      - name: Montar o pacote
+        run: |
+          mkdir -p pacote-nlp
+          pip install -r apps/nlp/requirements.txt --target pacote-nlp/.python_packages/lib/site-packages
+          cp apps/nlp/host.json apps/nlp/function_app.py pacote-nlp/
+          cp -r apps/nlp/vacina_nlp pacote-nlp/vacina_nlp
+          find pacote-nlp -name __pycache__ -type d -prune -exec rm -rf {} +
+
+      - name: Entrar na Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Publicar na Function App (Flex Consumption)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.NLP_FUNCTIONAPP_NAME }}
+          package: pacote-nlp
+          sku: flexconsumption
+
+      - name: Teste de fumaça
+        run: |
+          for i in 1 2 3 4 5 6 7 8; do
+            if curl -fsS "https://${NLP_FUNCTIONAPP_NAME}.azurewebsites.net/api/health"; then exit 0; fi
+            sleep 15
           done
           exit 1
 

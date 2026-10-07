@@ -39,6 +39,68 @@ export function toErrorResult(error: ServiceError): HttpResult {
         code: 'LIMIT_REACHED',
         message: 'Você chegou ao limite de pessoas cadastradas.',
       });
+    case 'RATE_LIMITED':
+      return {
+        ...json(429, { code: 'RATE_LIMITED', message: rateLimitedMessage(error.scope) }),
+        headers: { 'retry-after': String(error.retryAfterSeconds) },
+      };
+    case 'INVALID_CREDENTIALS':
+      return json(401, {
+        code: 'INVALID_CREDENTIALS',
+        message: 'E-mail ou senha incorretos. Confira e tente de novo.',
+      });
+    case 'EMAIL_ALREADY_REGISTERED':
+      return json(409, {
+        code: 'EMAIL_ALREADY_REGISTERED',
+        message: 'Já existe uma conta com este e-mail. Entre ou use outro e-mail.',
+      });
+    case 'WEAK_PASSWORD':
+      return json(422, {
+        code: 'WEAK_PASSWORD',
+        message: 'Essa senha é fácil de adivinhar. Use uma frase longa ou outra senha.',
+      });
+    case 'INVALID_TOKEN':
+      return json(401, {
+        code: 'INVALID_TOKEN',
+        message: 'Sua sessão terminou. Entre de novo.',
+      });
+    case 'AUTH_UNAVAILABLE':
+      return json(503, {
+        code: 'AUTH_UNAVAILABLE',
+        message: 'A entrada na conta não está disponível agora. Tente de novo em instantes.',
+      });
+    case 'ASSISTANT_UNAVAILABLE':
+      return json(503, {
+        code: 'ASSISTANT_UNAVAILABLE',
+        message: 'O assistente não está disponível agora. Tente de novo em instantes.',
+      });
+    case 'SPEECH_NOT_RECOGNIZED':
+      return json(422, {
+        code: 'SPEECH_NOT_RECOGNIZED',
+        message:
+          'Não consegui entender o áudio. Fale mais perto do microfone ou digite a sua pergunta.',
+      });
+    case 'UNSUPPORTED_AUDIO':
+      return json(415, {
+        code: 'UNSUPPORTED_AUDIO',
+        message: 'O áudio não está em um formato aceito. Digite a sua pergunta.',
+      });
+    case 'AUDIO_TOO_LARGE':
+      return json(413, {
+        code: 'AUDIO_TOO_LARGE',
+        message: 'O áudio é longo demais. Fale por até 30 segundos ou digite a sua pergunta.',
+      });
+  }
+}
+
+function rateLimitedMessage(scope: 'assistant' | 'login' | 'register' | undefined): string {
+  switch (scope) {
+    case 'login':
+      return 'Muitas tentativas de entrar. Aguarde um pouco e tente de novo.';
+    case 'register':
+      return 'Muitos cadastros em pouco tempo. Tente de novo mais tarde.';
+    default:
+      return 'Você fez muitas perguntas em pouco tempo. Tente de novo mais tarde.';
   }
 }
 

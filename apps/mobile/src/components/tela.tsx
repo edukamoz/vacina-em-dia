@@ -27,7 +27,7 @@ export function Tela({
   const router = useRouter();
   return (
     <SafeAreaView className="flex-1 bg-fundo">
-      <ScrollView contentContainerClassName="gap-lg p-lg medio:p-xl self-center w-full max-w-conteudo">
+      <ScrollView contentContainerClassName="gap-lg p-lg medio:p-xl expandido:p-xxl self-center w-full max-w-conteudo">
         {voltar ? (
           <Botao
             titulo="Voltar"

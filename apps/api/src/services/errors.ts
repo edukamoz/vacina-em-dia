@@ -25,6 +25,60 @@ export interface LimitReachedError {
   readonly code: 'LIMIT_REACHED';
 }
 
+/** Limite de uso do assistente atingido (ADR-010). */
+export interface RateLimitedError {
+  readonly code: 'RATE_LIMITED';
+  /** O que foi limitado; muda só a mensagem. Sem valor, é o assistente. */
+  readonly scope?: 'assistant' | 'login' | 'register';
+  /** Segundos até a próxima janela livre. */
+  readonly retryAfterSeconds: number;
+}
+
+/** O serviço de PLN ou de voz não respondeu ou não está configurado. */
+export interface AssistantUnavailableError {
+  readonly code: 'ASSISTANT_UNAVAILABLE';
+}
+
+/** A fala não foi entendida (silêncio, ruído ou outro idioma). */
+export interface SpeechNotRecognizedError {
+  readonly code: 'SPEECH_NOT_RECOGNIZED';
+}
+
+/** O áudio não está no formato aceito (WAV PCM de 16 kHz, mono). */
+export interface UnsupportedAudioError {
+  readonly code: 'UNSUPPORTED_AUDIO';
+}
+
+/** O áudio é maior que o limite aceito. */
+export interface AudioTooLargeError {
+  readonly code: 'AUDIO_TOO_LARGE';
+}
+
+/** E-mail ou senha incorretos (a mesma resposta para conta inexistente e senha errada). */
+export interface InvalidCredentialsError {
+  readonly code: 'INVALID_CREDENTIALS';
+}
+
+/** Já existe uma conta com esse e-mail. */
+export interface EmailAlreadyRegisteredError {
+  readonly code: 'EMAIL_ALREADY_REGISTERED';
+}
+
+/** Senha comum demais ou igual ao e-mail. */
+export interface WeakPasswordError {
+  readonly code: 'WEAK_PASSWORD';
+}
+
+/** Token de renovação inválido, expirado ou já usado. */
+export interface InvalidTokenError {
+  readonly code: 'INVALID_TOKEN';
+}
+
+/** O login não está configurado neste ambiente (falta a chave de assinatura). */
+export interface AuthUnavailableError {
+  readonly code: 'AUTH_UNAVAILABLE';
+}
+
 /** Erros de domínio dos casos de uso, mapeados para HTTP em um único ponto. */
 export type ServiceError =
   | NotFoundError
@@ -32,6 +86,16 @@ export type ServiceError =
   | GuardianDeclarationRequiredError
   | InvalidBirthDateError
   | LimitReachedError
+  | RateLimitedError
+  | AssistantUnavailableError
+  | SpeechNotRecognizedError
+  | UnsupportedAudioError
+  | AudioTooLargeError
+  | InvalidCredentialsError
+  | EmailAlreadyRegisteredError
+  | WeakPasswordError
+  | InvalidTokenError
+  | AuthUnavailableError
   | TransitionError;
 
 /** Resultado de um caso de uso: o valor ou um erro de domínio, nunca uma exceção. */
