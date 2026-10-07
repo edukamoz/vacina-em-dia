@@ -8,12 +8,12 @@ export type BotaoVariante = 'principal' | 'secundario' | 'perigo';
 
 const ESTILOS: Readonly<Record<BotaoVariante, { caixa: string; texto: string }>> = {
   principal: { caixa: 'min-h-principal bg-primaria border-primaria', texto: 'text-sobrePrimaria' },
-  secundario: { caixa: 'min-h-toque bg-fundo border-borda', texto: 'text-texto' },
-  perigo: { caixa: 'min-h-toque bg-fundo border-erro', texto: 'text-erro' },
+  secundario: { caixa: 'min-h-principal bg-fundo border-borda', texto: 'text-texto' },
+  perigo: { caixa: 'min-h-principal bg-fundo border-erro', texto: 'text-erro' },
 };
 
 /**
- * Botão do design system: altura mínima de 56 dp no principal e 48 dp nos demais, texto sempre
+ * Botão do design system: altura mínima de 56 dp em todos os tipos (como nas telas de referência), texto sempre
  * visível e papel de acessibilidade `button`.
  *
  * @param props.titulo - Texto do botão (também é o rótulo de acessibilidade).

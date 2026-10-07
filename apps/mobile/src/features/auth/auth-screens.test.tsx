@@ -257,7 +257,7 @@ describe('tela "Criar conta"', () => {
 describe('conta com login', () => {
   const logged = { ...STORED_SESSION, expiresAt: Date.now() + 3_600_000 };
 
-  test('CT-APP-L30: mostra o e-mail da conta e "Sair da conta" encerra a sessão', async () => {
+  test('CT-APP-L30: mostra o e-mail da conta e "Sair" encerra a sessão', async () => {
     const { store, box } = memorySessionStore(logged);
     const fake = createFakeFetch({
       'GET /consent': { status: 200, body: ACCEPTED },
@@ -265,7 +265,7 @@ describe('conta com login', () => {
     });
     await renderScreen(<AccountScreen />, fake.fetchFn, { store });
     expect(await screen.findByText('mariana@exemplo.com.br')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sair' }));
     await waitFor(() => expect(fake.calls.some((c) => c.key === 'POST /auth/logout')).toBe(true));
     await waitFor(() => expect(box.saved).toBeNull());
   });
@@ -278,9 +278,7 @@ describe('conta com login', () => {
     });
     await renderScreen(<AccountScreen />, fake.fetchFn, { store });
     await screen.findByText('mariana@exemplo.com.br');
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Excluir minha conta e todos os dados' }),
-    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Sim, excluir tudo' }));
     await waitFor(() => expect(box.saved).toBeNull());
     expect(fake.calls.some((c) => c.key === 'POST /auth/logout')).toBe(false);
