@@ -12,7 +12,7 @@ import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
 import { createMemberHandlers } from '../handlers/members';
 import { createReminderHandlers } from '../handlers/reminders';
-import type { HttpResult } from '../http';
+import { withSecurityHeaders, type HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
 import { createInMemoryStore } from '../repositories/in-memory-store';
@@ -167,10 +167,10 @@ export async function guarded(
   run: () => Promise<HttpResult>,
 ): Promise<HttpResponseInit> {
   try {
-    return await run();
+    return withSecurityHeaders(await run());
   } catch (error) {
     context.error(`Falha inesperada (${error instanceof Error ? error.name : 'desconhecida'}).`);
-    return internalErrorResult();
+    return withSecurityHeaders(internalErrorResult());
   }
 }
 
