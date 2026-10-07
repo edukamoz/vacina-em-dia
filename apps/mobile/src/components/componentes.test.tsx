@@ -50,6 +50,7 @@ const FONTE = {
 const DOSE: DoseResponse = {
   id: 'd-1',
   memberId: 'm-1',
+  origin: 'OFFICIAL',
   ruleId: 'crianca-penta-2',
   vaccine: 'penta (DTP+Hib+HB)',
   doseLabel: '2ª dose',

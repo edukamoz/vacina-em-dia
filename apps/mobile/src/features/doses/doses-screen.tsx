@@ -89,6 +89,7 @@ export function DosesScreen() {
   return (
     <Tela reservaBalao titulo={`Doses de ${selected.name.split(' ')[0] ?? selected.name}`}>
       <LinkTexto titulo="Trocar pessoa" onPress={() => router.push('/familia')} />
+      <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
 
       {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
       {doses.error && (

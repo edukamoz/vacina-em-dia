@@ -8,6 +8,7 @@ import { EstadoCarregando, EstadoErro } from '../../components/estados';
 import { LinkTexto } from '../../components/link-texto';
 import { SeletorDeData } from '../../components/seletor-de-data';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
+import { SeloOrigem } from '../../components/selo-origem';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { todayCivil } from '../../lib/dates';
@@ -186,7 +187,10 @@ export function DoseDetailScreen({ id }: { id: string }) {
         titulo="Voltar para Doses"
         onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
       />
-      <SeloEstadoDose status={dose.status} />
+      <View className="flex-row flex-wrap gap-sm">
+        <SeloEstadoDose status={dose.status} />
+        <SeloOrigem origem={dose.origin} />
+      </View>
       <Cartao className="gap-md">
         {paraQuem ? <Linha rotulo="Para quem" valor={paraQuem} /> : null}
         {linhaDeData ? (
@@ -194,8 +198,17 @@ export function DoseDetailScreen({ id }: { id: string }) {
         ) : (
           <Linha rotulo="Data" valor={doseHint(dose)} />
         )}
-        <Linha rotulo="Quando é indicada" valor={dose.timingLabel} />
-        <Linha rotulo="Protege contra" valor={dose.diseases} />
+        {dose.origin === 'CUSTOM' ? (
+          <Texto className="text-textoSecundario">
+            Você adicionou esta dose. Ela não faz parte do calendário oficial; siga a orientação do
+            profissional que a indicou.
+          </Texto>
+        ) : (
+          <>
+            <Linha rotulo="Quando é indicada" valor={dose.timingLabel} />
+            <Linha rotulo="Protege contra" valor={dose.diseases} />
+          </>
+        )}
         {dose.conditional ? (
           <Texto className="text-textoSecundario">
             Esta vacina só é indicada em algumas situações. Leia as notas abaixo e converse com um

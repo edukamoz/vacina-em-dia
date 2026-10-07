@@ -34,6 +34,7 @@ function Rotas() {
       <Stack.Protected guard={entrou}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="consentimento" />
+        <Stack.Screen name="dose/nova" />
         <Stack.Screen name="dose/[id]" />
         <Stack.Screen name="membro/[id]" />
         <Stack.Screen name="membro/novo" />

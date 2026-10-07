@@ -1,4 +1,4 @@
-import { PNI_2026 } from '@vacina/shared';
+import { MAX_CUSTOM_DOSES, PNI_2026 } from '@vacina/shared';
 import { MAX_MEMBERS } from './member-service';
 import { OTHER_OWNER, OWNER, buildApp } from '../test-support';
 
@@ -82,7 +82,7 @@ describe('serviço de membros da família (RF02)', () => {
     }
     expect(await app.members.create(OWNER, ADULT)).toEqual({
       ok: false,
-      error: { code: 'LIMIT_REACHED' },
+      error: { code: 'LIMIT_REACHED', scope: 'members' },
     });
   });
 
@@ -171,5 +171,133 @@ describe('serviço de membros da família (RF02)', () => {
     const cleared = await app.members.update(OWNER, created.value.id, ADULT);
     expect(cleared.ok && cleared.value.relationship).toBeNull();
     expect((await app.members.list(OWNER))[0]?.relationship).toBeNull();
+  });
+
+  describe('dose avulsa (RF04)', () => {
+    const AVULSA = { vaccine: 'Febre tifoide', doseLabel: '1ª dose', dueDate: '2026-11-04' };
+
+    async function comMembro() {
+      const app = buildApp();
+      await app.consent();
+      const created = await app.members.create(OWNER, ADULT);
+      if (!created.ok) throw new Error('falhou');
+      return { app, memberId: created.value.id };
+    }
+
+    test('CT-AV-01: cadastra em Pendente, com origem CUSTOM e sem linha do calendário', async () => {
+      const { app, memberId } = await comMembro();
+      const result = await app.members.addCustomDose(OWNER, memberId, AVULSA);
+      expect(result).toMatchObject({
+        ok: true,
+        value: {
+          origin: 'CUSTOM',
+          ruleId: null,
+          vaccine: 'Febre tifoide',
+          doseLabel: '1ª dose',
+          status: 'PENDING',
+          dueDate: '2026-11-04',
+          scheduledDate: null,
+          appliedDate: null,
+          notes: [],
+        },
+      });
+    });
+
+    test('CT-AV-02: aparece na lista do membro, junto das oficiais, na ordem da data prevista', async () => {
+      const { app, memberId } = await comMembro();
+      await app.members.addCustomDose(OWNER, memberId, { ...AVULSA, dueDate: '2026-10-06' });
+      const lista = await app.doses.listForMember(OWNER, memberId);
+      if (!lista.ok) throw new Error('falhou');
+      const avulsas = lista.value.items.filter((d) => d.origin === 'CUSTOM');
+      expect(avulsas).toHaveLength(1);
+      expect(lista.value.items.some((d) => d.origin === 'OFFICIAL')).toBe(true);
+      const datas = lista.value.items.map((d) => d.dueDate);
+      expect(datas).toEqual([...datas].sort());
+    });
+
+    test('CT-AV-03: segue o ciclo de estados: agenda, aplica e cancela como as oficiais', async () => {
+      const { app, memberId } = await comMembro();
+      const criada = await app.members.addCustomDose(OWNER, memberId, AVULSA);
+      if (!criada.ok) throw new Error('falhou');
+      const id = criada.value.id;
+      expect(
+        await app.doses.applyEvent(OWNER, id, { type: 'SCHEDULE', date: '2026-10-20' }),
+      ).toMatchObject({ ok: true, value: { status: 'SCHEDULED', scheduledDate: '2026-10-20' } });
+      expect(
+        await app.doses.applyEvent(OWNER, id, { type: 'APPLY', date: '2026-10-06' }),
+      ).toMatchObject({ ok: true, value: { status: 'APPLIED', origin: 'CUSTOM' } });
+      const outra = await app.members.addCustomDose(OWNER, memberId, AVULSA);
+      if (!outra.ok) throw new Error('falhou');
+      expect(
+        await app.doses.applyEvent(OWNER, outra.value.id, { type: 'CANCEL', confirmed: true }),
+      ).toMatchObject({ ok: true, value: { status: 'CANCELLED' } });
+    });
+
+    test('CT-T04 em dose avulsa: a rotina de prazo a marca como atrasada quando a data passa', async () => {
+      const { app, memberId } = await comMembro();
+      await app.members.addCustomDose(OWNER, memberId, { ...AVULSA, dueDate: '2026-10-06' });
+      app.setNow('2026-10-08T15:00:00.000Z');
+      const lista = await app.doses.listForMember(OWNER, memberId);
+      if (!lista.ok) throw new Error('falhou');
+      expect(lista.value.items.find((d) => d.origin === 'CUSTOM')?.status).toBe('OVERDUE');
+    });
+
+    test('CT-AV-04: editar a pessoa não duplica nem apaga a dose avulsa', async () => {
+      const { app, memberId } = await comMembro();
+      await app.members.addCustomDose(OWNER, memberId, AVULSA);
+      await app.members.update(OWNER, memberId, { ...ADULT, name: 'Ana Maria' });
+      const lista = await app.doses.listForMember(OWNER, memberId);
+      if (!lista.ok) throw new Error('falhou');
+      expect(lista.value.items.filter((d) => d.origin === 'CUSTOM')).toHaveLength(1);
+    });
+
+    test.each([
+      ['ontem', '2026-10-05'],
+      ['mais de 10 anos à frente', '2037-01-01'],
+    ])('CT-AV-05: recusa a data prevista %s', async (_nome, dueDate) => {
+      const { app, memberId } = await comMembro();
+      expect(await app.members.addCustomDose(OWNER, memberId, { ...AVULSA, dueDate })).toEqual({
+        ok: false,
+        error: { code: 'INVALID_DOSE_DATE' },
+      });
+    });
+
+    test('CT-AV-06: hoje é aceito (valor limite)', async () => {
+      const { app, memberId } = await comMembro();
+      const result = await app.members.addCustomDose(OWNER, memberId, {
+        ...AVULSA,
+        dueDate: '2026-10-06',
+      });
+      expect(result.ok).toBe(true);
+    });
+
+    test('CT-AV-07: respeita o limite de doses avulsas por pessoa', async () => {
+      const { app, memberId } = await comMembro();
+      for (let i = 0; i < MAX_CUSTOM_DOSES; i += 1) {
+        expect((await app.members.addCustomDose(OWNER, memberId, AVULSA)).ok).toBe(true);
+      }
+      expect(await app.members.addCustomDose(OWNER, memberId, AVULSA)).toEqual({
+        ok: false,
+        error: { code: 'LIMIT_REACHED', scope: 'customDoses' },
+      });
+    });
+
+    test('CT-AV-08: exige consentimento e só vale para membro do próprio dono', async () => {
+      const semConsentimento = buildApp();
+      expect(await semConsentimento.members.addCustomDose(OWNER, 'm-1', AVULSA)).toEqual({
+        ok: false,
+        error: { code: 'CONSENT_REQUIRED' },
+      });
+      const { app, memberId } = await comMembro();
+      await app.consent(OTHER_OWNER);
+      expect(await app.members.addCustomDose(OTHER_OWNER, memberId, AVULSA)).toEqual({
+        ok: false,
+        error: { code: 'NOT_FOUND' },
+      });
+      expect(await app.members.addCustomDose(OWNER, 'nao-existe', AVULSA)).toEqual({
+        ok: false,
+        error: { code: 'NOT_FOUND' },
+      });
+    });
   });
 });

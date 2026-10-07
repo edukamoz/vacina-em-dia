@@ -11,7 +11,12 @@ import {
 import { civilToday, type Clock } from '../clock';
 import type { DoseRepository, MemberRepository, StoredDose } from '../repositories/repositories';
 import { failure, success, type Result } from './errors';
-import { toDoseResponse, toMemberResponse, toSourceResponse } from './mappers';
+import {
+  toCustomDoseResponse,
+  toDoseResponse,
+  toMemberResponse,
+  toSourceResponse,
+} from './mappers';
 
 /** Casos de uso de dose e do calendário de cada membro (RF03 e RF04). */
 export interface DoseService {
@@ -58,10 +63,11 @@ export function createDoseService({
   ): Promise<readonly StoredDose[]> {
     const changed: StoredDose[] = [];
     const result = list.map((dose) => {
-      const rule = rules.get(dose.ruleId);
+      const rule = dose.ruleId === null ? undefined : rules.get(dose.ruleId);
+      // Dose avulsa tem sempre uma data prevista; a oficial só atrasa se a regra tem idade fixa.
       const eligible =
         dose.status === 'SCHEDULED' ||
-        (dose.status === 'PENDING' && !!rule && canBecomeOverdue(rule));
+        (dose.status === 'PENDING' && (dose.ruleId === null || (!!rule && canBecomeOverdue(rule))));
       if (!eligible) return dose;
       const moved = transitionDose(dose, { type: 'MARK_OVERDUE' }, { today, actor: 'SCHEDULER' });
       if (!moved.ok) return dose;
@@ -74,6 +80,7 @@ export function createDoseService({
   }
 
   const respond = (dose: StoredDose): DoseResponse | undefined => {
+    if (dose.ruleId === null) return toCustomDoseResponse(dose);
     const rule = rules.get(dose.ruleId);
     return rule ? toDoseResponse(dose, rule, calendar) : undefined;
   };
@@ -95,7 +102,7 @@ export function createDoseService({
         .sort(
           (a, b) =>
             a.dueDate.localeCompare(b.dueDate) ||
-            (order.get(a.ruleId) ?? 0) - (order.get(b.ruleId) ?? 0),
+            (order.get(a.ruleId ?? '') ?? 0) - (order.get(b.ruleId ?? '') ?? 0),
         );
       return success({
         source: toSourceResponse(calendar),

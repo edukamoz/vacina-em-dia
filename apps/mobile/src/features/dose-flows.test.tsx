@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { DoseResponse } from '@vacina/shared';
 import { DoseDetailScreen } from './doses/dose-detail-screen';
 import { DosesScreen, LIMITE_APLICADAS, agruparDoses } from './doses/doses-screen';
+import { NewDoseScreen } from './doses/new-dose-screen';
 import { HistoryScreen, historyOf } from './history/history-screen';
 import {
   MEMBER,
@@ -385,5 +386,116 @@ describe('detalhe da dose (RF04)', () => {
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
     expect(await screen.findByText('Não encontramos o que você procura.')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
+  });
+});
+
+const AVULSA = dose({
+  id: 'd-av',
+  origin: 'CUSTOM',
+  ruleId: null,
+  vaccine: 'Febre tifoide',
+  doseLabel: '1ª dose',
+  diseases: '',
+  timingKind: 'CUSTOM',
+  timingLabel: 'Data escolhida por você',
+  dueDate: '2026-11-04',
+});
+
+describe('dose avulsa (RF04)', () => {
+  test('CT-AV-A01: a tela Doses tem o botão "Adicionar dose" e marca a origem de cada cartão', async () => {
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'GET /members/m-1/doses': { status: 200, body: memberDoses([PENDING, AVULSA]) },
+    });
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    expect(await screen.findByText('Febre tifoide, 1ª dose')).toBeOnTheScreen();
+    expect(screen.getByText('Adicionada por você')).toBeOnTheScreen();
+    expect(screen.getByText('Oficial')).toBeOnTheScreen();
+    expect(screen.getByText('Prevista para 04/11/2026')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Adicionar dose' }));
+    expect(mockPush).toHaveBeenCalledWith('/dose/nova');
+  });
+
+  test('CT-AV-A02: cadastra com nome, dose e data do calendário e abre o detalhe', async () => {
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'POST /members/m-1/doses': { status: 201, body: AVULSA },
+    });
+    await renderScreen(<NewDoseScreen />, fake.fetchFn);
+    await fireEvent.changeText(await screen.findByLabelText('Nome da vacina'), ' Febre tifoide ');
+    await fireEvent.changeText(screen.getByLabelText('Qual dose'), '1ª dose');
+    expect(screen.getByRole('button', { name: '5 de outubro de 2026' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Próximo mês' }));
+    await fireEvent.press(screen.getByRole('button', { name: '4 de novembro de 2026' }));
+    expect(screen.getByText('Data escolhida: 04/11/2026')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Adicionar dose' }));
+    await waitFor(() =>
+      expect(mockReplace).toHaveBeenCalledWith({ pathname: '/dose/[id]', params: { id: 'd-av' } }),
+    );
+    expect(fake.calls.find((c) => c.key === 'POST /members/m-1/doses')?.body).toEqual({
+      vaccine: 'Febre tifoide',
+      doseLabel: '1ª dose',
+      dueDate: '2026-11-04',
+    });
+  });
+
+  test('CT-AV-A03: confere nome e dose antes de enviar', async () => {
+    const fake = createFakeFetch({ ...FAMILY });
+    await renderScreen(<NewDoseScreen />, fake.fetchFn);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar dose' }));
+    expect(screen.getByText('Informe o nome da vacina.')).toBeOnTheScreen();
+    expect(screen.getByText(/Informe qual é a dose/)).toBeOnTheScreen();
+    expect(fake.calls.some((c) => c.key.startsWith('POST'))).toBe(false);
+  });
+
+  test('CT-AV-A04: mostra a mensagem do servidor, por exemplo o limite de doses', async () => {
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'POST /members/m-1/doses': {
+        status: 422,
+        body: {
+          code: 'LIMIT_REACHED',
+          message: 'Você chegou ao limite de doses cadastradas à mão para esta pessoa.',
+        },
+      },
+    });
+    await renderScreen(<NewDoseScreen />, fake.fetchFn);
+    await fireEvent.changeText(await screen.findByLabelText('Nome da vacina'), 'Raiva');
+    await fireEvent.changeText(screen.getByLabelText('Qual dose'), 'Reforço');
+    await fireEvent.press(screen.getByRole('button', { name: 'Adicionar dose' }));
+    expect(await screen.findByText(/limite de doses cadastradas à mão/)).toBeOnTheScreen();
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  test('CT-AV-A05: sem ninguém cadastrado, leva a adicionar uma pessoa', async () => {
+    const fake = createFakeFetch({ 'GET /members': { status: 200, body: { items: [] } } });
+    await renderScreen(<NewDoseScreen />, fake.fetchFn);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar pessoa' }));
+    expect(mockPush).toHaveBeenCalledWith('/membro/novo');
+  });
+
+  test('CT-AV-A06: erro ao carregar a família permite tentar de novo', async () => {
+    const fake = createFakeFetch({ 'GET /members': { status: 503, body: undefined } });
+    await renderScreen(<NewDoseScreen />, fake.fetchFn);
+    expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeOnTheScreen();
+  });
+
+  test('CT-AV-A07: o detalhe da dose avulsa mostra a origem e não inventa "Protege contra"', async () => {
+    const fake = detailRoutes(AVULSA);
+    await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
+    expect(await screen.findByText('Adicionada por você')).toBeOnTheScreen();
+    expect(screen.getByText(/Ela não faz parte do calendário oficial/)).toBeOnTheScreen();
+    expect(screen.getByText('04/11/2026')).toBeOnTheScreen();
+    expect(screen.queryByText('Protege contra')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Quando é indicada')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Confira na sua caderneta')).not.toBeOnTheScreen();
+  });
+
+  test('CT-AV-A08: dose avulsa agendada e aplicada usa as mesmas ações das oficiais', async () => {
+    const fake = detailRoutes(AVULSA);
+    await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
+    expect(await screen.findByRole('button', { name: 'Agendar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Registrar aplicação' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Cancelar dose' })).toBeOnTheScreen();
   });
 });

@@ -106,6 +106,8 @@ Estado atual da dose, segundo a máquina de estados (`estados-dose.md`).
 | `id` | `UNIQUEIDENTIFIER` | não | PK | Identificador da dose. |
 | `member_id` | `UNIQUEIDENTIFIER` | não | FK → `member.id` (cascata); UK com `dose_rule_id` | Membro. |
 | `dose_rule_id` | `UNIQUEIDENTIFIER` | não | FK → `dose_rule.id` | Regra que originou a dose. |
+| `custom_vaccine` | `NVARCHAR(80)` | sim | preenchida só em dose avulsa (ADR-016) | Nome da vacina digitado pela pessoa; a dose avulsa não tem `dose_rule_id`. |
+| `custom_dose_label` | `NVARCHAR(40)` | sim | preenchida só em dose avulsa | Qual dose é (texto livre). |
 | `status` | `VARCHAR(10)` | não | `CHECK`: `PENDING`, `SCHEDULED`, `OVERDUE`, `APPLIED`, `CANCELLED` | Estado atual. |
 | `due_date` | `DATE` | não | | Data prevista, calculada a partir da data de nascimento e da regra. |
 | `scheduled_date` | `DATE` | sim | obrigatória em `SCHEDULED` | Data agendada pelo usuário. |

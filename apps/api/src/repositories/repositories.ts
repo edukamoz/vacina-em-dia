@@ -14,8 +14,10 @@ export interface StoredMember {
 export interface StoredDose extends DoseSnapshot {
   readonly id: string;
   readonly memberId: string;
-  /** Linha do calendário oficial que originou a dose. */
-  readonly ruleId: string;
+  /** Linha do calendário oficial que originou a dose; `null` em dose avulsa. */
+  readonly ruleId: string | null;
+  /** Nome e dose informados pela pessoa; só em dose avulsa (`ruleId` nulo). */
+  readonly custom?: { readonly vaccine: string; readonly doseLabel: string } | null;
 }
 
 /** Consentimento guardado (RF09). */
