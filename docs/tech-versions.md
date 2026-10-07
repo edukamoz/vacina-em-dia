@@ -94,3 +94,11 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 | pytest-cov | 7.1.0 | cobertura (somente desenvolvimento) |
 | mcr.microsoft.com/azure-functions/python | 4-python3.13 | host oficial das Functions no contêiner do PLN (só `linux/amd64`) |
 
+
+## Acesso ao Azure SQL (SCRUM-15, conferido no npm em 07/10/2026)
+
+| Tecnologia | Versão | Observação |
+|---|---|---|
+| mssql | 12.7.4 | Cliente do SQL Server/Azure SQL na API (`apps/api`) |
+| @types/mssql | 12.3.0 | Tipos (desenvolvimento) |
+| tedious (dependência do mssql) | 20.3.3 | Protocolo TDS; traz o `@azure/identity` 4.13.3 para a autenticação Entra |

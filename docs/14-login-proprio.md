@@ -8,10 +8,10 @@ Cadastro e entrada por e-mail e senha, na própria API. Decisão e alternativas:
 |---|---|
 | Rotas `/auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/me` | Prontas, no Swagger, com testes |
 | Hash de senha (scrypt), política de senha, JWT HS256, token de renovação com rotação, bloqueio por falhas | Prontos, com testes |
-| Contas **em memória** | Provisório: somem ao reiniciar a API. O ADR-014 exige o **Azure SQL** (próximo passo) |
+| Contas, tokens, consentimento, membros e doses no **Azure SQL** | Prontos e verificados em 07/10/2026 contra o banco real (ver `docs/15-persistencia-sql.md`). Ligados na API pelas variáveis `SQL_SERVER` e `SQL_DATABASE`; **ainda não ligados no Azure** (ver abaixo) |
 | Telas Entrar e Criar conta no app | A fazer |
 | Recuperação de senha e confirmação de e-mail | A fazer; exige serviço de e-mail (ver ADR-014) |
-| `AUTH_TOKEN_SECRET` no Key Vault e nas configurações da API | A fazer (sem ele, as rotas respondem 503) |
+| `AUTH_TOKEN_SECRET` | Criado em 07/10/2026 como configuração da Function App (valor aleatório de 48 bytes, fora do Git). Mover para o Key Vault quando houver o papel de escrita |
 
 ## Como funciona
 
@@ -52,7 +52,7 @@ Cadastro e entrada por e-mail e senha, na própria API. Decisão e alternativas:
 
 ## Próximos passos
 
-1. Persistência no Azure SQL (usuário do banco para a identidade da API, tabelas, migrações) e repositórios SQL das contas, membros, doses e consentimento.
+1. ~~Persistência no Azure SQL~~ (feito). **Ligar no Azure** (`SQL_SERVER` e `SQL_DATABASE`) só junto com o app usando o login: com o banco ligado, a sessão de demonstração deixa de funcionar, porque os dados passam a pertencer a uma conta.
 2. Telas Entrar e Criar conta (`design-vacina-em-dia/telas`), cliente com renovação automática e armazenamento do token (ADR-009).
 3. `AUTH_TOKEN_SECRET` no Key Vault; depois `DEMO_SESSION_ENABLED=false`.
 4. Recuperação de senha e confirmação de e-mail, com um serviço de e-mail transacional (a aprovar).
