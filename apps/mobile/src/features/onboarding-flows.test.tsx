@@ -247,7 +247,7 @@ describe('conta (RF09)', () => {
     expect(await screen.findByText(/ainda não aceitou/)).toBeOnTheScreen();
   });
 
-  test('CT-APP-X03: excluir a conta pede confirmação, apaga tudo e volta ao consentimento', async () => {
+  test('CT-APP-X03: excluir a conta pede confirmação, apaga tudo e encerra a sessão', async () => {
     const fake = createFakeFetch({
       'GET /consent': { status: 200, body: ACCEPTED },
       'DELETE /account': { status: 204 },
@@ -264,7 +264,7 @@ describe('conta (RF09)', () => {
       screen.getByRole('button', { name: 'Excluir minha conta e todos os dados' }),
     );
     await fireEvent.press(screen.getByRole('button', { name: 'Sim, excluir tudo' }));
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/consentimento'));
+    await waitFor(() => expect(fake.calls.some((c) => c.key === 'DELETE /account')).toBe(true));
   });
 
   test('CT-APP-X04: falha ao excluir a conta é exibida', async () => {

@@ -89,7 +89,7 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
       {expandido ? (
         <View className="mt-auto px-sm pt-lg">
           <Texto variante="apoio" className="text-textoSecundario">
-            Versão de demonstração, sem login.
+            Projeto acadêmico, versão de demonstração.
           </Texto>
         </View>
       ) : null}
