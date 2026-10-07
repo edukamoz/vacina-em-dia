@@ -6,6 +6,7 @@ import { EstadoCarregando, EstadoErro } from '../../src/components/estados';
 import { Tela } from '../../src/components/tela';
 import { useConsent } from '../../src/features/data/hooks';
 import { modoDeLayout, posicaoDaBarra } from '../../src/lib/layout';
+import { useThemeColors } from '../../src/theme/theme-provider';
 
 /**
  * Abas do app (Doses, Família, Histórico e Conta) mais a conversa com o assistente, aberta pelo
@@ -16,6 +17,7 @@ import { modoDeLayout, posicaoDaBarra } from '../../src/lib/layout';
 export default function TabsLayout() {
   const largura = useWindowDimensions().width;
   const consent = useConsent();
+  const cores = useThemeColors();
 
   if (consent.isPending) {
     return (
@@ -42,6 +44,8 @@ export default function TabsLayout() {
         tabBar={() => <BarraDeNavegacao />}
         screenOptions={{
           headerShown: false,
+          // O fundo padrão do navegador é um cinza claro fixo; sem isto ele aparece nos temas Escuro e Alto contraste.
+          sceneStyle: { backgroundColor: cores.fundo },
           // Celular: barra embaixo. Tablet e computador: barra lateral (design system, seção 2.5).
           tabBarPosition: posicaoDaBarra(modoDeLayout(largura)),
         }}
