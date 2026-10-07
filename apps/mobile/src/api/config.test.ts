@@ -1,4 +1,4 @@
-import { DEFAULT_API_BASE_URL, resolveApiBaseUrl } from './config';
+import { DEFAULT_API_BASE_URL, ajustarParaEmulador, resolveApiBaseUrl } from './config';
 
 describe('resolveApiBaseUrl', () => {
   test.each([undefined, '', '   '])(
@@ -35,5 +35,27 @@ describe('resolveApiBaseUrl', () => {
 
   test.each(['ftp://x', 'javascript:alert(1)', 'nao-e-url'])('CT-APP-A03: rejeita %p', (value) => {
     expect(() => resolveApiBaseUrl(value)).toThrow('EXPO_PUBLIC_API_URL');
+  });
+});
+
+describe('ajustarParaEmulador', () => {
+  test.each([
+    ['http://localhost:7071/api', 'http://10.0.2.2:7071/api'],
+    ['http://127.0.0.1:7071/api', 'http://10.0.2.2:7071/api'],
+    ['http://192.168.0.10:7071/api', 'http://192.168.0.10:7071/api'],
+    [
+      'https://func-vacinaemdia.azurewebsites.net/api',
+      'https://func-vacinaemdia.azurewebsites.net/api',
+    ],
+    ['http://localhost.exemplo.com/api', 'http://localhost.exemplo.com/api'],
+    ['/api', '/api'],
+  ])('CT-APP-C01: no Android, %s vira %s', (entrada, esperado) => {
+    expect(ajustarParaEmulador(entrada, 'android')).toBe(esperado);
+  });
+
+  test.each(['ios', 'web'])('CT-APP-C02: em %s não muda o endereço', (plataforma) => {
+    expect(ajustarParaEmulador('http://localhost:7071/api', plataforma)).toBe(
+      'http://localhost:7071/api',
+    );
   });
 });
