@@ -61,3 +61,40 @@ export interface AccountRepository {
   /** Apaga todos os dados do dono: membros, doses e consentimento (RF09). */
   deleteAll(ownerId: string): Promise<void>;
 }
+
+/** Conta de login guardada (ADR-014). O e-mail fica em minúsculas; a senha, só como hash. */
+export interface StoredAccount {
+  readonly id: string;
+  readonly email: string;
+  readonly passwordHash: string;
+  readonly createdAt: string;
+}
+
+/** Token de renovação guardado: só o hash, nunca o valor entregue ao cliente. */
+export interface StoredRefreshToken {
+  readonly tokenHash: string;
+  readonly accountId: string;
+  readonly expiresAt: string;
+  /** Quando foi usado ou revogado; presente significa que não vale mais. */
+  readonly revokedAt?: string;
+}
+
+/** Acesso às contas de login e aos tokens de renovação. */
+export interface AuthRepository {
+  /** Cria a conta; `false` quando o e-mail já existe (a unicidade é do repositório, sem corrida). */
+  createAccount(account: StoredAccount): Promise<boolean>;
+  /** Busca a conta pelo e-mail em minúsculas. */
+  findAccountByEmail(email: string): Promise<StoredAccount | undefined>;
+  /** Busca a conta pelo identificador. */
+  findAccountById(id: string): Promise<StoredAccount | undefined>;
+  /** Guarda um token de renovação. */
+  saveRefreshToken(token: StoredRefreshToken): Promise<void>;
+  /** Busca um token de renovação pelo hash. */
+  findRefreshToken(tokenHash: string): Promise<StoredRefreshToken | undefined>;
+  /** Marca o token como usado ou revogado. */
+  revokeRefreshToken(tokenHash: string, at: string): Promise<void>;
+  /** Revoga todos os tokens da conta (reuso suspeito ou saída de todos os aparelhos). */
+  revokeAllRefreshTokens(accountId: string, at: string): Promise<void>;
+  /** Apaga a conta e os tokens dela (exclusão de conta, RF09). */
+  deleteAccount(id: string): Promise<void>;
+}
