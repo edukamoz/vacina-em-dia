@@ -23,12 +23,12 @@ export function CampoTexto({
 }) {
   const { theme } = useTheme();
   return (
-    <View className="gap-xs">
+    <View className="gap-sm">
       <Texto variante="rotulo">{rotulo}</Texto>
       <TextInput
         accessibilityLabel={rotulo}
         placeholderTextColor={getThemeColors(theme).textoSecundario}
-        className={`min-h-toque rounded-campo border-padrao bg-superficie px-md py-sm text-corpo font-regular text-texto ${
+        className={`min-h-principal rounded-campo border-padrao bg-superficie px-lg py-sm text-corpo font-regular text-texto ${
           erro ? 'border-erro' : 'border-borda'
         }`}
         {...rest}
