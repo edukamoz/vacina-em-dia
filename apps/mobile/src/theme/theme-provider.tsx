@@ -64,3 +64,12 @@ export function useTheme(): ThemeContextValue {
   if (!context) throw new Error('useTheme deve ser usado dentro do ThemeProvider.');
   return context;
 }
+
+/**
+ * Cores do tema atual, para o que não aceita classe de estilo (como o traço de um ícone SVG). Fora
+ * do `ThemeProvider` (em testes isolados) devolve as cores do tema Claro.
+ */
+export function useThemeColors() {
+  const context = useContext(ThemeContext);
+  return getThemeColors(context?.theme ?? 'light');
+}

@@ -32,14 +32,14 @@ export function HistoryScreen() {
 
   if (members.isPending) {
     return (
-      <Tela titulo="Histórico">
+      <Tela reservaBalao titulo="Histórico">
         <EstadoCarregando rotulo="Carregando a família" />
       </Tela>
     );
   }
   if (members.error) {
     return (
-      <Tela titulo="Histórico">
+      <Tela reservaBalao titulo="Histórico">
         <EstadoErro
           mensagem={members.error.message}
           onTentarDeNovo={() => void members.refetch()}
@@ -49,7 +49,7 @@ export function HistoryScreen() {
   }
   if (!selected) {
     return (
-      <Tela titulo="Histórico">
+      <Tela reservaBalao titulo="Histórico">
         <EstadoVazio
           titulo="Nenhuma pessoa cadastrada"
           descricao="Adicione alguém da família para registrar e consultar as vacinas tomadas."
@@ -62,7 +62,7 @@ export function HistoryScreen() {
   const historico = doses.data ? historyOf(doses.data.items) : undefined;
 
   return (
-    <Tela titulo="Histórico" subtitulo="Vacinas já aplicadas ou canceladas.">
+    <Tela reservaBalao titulo="Histórico" subtitulo="Vacinas já aplicadas ou canceladas.">
       {items.length > 1 ? (
         <SeletorDeMembro membros={items} selecionadoId={selected.id} aoSelecionar={selectMember} />
       ) : (

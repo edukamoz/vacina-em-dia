@@ -20,7 +20,7 @@ beforeEach(() => {
 });
 
 describe('navegação principal', () => {
-  test('CT-LAY-03: tem as cinco abas, cada uma como link com o nome da página', async () => {
+  test('CT-LAY-03: tem as quatro abas, cada uma como link com o nome da página', async () => {
     await render(<BarraDeNavegacao largura={390} />);
     expect(screen.getByLabelText('Menu principal')).toBeOnTheScreen();
     for (const { titulo } of ABAS) {
@@ -29,9 +29,9 @@ describe('navegação principal', () => {
   });
 
   test('CT-LAY-04: marca a página atual e leva ao caminho de cada aba ao tocar', async () => {
-    mockPath = '/calendario';
+    mockPath = '/';
     await render(<BarraDeNavegacao largura={390} />);
-    expect(screen.getByRole('link', { name: 'Calendário' })).toBeSelected();
+    expect(screen.getByRole('link', { name: 'Doses' })).toBeSelected();
     expect(screen.getByRole('link', { name: 'Família' })).not.toBeSelected();
     await fireEvent.press(screen.getByRole('link', { name: 'Histórico' }));
     expect(mockPush).toHaveBeenCalledWith('/historico');
