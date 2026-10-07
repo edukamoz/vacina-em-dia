@@ -7,6 +7,7 @@
 export * from './calendar';
 export * from './domain';
 export * from './schemas/assistant-api';
+export * from './schemas/auth-api';
 export * from './schemas/dose';
 export * from './schemas/dose-api';
 export * from './schemas/family-api';

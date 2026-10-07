@@ -5,19 +5,24 @@ import { createHttpNlpClient, unavailableNlpClient } from '../clients/nlp-http-c
 import { createHttpSpeechClient, unavailableSpeechClient } from '../clients/speech-http-client';
 import { createAccountHandlers } from '../handlers/account';
 import { createAssistantHandlers } from '../handlers/assistant';
+import { createAuthHandlers, unavailableAuthHandlers } from '../handlers/auth';
 import { createConsentHandlers } from '../handlers/consent';
 import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
 import { createMemberHandlers } from '../handlers/members';
 import type { HttpResult } from '../http';
-import { DEMO_SESSION_HEADER, resolveDemoOwner } from '../identity';
+import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
+import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
 import { createInMemoryStore } from '../repositories/in-memory-store';
 import { createAccountService } from '../services/account-service';
 import { createAssistantService } from '../services/assistant-service';
+import { createAuthService } from '../services/auth-service';
 import { createConsentService } from '../services/consent-service';
 import { createDoseService } from '../services/dose-service';
 import { createMemberService } from '../services/member-service';
+import { createScryptHasher } from '../services/password-hasher';
 import { createFixedWindowLimiter } from '../services/rate-limiter';
+import { createTokenService, MIN_SECRET_LENGTH } from '../services/token-service';
 
 /**
  * Ponto de montagem (borda): cria o relógio real, o gerador de identificadores e liga repositórios,
@@ -50,7 +55,45 @@ export const doseHandlers = createDoseHandlers(doseService);
 export const consentHandlers = createConsentHandlers(
   createConsentService({ consents: store.consents, clock }),
 );
-export const accountHandlers = createAccountHandlers(createAccountService(store.accounts));
+const authRepository = createInMemoryAuthRepository();
+export const accountHandlers = createAccountHandlers(
+  createAccountService(store.accounts, authRepository),
+);
+
+/**
+ * Login próprio (ADR-014). A chave de assinatura do token vem de `AUTH_TOKEN_SECRET` (Key Vault);
+ * sem ela, o login responde 503 em vez de usar uma chave padrão.
+ */
+const authSecret = process.env['AUTH_TOKEN_SECRET'];
+const tokens =
+  authSecret && authSecret.length >= MIN_SECRET_LENGTH
+    ? createTokenService({ secret: authSecret, clock })
+    : undefined;
+const authService = tokens
+  ? createAuthService({
+      accounts: authRepository,
+      hasher: createScryptHasher(),
+      tokens,
+      clock,
+      newId: randomUUID,
+      limiter: createFixedWindowLimiter(clock),
+      maxAccounts: MAX_ACCOUNTS,
+      countAccounts: authRepository.size,
+    })
+  : undefined;
+export const authHandlers = authService ? createAuthHandlers(authService) : unavailableAuthHandlers;
+
+/** A sessão de demonstração vale até ser desligada com `DEMO_SESSION_ENABLED=false`. */
+const demoEnabled = process.env['DEMO_SESSION_ENABLED'] !== 'false';
+
+/** Endereço de rede de quem chamou (sem a porta); só serve para limitar abusos. */
+export function originOf(request: HttpRequest): { ip: string } {
+  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
+  const ip = forwarded
+    .replace(/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/, '$1')
+    .replace(/^\[(.+)\]:\d+$/, '$1');
+  return { ip: ip.slice(0, 64) || 'desconhecido' };
+}
 
 /**
  * Assistente: PLN e voz vêm de variáveis de ambiente (as chaves ficam no Key Vault, nunca no
@@ -87,7 +130,7 @@ export async function guarded(
 
 /**
  * Como {@link guarded}, mas só executa com uma sessão identificada: descobre o dono dos dados pelo
- * cabeçalho (ver `identity.ts`) e responde 401 quando falta ou é inválido.
+ * token `Bearer` ou, se habilitado, pelo cabeçalho de demonstração (ver `identity.ts`) e responde 401 quando falta ou é inválido.
  */
 export async function authenticated(
   request: HttpRequest,
@@ -95,7 +138,13 @@ export async function authenticated(
   run: (ownerId: string) => Promise<HttpResult>,
 ): Promise<HttpResponseInit> {
   return guarded(context, async () => {
-    const ownerId = resolveDemoOwner(request.headers.get(DEMO_SESSION_HEADER));
+    const ownerId = resolveOwner(
+      {
+        authorization: request.headers.get('authorization'),
+        demoSession: request.headers.get(DEMO_SESSION_HEADER),
+      },
+      { authenticate: (token) => authService?.authenticate(token), demoEnabled },
+    );
     return ownerId ? run(ownerId) : unauthorizedResult();
   });
 }
