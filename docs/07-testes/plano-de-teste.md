@@ -81,7 +81,7 @@ Pirâmide de testes: **muitos testes unitários** (domínio, serviços e valida�
 
 | Técnica | Onde se aplica | Observação |
 |---|---|---|
-| Caixa preta: **partição de equivalência e análise de valor limite** | Formulários e entradas da API (cadastro, membros, datas de dose) | Os casos e a tabela de execução são o SCRUM-28 |
+| Caixa preta: **partição de equivalência e análise de valor limite** | Formulários e entradas da API (cadastro, membros, datas de dose) | 127 casos em `caixa-preta-casos.md` e tabela de execução em `caixa-preta-execucao.md` (SCRUM-28, feitos em 07/10/2026) |
 | Cobertura de estados, de transições e de caminhos | Ciclo de vida da dose | 42 casos já escritos: CT-E (5), CT-T (12), CT-G (9), CT-I (9) e CT-C (7) |
 | Teste de regressão automatizado | Todo o código | Executado em cada push |
 | Teste de autorização | API | Para todo recurso: usuário A não acessa dado do usuário B |
