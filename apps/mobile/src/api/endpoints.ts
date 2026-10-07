@@ -2,6 +2,7 @@ import {
   accountInfoSchema,
   assistantResponseSchema,
   authSessionSchema,
+  type CustomDoseInput,
   consentInputSchema,
   consentResponseSchema,
   doseResponseSchema,
@@ -90,6 +91,13 @@ export const endpoints = {
 
   createMember: (ctx: ApiContext, input: MemberInput) =>
     apiRequest(ctx, { path: '/members', method: 'POST', body: input }, memberResponseSchema),
+
+  createCustomDose: (ctx: ApiContext, memberId: string, input: CustomDoseInput) =>
+    apiRequest(
+      ctx,
+      { path: `/members/${encodeURIComponent(memberId)}/doses`, method: 'POST', body: input },
+      doseResponseSchema,
+    ),
 
   updateMember: (ctx: ApiContext, id: string, input: MemberInput) =>
     apiRequest(

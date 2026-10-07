@@ -141,4 +141,41 @@ describe('handlers de consentimento e conta', () => {
     expect((await app.handlers.account.deleteAccount(OWNER)).status).toBe(204);
     expect((await app.handlers.members.list(OWNER)).jsonBody).toEqual({ items: [] });
   });
+
+  describe('handler da dose avulsa', () => {
+    const AVULSA = { vaccine: 'Febre tifoide', doseLabel: '1ª dose', dueDate: '2026-11-04' };
+
+    test('CT-AV-H01: cadastra (201) e a dose volta na lista do membro', async () => {
+      const { app, id } = await withMember();
+      const res = await app.handlers.members.addCustomDose(OWNER, id, AVULSA);
+      expect(res.status).toBe(201);
+      expect(doseResponseSchema.safeParse(res.jsonBody).success).toBe(true);
+      const lista = await app.handlers.members.listDoses(OWNER, id);
+      expect(memberDosesResponseSchema.safeParse(lista.jsonBody).success).toBe(true);
+    });
+
+    test.each([
+      ['corpo ausente', undefined],
+      ['nome vazio', { ...AVULSA, vaccine: ' ' }],
+      ['data inexistente', { ...AVULSA, dueDate: '2026-02-30' }],
+    ])('CT-AV-H02: corpo inválido (%s) devolve 400 sem expor valores', async (_nome, body) => {
+      const { app, id } = await withMember();
+      const res = await app.handlers.members.addCustomDose(OWNER, id, body);
+      expect(res.status).toBe(400);
+      expect(apiErrorSchema.safeParse(res.jsonBody).success).toBe(true);
+    });
+
+    test('CT-AV-H03: identificador inválido (400), membro de outro dono (404) e data passada (422)', async () => {
+      const { app, id } = await withMember();
+      expect((await app.handlers.members.addCustomDose(OWNER, '../x', AVULSA)).status).toBe(400);
+      await app.consent(OTHER_OWNER);
+      expect((await app.handlers.members.addCustomDose(OTHER_OWNER, id, AVULSA)).status).toBe(404);
+      const passada = await app.handlers.members.addCustomDose(OWNER, id, {
+        ...AVULSA,
+        dueDate: '2026-10-05',
+      });
+      expect(passada.status).toBe(422);
+      expect(passada.jsonBody).toMatchObject({ code: 'INVALID_DOSE_DATE' });
+    });
+  });
 });

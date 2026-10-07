@@ -97,9 +97,27 @@ app.http('deleteMember', {
   handler: deleteMember,
 });
 
+/** `POST /api/members/{id}/doses`: cadastra uma dose avulsa (fora do calendário oficial). */
+export async function addCustomDose(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  return authenticated(request, context, async (ownerId) => {
+    const body: unknown = await request.json().catch(() => undefined);
+    return memberHandlers.addCustomDose(ownerId, request.params['id'], body);
+  });
+}
+
 app.http('listMemberDoses', {
   methods: ['GET'],
   authLevel: 'anonymous',
   route: 'members/{id}/doses',
   handler: listMemberDoses,
+});
+
+app.http('addCustomDose', {
+  methods: ['POST'],
+  authLevel: 'anonymous',
+  route: 'members/{id}/doses',
+  handler: addCustomDose,
 });

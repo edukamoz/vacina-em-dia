@@ -2,6 +2,7 @@ import type { DoseResponse, DoseStatus } from '@vacina/shared';
 import { Pressable, View } from 'react-native';
 import { Cartao } from '../../components/cartao';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
+import { SeloOrigem } from '../../components/selo-origem';
 import { Texto } from '../../components/texto';
 import { formatCivilDate } from './format-date';
 
@@ -28,7 +29,9 @@ const FAIXA: Readonly<Record<DoseStatus, string>> = {
 export function doseHint(
   dose: Pick<DoseResponse, 'status' | 'dueDate' | 'scheduledDate' | 'appliedDate' | 'timingKind'>,
 ): string {
-  if (dose.status === 'PENDING' && dose.timingKind !== 'AGE') return 'Confira na sua caderneta';
+  if (dose.status === 'PENDING' && dose.timingKind !== 'AGE' && dose.timingKind !== 'CUSTOM') {
+    return 'Confira na sua caderneta';
+  }
   const linha = doseDateRow(dose);
   return linha ? `${linha.rotulo} ${linha.valor}` : DICA[dose.status];
 }
@@ -40,7 +43,9 @@ export function doseHint(
 export function doseDateRow(
   dose: Pick<DoseResponse, 'status' | 'dueDate' | 'scheduledDate' | 'appliedDate' | 'timingKind'>,
 ): { rotulo: string; valor: string } | null {
-  if (dose.status === 'PENDING' && dose.timingKind !== 'AGE') return null;
+  if (dose.status === 'PENDING' && dose.timingKind !== 'AGE' && dose.timingKind !== 'CUSTOM') {
+    return null;
+  }
   const date = {
     SCHEDULED: dose.scheduledDate,
     OVERDUE: dose.dueDate,
@@ -68,7 +73,10 @@ export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () =
           {dose.timingLabel}
           {dose.conditional ? ' · depende de condições' : ''}
         </Texto>
-        <SeloEstadoDose status={dose.status} />
+        <View className="flex-row flex-wrap gap-sm">
+          <SeloEstadoDose status={dose.status} />
+          <SeloOrigem origem={dose.origin} />
+        </View>
         <Texto variante="apoio" className="text-textoSecundario">
           {doseHint(dose)}
         </Texto>

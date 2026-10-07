@@ -113,6 +113,34 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       expect(await repos.members.get(alice, id)).toEqual(member(id));
     });
 
+    test('CT-DB-AV: dose avulsa grava sem linha do calendário e volta com nome e dose', async () => {
+      const owner = await newOwner();
+      const m = randomUUID();
+      await repos.members.save(owner, member(m));
+      const [oficial, avulsa] = [randomUUID(), randomUUID()];
+      await repos.doses.saveMany(owner, [
+        dose(oficial, m),
+        dose(avulsa, m, {
+          ruleId: null,
+          custom: { vaccine: 'Febre tifoide', doseLabel: '1ª dose' },
+        }),
+      ]);
+      const lidas = await repos.doses.listByMember(owner, m);
+      expect(lidas.map((d) => d.ruleId)).toEqual(['regra-1', null]);
+      expect(lidas[1]?.custom).toEqual({ vaccine: 'Febre tifoide', doseLabel: '1ª dose' });
+      await repos.doses.saveMany(owner, [
+        dose(avulsa, m, {
+          ruleId: null,
+          custom: { vaccine: 'Febre tifoide', doseLabel: '1ª dose' },
+          status: 'APPLIED',
+          appliedDate: '2026-10-01',
+        }),
+      ]);
+      const depois = await repos.doses.get(owner, avulsa);
+      expect(depois).toMatchObject({ status: 'APPLIED', appliedDate: '2026-10-01', ruleId: null });
+      expect(depois?.custom?.vaccine).toBe('Febre tifoide');
+    });
+
     test('CT-DB-04: doses gravam, atualizam e listam na ordem de geração, com datas e nulos', async () => {
       const owner = await newOwner();
       const m = randomUUID();

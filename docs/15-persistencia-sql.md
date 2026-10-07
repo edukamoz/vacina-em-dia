@@ -12,6 +12,7 @@ Os dados passam a viver no Azure SQL (ADR-004), com a API sem senha de banco (AD
 | Ligado na API do Azure (`SQL_SERVER` e `SQL_DATABASE`) | **Não**: a sessão de demonstração do app atual quebraria (ver abaixo) |
 | Migração `002-redefinicao-de-senha.sql` (tabela `password_reset_token`) | Aplicada em 07/10/2026 |
 | Migração `003-parentesco-do-membro.sql` (coluna `member.relationship`) | **Escrita, ainda não aplicada no banco da nuvem** (aplicar antes de publicar a API que a usa) |
+| Migração `004-dose-avulsa.sql` (`dose.rule_id` opcional, `custom_vaccine`, `custom_dose_label`, restrição `ck_dose_origin`) | **Escrita, ainda não aplicada no banco da nuvem** (aplicar antes de publicar a API que a usa) |
 | Histórico de eventos da dose (`dose_event`), lembretes e dispositivos push | Não existem ainda (SCRUM-19) |
 
 ## Esquema implementado
@@ -31,7 +32,7 @@ Resumo; o modelo completo planejado está em `docs/03-uml/der.md` e `dicionario-
 | `consent` | `account_id`, `term_version`, `accepted_at`, `guardian_declaration` |
 | `member` | `id`, `account_id`, `display_name`, `birth_date`, `is_pregnant`, `relationship` (opcional; código de parentesco), `seq` |
 | `password_reset_token` | `token_hash` (SHA-256), `account_id`, `expires_at`, `used_at` |
-| `dose` | `id`, `member_id`, `rule_id`, `status` (CHECK nos 5 estados), `due_date`, `scheduled_date`, `applied_date`, `seq` |
+| `dose` | `id`, `member_id`, `rule_id` (nulo em dose avulsa), `custom_vaccine`, `custom_dose_label` (só em dose avulsa), `status` (CHECK nos 5 estados), `due_date`, `scheduled_date`, `applied_date`, `seq` |
 
 Excluir a conta apaga tudo em cascata (RF09). A propriedade é conferida em toda consulta: membros por `account_id`, doses pela junção com o membro do dono.
 
