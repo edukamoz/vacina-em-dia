@@ -55,20 +55,21 @@ export const SELO_POR_ESTADO: Readonly<Record<DoseStatus, EstiloSelo>> = {
  * Selo do estado da dose. Nunca depende só da cor: leva ícone e texto, e o rótulo de
  * acessibilidade diz "Dose atrasada", "Dose aplicada" etc.
  *
- * @param props.status - Estado da dose.
+ * @param props.status - Estado da dose (define cor e ícone).
+ * @param props.rotulo - Texto próprio no lugar do nome do estado, por exemplo "2 doses atrasadas".
  */
-export function SeloEstadoDose({ status }: { status: DoseStatus }) {
+export function SeloEstadoDose({ status, rotulo }: { status: DoseStatus; rotulo?: string }) {
   const selo = SELO_POR_ESTADO[status];
   const cores = useThemeColors();
   return (
     <View
       accessible
-      accessibilityLabel={`Dose ${selo.rotulo.toLowerCase()}`}
+      accessibilityLabel={rotulo ?? `Dose ${selo.rotulo.toLowerCase()}`}
       className={`flex-row items-center gap-sm self-start rounded-selo border-padrao px-md py-xs ${selo.caixa}`}
     >
       <Icone nome={selo.icone} cor={cores[selo.cor]} />
       <Texto variante="rotulo" className={selo.texto} importantForAccessibility="no">
-        {selo.rotulo}
+        {rotulo ?? selo.rotulo}
       </Texto>
     </View>
   );
