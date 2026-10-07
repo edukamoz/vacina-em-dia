@@ -108,4 +108,5 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 | Tecnologia | Versão | Observação |
 |---|---|---|
 | expo-secure-store | ~57.0.4 | Token de sessão no celular (Keychain e Keystore), conforme a ADR-009 |
+| expo-audio | ~57.0.5 | Microfone no celular (`AudioStream`, PCM) para a pergunta por voz (RF06) |
 | react-native-svg | 15.15.4 | Marca do Vacina em Dia nas telas de entrada (versão indicada pelo `expo install`) |

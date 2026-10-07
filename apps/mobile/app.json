@@ -10,7 +10,17 @@
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router", "expo-font", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "O Vacina em Dia usa o microfone só para ouvir a sua pergunta por voz. O áudio não é guardado."
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }
