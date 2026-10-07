@@ -67,6 +67,15 @@ GERAR_TABELA=1 npx jest src/caixa-preta       # executa e regrava a tabela de ex
 | Propriedade | I: membro de outro usuário (404) | n/a |
 | Faixa etária | Criança até 10 anos, adolescente e jovem até 25, adulto até 60, idoso daí em diante (calendário do PNI, `docs/10-calendario-vacinal.md`) | Dia anterior e dia do aniversário de 10, 25 e 60 anos; recém-nascido |
 
+### Parentesco do membro (RF02)
+
+O parentesco é opcional e escolhido em uma lista fixa de 11 códigos (`SELF`, `MOTHER`, `FATHER`, `SON`, `DAUGHTER`, `GRANDMOTHER`, `GRANDFATHER`, `SISTER`, `BROTHER`, `SPOUSE`, `OTHER`). Por ser uma enumeração, quase não há valor limite: usa-se partição, com dois limites de forma (texto vazio e caixa diferente).
+
+| Campo | Partições | Valores limite |
+|---|---|---|
+| Parentesco | V: cada código da lista (o próprio usuário, um parente, "outro"), omitido, nulo. I: fora da lista, tipo errado (número) | texto vazio (inválido); código em minúsculas (inválido, a lista é sensível à caixa) |
+| Edição | V: trocar de um parentesco para outro; limpar (voltar a "não informado") | n/a |
+
 ### Doses (RF04)
 
 Ambiente: recém-nascido (todas as doses Pendentes), com data de hoje fixa. Detalhe da máquina de estados em `casos-teste-estados-dose.md`.
@@ -80,6 +89,21 @@ Ambiente: recém-nascido (todas as doses Pendentes), com data de hoje fixa. Deta
 | Estado de origem | I: aplicar uma dose já aplicada, agendar uma dose cancelada, reagendar uma dose que não está atrasada (409) | n/a |
 | Existência e propriedade | I: dose inexistente, dose de outro usuário (404) | n/a |
 | Rotina de prazo | Dose vencida vira Atrasada ao ser lida | dia seguinte ao vencimento |
+
+### Dose avulsa (RF04, ADR-016)
+
+Vacina cadastrada à mão, fora do calendário oficial. Ambiente: pessoa adulta com consentimento, relógio fixo em **2026-10-06**. A dose nasce Pendente e segue o mesmo ciclo de estados das oficiais.
+
+| Campo | Partições | Valores limite |
+|---|---|---|
+| Nome da vacina | V: de 2 a 80 caracteres, com acento e espaços nas pontas (removidos). I: vazio, só espaços, ausente, com caractere de controle, tipo errado | 1 (inválido), 2 e 80 (válidos), 81 (inválido) |
+| Qual dose | V: de 1 a 40 caracteres. I: vazia, ausente | 0 e 41 (inválidos), 1 e 40 (válidos) |
+| Data prevista | V: de hoje até o último dia do 10º ano à frente. I: passada, distante demais, inexistente, formato brasileiro, ausente, corpo ausente | ontem (422), hoje e amanhã (201); 2036-12-31 (201) e 2037-01-01 (422) |
+| Doses avulsas por pessoa | Até 30 | 30ª (201), 31ª (422) |
+| Consentimento e propriedade | I: sem consentimento (403), pessoa inexistente ou de outro usuário (404), id inválido (400) | n/a |
+| Ciclo de estados | V: agendar (T2), aplicar com data passada (T3), cancelar confirmando (T5). I: aplicar com data de amanhã e cancelar sem confirmar (422) | aplicar D+1 (422) |
+| Rotina de prazo | Dose avulsa pendente vira Atrasada quando a data prevista passa | no próprio dia segue Pendente; no dia seguinte, Atrasada (T4) |
+| Convivência com as oficiais | A avulsa aparece na lista da pessoa; editar a pessoa não a apaga nem a duplica | n/a |
 
 ### Assistente: texto e voz (RF06 e RF07)
 
@@ -101,4 +125,4 @@ Ambiente: recém-nascido (todas as doses Pendentes), com data de hoje fixa. Deta
 
 ## Limitação conhecida e honesta
 
-Os valores esperados saíram da especificação (requisitos, ADRs e esquemas), mas os casos foram escritos e executados pelo mesmo autor; uma revisão por outra pessoa (por exemplo, o professor) é recomendada. Na primeira execução, um caso (CT-CP-C08) reprovou porque a **senha de teste escolhida estava na lista de senhas comuns**: foi erro da entrada do caso, não da API, e a entrada foi trocada por uma senha fora da lista. Nenhum outro caso precisou de ajuste.
+Os valores esperados saíram da especificação (requisitos, ADRs e esquemas), mas os casos foram escritos e executados pelo mesmo autor; uma revisão por outra pessoa (por exemplo, o professor) é recomendada. Na primeira execução, um caso (CT-CP-C08) reprovou porque a **senha de teste escolhida estava na lista de senhas comuns**: foi erro da entrada do caso, não da API, e a entrada foi trocada por uma senha fora da lista. Na segunda rodada (parentesco e dose avulsa), um caso (CT-CP-V36, cancelar a dose avulsa sem confirmar) também reprovou na primeira execução: a expectativa escrita foi 400 (validação), mas a regra "cancelar exige confirmação" é uma guarda do domínio e devolve **422 `GUARD_VIOLATION`**, como já previa o caso das doses oficiais (CT-CP-D11). Foi erro da expectativa, não da API, e foi corrigida. Nenhum outro caso precisou de ajuste.

@@ -3,8 +3,8 @@
 > **Arquivo gerado** pela execução automatizada (`GERAR_TABELA=1 npx jest src/caixa-preta` em `apps/api`). Não edite à mão: rode de novo. O "Obtido" é o que a API devolveu **nesta execução**, não o que se esperava.
 
 - **Data da execução:** 2026-10-07
-- **Versão do código (commit):** 91ce223
-- **Resultado geral:** 127 de 127 casos aprovados
+- **Versão do código (commit):** 7d71449
+- **Resultado geral:** 179 de 179 casos aprovados
 - **Como foi executado:** pelas camadas de entrada da API (validação Zod, handlers, serviços e regras de domínio reais), em memória, com relógio controlado (hoje = 2026-10-06), sem rede e sem Azure. Atende a "teste de caixa preta com tabela de execução" da entrega de Qualidade e Testes.
 - **Técnicas:** PE = partição de equivalência; VL = análise de valor limite. Descrição das partições e dos limites: `docs/07-testes/caixa-preta-casos.md`.
 - **Legenda de "Esperado" e "Obtido":** código HTTP, código de erro da API e, quando conferido, um detalhe (por exemplo, a faixa etária ou o estado da dose).
@@ -18,10 +18,12 @@
 | Recuperação de senha | RF01 | 16 | 8 | 8 | 16 | 0 |
 | Consentimento | RF09 | 10 | 6 | 4 | 10 | 0 |
 | Membros da família | RF02 | 25 | 13 | 12 | 25 | 0 |
+| Parentesco do membro | RF02 | 12 | 10 | 2 | 12 | 0 |
 | Faixa etária do calendário | RF03 | 7 | 0 | 7 | 7 | 0 |
 | Doses | RF04 | 22 | 16 | 6 | 22 | 0 |
+| Dose avulsa | RF04 | 40 | 22 | 18 | 40 | 0 |
 | Assistente | RF06 e RF07 | 19 | 8 | 11 | 19 | 0 |
-| **Total** | | **127** | **67** | **60** | **127** | **0** |
+| **Total** | | **179** | **99** | **80** | **179** | **0** |
 
 ## Cadastro de conta (RF01)
 
@@ -127,6 +129,23 @@
 | CT-CP-M24 | VL | 21º membro da conta | 21º cadastro | 422 LIMIT_REACHED | 422 LIMIT_REACHED | Aprovado |
 | CT-CP-M25 | PE | Membro de outro usuário | dono B consulta o membro do dono A | 404 NOT_FOUND | 404 NOT_FOUND | Aprovado |
 
+## Parentesco do membro (RF02)
+
+| ID | Técnica | Classe ou valor | Entrada | Esperado | Obtido | Resultado |
+|---|---|---|---|---|---|---|
+| CT-CP-P01 | PE | Parentesco válido: o próprio usuário | SELF | 201 SELF | 201 SELF | Aprovado |
+| CT-CP-P02 | PE | Parentesco válido: parente (filha) | DAUGHTER | 201 DAUGHTER | 201 DAUGHTER | Aprovado |
+| CT-CP-P03 | PE | Parentesco válido: outro parente ou pessoa cuidada | OTHER | 201 OTHER | 201 OTHER | Aprovado |
+| CT-CP-P04 | PE | Parentesco omitido (opcional, vale "não informado") | sem o campo | 201 null | 201 null | Aprovado |
+| CT-CP-P05 | PE | Parentesco nulo (prefiro não informar) | relationship = null | 201 null | 201 null | Aprovado |
+| CT-CP-P06 | PE | Todos os 11 parentescos da lista são aceitos | os 11 códigos, um por pessoa | 201 | 201 | Aprovado |
+| CT-CP-P07 | PE | Parentesco fora da lista | VIZINHO | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-P08 | VL | Código em minúsculas (a lista é sensível à caixa) | self | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-P09 | VL | Parentesco vazio | texto vazio | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-P10 | PE | Parentesco de tipo errado | número 7 | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-P11 | PE | Trocar o parentesco na edição | DAUGHTER para FATHER | 200 FATHER | 200 FATHER | Aprovado |
+| CT-CP-P12 | PE | Limpar o parentesco na edição | MOTHER para nulo | 200 null | 200 null | Aprovado |
+
 ## Faixa etária do calendário (RF03)
 
 | ID | Técnica | Classe ou valor | Entrada | Esperado | Obtido | Resultado |
@@ -165,6 +184,51 @@
 | CT-CP-D20 | PE | Dose inexistente | id que não existe | 404 NOT_FOUND | 404 NOT_FOUND | Aprovado |
 | CT-CP-D21 | PE | Dose de outro usuário | dono B tenta aplicar a dose do dono A | 404 NOT_FOUND | 404 NOT_FOUND | Aprovado |
 | CT-CP-D22 | PE | Atraso: dose vencida vira Atrasada na leitura (rotina de prazo) | dose de BCG (ao nascer) lida 1 dia depois | 200 OVERDUE | 200 OVERDUE | Aprovado |
+
+## Dose avulsa (RF04)
+
+| ID | Técnica | Classe ou valor | Entrada | Esperado | Obtido | Resultado |
+|---|---|---|---|---|---|---|
+| CT-CP-V01 | PE | Dados válidos: nasce Pendente e com origem avulsa | Febre tifoide, 1ª dose, daqui a 28 dias | 201 CUSTOM | 201 CUSTOM | Aprovado |
+| CT-CP-V02 | PE | Estado inicial da dose avulsa (T1) | dados válidos | 201 PENDING | 201 PENDING | Aprovado |
+| CT-CP-V03 | PE | Nome com acento e espaços nas pontas (removidos) | "  Raiva (pré-exposição)  " | 201 Raiva (pré-exposição) | 201 Raiva (pré-exposição) | Aprovado |
+| CT-CP-V04 | VL | Nome com 1 caractere (abaixo do mínimo de 2) | nome de 1 caractere | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V05 | VL | Nome com 2 caracteres (mínimo) | nome de 2 caracteres | 201 | 201 | Aprovado |
+| CT-CP-V06 | VL | Nome com 80 caracteres (máximo) | nome de 80 caracteres | 201 | 201 | Aprovado |
+| CT-CP-V07 | VL | Nome com 81 caracteres | nome de 81 caracteres | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V08 | PE | Nome só com espaços | nome "     " | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V09 | PE | Nome ausente | sem nome | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V10 | PE | Nome com caractere de controle | nome com quebra de linha | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V11 | PE | Nome com tipo errado | número 123 | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V12 | VL | Dose vazia (abaixo do mínimo de 1) | dose vazia | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V13 | VL | Dose com 1 caractere (mínimo) | dose "1" | 201 | 201 | Aprovado |
+| CT-CP-V14 | VL | Dose com 40 caracteres (máximo) | dose de 40 caracteres | 201 | 201 | Aprovado |
+| CT-CP-V15 | VL | Dose com 41 caracteres | dose de 41 caracteres | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V16 | PE | Dose ausente | sem a dose | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V17 | VL | Data prevista ontem (D-1, abaixo do limite) | 2026-10-05 | 422 INVALID_DOSE_DATE | 422 INVALID_DOSE_DATE | Aprovado |
+| CT-CP-V18 | VL | Data prevista hoje (D, limite inferior válido) | 2026-10-06 | 201 | 201 | Aprovado |
+| CT-CP-V19 | VL | Data prevista amanhã (D+1) | 2026-10-07 | 201 | 201 | Aprovado |
+| CT-CP-V20 | VL | Último dia do 10º ano à frente (limite superior válido) | 2036-12-31 | 201 | 201 | Aprovado |
+| CT-CP-V21 | VL | Primeiro dia do 11º ano à frente (acima do limite) | 2037-01-01 | 422 INVALID_DOSE_DATE | 422 INVALID_DOSE_DATE | Aprovado |
+| CT-CP-V22 | PE | Data inexistente no calendário | 2026-02-30 | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V23 | PE | Data em formato brasileiro | 04/11/2026 | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V24 | PE | Data ausente | sem data | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V25 | PE | Corpo ausente | sem corpo | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V26 | VL | 30ª dose avulsa da pessoa (limite) | 30ª dose avulsa | 201 | 201 | Aprovado |
+| CT-CP-V27 | VL | 31ª dose avulsa da pessoa | 31ª dose avulsa | 422 LIMIT_REACHED | 422 LIMIT_REACHED | Aprovado |
+| CT-CP-V28 | PE | Sem consentimento prévio | cadastrar a dose sem aceitar o termo | 403 CONSENT_REQUIRED | 403 CONSENT_REQUIRED | Aprovado |
+| CT-CP-V29 | PE | Pessoa inexistente | id de pessoa que não existe | 404 NOT_FOUND | 404 NOT_FOUND | Aprovado |
+| CT-CP-V30 | PE | Pessoa de outro usuário | id de pessoa de outro dono | 404 NOT_FOUND | 404 NOT_FOUND | Aprovado |
+| CT-CP-V31 | PE | Identificador de pessoa inválido | id "../x" | 400 VALIDATION_ERROR | 400 VALIDATION_ERROR | Aprovado |
+| CT-CP-V32 | PE | Ciclo de estados: agendar a dose avulsa (T2) | SCHEDULE 2026-10-06 | 200 SCHEDULED | 200 SCHEDULED | Aprovado |
+| CT-CP-V33 | PE | Ciclo de estados: registrar a aplicação da dose avulsa (T3) | APPLY 2026-09-06 | 200 APPLIED | 200 APPLIED | Aprovado |
+| CT-CP-V34 | VL | Aplicar a dose avulsa com data de amanhã (acima do limite) | APPLY 2026-10-07 | 422 GUARD_VIOLATION | 422 GUARD_VIOLATION | Aprovado |
+| CT-CP-V35 | PE | Ciclo de estados: cancelar a dose avulsa confirmando (T5) | CANCEL confirmado | 200 CANCELLED | 200 CANCELLED | Aprovado |
+| CT-CP-V36 | PE | Cancelar a dose avulsa sem confirmar | CANCEL confirmed = false | 422 GUARD_VIOLATION | 422 GUARD_VIOLATION | Aprovado |
+| CT-CP-V37 | VL | Rotina de prazo: no próprio dia da data prevista a dose segue Pendente | data prevista hoje; lida hoje | 200 PENDING | 200 PENDING | Aprovado |
+| CT-CP-V38 | VL | Rotina de prazo: no dia seguinte à data prevista a dose vira Atrasada (T4) | data prevista hoje; lida amanhã | 200 OVERDUE | 200 OVERDUE | Aprovado |
+| CT-CP-V39 | PE | Dose avulsa aparece na lista da pessoa junto das oficiais | listar as doses depois de cadastrar uma avulsa | 200 1 | 200 1 | Aprovado |
+| CT-CP-V40 | PE | Editar a pessoa não apaga nem duplica a dose avulsa | editar o nome depois de cadastrar uma avulsa | 200 1 | 200 1 | Aprovado |
 
 ## Assistente (RF06 e RF07)
 
