@@ -60,6 +60,30 @@ export interface ConsentRepository {
   save(ownerId: string, consent: StoredConsent): Promise<void>;
 }
 
+/** Dose candidata ao e-mail de lembrete, com o endereço de quem a receberia. */
+export interface ReminderCandidate {
+  readonly accountId: string;
+  readonly email: string;
+  readonly dose: DoseSnapshot;
+}
+
+/** Preferência e controle de envio dos lembretes por e-mail (RF05). */
+export interface ReminderRepository {
+  /** Diz se a conta recebe lembretes por e-mail; ligado por padrão. */
+  getEmailEnabled(ownerId: string): Promise<boolean>;
+  /** Liga ou desliga os lembretes por e-mail da conta. */
+  setEmailEnabled(ownerId: string, enabled: boolean): Promise<void>;
+  /**
+   * Doses Pendentes ou Agendadas, de contas com consentimento e lembretes ligados que ainda não
+   * receberam e-mail em `today`, cuja data é hoje ou daqui a 7 dias. A rotina confere a regra.
+   */
+  listEmailCandidates(today: CivilDate): Promise<readonly ReminderCandidate[]>;
+  /** Reserva o envio do dia; `false` se a conta já recebeu (ou está recebendo) em `today`. */
+  claimEmailDay(accountId: string, today: CivilDate): Promise<boolean>;
+  /** Devolve a reserva quando o envio falhou, para a próxima rotina tentar de novo. */
+  releaseEmailDay(accountId: string, today: CivilDate): Promise<void>;
+}
+
 /** Operações sobre a conta inteira. */
 export interface AccountRepository {
   /** Apaga todos os dados do dono: membros, doses e consentimento (RF09). */

@@ -18,6 +18,7 @@ export * from './handlers/docs';
 export * from './handlers/doses';
 export * from './handlers/health';
 export * from './handlers/members';
+export * from './handlers/reminders';
 export * from './openapi/build-spec';
 export * from './repositories/in-memory-store';
 export * from './repositories/repositories';
