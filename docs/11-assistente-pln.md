@@ -26,7 +26,12 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 
 ## Busca (voz)
 
-`POST /api/search` recebe a transcrição e devolve até 5 vacinas parecidas (TF-IDF e cosseno sobre nome, apelidos populares e doenças evitadas), com doenças e indicações do calendário. É busca por similaridade de texto, não IA generativa.
+`POST /api/search` recebe a transcrição e devolve até 5 vacinas parecidas, com doenças e indicações do calendário. Não é IA generativa. A nota de cada vacina combina duas medidas sobre um documento por vacina (nome, apelidos populares, doenças evitadas, faixas, momentos e observações do calendário):
+
+1. **TF-IDF de n-gramas de caracteres** (3 a 5) e cosseno: acha o que a consulta e o documento têm em comum mesmo com erro de transcrição ("tuberculoze").
+2. **LSA** (análise semântica latente): SVD truncado do TF-IDF (12 temas, semente fixa), que aproxima termos que aparecem juntos. Peso de 0,3 na nota final.
+
+Nota mínima de 0,35 (abaixo disso não devolve). Índice montado na partida em cerca de 35 ms; cada consulta leva cerca de 2 ms. **Avaliação:** `docs/07-testes/avaliacao-busca-semantica.md` (gerada por `python -m vacina_nlp.search_evaluate`): acerto na 1ª posição de 68,3% no índice original para **88,9%** no atual (MRR de 0,722 para 0,928) em 63 consultas. A melhoria vem de enriquecer os documentos e dos n-gramas de caracteres; o efeito isolado do **LSA é pequeno e não distinguível de ruído** com só 22 documentos (o relatório mostra isso). Consultas com palavras ausentes dos dados ("tosse comprida") continuam difíceis; embeddings resolveriam, com custo e memória (alternativa registrada no relatório).
 
 ## Contrato do serviço (interno; a API principal é quem o chama)
 
@@ -57,6 +62,8 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 | CT-NLP-60 a 69 | Respostas curadas, fontes, saúde individual, entrada vazia, baixa confiança |
 | CT-NLP-70 a 81 | Respostas montadas com o calendário oficial |
 | CT-NLP-90 a 93 | Busca por nome, apelido e doença |
+| CT-NLP-130 a 138 | Busca semântica: erro de fala, consulta de grupo, parâmetros, determinismo, documento enriquecido, fora do tema, limiar |
+| CT-NLP-140 a 146 | Avaliação da busca: conjunto de teste (nomes oficiais, respostas de grupo vindas do calendário), métricas, superação do índice original, limiar e relatório |
 | CT-NLP-100 a 106 | Validação das requisições e erros sem repetir o texto |
 | CT-NLP-110 a 112 | Rotas, chave da função e cabeçalhos |
 | CT-NLP-120 a 127 | Avaliação: F1 acima da meta, sem vazamento, limiar, relatório |
