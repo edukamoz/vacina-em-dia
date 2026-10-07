@@ -85,6 +85,14 @@ jobs:
       - name: Testes com cobertura (mínimo de 80%)
         run: pytest --cov --cov-report=term-missing --cov-report=xml
 
+      # Só as dependências de produção (requirements.txt): as de teste não vão para a nuvem. Falha se
+      # alguma versão fixada tiver vulnerabilidade conhecida; nesse caso, atualizar e registrar em
+      # docs/tech-versions.md. A versão do pip-audit é fixada para a auditoria ser reproduzível.
+      - name: Auditar as dependências de produção (pip-audit)
+        run: |
+          pip install pip-audit==2.10.1
+          pip-audit -r requirements.txt --no-deps --disable-pip
+
       - name: Guardar o relatório de cobertura
         if: always()
         uses: actions/upload-artifact@v7
