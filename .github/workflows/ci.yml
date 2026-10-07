@@ -145,6 +145,10 @@ jobs:
           # Serviço de PLN: saúde livre e chatbot protegido pela chave da função (401 sem ela).
           curl -fsS http://localhost:7072/api/health
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -d '{}' http://localhost:7072/api/chat)" = "401"
+          # Login e chatbot de ponta a ponta: cadastro na API e pergunta que a API repassa ao PLN
+          # (com a chave local de desenvolvimento do docker-compose).
+          TOKEN=$(curl -fsS -X POST http://localhost:8080/api/auth/register -H 'Content-Type: application/json' -d '{"email":"ci@exemplo.com.br","password":"uma frase longa e boa"}' | python3 -c "import json,sys; print(json.load(sys.stdin)['accessToken'])")
+          curl -fsS -X POST http://localhost:8080/api/assistant/message -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"text":"Para que serve a BCG?"}' | grep -q '"intent":"vacina_para_que_serve"'
 
       - name: Mostrar os logs se algo falhar
         if: failure()

@@ -1,7 +1,12 @@
 # Ambiente local do Vacina em Dia: `docker compose up --build`
 #   app web:  http://localhost:8080
 #   API:      http://localhost:7071/api/health  (Swagger em /api/docs)
-# As portas só aceitam conexões do próprio computador (127.0.0.1).
+# As portas só aceitam conexões do próprio computador (127.0.0.1) e mudam por variável de ambiente
+# se já estiverem em uso: API_PORT (7071), NLP_PORT (7072) e WEB_PORT (8080).
+#
+# ATENÇÃO: os valores `local` abaixo (chave do login e chaves do PLN) são constantes de
+# DESENVOLVIMENTO, públicas no repositório. Servem só a este ambiente local, que guarda tudo em
+# memória; nunca os use na nuvem. Na Azure as chaves reais ficam no Key Vault.
 #   PLN:      http://localhost:7072/api/health  (chatbot e busca; /chat e /search exigem a chave)
 name: vacina-em-dia
 
@@ -30,8 +35,17 @@ services:
       # Conta de desenvolvimento do Azurite; o endereço do serviço é o nome dele no compose.
       AzureWebJobsStorage: UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite
       DOCS_ENABLED: 'true'
+      # Login próprio (ADR-014): sem a chave de assinatura, as rotas /auth respondem 503. Pode ser
+      # trocada por um valor seu: AUTH_TOKEN_SECRET=... docker compose up.
+      AUTH_TOKEN_SECRET: ${AUTH_TOKEN_SECRET:-chave-local-do-login-somente-para-desenvolvimento-0123456789}
+      # No ambiente local não há sessão de demonstração: o app exige login, como na nuvem.
+      DEMO_SESSION_ENABLED: 'false'
+      # Chatbot por texto. A voz precisa do Azure AI Speech (SPEECH_ENDPOINT e SPEECH_KEY): sem eles
+      # a API responde "assistente indisponível" só na voz. Sem banco, os dados ficam em memória.
+      NLP_BASE_URL: http://nlp/api
+      NLP_FUNCTION_KEY: chave-local-do-pln-somente-para-desenvolvimento
     ports:
-      - '127.0.0.1:7071:80'
+      - '127.0.0.1:${API_PORT:-7071}:80'
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:80/api/health || exit 1']
       interval: 10s
@@ -50,8 +64,13 @@ services:
     environment:
       FUNCTIONS_WORKER_RUNTIME: python
       AzureWebJobsStorage: UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azurite
+      # Chaves da função num arquivo conhecido (docker/nlp-host-secrets.json), para a API chamar o
+      # PLN sem precisar descobrir a chave que o host gera sozinho.
+      AzureWebJobsSecretStorageType: files
+    volumes:
+      - ./docker/nlp-host-secrets.json:/azure-functions-host/Secrets/host.json
     ports:
-      - '127.0.0.1:7072:80'
+      - '127.0.0.1:${NLP_PORT:-7072}:80'
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:80/api/health || exit 1']
       interval: 10s
@@ -67,7 +86,7 @@ services:
       api:
         condition: service_healthy
     ports:
-      - '127.0.0.1:8080:80'
+      - '127.0.0.1:${WEB_PORT:-8080}:80'
 
 volumes:
   azurite-data:

@@ -12,7 +12,7 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 | 6 | Product Backlog (Kanban) | LDM | Jira com épicos e itens | 3 | Exportar o quadro (print) e conferir status |
 | 7 | Reuniões de planejamento e encerramento (sprints feitas) | PI | Sprint 1 em curso; registros com `[a informar]` | 2 | Registrar datas e tempos reais. **Depende do autor** |
 | 8 | Expectativa das próximas sprints | PI | Cronograma em `docs/09` | 4 | Slide com as sprints 2 a 6 |
-| 9 | Documentação técnica (Docker, manutenção) | PI | `docker-compose.yml`, `README`, `docs/08` | 3 | **Seção de manutenção do Docker** (subir, parar, logs, atualizar imagem, problemas comuns) |
+| 9 | Documentação técnica (Docker, manutenção) | PI | **Feito em 07/10/2026:** `docs/17-docker-manutencao.md` (serviços, operação, dados, configuração, atualização de versões, problemas comuns, verificação e diferenças com a nuvem), verificado com o ambiente rodando; teste de fumaça no CI com login e chatbot | 5 | Nada essencial |
 | 10 | Documentação de desenvolvimento (totalização categorizada) | LDM | Esqueleto em `docs/09` | 2 | Totais por categoria; **depende dos tempos reais do autor** |
 | 11 | Conversão de serviços (AWS para Azure) | CN2 | **Não existe** | 0 | Tabela AWS → Azure com o que o projeto usa (ver §2) |
 | 12 | Custos dos serviços no Azure | CN2 | Só menção (SCRUM-26) | 1 | Estimativa na calculadora de preços, por serviço e total mensal |
