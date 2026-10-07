@@ -7,6 +7,7 @@ import {
   selectDoseRulesToGenerate,
   type CalendarDataset,
   type MemberInput,
+  type Relationship,
   type MemberResponse,
 } from '@vacina/shared';
 import { civilToday, type Clock } from '../clock';
@@ -18,6 +19,11 @@ import type {
 } from '../repositories/repositories';
 import { failure, success, type Result } from './errors';
 import { toMemberResponse } from './mappers';
+
+/** Dados de um membro vindos do cliente; o parentesco pode faltar (vale "não informado"). */
+export type MemberData = Omit<MemberInput, 'relationship'> & {
+  readonly relationship?: Relationship | null;
+};
 
 /** Quantidade máxima de membros por conta. */
 export const MAX_MEMBERS = 20;
@@ -32,9 +38,9 @@ export interface MemberService {
   /** Busca um membro do dono. */
   get(ownerId: string, id: string): Promise<Result<MemberResponse>>;
   /** Cadastra um membro e gera as doses do calendário para ele. */
-  create(ownerId: string, input: MemberInput): Promise<Result<MemberResponse>>;
+  create(ownerId: string, input: MemberData): Promise<Result<MemberResponse>>;
   /** Edita um membro e gera as doses que passaram a ser indicadas. */
-  update(ownerId: string, id: string, input: MemberInput): Promise<Result<MemberResponse>>;
+  update(ownerId: string, id: string, input: MemberData): Promise<Result<MemberResponse>>;
   /** Exclui o membro e as doses dele. */
   remove(ownerId: string, id: string): Promise<Result<null>>;
 }
@@ -60,7 +66,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
   const { members, doses, consents, clock, newId, calendar } = deps;
 
   /** Confere as regras comuns a criar e editar; devolve o erro ou `null` se estiver tudo certo. */
-  async function validate(ownerId: string, input: MemberInput, today: string) {
+  async function validate(ownerId: string, input: MemberData, today: string) {
     const consent = await consents.get(ownerId);
     if (!consent) return failure({ code: 'CONSENT_REQUIRED' });
     if (compareCivilDates(input.birthDate, today) > 0) {
@@ -117,6 +123,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         name: input.name,
         birthDate: input.birthDate,
         isPregnant: input.isPregnant,
+        relationship: input.relationship ?? null,
       };
       await members.save(ownerId, member);
       await generateDoses(ownerId, member, today);
@@ -134,6 +141,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         name: input.name,
         birthDate: input.birthDate,
         isPregnant: input.isPregnant,
+        relationship: input.relationship ?? null,
       };
       await members.save(ownerId, member);
       await generateDoses(ownerId, member, today);

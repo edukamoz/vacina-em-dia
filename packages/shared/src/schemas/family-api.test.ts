@@ -3,12 +3,18 @@ import {
   memberDosesResponseSchema,
   memberIdSchema,
   memberInputSchema,
+  RELATIONSHIPS,
 } from './family-api';
 
 describe('esquemas de família e consentimento', () => {
   test('CT-FAM-S01: aceita um membro e assume que não é gestante', () => {
     const parsed = memberInputSchema.parse({ name: ' Maria ', birthDate: '2024-05-20' });
-    expect(parsed).toEqual({ name: 'Maria', birthDate: '2024-05-20', isPregnant: false });
+    expect(parsed).toEqual({
+      name: 'Maria',
+      birthDate: '2024-05-20',
+      isPregnant: false,
+      relationship: null,
+    });
   });
 
   test.each([
@@ -19,6 +25,17 @@ describe('esquemas de família e consentimento', () => {
     ['gestante que não é booleano', { name: 'Maria', birthDate: '2024-05-20', isPregnant: 'sim' }],
   ])('CT-FAM-S02: rejeita membro com %s', (_nome, value) => {
     expect(memberInputSchema.safeParse(value).success).toBe(false);
+  });
+
+  test.each(RELATIONSHIPS)('CT-FAM-S06: aceita o parentesco %s', (relationship) => {
+    const parsed = memberInputSchema.parse({ name: 'Ana', birthDate: '2024-05-20', relationship });
+    expect(parsed.relationship).toBe(relationship);
+  });
+
+  test.each(['AVO', 'self', '', 7])('CT-FAM-S07: rejeita o parentesco %p', (relationship) => {
+    expect(
+      memberInputSchema.safeParse({ name: 'Ana', birthDate: '2024-05-20', relationship }).success,
+    ).toBe(false);
   });
 
   test.each(['3f1c2d4e-5a6b', 'm-1'])('CT-FAM-S03: aceita o identificador %s', (id) => {

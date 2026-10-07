@@ -27,6 +27,7 @@ describe('handlers de membros', () => {
     ['nome vazio', { ...BODY, name: ' ' }],
     ['data inexistente', { ...BODY, birthDate: '2025-02-30' }],
     ['gestante inválido', { ...BODY, isPregnant: 'sim' }],
+    ['parentesco desconhecido', { ...BODY, relationship: 'VIZINHO' }],
   ])('CT-API-H02: corpo inválido (%s) devolve 400 sem expor valores', async (_nome, body) => {
     const { app } = await withMember();
     const res = await app.handlers.members.create(OWNER, body);

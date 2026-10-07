@@ -26,7 +26,12 @@ describe('endpoints da API', () => {
     });
     const ctx = { baseUrl: TEST_BASE_URL, sessionId: TEST_SESSION, fetchFn: fake.fetchFn };
     const signal = new AbortController().signal;
-    const input = { name: 'Maria', birthDate: '2025-05-20', isPregnant: false };
+    const input = {
+      name: 'Maria',
+      birthDate: '2025-05-20',
+      isPregnant: false,
+      relationship: 'SON' as const,
+    };
 
     await endpoints.getConsent(ctx, signal);
     await endpoints.acceptConsent(ctx, {

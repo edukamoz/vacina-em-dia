@@ -1,4 +1,4 @@
-import type { MemberResponse } from '@vacina/shared';
+import type { MemberResponse, Relationship } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -7,18 +7,20 @@ import { Botao } from '../../components/botao';
 import { CampoTexto } from '../../components/campo-texto';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
+import { Selecao } from '../../components/selecao';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { maskBrDate, parseBrDate, todayCivil } from '../../lib/dates';
 import { useSession } from '../../session/session-provider';
 import { formatCivilDate } from '../doses/format-date';
+import { OPCOES_DE_PARENTESCO } from './parentesco';
 import { useCreateMember, useDeleteMember, useMembers, useUpdateMember } from '../data/hooks';
 
 interface FormProps {
   readonly membro?: MemberResponse;
 }
 
-/** Formulário de pessoa (cadastro e edição): nome ou apelido, nascimento e grupo gestante. */
+/** Formulário de pessoa (cadastro e edição): nome ou apelido, nascimento, parentesco e grupo gestante. */
 function MemberForm({ membro }: FormProps) {
   const router = useRouter();
   const { selectMember } = useSession();
@@ -29,6 +31,7 @@ function MemberForm({ membro }: FormProps) {
   const [nome, setNome] = useState(membro?.name ?? '');
   const [nascimento, setNascimento] = useState(membro ? formatCivilDate(membro.birthDate) : '');
   const [gestante, setGestante] = useState(membro?.isPregnant ?? false);
+  const [parentesco, setParentesco] = useState<Relationship | null>(membro?.relationship ?? null);
   const [tentou, setTentou] = useState(false);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
 
@@ -46,7 +49,7 @@ function MemberForm({ membro }: FormProps) {
     setTentou(true);
     if (nome.trim() === '' || !birthDate || birthDate > todayCivil()) return;
     mutation.mutate(
-      { name: nome.trim(), birthDate, isPregnant: gestante },
+      { name: nome.trim(), birthDate, isPregnant: gestante, relationship: parentesco },
       {
         onSuccess: (salvo) => {
           selectMember(salvo.id);
@@ -80,6 +83,12 @@ function MemberForm({ membro }: FormProps) {
         maxLength={10}
         ajuda="Dia, mês e ano. Exemplo: 20/05/2024."
         erro={erroNascimento}
+      />
+      <Selecao
+        rotulo="Quem é esta pessoa para você?"
+        valor={parentesco}
+        opcoes={OPCOES_DE_PARENTESCO}
+        aoEscolher={setParentesco}
       />
       <Alternar
         rotulo="Esta pessoa está grávida (inclui as vacinas da gestação)"

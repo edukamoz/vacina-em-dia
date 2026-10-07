@@ -102,6 +102,7 @@ describe('família (RF02)', () => {
     });
     await renderScreen(<FamilyScreen />, fake.fetchFn);
     expect(await screen.findByText('16 meses · Criança')).toBeOnTheScreen();
+    expect(screen.getByText('Filha')).toBeOnTheScreen();
     expect(screen.getByText('36 anos · Adulto · gestante')).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ver vacinas de Maria' }));
@@ -187,7 +188,7 @@ describe('formulário de pessoa (RF02)', () => {
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
     expect(fake.calls[0]).toMatchObject({
       key: 'POST /members',
-      body: { name: 'Maria', birthDate: '2025-05-20', isPregnant: true },
+      body: { name: 'Maria', birthDate: '2025-05-20', isPregnant: true, relationship: null },
     });
   });
 
@@ -225,7 +226,26 @@ describe('formulário de pessoa (RF02)', () => {
     expect(fake.calls.find((c) => c.key === 'PUT /members/m-1')?.body).toMatchObject({
       name: 'Maria Clara',
       birthDate: '2025-05-20',
+      relationship: 'DAUGHTER',
     });
+  });
+
+  test('CT-APP-M09: escolhe o parentesco no select, troca e volta a "não informar"', async () => {
+    const fake = createFakeFetch({ 'POST /members': { status: 201, body: MEMBER } });
+    await renderScreen(<NewMemberScreen />, fake.fetchFn);
+    await fireEvent.changeText(screen.getByLabelText('Nome ou apelido'), 'Maria');
+    await fireEvent.changeText(screen.getByLabelText('Data de nascimento'), '20052025');
+    const campo = screen.getByRole('button', {
+      name: /Quem é esta pessoa para você\?: Prefiro não informar/,
+    });
+    await fireEvent.press(campo);
+    expect(screen.getByRole('radio', { name: 'Prefiro não informar' })).toBeChecked();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Avó' }));
+    expect(screen.queryByRole('radio', { name: 'Avô' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /: Avó/ })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar e ver as vacinas' }));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
+    expect(fake.calls[0]?.body).toMatchObject({ relationship: 'GRANDMOTHER' });
   });
 
   test('CT-APP-M05: excluir pede confirmação e só então apaga', async () => {
