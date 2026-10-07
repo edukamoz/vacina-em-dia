@@ -7,7 +7,7 @@ import { Texto } from '../../components/texto';
 import { ChatMessageView } from './chat-message';
 import { useAssistantChat } from './use-assistant-chat';
 import { MAX_RECORDING_SECONDS, VoiceError, type VoiceRecorder } from './voice-types';
-import { createVoiceRecorder, isVoiceSupported } from './voice-recorder';
+import { isVoiceSupported, useVoiceRecorder } from './voice-recorder';
 
 const MAX_LENGTH = 300;
 
@@ -25,6 +25,7 @@ export function AssistantScreen() {
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [segundos, setSegundos] = useState(0);
+  const voiceRecorder = useVoiceRecorder();
   const recorder = useRef<VoiceRecorder | null>(null);
   const scroll = useRef<ScrollView>(null);
   const voiceAvailable = isVoiceSupported();
@@ -58,7 +59,7 @@ export function AssistantScreen() {
     chat.clearError();
     setVoiceError(null);
     try {
-      recorder.current = createVoiceRecorder();
+      recorder.current = voiceRecorder;
       await recorder.current.start();
       setSegundos(0);
       setVoiceState('recording');
@@ -181,8 +182,8 @@ export function AssistantScreen() {
               </View>
               {!voiceAvailable ? (
                 <Texto variante="apoio" className="text-textoSecundario">
-                  A pergunta por voz está disponível no navegador; por enquanto, no celular, digite
-                  a sua pergunta.
+                  A pergunta por voz não está disponível neste navegador (ela exige conexão segura e
+                  microfone). Digite a sua pergunta.
                 </Texto>
               ) : null}
             </View>
