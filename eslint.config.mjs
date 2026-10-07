@@ -35,7 +35,13 @@ export default tseslint.config(
   {
     // Scripts de linha de comando rodam no Node: têm `process` e `console`, e imprimem no terminal.
     files: ['scripts/**/*.mjs'],
-    languageOptions: { globals: { process: 'readonly', console: 'readonly', fetch: 'readonly', performance: 'readonly' },
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        fetch: 'readonly',
+        performance: 'readonly',
+      },
     },
     rules: { 'no-console': 'off' },
   },
