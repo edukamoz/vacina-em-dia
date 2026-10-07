@@ -1,8 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { View } from 'react-native';
 import { ApiRequestError } from '../../api/client';
 import { Botao } from '../../components/botao';
 import { CampoTexto } from '../../components/campo-texto';
+import { LinkTexto } from '../../components/link-texto';
 import { Texto } from '../../components/texto';
 import { useSession } from '../../session/session-provider';
 import { AuthFrame } from './auth-frame';
@@ -72,16 +74,10 @@ export function LoginScreen() {
         disabled={pending}
         onPress={() => void submit()}
       />
-      <Botao
-        titulo="Esqueci minha senha"
-        variante="secundario"
-        onPress={() => router.push('/esqueci-senha')}
-      />
-      <Botao
-        titulo="Criar conta"
-        variante="secundario"
-        onPress={() => router.replace('/criar-conta')}
-      />
+      <View>
+        <LinkTexto titulo="Esqueci minha senha" onPress={() => router.push('/esqueci-senha')} />
+        <LinkTexto titulo="Criar conta" onPress={() => router.replace('/criar-conta')} />
+      </View>
     </AuthFrame>
   );
 }
