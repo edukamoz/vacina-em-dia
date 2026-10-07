@@ -133,6 +133,7 @@ export const MEMBER: MemberResponse = {
   name: 'Maria',
   birthDate: '2025-05-20',
   isPregnant: false,
+  relationship: 'DAUGHTER',
   ageGroup: 'CHILD',
 };
 
@@ -141,6 +142,7 @@ export const OTHER_MEMBER: MemberResponse = {
   name: 'João',
   birthDate: '1990-01-10',
   isPregnant: false,
+  relationship: null,
   ageGroup: 'ADULT',
 };
 

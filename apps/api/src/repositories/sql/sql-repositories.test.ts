@@ -68,6 +68,7 @@ describe('repositórios SQL', () => {
       name: hostile,
       birthDate: '2024-01-01',
       isPregnant: false,
+      relationship: null,
     });
     await repos.members.get(hostile, hostile);
     await repos.auth.findAccountByEmail(hostile);
