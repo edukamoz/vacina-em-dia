@@ -14,7 +14,8 @@ const DICA: Readonly<Record<DoseStatus, string>> = {
   CANCELLED: 'Não é mais necessária',
 };
 
-const FAIXA: Readonly<Record<DoseStatus, string>> = {
+/** Classe da faixa lateral de cada estado (usada nos cartões de dose e do histórico). */
+export const FAIXA_POR_ESTADO: Readonly<Record<DoseStatus, string>> = {
   PENDING: 'bg-pendente',
   SCHEDULED: 'bg-agendada',
   OVERDUE: 'bg-atrasada',
@@ -66,7 +67,7 @@ export function doseDateRow(
 export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () => void }) {
   const conteudo = (
     <Cartao className="flex-row overflow-hidden p-0">
-      <View className={`w-[6px] ${FAIXA[dose.status]}`} />
+      <View className={`w-[6px] ${FAIXA_POR_ESTADO[dose.status]}`} />
       <View className="flex-1 gap-sm p-lg">
         <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
         <Texto variante="apoio" className="text-textoSecundario">

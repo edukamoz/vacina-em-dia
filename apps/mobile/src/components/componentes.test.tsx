@@ -136,16 +136,19 @@ describe('estados', () => {
 });
 
 describe('SeletorDeTema', () => {
-  test('CT-TEMA-04: marca o tema em uso e troca ao tocar', async () => {
+  test('CT-TEMA-04: marca a escolha de tema (inclusive seguir o aparelho) e troca ao tocar', async () => {
     await render(
       <ThemeProvider initialPreference="light">
         <SeletorDeTema />
       </ThemeProvider>,
     );
-    expect(screen.getByRole('button', { name: 'Claro' })).toBeSelected();
-    await fireEvent.press(screen.getByRole('button', { name: 'Escuro' }));
-    expect(screen.getByRole('button', { name: 'Escuro' })).toBeSelected();
-    expect(screen.getByRole('button', { name: 'Claro' })).not.toBeSelected();
+    expect(screen.getByRole('radio', { name: 'Claro' })).toBeChecked();
+    await fireEvent.press(screen.getByRole('radio', { name: 'Escuro' }));
+    expect(screen.getByRole('radio', { name: 'Escuro' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Claro' })).not.toBeChecked();
+    expect(screen.getAllByRole('radio')).toHaveLength(4);
+    await fireEvent.press(screen.getByRole('radio', { name: 'Seguir o aparelho' }));
+    expect(screen.getByRole('radio', { name: 'Seguir o aparelho' })).toBeChecked();
   });
 });
 

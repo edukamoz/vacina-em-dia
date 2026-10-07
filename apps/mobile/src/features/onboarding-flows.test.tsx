@@ -296,7 +296,10 @@ describe('conta (RF09)', () => {
     const fake = createFakeFetch({ 'GET /consent': { status: 200, body: ACCEPTED } });
     await renderScreen(<AccountScreen />, fake.fetchFn);
     expect(await screen.findByText(/versão 2026-10-06/)).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Escuro' })).toBeOnTheScreen();
+    expect(screen.getByRole('radio', { name: 'Escuro' })).toBeOnTheScreen();
+    expect(screen.getByRole('radio', { name: 'Seguir o aparelho' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Seus dados' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Tema' })).toBeOnTheScreen();
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
   });
 
@@ -312,16 +315,12 @@ describe('conta (RF09)', () => {
       'DELETE /account': { status: 204 },
     });
     await renderScreen(<AccountScreen />, fake.fetchFn);
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Excluir minha conta e todos os dados' }),
-    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
     expect(fake.calls.some((c) => c.key === 'DELETE /account')).toBe(false);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Não, voltar' }));
     expect(screen.queryByText('Excluir tudo?')).not.toBeOnTheScreen();
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Excluir minha conta e todos os dados' }),
-    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Sim, excluir tudo' }));
     await waitFor(() => expect(fake.calls.some((c) => c.key === 'DELETE /account')).toBe(true));
   });
@@ -332,9 +331,7 @@ describe('conta (RF09)', () => {
       'DELETE /account': { status: 500, body: undefined },
     });
     await renderScreen(<AccountScreen />, fake.fetchFn);
-    await fireEvent.press(
-      screen.getByRole('button', { name: 'Excluir minha conta e todos os dados' }),
-    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Sim, excluir tudo' }));
     expect(await screen.findByText(/O servidor não conseguiu responder/)).toBeOnTheScreen();
     expect(mockReplace).not.toHaveBeenCalled();
