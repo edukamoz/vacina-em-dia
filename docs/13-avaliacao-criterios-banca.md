@@ -20,7 +20,7 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 | 14 | Teste da aplicação e tabela de execução | QTS | Testes automatizados (541 TS + 162 Python); sem tabela de execução | 2 | Casos de caixa preta (partição e valor limite) e tabela de execução com resultado real |
 | 15 | UML de estados de uma funcionalidade | QTS | `docs/03-uml/estados-dose.md` (5 estados, 12 transições) | 5 | Nada essencial |
 | 16 | Casos de teste (estados, transições, sequências) | QTS | 42 casos em `docs/07-testes/casos-teste-estados-dose.md`, automatizados | 4 | Gerar a tabela de execução a partir do Jest (resultado real) |
-| 17 | **PLN: sistema de busca semântica (0–20)** | PLN | Busca TF-IDF + cosseno; chatbot TF-IDF + SVM; voz | 12 | Ver §1 |
+| 17 | **PLN: sistema de busca semântica (0–20)** | PLN | **Feito em 07/10/2026:** busca por n-gramas de caracteres + LSA sobre documentos enriquecidos, com avaliação em 63 consultas (acerto na 1ª posição de 68,3% para 88,9%); voz com Azure AI Speech; chatbot TF-IDF + SVM (F1 macro 0,93). Relatório honesto: o LSA isolado tem efeito pequeno | 15 | Revisão das consultas de teste; embeddings só com custo aprovado |
 
 Soma estimada: cerca de **51 de 100**. Os maiores ganhos por esforço: Bicep, AWS→Azure e custos (15 pontos hoje zerados ou quase), a tabela de execução (3), e a busca semântica (até 8).
 
