@@ -17,9 +17,11 @@
     "@asteasolutions/zod-to-openapi": "9.1.0",
     "@azure/functions": "4.16.5",
     "@vacina/shared": "0.1.0",
+    "mssql": "12.7.4",
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@types/mssql": "12.3.0",
     "azure-functions-core-tools": "4.15.2"
   }
 }
