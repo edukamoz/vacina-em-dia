@@ -12,22 +12,30 @@ import { Texto } from './texto';
  * @param props.titulo - Título da tela.
  * @param props.subtitulo - Frase de apoio abaixo do título.
  * @param props.voltar - Mostra o botão "Voltar" (telas fora das abas).
+ * @param props.reservaBalao - Deixa espaço no fim para o balão do assistente não cobrir o conteúdo
+ *   (telas das abas).
  */
 export function Tela({
   titulo,
   subtitulo,
   voltar = false,
+  reservaBalao = false,
   children,
 }: {
   titulo: string;
   subtitulo?: string;
   voltar?: boolean;
+  reservaBalao?: boolean;
   children: ReactNode;
 }) {
   const router = useRouter();
   return (
     <SafeAreaView className="flex-1 bg-fundo">
-      <ScrollView contentContainerClassName="gap-lg p-lg medio:p-xl expandido:p-xxl self-center w-full max-w-conteudo">
+      <ScrollView
+        contentContainerClassName={`gap-lg p-lg medio:p-xl expandido:p-xxl self-center w-full max-w-conteudo ${
+          reservaBalao ? 'pb-[96px]' : ''
+        }`}
+      >
         {voltar ? (
           <Botao
             titulo="Voltar"

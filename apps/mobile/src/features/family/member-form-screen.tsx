@@ -51,7 +51,7 @@ function MemberForm({ membro }: FormProps) {
         onSuccess: (salvo) => {
           selectMember(salvo.id);
           if (membro) router.back();
-          else router.replace('/calendario');
+          else router.replace('/');
         },
       },
     );

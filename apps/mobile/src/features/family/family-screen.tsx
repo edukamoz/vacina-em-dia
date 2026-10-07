@@ -30,7 +30,11 @@ export function FamilyScreen() {
   const today = todayCivil();
 
   return (
-    <Tela titulo="Sua família" subtitulo="Escolha uma pessoa para ver as vacinas dela.">
+    <Tela
+      reservaBalao
+      titulo="Sua família"
+      subtitulo="Escolha uma pessoa para ver as vacinas dela."
+    >
       {isPending && <EstadoCarregando rotulo="Carregando a família" />}
       {error && <EstadoErro mensagem={error.message} onTentarDeNovo={() => void refetch()} />}
       {data && data.items.length === 0 && (
@@ -57,7 +61,7 @@ export function FamilyScreen() {
                   variante="secundario"
                   onPress={() => {
                     selectMember(membro.id);
-                    router.push('/calendario');
+                    router.push('/');
                   }}
                 />
                 <Botao

@@ -1,16 +1,22 @@
 import { Link, usePathname } from 'expo-router';
 import { Pressable, useWindowDimensions, View } from 'react-native';
 import { modoDeLayout } from '../lib/layout';
+import { useThemeColors } from '../theme/theme-provider';
+import { Icone, type NomeDoIcone } from './icone';
 import { Texto } from './texto';
 
 /** Abas do app, na ordem de exibição. O caminho é o da rota dentro de `app/(tabs)`. */
 export const ABAS = [
-  { name: 'index', caminho: '/', titulo: 'Família', icone: '⌂' },
-  { name: 'calendario', caminho: '/calendario', titulo: 'Calendário', icone: '▦' },
-  { name: 'assistente', caminho: '/assistente', titulo: 'Assistente', icone: '✉' },
-  { name: 'historico', caminho: '/historico', titulo: 'Histórico', icone: '☰' },
-  { name: 'conta', caminho: '/conta', titulo: 'Conta', icone: '☺' },
-] as const;
+  { name: 'index', caminho: '/', titulo: 'Doses', icone: 'doses' },
+  { name: 'familia', caminho: '/familia', titulo: 'Família', icone: 'familia' },
+  { name: 'historico', caminho: '/historico', titulo: 'Histórico', icone: 'historico' },
+  { name: 'conta', caminho: '/conta', titulo: 'Conta', icone: 'conta' },
+] as const satisfies readonly {
+  name: string;
+  caminho: string;
+  titulo: string;
+  icone: NomeDoIcone;
+}[];
 
 /**
  * Navegação principal, que muda de forma conforme a largura (`docs/04-design-system.md`, 2.5):
@@ -27,6 +33,7 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
   const modo = modoDeLayout(largura ?? janela);
   const lateral = modo !== 'compacto';
   const expandido = modo === 'expandido';
+  const cores = useThemeColors();
 
   return (
     <View
@@ -65,13 +72,7 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
                     : 'flex-1 gap-xs px-xs py-sm'
                 } ${ativa ? 'bg-primariaSuave' : ''}`}
               >
-                <Texto
-                  variante="titulo3"
-                  className={ativa ? 'text-primaria' : 'text-textoSecundario'}
-                  importantForAccessibility="no"
-                >
-                  {icone}
-                </Texto>
+                <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />
                 <Texto
                   variante={ativa ? 'corpoNegrito' : 'corpo'}
                   className={ativa ? 'text-primaria' : 'text-texto'}

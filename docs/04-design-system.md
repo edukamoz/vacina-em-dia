@@ -136,11 +136,11 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 | Entrar e criar conta | RF01 | Uma coluna, botão de largura total | Duas colunas: lateral de 560 com a marca e formulário de 440 (implementado em 07/10/2026, ver `docs/14-login-proprio.md`) |
 | Consentimento | RF09 | Texto em linguagem simples, botão "Aceito" | Mesmo, em coluna de leitura |
 | Início: pessoas da família | RF02 | Lista de cartões de membro | Grade de cartões ao lado da barra lateral |
-| Calendário do membro | RF03 e RF04 | Lista de cartões de dose, mais atrasadas primeiro | Duas colunas, filtro por estado |
+| Doses | RF03 e RF04 | Cartões de dose em três grupos ("Precisam de atenção", "Próximas", "Aplicadas", até 5 aplicadas), "Trocar pessoa" leva à Família | Duas colunas |
 | Detalhe da dose | RF04 | Ações: agendar, registrar aplicação, cancelar | Painel ao lado da lista |
 | Histórico | RF08 | Doses aplicadas por data | Tabela simples com cabeçalhos |
 | Perguntar por voz | RF06 | Botão grande de voz e resultado | Mesmo, com atalho de teclado |
-| Assistente (chatbot) | RF07 | Conversa com respostas e fonte | Coluna central |
+| Assistente (chatbot) | RF07 | Conversa com respostas e fonte; abre pelo **balão flutuante** no canto inferior direito de todas as abas (fora da barra de navegação) | Coluna central |
 | Conta e privacidade | RF09 | Exportar e **excluir conta** com confirmação | Mesmo |
 
 ## 5. Acessibilidade: checklist (RNF04)
@@ -172,7 +172,7 @@ Estados de carregando, erro e vazio já existem (`src/components/estados.tsx`) e
 
 Lição de implementação: duas classes de cor no mesmo elemento (por exemplo `text-texto` e `text-sobrePrimaria`) disputam pela ordem do CSS gerado, não pela ordem escrita. O componente Texto só aplica a cor padrão quando quem chama não escolheu outra. Contraste dos botões verificado no navegador nos três temas (mínimo de 6,5:1).
 
-Limitações conhecidas: os ícones do selo são símbolos de texto (sem biblioteca de ícones); o aviso de "texto a 200%" e o teste com leitores de tela ainda precisam ser feitos à mão.
+Navegação: quatro abas (Doses, Família, Histórico, Conta), como no design de referência. Os ícones são SVG próprios (`src/components/icone.tsx`), sem biblioteca externa. Limitações conhecidas: o aviso de "texto a 200%" e o teste com leitores de tela ainda precisam ser feitos à mão.
 
 As versões exatas de NativeWind, Expo e da fonte estão em `docs/tech-versions.md`.
 
