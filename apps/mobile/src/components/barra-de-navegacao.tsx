@@ -2,6 +2,7 @@ import { Link, usePathname } from 'expo-router';
 import { Pressable, useWindowDimensions, View } from 'react-native';
 import { modoDeLayout } from '../lib/layout';
 import { useThemeColors } from '../theme/theme-provider';
+import { Logo } from '../features/auth/logo';
 import { Icone, type NomeDoIcone } from './icone';
 import { Texto } from './texto';
 
@@ -41,22 +42,17 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
       accessibilityLabel="Menu principal"
       className={
         lateral
-          ? `border-r-padrao border-borda bg-superficie py-lg ${expandido ? 'w-[248px] px-md' : 'w-[96px] px-xs'}`
+          ? `border-r-padrao border-borda bg-superficie ${expandido ? 'w-[248px] gap-xxl px-lg py-xl' : 'w-[96px] px-xs py-lg'}`
           : 'min-h-[64px] flex-row border-t-padrao border-borda bg-superficie'
       }
     >
       {expandido ? (
-        <View className="gap-xs px-sm pb-lg">
-          <Texto variante="titulo3" accessibilityRole="header">
-            Vacina em Dia
-          </Texto>
-          <Texto variante="apoio" className="text-textoSecundario">
-            Carteira de vacinação da família
-          </Texto>
+        <View className="px-sm">
+          <Logo />
         </View>
       ) : null}
 
-      <View className={lateral ? 'gap-xs' : 'flex-1 flex-row'}>
+      <View className={lateral ? 'gap-sm' : 'flex-1 flex-row'}>
         {ABAS.map(({ caminho, titulo, icone }) => {
           const ativa = pathname === caminho;
           return (
@@ -66,10 +62,10 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
                 accessibilityLabel={titulo}
                 accessibilityState={{ selected: ativa }}
                 aria-current={ativa ? 'page' : undefined}
-                className={`min-h-toque items-center justify-center rounded-botao hover:bg-primariaSuave ${
+                className={`items-center justify-center hover:bg-primariaSuave ${
                   lateral && expandido
-                    ? 'flex-row justify-start gap-md px-md py-md'
-                    : 'flex-1 gap-xs px-xs py-sm'
+                    ? 'min-h-principal flex-row justify-start gap-md rounded-cartao px-lg'
+                    : 'min-h-toque flex-1 gap-xs rounded-botao px-xs py-sm'
                 } ${ativa ? 'bg-primariaSuave' : ''}`}
               >
                 <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />
@@ -86,14 +82,6 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
           );
         })}
       </View>
-
-      {expandido ? (
-        <View className="mt-auto px-sm pt-lg">
-          <Texto variante="apoio" className="text-textoSecundario">
-            Projeto acadêmico, versão de demonstração.
-          </Texto>
-        </View>
-      ) : null}
     </View>
   );
 }

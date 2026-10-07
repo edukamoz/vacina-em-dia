@@ -182,7 +182,7 @@ A seção 2.5 está implementada no app (`src/lib/layout.ts`, `src/components/ba
 
 - **Compacto** (menos de 600 px): barra de abas **embaixo**, uma coluna.
 - **Médio** (600 a 1023 px): barra **lateral compacta** de 96 px (ícone e texto), uma coluna.
-- **Expandido** (1024 px ou mais): barra **lateral fixa** de 248 px, com nome do app, texto de cada item e aviso de demonstração; conteúdo com no máximo 960 px, margem de 32 px e **listas de cartões em duas colunas**.
+- **Expandido** (1024 px ou mais): barra **lateral fixa** de 248 px, com o logo e o texto de cada item (itens de 56 px, raio 12); conteúdo com no máximo 960 px **mais** a margem de 32 px de cada lado, espaço de 32 px entre blocos (24 px no celular), **ação principal à direita do título** e **listas de cartões em duas colunas** com 16 px de espaço.
 - Cada item de navegação é um **link** de verdade (`role=link`, `aria-current=page` na página atual), com destaque que não depende só da cor e estado de passar o mouse.
 - Verificado no navegador em 390, 800 e 1280 px. Ao arrastar a janela, o navegador avisa o app do novo tamanho; nas telas de celular e tablet o layout é decidido pela largura na carga e a cada redimensionamento.
 

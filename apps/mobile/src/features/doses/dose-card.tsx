@@ -68,7 +68,7 @@ export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () =
     <Cartao className="flex-row overflow-hidden p-0">
       <View className={`w-[6px] ${FAIXA[dose.status]}`} />
       <View className="flex-1 gap-sm p-lg">
-        <Texto variante="corpoNegrito">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
+        <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
         <Texto variante="apoio" className="text-textoSecundario">
           {dose.timingLabel}
           {dose.conditional ? ' · depende de condições' : ''}
