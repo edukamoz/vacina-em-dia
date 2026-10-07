@@ -10,6 +10,7 @@ Os dados passam a viver no Azure SQL (ADR-004), com a API sem senha de banco (AD
 | Repositórios SQL (contas, tokens, consentimento, membros, doses) | Prontos; mesmos testes de contrato dos repositórios em memória |
 | Usuário do banco para a identidade gerenciada da API | Criado (leitura e escrita), por `scripts/db-migrate.mjs` |
 | Ligado na API do Azure (`SQL_SERVER` e `SQL_DATABASE`) | **Não**: a sessão de demonstração do app atual quebraria (ver abaixo) |
+| Migração `002-redefinicao-de-senha.sql` (tabela `password_reset_token`) | Aplicada em 07/10/2026 |
 | Histórico de eventos da dose (`dose_event`), lembretes e dispositivos push | Não existem ainda (SCRUM-19) |
 
 ## Esquema implementado
@@ -28,6 +29,7 @@ Resumo; o modelo completo planejado está em `docs/03-uml/der.md` e `dicionario-
 | `refresh_token` | `token_hash` (SHA-256), `account_id`, `expires_at`, `revoked_at` |
 | `consent` | `account_id`, `term_version`, `accepted_at`, `guardian_declaration` |
 | `member` | `id`, `account_id`, `display_name`, `birth_date`, `is_pregnant`, `seq` |
+| `password_reset_token` | `token_hash` (SHA-256), `account_id`, `expires_at`, `used_at` |
 | `dose` | `id`, `member_id`, `rule_id`, `status` (CHECK nos 5 estados), `due_date`, `scheduled_date`, `applied_date`, `seq` |
 
 Excluir a conta apaga tudo em cascata (RF09). A propriedade é conferida em toda consulta: membros por `account_id`, doses pela junção com o membro do dono.

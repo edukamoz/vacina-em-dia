@@ -42,6 +42,8 @@ function Rotas() {
         <Stack.Screen name="apresentacao" />
         <Stack.Screen name="entrar" />
         <Stack.Screen name="criar-conta" />
+        <Stack.Screen name="esqueci-senha" />
+        <Stack.Screen name="redefinir-senha" />
       </Stack.Protected>
     </Stack>
   );

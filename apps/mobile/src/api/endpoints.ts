@@ -10,8 +10,10 @@ import {
   memberResponseSchema,
   type AssistantMessageInput,
   type ConsentInput,
+  type ForgotPasswordInput,
   type LoginInput,
   type RegisterInput,
+  type ResetPasswordInput,
   type DoseEventInput,
   type MemberInput,
 } from '@vacina/shared';
@@ -48,6 +50,22 @@ export const endpoints = {
       path: '/auth/logout',
       method: 'POST',
       body: { refreshToken },
+      anonymous: true,
+    }),
+
+  forgotPassword: (ctx: ApiContext, input: ForgotPasswordInput) =>
+    apiRequestNoContent(ctx, {
+      path: '/auth/forgot-password',
+      method: 'POST',
+      body: input,
+      anonymous: true,
+    }),
+
+  resetPassword: (ctx: ApiContext, input: ResetPasswordInput) =>
+    apiRequestNoContent(ctx, {
+      path: '/auth/reset-password',
+      method: 'POST',
+      body: input,
       anonymous: true,
     }),
 

@@ -64,6 +64,11 @@ export function toErrorResult(error: ServiceError): HttpResult {
         code: 'INVALID_TOKEN',
         message: 'Sua sessão terminou. Entre de novo.',
       });
+    case 'INVALID_RESET_TOKEN':
+      return json(400, {
+        code: 'INVALID_RESET_TOKEN',
+        message: 'Este link não vale mais. Peça uma nova senha para receber outro.',
+      });
     case 'AUTH_UNAVAILABLE':
       return json(503, {
         code: 'AUTH_UNAVAILABLE',
@@ -93,8 +98,12 @@ export function toErrorResult(error: ServiceError): HttpResult {
   }
 }
 
-function rateLimitedMessage(scope: 'assistant' | 'login' | 'register' | undefined): string {
+function rateLimitedMessage(
+  scope: 'assistant' | 'login' | 'register' | 'reset' | undefined,
+): string {
   switch (scope) {
+    case 'reset':
+      return 'Muitos pedidos de nova senha. Tente de novo mais tarde.';
     case 'login':
       return 'Muitas tentativas de entrar. Aguarde um pouco e tente de novo.';
     case 'register':

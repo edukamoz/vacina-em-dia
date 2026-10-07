@@ -38,6 +38,26 @@ export const loginInputSchema = z
   })
   .meta({ id: 'LoginInput' });
 
+/** Pedido de recuperação de senha: o e-mail da conta. */
+export const forgotPasswordInputSchema = z
+  .object({ email: emailField })
+  .meta({ id: 'ForgotPasswordInput' });
+
+/** Nova senha, com o token recebido por e-mail. */
+export const resetPasswordInputSchema = z
+  .object({
+    token: z.string().min(20).max(200).meta({ description: 'Token do link recebido por e-mail.' }),
+    password: z
+      .string()
+      .min(PASSWORD_MIN_LENGTH, 'A senha precisa de pelo menos 8 caracteres.')
+      .max(PASSWORD_MAX_LENGTH)
+      .meta({
+        example: 'outra frase longa e boa',
+        description: 'Nova senha de 8 a 128 caracteres.',
+      }),
+  })
+  .meta({ id: 'ResetPasswordInput' });
+
 /** Renovação ou encerramento da sessão: o token de renovação recebido no login. */
 export const refreshInputSchema = z
   .object({
@@ -72,6 +92,10 @@ export const authSessionSchema = z
   })
   .meta({ id: 'AuthSession' });
 
+/** Pedido de recuperação de senha. */
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordInputSchema>;
+/** Redefinição de senha. */
+export type ResetPasswordInput = z.infer<typeof resetPasswordInputSchema>;
 /** Cadastro. */
 export type RegisterInput = z.infer<typeof registerInputSchema>;
 /** Login. */

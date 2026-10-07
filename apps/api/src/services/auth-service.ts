@@ -1,11 +1,19 @@
-import type { AuthSession, LoginInput, RegisterInput } from '@vacina/shared';
+import type {
+  AuthSession,
+  ForgotPasswordInput,
+  LoginInput,
+  RegisterInput,
+  ResetPasswordInput,
+} from '@vacina/shared';
 import type { Clock } from '../clock';
 import type { AuthRepository, StoredAccount } from '../repositories/repositories';
 import type { RateLimiter } from './assistant-ports';
+import type { EmailClient } from './email-ports';
 import { failure, success, type Result } from './errors';
 import { createFailureThrottle, throttleKey, type FailureThrottle } from './failure-throttle';
 import type { PasswordHasher } from './password-hasher';
 import { isWeakPassword } from './password-policy';
+import { buildPasswordResetEmail, RESET_TOKEN_TTL_MINUTES } from './password-reset-email';
 import type { TokenService } from './token-service';
 
 /** De onde vem a requisição: usado só para limitar abusos; nunca é guardado nem registrado. */
@@ -22,6 +30,13 @@ export interface AuthService {
   login(input: LoginInput, origin: RequestOrigin): Promise<Result<AuthSession>>;
   /** Troca um token de renovação por uma sessão nova (rotação: o antigo deixa de valer). */
   refresh(refreshToken: string): Promise<Result<AuthSession>>;
+  /**
+   * Pede a recuperação de senha. A resposta é a mesma exista a conta ou não (não revela quais
+   * e-mails têm conta); se existir, envia o link por e-mail. Limitado por e-mail e por origem.
+   */
+  requestPasswordReset(input: ForgotPasswordInput, origin: RequestOrigin): Promise<Result<void>>;
+  /** Cria a nova senha com o token do e-mail (uso único, validade de 1 hora) e encerra todas as sessões. */
+  resetPassword(input: ResetPasswordInput): Promise<Result<void>>;
   /** Encerra a sessão revogando o token de renovação. Idempotente: nunca falha. */
   logout(refreshToken: string): Promise<void>;
   /** Devolve o id da conta dona do token de acesso, ou `undefined` se não for válido. */
@@ -43,6 +58,12 @@ export interface AuthServiceDeps {
   readonly emailThrottle?: FailureThrottle;
   /** Falhas de login por origem; por padrão 20 a cada 15 minutos. */
   readonly ipThrottle?: FailureThrottle;
+  /** Envio de e-mail (recuperação de senha). Sem ele, o pedido é aceito mas nada é enviado. */
+  readonly email?: EmailClient;
+  /** Endereço do app web, usado no link do e-mail. */
+  readonly webBaseUrl?: string;
+  /** Registra uma falha de envio de e-mail, só com o tipo (nunca endereço ou conteúdo). */
+  readonly reportError?: (kind: string) => void;
   /** Máximo de contas; passou disso o cadastro é recusado. */
   readonly maxAccounts?: number;
   /** Quantas contas existem agora (para aplicar o máximo). */
@@ -50,6 +71,8 @@ export interface AuthServiceDeps {
 }
 
 const LOGIN_WINDOW_SECONDS = 15 * 60;
+const RESET_EMAIL_RULE = { name: 'reset-email', limit: 3, windowSeconds: 60 * 60 } as const;
+const RESET_IP_RULE = { name: 'reset-ip', limit: 10, windowSeconds: 60 * 60 } as const;
 const REGISTER_RULE = { name: 'register', limit: 10, windowSeconds: 60 * 60 } as const;
 
 /** Normaliza o e-mail: sem espaços nas pontas e em minúsculas. */
@@ -169,6 +192,59 @@ export function createAuthService(deps: AuthServiceDeps): AuthService {
       if (!account) return failure({ code: 'INVALID_TOKEN' });
       await deps.accounts.revokeRefreshToken(hash, now);
       return success(await openSession(account));
+    },
+
+    async requestPasswordReset(input, origin) {
+      const email = normalizeEmail(input.email);
+      const byEmail = await deps.limiter.consume(`email:${throttleKey(email)}`, [RESET_EMAIL_RULE]);
+      const byIp = await deps.limiter.consume(`ip:${throttleKey(origin.ip)}`, [RESET_IP_RULE]);
+      const limited = [byEmail, byIp].find((decision) => !decision.allowed);
+      if (limited && !limited.allowed) {
+        return failure({
+          code: 'RATE_LIMITED',
+          scope: 'reset',
+          retryAfterSeconds: limited.retryAfterSeconds,
+        });
+      }
+
+      const account = await deps.accounts.findAccountByEmail(email);
+      if (!account || !deps.email || !deps.webBaseUrl) return success(undefined);
+      const reset = deps.tokens.newRefreshToken();
+      const expiresAt = new Date(
+        Date.parse(deps.clock()) + RESET_TOKEN_TTL_MINUTES * 60 * 1000,
+      ).toISOString();
+      await deps.accounts.savePasswordResetToken({
+        tokenHash: reset.hash,
+        accountId: account.id,
+        expiresAt,
+      });
+      try {
+        await deps.email.send(buildPasswordResetEmail(account.email, deps.webBaseUrl, reset.token));
+      } catch {
+        // Não revela ao cliente (que existe conta); só o tipo da falha vai para o registro.
+        deps.reportError?.('PASSWORD_RESET_EMAIL_FAILED');
+      }
+      return success(undefined);
+    },
+
+    async resetPassword(input) {
+      const hash = deps.tokens.hashRefreshToken(input.token);
+      const stored = await deps.accounts.findPasswordResetToken(hash);
+      const now = deps.clock();
+      if (!stored || stored.usedAt || Date.parse(stored.expiresAt) <= Date.parse(now)) {
+        return failure({ code: 'INVALID_RESET_TOKEN' });
+      }
+      const account = await deps.accounts.findAccountById(stored.accountId);
+      if (!account) return failure({ code: 'INVALID_RESET_TOKEN' });
+      if (isWeakPassword(input.password, account.email)) return failure({ code: 'WEAK_PASSWORD' });
+      // Uso único: só quem marcar o token primeiro continua (protege contra dois pedidos ao mesmo tempo).
+      if (!(await deps.accounts.consumePasswordResetToken(hash, now))) {
+        return failure({ code: 'INVALID_RESET_TOKEN' });
+      }
+      await deps.accounts.updatePasswordHash(account.id, await deps.hasher.hash(input.password));
+      await deps.accounts.revokeAllRefreshTokens(account.id, now);
+      emailThrottle.reset(`email:${throttleKey(account.email)}`);
+      return success(undefined);
     },
 
     async logout(refreshToken) {
