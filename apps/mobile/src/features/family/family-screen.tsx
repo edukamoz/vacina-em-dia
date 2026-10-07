@@ -1,15 +1,17 @@
-import type { MemberResponse } from '@vacina/shared';
+import type { DoseResponse, DoseStatus, MemberResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
-import { View } from 'react-native';
+import { Pressable } from 'react-native';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
 import { Grade } from '../../components/grade';
+import { LinkTexto } from '../../components/link-texto';
+import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { describeAge, todayCivil } from '../../lib/dates';
 import { useSession } from '../../session/session-provider';
-import { useMembers } from '../data/hooks';
+import { useDosesOfMembers, useMembers } from '../data/hooks';
 
 /** Rótulo de cada faixa etária, em linguagem simples. */
 export const GRUPO_ROTULO: Readonly<Record<MemberResponse['ageGroup'], string>> = {
@@ -19,64 +21,96 @@ export const GRUPO_ROTULO: Readonly<Record<MemberResponse['ageGroup'], string>> 
   ELDERLY: 'Idoso',
 };
 
+/** Resumo de uma pessoa para o selo do cartão: o estado que dá a cor e o texto. */
+export interface ResumoDaPessoa {
+  readonly status: DoseStatus;
+  readonly rotulo: string;
+}
+
 /**
- * Aba "Família" (RF02): as pessoas cadastradas, com atalho para a carteira de cada uma, e o botão
- * de adicionar. É a porta de entrada do app depois do consentimento.
+ * Resume as doses de uma pessoa em uma frase com cor: atrasadas primeiro (pedem ação), depois
+ * agendadas e, se não houver nenhuma das duas, "Nenhuma dose atrasada". Não diz "em dia" porque
+ * doses "conforme histórico vacinal" continuam abertas até a pessoa conferir a caderneta.
+ */
+export function resumoDaPessoa(doses: readonly Pick<DoseResponse, 'status'>[]): ResumoDaPessoa {
+  const conta = (status: DoseStatus) => doses.filter((dose) => dose.status === status).length;
+  const atrasadas = conta('OVERDUE');
+  if (atrasadas > 0) {
+    return {
+      status: 'OVERDUE',
+      rotulo: `${atrasadas} ${atrasadas === 1 ? 'dose atrasada' : 'doses atrasadas'}`,
+    };
+  }
+  const agendadas = conta('SCHEDULED');
+  if (agendadas > 0) {
+    return {
+      status: 'SCHEDULED',
+      rotulo: `${agendadas} ${agendadas === 1 ? 'dose agendada' : 'doses agendadas'}`,
+    };
+  }
+  return { status: 'APPLIED', rotulo: 'Nenhuma dose atrasada' };
+}
+
+/**
+ * Aba "Família" (RF02): as pessoas cadastradas, cada uma com o resumo das doses; tocar no cartão
+ * abre as doses da pessoa. O botão de adicionar fica no alto, como no design.
  */
 export function FamilyScreen() {
   const router = useRouter();
   const { selectMember } = useSession();
   const { data, error, isPending, refetch } = useMembers();
   const today = todayCivil();
+  const pessoas = data?.items ?? [];
+  const doses = useDosesOfMembers(pessoas.map((pessoa) => pessoa.id));
 
   return (
-    <Tela
-      reservaBalao
-      titulo="Sua família"
-      subtitulo="Escolha uma pessoa para ver as vacinas dela."
-    >
+    <Tela reservaBalao titulo="Família">
+      <Botao titulo="Adicionar pessoa" icone="mais" onPress={() => router.push('/membro/novo')} />
       {isPending && <EstadoCarregando rotulo="Carregando a família" />}
       {error && <EstadoErro mensagem={error.message} onTentarDeNovo={() => void refetch()} />}
-      {data && data.items.length === 0 && (
+      {data && pessoas.length === 0 && (
         <EstadoVazio
           titulo="Ninguém cadastrado ainda"
           descricao="Adicione você, seu filho ou outra pessoa da família para ver o calendário de vacinas."
         />
       )}
-      {data && data.items.length > 0 && (
+      {pessoas.length > 0 && (
         <Grade>
-          {data.items.map((membro) => (
-            <Cartao key={membro.id} className="gap-md">
-              <Texto variante="titulo3" accessibilityRole="header">
-                {membro.name}
-              </Texto>
-              <Texto className="text-textoSecundario">
-                {`${describeAge(membro.birthDate, today)} · ${GRUPO_ROTULO[membro.ageGroup]}${
-                  membro.isPregnant ? ' · gestante' : ''
-                }`}
-              </Texto>
-              <View className="gap-sm">
-                <Botao
-                  titulo={`Ver vacinas de ${membro.name}`}
-                  variante="secundario"
+          {pessoas.map((membro, indice) => {
+            const lista = doses[indice]?.data?.items;
+            const resumo = lista ? resumoDaPessoa(lista) : null;
+            return (
+              <Cartao key={membro.id} className="gap-sm">
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Ver vacinas de ${membro.name}`}
                   onPress={() => {
                     selectMember(membro.id);
                     router.push('/');
                   }}
-                />
-                <Botao
+                  className="gap-sm"
+                >
+                  <Texto variante="titulo3" importantForAccessibility="no">
+                    {membro.name}
+                  </Texto>
+                  <Texto className="text-textoSecundario" importantForAccessibility="no">
+                    {`${describeAge(membro.birthDate, today)} · ${GRUPO_ROTULO[membro.ageGroup]}${
+                      membro.isPregnant ? ' · gestante' : ''
+                    }`}
+                  </Texto>
+                  {resumo ? <SeloEstadoDose status={resumo.status} rotulo={resumo.rotulo} /> : null}
+                </Pressable>
+                <LinkTexto
                   titulo={`Editar ${membro.name}`}
-                  variante="secundario"
                   onPress={() =>
                     router.push({ pathname: '/membro/[id]', params: { id: membro.id } })
                   }
                 />
-              </View>
-            </Cartao>
-          ))}
+              </Cartao>
+            );
+          })}
         </Grade>
       )}
-      <Botao titulo="Adicionar pessoa" onPress={() => router.push('/membro/novo')} />
     </Tela>
   );
 }
