@@ -17,9 +17,9 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 | 11 | Conversão de serviços (AWS para Azure) | CN2 | **Não existe** | 0 | Tabela AWS → Azure com o que o projeto usa (ver §2) |
 | 12 | Custos dos serviços no Azure | CN2 | Só menção (SCRUM-26) | 1 | Estimativa na calculadora de preços, por serviço e total mensal |
 | 13 | Infraestrutura como código (Bicep) | CN2 | **Não existe** (recursos criados por CLI) | 0 | Templates Bicep dos recursos reais, validados com `az bicep build` e `what-if` |
-| 14 | Teste da aplicação e tabela de execução | QTS | Testes automatizados (541 TS + 162 Python); sem tabela de execução | 2 | Casos de caixa preta (partição e valor limite) e tabela de execução com resultado real |
+| 14 | Teste da aplicação e tabela de execução | QTS | **Feito em 07/10/2026:** 127 casos de caixa preta (partição de equivalência e valor limite) e tabela de execução com resultado obtido (`docs/07-testes/caixa-preta-execucao.md`) | 4 | Revisão por outra pessoa; tabela de execução dos testes de estados |
 | 15 | UML de estados de uma funcionalidade | QTS | `docs/03-uml/estados-dose.md` (5 estados, 12 transições) | 5 | Nada essencial |
-| 16 | Casos de teste (estados, transições, sequências) | QTS | 42 casos em `docs/07-testes/casos-teste-estados-dose.md`, automatizados | 4 | Gerar a tabela de execução a partir do Jest (resultado real) |
+| 16 | Casos de teste (estados, transições, sequências) | QTS | 42 casos em `docs/07-testes/casos-teste-estados-dose.md`, automatizados, com **tabela de execução gerada do Jest** em `execucao-estados-dose.md` (42 de 42 aprovados em 07/10/2026) | 5 | Nada essencial |
 | 17 | **PLN: sistema de busca semântica (0–20)** | PLN | Busca TF-IDF + cosseno; chatbot TF-IDF + SVM; voz | 12 | Ver §1 |
 
 Soma estimada: cerca de **51 de 100**. Os maiores ganhos por esforço: Bicep, AWS→Azure e custos (15 pontos hoje zerados ou quase), a tabela de execução (3), e a busca semântica (até 8).
