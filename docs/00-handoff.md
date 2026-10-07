@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 07/10/2026 (fim do dia, computador de casa; ver 0.7 e 0.8). Na `main` (PRs até o #34): calendário oficial, família, doses, consentimento, layout web, assistente (texto e voz), PLN com busca LSA, login próprio, recuperação de senha por e-mail (código pronto, e-mail **desligado** na nuvem), Azure SQL, Bicep, custos, caixa preta. **Única branch aberta para PR:** `docs/SCRUM-25-docker-manutencao` (manutenção do Docker, login e chatbot no compose, teste de fumaça no CI, correção do Prettier do `search_test_set.json` e esta atualização do handoff). As demais branches já foram mescladas e podem ser apagadas.
+**Última atualização:** 07/10/2026 (fim do dia, computador de casa; **leia a seção 0.10 primeiro**, que está em dia; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -21,7 +21,7 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 - Rodar sem contêiner: `npm run dev:api` (terminal 1) e `npm run dev:mobile` (terminal 2). Rodar tudo em contêineres: `docker compose up --build` (app web em http://localhost:8080, API em http://localhost:7071/api/docs); portas mudam com `API_PORT`, `NLP_PORT`, `WEB_PORT`. Detalhes no `README.md` e em `docs/17-docker-manutencao.md`.
 - **Não vão pelo Git** (copie à mão se precisar): a pasta `design-vacina-em-dia/` (referência visual das telas, **nunca commitar**), a pasta `assets/` (não versionada) e o `apps/api/local.settings.json`. O PLN local precisa de ambiente Python próprio (`apps/nlp`, `pip install -r requirements.txt`, `pytest`).
 - Para falar com o Azure: `az login` no navegador (o acesso condicional do diretório expira o login a cada 3 dias). Para o Jira, o Claude usa o conector (site `vacinaemdia.atlassian.net`; transição "Em análise" tem id `31`).
-- Ferramentas que o Claude pode precisar em casa (o autor decide instalar): Docker Desktop, `poppler`, `pandoc` e `libreoffice` (Word e PDF), `gh` (opcional; o autor abre e mescla os PRs).
+- Ferramentas que o Claude pode precisar em casa (o autor decide instalar): Docker Desktop, `poppler`, `pandoc` e `libreoffice` (Word e PDF), `gh` (**o Claude abre os PRs e edita descrição e comentários**; o autor mescla; precisa de `gh auth login`).
 - Peça ao Claude de casa para **ler o `CLAUDE.md` e este arquivo** e, **antes de mexer em qualquer coisa**, salvar na memória dele as "Regras permanentes do autor" (0.4), porque a memória não veio junto.
 
 ### 0.2 O que existe e funciona hoje
@@ -49,7 +49,7 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 1. **Nunca incluir o Claude como coautor** em commits, PRs ou documentos (sem `Co-Authored-By` nem a linha "Generated with"). Vale mais do que qualquer padrão da ferramenta.
 2. **Documentações em Word (.docx, ABNT) durante o desenvolvimento e PDF só na entrega.** A conversão dos 3 modelos (`docs/referencias-disciplinas/Modelo-Documentacao_*.pdf`) para Word ficou para o computador de casa; só apagar os PDFs de modelo depois de o autor conferir.
 3. **Nunca inventar** horas, datas de reunião, atividades ou valores. Só registros reais informados pelo autor.
-4. **Uma branch por tarefa** (`feature/`, `fix/`, `docs/`, `chore/` + `SCRUM-n`). O **autor abre e mescla os PRs**.
+4. **Uma branch por tarefa** (`feature/`, `fix/`, `docs/`, `chore/` + `SCRUM-n`). O **Claude abre o PR com `gh`** (template em `.github/pull_request_template.md`) e mantém a descrição atualizada; o **autor mescla**.
 5. Criar recursos no Azure dispensa o "pode" do autor (menor custo possível). `rg-delbicos` **não** deve ser apagado por ora.
 6. O autor decide; o Claude propõe plano curto antes de tarefa grande, um item por vez.
 
@@ -64,13 +64,9 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 - macOS não tem o comando `timeout`. A imagem das Functions no Docker só tem `amd64`.
 - **Figma (SCRUM-32):** arquivo `lZboLAlTDtA2cJQRyKtcdW`; o plano Starter limita chamadas, modos e páginas. Estratégia econômica: poucos scripts grandes, temas por regravação das variáveis ligadas, uma única captura no fim. Detalhes e IDs no bloco "SCRUM-32, Figma" do histórico (0.9).
 
-### 0.6 Próximos passos, em ordem sugerida
+### 0.6 Próximos passos (substituído)
 
-1. **Autor:** (a) mesclar os PRs na ordem acima; (b) **criar o tenant do Entra External ID** (`docs/12-guia-tenant-entra.md`) e enviar o ID, o nome e o domínio primário; (c) conceder a si o papel "Key Vault Secrets Officer" no `kv-vedia6398` para o Claude mover as chaves do assistente para o cofre; (d) **revisar** `apps/nlp/vacina_nlp/data/intents.json` e `responses.json` e o texto do termo de consentimento (`apps/mobile/src/features/consent/terms.ts`); (e) testar a voz com um microfone real (Chrome, https) e conferir o visual do site; (f) apagar a pasta solta `D:\c` (resíduo de um erro de caminho; só contém arquivos temporários); (g) informar tempos reais do SCRUM-18, 20, 21 e 25 e decidir quais itens vão a "Em análise".
-2. **SCRUM-13, login:** com o tenant, registrar o app, criar o fluxo de entrada, validar o token na API (trocar `resolveDemoOwner`) e remover o cabeçalho de demonstração. Depois, **banco Azure SQL** (SCRUM-15/18) para os dados persistirem.
-3. **Lembretes (SCRUM-19)** e rotina de atraso agendada; **voz no celular** (módulo de áudio do Expo validado em aparelho).
-4. **SCRUM-26:** confirmar custos na calculadora (inclui a instância sempre pronta do PLN). **SCRUM-35, 34, 36, 37:** documentações em Word e panfleto; só com dados reais informados pelo autor.
-5. **Figma (SCRUM-32):** terminar telas restantes, tablet e web.
+Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado (ADR-014). Os próximos passos atuais estão em **0.10**.
 
 ### 0.7 Estado de 07/10/2026 (noite): login, banco e infraestrutura como código
 
@@ -103,6 +99,37 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.10 Estado em 07/10/2026 (fim do dia): o que está pronto, o que está aberto e o que falta
+
+**Na `main`:** login próprio e recuperação de senha (Brevo, **funcionando em produção**); Azure SQL; Bicep, custos e equivalência AWS para Azure; caixa preta (127 casos); busca com LSA; Docker com manutenção documentada; **telas no padrão do design:** 4 abas (Doses, Família, Histórico, Conta), balão flutuante do assistente, tela Doses (atenção, próximas, aplicadas), Família com resumo e **parentesco** (select, migração 003 **aplicada**), Detalhe da dose com **calendário** para escolher datas (`SeletorDeData`), **dose avulsa** (ADR-016) com etiqueta "Oficial" ou "Adicionada por você".
+
+**PRs de 07/10/2026 (todos mesclados na `main`; o Claude abre e mescla a pedido do autor):** #45 contrato do repositório SQL (liberou a dose avulsa), #46 web fiel ao design, #47 Histórico e Conta, #49 Apresentação, Entrar e Criar conta, #50 correção de um teste instável da tela Doses (`CT-APP-K01`, que reprovava PRs sem relação) e #48 este handoff. As branches foram apagadas.
+
+**Publicação da dose avulsa:** a migração `004-dose-avulsa.sql` **já foi aplicada** no `sqldb-vacinaemdia`; o deploy do PR #44 foi cancelado de propósito (rodaria antes do banco) e a publicação veio com o PR #45. **Confira no site publicado** (cadastrar uma dose avulsa e abrir o Histórico).
+
+**Pendências do autor:**
+1. **Apagar a regra de firewall do SQL** (`az sql server firewall-rule delete -g rg-vacinaemdia -s sql-vacinaemdia-vedia6398 -n migracao-temporaria`); conferir com `az sql server firewall-rule list ... --query "[].name" -o tsv`. Para rodar migrações de novo, a regra é recriada com o IP do computador.
+2. **Brevo:** apagar no painel a chave de API que apareceu no terminal (já houve outras expostas) e gerar uma nova; atualizar na Function App.
+3. Itens antigos: o Douglas mover o `rg-delbicos`; Key Vault (papel de escrita); voz com microfone real; revisar dataset do chatbot e o termo de consentimento; tempos reais no Jira; apagar `D:\c`.
+
+**Próximos passos do Claude, em ordem sugerida:**
+1. Conferir o deploy da `main` no site publicado (dose avulsa, parentesco, telas novas) e o CI da `main`.
+2. Fidelidade ao design que ainda falta: **Criar conta** (campo Nome e aceite de termos, que dependem de escrever os Termos de uso e a Política de privacidade com o autor), tablet (600 a 1023 px, não desenhado) e os temas Escuro e Alto contraste.
+3. **Caixa preta:** acrescentar casos de parentesco e de dose avulsa e regenerar as tabelas (`scripts/gerar-execucao-estados.mjs` e `caixa-preta`).
+4. Telas ainda sem referência no design: Assistente, Consentimento, Membro (formulário), Redefinir senha; temas Escuro e Alto contraste ainda não vistos em nenhuma tela nova.
+5. Lembretes (SCRUM-19); voz no celular; confirmação de e-mail no cadastro (não existe); documentações em Word (SCRUM-34, 35, 36) e panfleto (SCRUM-37), só com dados reais do autor; estado inicial (CN2) e Product Owner dependem do autor.
+
+**Decisões do autor nesta fase:** o parentesco é opcional e escolhido em lista; a dose avulsa tem nome e dose em texto livre e data prevista por calendário (hoje em diante; para o que já foi tomado, cadastrar e registrar a aplicação); segue o mesmo ciclo de estados; o Claude **abre os PRs e edita descrição e comentários**, o autor mescla.
+
+**Armadilhas novas (além das de 0.5):**
+- **Nunca rode `git checkout -- .`** nem comandos que descartem alterações: já apagou trabalho não commitado uma vez (refeito). Commite cedo.
+- Heredoc ou `sed` do shell com aspas falha; escreva scripts Python com a ferramenta de arquivos e rode o arquivo.
+- `gh pr create` usa GraphQL e pode falhar quando o GitHub está instável; a API REST pode ajudar. `gh run cancel <id>` cancela um deploy que não pode ir ao ar.
+- **O deploy não aplica migrações:** aplique (`node scripts/db-migrate.mjs --server sql-vacinaemdia-vedia6398.database.windows.net --database sqldb-vacinaemdia`, com `az login` e IP liberado) **antes** de publicar código que as use. Rode também o contrato no SQL real (`SQL_TEST_SERVER` e `SQL_TEST_DATABASE`); ele já pegou um desvio que os testes em memória não pegaram.
+- Teste no navegador embutido: clique em `Adicionar dose` da tela anterior pode pegar o botão errado (telas da pilha continuam no DOM); use o último elemento com o mesmo rótulo. `form_input` não atualiza o estado do React; digite ou use o setter nativo com `input`.
+- Localmente: `npm run dev:api` precisa do Azurite (`docker compose up -d azurite`) e de `AUTH_TOKEN_SECRET` no `apps/api/local.settings.json`; no emulador do Android o app usa `10.0.2.2` sozinho.
+- Pastas fora do Git que precisam ser copiadas à mão: `design-vacina-em-dia/` (nunca commitar), `assets/`, `apps/api/local.settings.json`.
 
 ### 0.9 Histórico detalhado das sessões (referência; a retomada está em 0.1 a 0.6)
 
