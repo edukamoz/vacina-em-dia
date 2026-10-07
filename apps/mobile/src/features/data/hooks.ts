@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ConsentInput, DoseEventInput, MemberInput } from '@vacina/shared';
 import { endpoints } from '../../api/endpoints';
 import { useSession } from '../../session/session-provider';
@@ -71,6 +71,20 @@ export function useMemberDoses(memberId: string | null) {
     queryKey: ['member-doses', memberId],
     queryFn: ({ signal }) => endpoints.getMemberDoses(api, memberId ?? '', signal),
     enabled: memberId !== null,
+  });
+}
+
+/**
+ * Calendário de várias pessoas de uma vez (para o resumo da aba Família). Usa a mesma chave de
+ * cache de `useMemberDoses`, então abrir a pessoa depois não busca de novo.
+ */
+export function useDosesOfMembers(memberIds: readonly string[]) {
+  const { api } = useSession();
+  return useQueries({
+    queries: memberIds.map((id) => ({
+      queryKey: ['member-doses', id],
+      queryFn: ({ signal }: { signal: AbortSignal }) => endpoints.getMemberDoses(api, id, signal),
+    })),
   });
 }
 
