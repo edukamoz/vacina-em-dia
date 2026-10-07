@@ -7,6 +7,7 @@ import type {
   MemberRepository,
   StoredAccount,
   StoredDose,
+  StoredPasswordResetToken,
   StoredMember,
   StoredRefreshToken,
 } from '../repositories';
@@ -304,6 +305,49 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
          WHERE account_id = @account AND revoked_at IS NULL`,
         { account: str(accountId), at: when(at) },
       );
+    },
+    async savePasswordResetToken(token) {
+      await db.run(
+        `INSERT INTO password_reset_token (token_hash, account_id, expires_at)
+         VALUES (@hash, @account, CONVERT(datetime2(3), @expires, 127))`,
+        {
+          hash: str(token.tokenHash, 64),
+          account: str(token.accountId),
+          expires: when(token.expiresAt),
+        },
+      );
+    },
+    async findPasswordResetToken(tokenHash) {
+      const result = await db.run(
+        `SELECT token_hash, account_id, CONVERT(char(23), expires_at, 127) AS expires_at,
+           CONVERT(char(23), used_at, 127) AS used_at
+         FROM password_reset_token WHERE token_hash = @hash`,
+        { hash: str(tokenHash, 64) },
+      );
+      const row = result.rows[0];
+      if (!row) return undefined;
+      const usedAt = nullableText(row, 'used_at');
+      const token: StoredPasswordResetToken = {
+        tokenHash: text(row, 'token_hash'),
+        accountId: text(row, 'account_id'),
+        expiresAt: instant(row, 'expires_at'),
+        ...(usedAt === null ? {} : { usedAt: isoUtc(usedAt) }),
+      };
+      return token;
+    },
+    async consumePasswordResetToken(tokenHash, at) {
+      const result = await db.run(
+        `UPDATE password_reset_token SET used_at = CONVERT(datetime2(3), @at, 127)
+         WHERE token_hash = @hash AND used_at IS NULL`,
+        { hash: str(tokenHash, 64), at: when(at) },
+      );
+      return result.rowsAffected > 0;
+    },
+    async updatePasswordHash(accountId, passwordHash) {
+      await db.run('UPDATE app_account SET password_hash = @hash WHERE id = @id', {
+        hash: str(passwordHash, 200),
+        id: str(accountId),
+      });
     },
     async deleteAccount(id) {
       await db.run('DELETE FROM app_account WHERE id = @id', { id: str(id) });

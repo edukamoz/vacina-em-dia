@@ -1,4 +1,9 @@
-import type { AuthRepository, StoredAccount, StoredRefreshToken } from './repositories';
+import type {
+  AuthRepository,
+  StoredAccount,
+  StoredPasswordResetToken,
+  StoredRefreshToken,
+} from './repositories';
 
 /** Quantidade máxima de contas em memória; passou disso, o cadastro é recusado pelo serviço. */
 export const MAX_ACCOUNTS = 10_000;
@@ -11,6 +16,7 @@ export function createInMemoryAuthRepository(): AuthRepository & { readonly size
   const byId = new Map<string, StoredAccount>();
   const byEmail = new Map<string, string>();
   const tokens = new Map<string, StoredRefreshToken>();
+  const resets = new Map<string, StoredPasswordResetToken>();
 
   return {
     size: () => byId.size,
@@ -40,11 +46,26 @@ export function createInMemoryAuthRepository(): AuthRepository & { readonly size
         }
       }
     },
+    async savePasswordResetToken(token) {
+      resets.set(token.tokenHash, token);
+    },
+    findPasswordResetToken: async (tokenHash) => resets.get(tokenHash),
+    async consumePasswordResetToken(tokenHash, at) {
+      const token = resets.get(tokenHash);
+      if (!token || token.usedAt) return false;
+      resets.set(tokenHash, { ...token, usedAt: at });
+      return true;
+    },
+    async updatePasswordHash(accountId, passwordHash) {
+      const account = byId.get(accountId);
+      if (account) byId.set(accountId, { ...account, passwordHash });
+    },
     async deleteAccount(id) {
       const account = byId.get(id);
       if (account) byEmail.delete(account.email);
       byId.delete(id);
       for (const [hash, token] of tokens) if (token.accountId === id) tokens.delete(hash);
+      for (const [hash, token] of resets) if (token.accountId === id) resets.delete(hash);
     },
   };
 }

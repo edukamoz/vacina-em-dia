@@ -87,6 +87,8 @@ describe('especificação OpenAPI', () => {
     ['post', '/auth/login', ['200', '400', '401', '429', '503']],
     ['post', '/auth/refresh', ['200', '400', '401', '503']],
     ['post', '/auth/logout', ['204', '400']],
+    ['post', '/auth/forgot-password', ['202', '400', '429']],
+    ['post', '/auth/reset-password', ['204', '400', '422']],
     ['get', '/auth/me', ['200', '401']],
     ['post', '/assistant/voice', ['200', '401', '413', '415', '422', '429', '500', '503']],
   ])('CT-API-O04: %s %s documenta os códigos %j', (method, path, codes) => {
@@ -102,6 +104,8 @@ describe('especificação OpenAPI', () => {
       '/auth/login',
       '/auth/refresh',
       '/auth/logout',
+      '/auth/forgot-password',
+      '/auth/reset-password',
     ]);
     for (const [path, ops] of Object.entries(doc.paths)) {
       if (open.has(path)) continue;

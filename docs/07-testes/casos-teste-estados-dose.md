@@ -163,4 +163,4 @@ Cada passo informa a ação e o estado esperado depois dela.
 - Os casos de caminho (seção 5) viram testes de sequência sobre a mesma função, e depois alguns viram testes de integração da API com Supertest.
 - A data de hoje deve ser **injetada** (relógio controlado), nunca lida diretamente dentro da regra. Isso permite testar T4, T7 e os limites de data de forma determinística.
 - O nome de cada teste deve conter o ID do caso (por exemplo, `CT-T04`), para ligar o relatório do Jest a este documento.
-- A tabela de execução (resultado obtido e status de cada caso) é gerada na execução, junto com o SCRUM-28 e o SCRUM-30.
+- A tabela de execução (resultado obtido e status de cada caso) é gerada na execução, junto com o SCRUM-28 e o SCRUM-30. A tabela de execução dos 42 casos, gerada do Jest, está em `execucao-estados-dose.md` (`node scripts/gerar-execucao-estados.mjs`). Para o teste de caixa preta de formulários e API, ver `caixa-preta-casos.md` e `caixa-preta-execucao.md`.

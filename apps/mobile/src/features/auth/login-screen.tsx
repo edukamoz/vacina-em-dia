@@ -9,10 +9,6 @@ import { AuthFrame } from './auth-frame';
 import { CampoSenha } from './campo-senha';
 import { validateCredentials, type FieldErrors } from './validate';
 
-/** Aviso para quando a recuperação de senha ainda não existe (ADR-014). */
-const ESQUECI_A_SENHA =
-  'A recuperação de senha ainda não está disponível. Se você esqueceu a senha, crie uma nova conta com outro e-mail.';
-
 /** Tela "Entrar" (RF01): e-mail e senha. */
 export function LoginScreen() {
   const router = useRouter();
@@ -22,7 +18,6 @@ export function LoginScreen() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [mostrarAviso, setMostrarAviso] = useState(false);
 
   async function submit() {
     if (pending) return;
@@ -80,9 +75,8 @@ export function LoginScreen() {
       <Botao
         titulo="Esqueci minha senha"
         variante="secundario"
-        onPress={() => setMostrarAviso(true)}
+        onPress={() => router.push('/esqueci-senha')}
       />
-      {mostrarAviso ? <Texto accessibilityLiveRegion="polite">{ESQUECI_A_SENHA}</Texto> : null}
       <Botao
         titulo="Criar conta"
         variante="secundario"
