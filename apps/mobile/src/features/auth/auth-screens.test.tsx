@@ -165,14 +165,14 @@ describe('tela "Entrar"', () => {
   test('CT-APP-L16: "Esqueci minha senha" leva à tela de recuperação', async () => {
     const { store } = memorySessionStore();
     await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn, { store });
-    await fireEvent.press(screen.getByRole('button', { name: 'Esqueci minha senha' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Esqueci minha senha' }));
     expect(mockPush).toHaveBeenCalledWith('/esqueci-senha');
   });
 
   test('CT-APP-L17: "Criar conta" leva à tela de cadastro', async () => {
     const { store } = memorySessionStore();
     await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn, { store });
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Criar conta' }));
     expect(mockReplace).toHaveBeenCalledWith('/criar-conta');
   });
 
@@ -245,7 +245,7 @@ describe('tela "Criar conta"', () => {
     const { store } = memorySessionStore();
     const fetchFn = jest.fn().mockRejectedValue(new Error('x'));
     await renderScreen(<RegisterScreen />, fetchFn as unknown as typeof fetch, { store });
-    await fireEvent.press(screen.getByRole('button', { name: 'Já tenho conta. Entrar' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Já tenho conta. Entrar' }));
     expect(mockReplace).toHaveBeenCalledWith('/entrar');
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
