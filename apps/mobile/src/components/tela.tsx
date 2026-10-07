@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Botao } from './botao';
 import { Texto } from './texto';
@@ -12,6 +12,9 @@ import { Texto } from './texto';
  * @param props.titulo - Título da tela.
  * @param props.subtitulo - Frase de apoio abaixo do título.
  * @param props.voltar - Mostra o botão "Voltar" (telas fora das abas).
+ * @param props.acao - Ação principal da tela (botão). No computador fica à direita do título; no
+ *   celular, logo abaixo dele, em largura total.
+ * @param props.abaixoDoTitulo - Conteúdo colado ao título, como o link "Trocar pessoa".
  * @param props.reservaBalao - Deixa espaço no fim para o balão do assistente não cobrir o conteúdo
  *   (telas das abas).
  */
@@ -19,12 +22,16 @@ export function Tela({
   titulo,
   subtitulo,
   voltar = false,
+  acao,
+  abaixoDoTitulo,
   reservaBalao = false,
   children,
 }: {
   titulo: string;
   subtitulo?: string;
   voltar?: boolean;
+  acao?: ReactNode;
+  abaixoDoTitulo?: ReactNode;
   reservaBalao?: boolean;
   children: ReactNode;
 }) {
@@ -32,7 +39,7 @@ export function Tela({
   return (
     <SafeAreaView className="flex-1 bg-fundo">
       <ScrollView
-        contentContainerClassName={`gap-lg p-lg medio:p-xl expandido:p-xxl self-center w-full max-w-conteudo ${
+        contentContainerClassName={`gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem ${
           reservaBalao ? 'pb-[96px]' : ''
         }`}
       >
@@ -43,10 +50,16 @@ export function Tela({
             onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           />
         ) : null}
-        <Texto variante="titulo1" accessibilityRole="header">
-          {titulo}
-        </Texto>
-        {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
+        <View className="gap-md expandido:flex-row expandido:items-start expandido:justify-between expandido:gap-xl">
+          <View className="expandido:flex-1">
+            <Texto variante="titulo1" accessibilityRole="header">
+              {titulo}
+            </Texto>
+            {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
+            {abaixoDoTitulo}
+          </View>
+          {acao}
+        </View>
         {children}
       </ScrollView>
     </SafeAreaView>
