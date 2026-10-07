@@ -1,8 +1,7 @@
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Texto } from '../../components/texto';
-import { useTheme } from '../../theme/theme-provider';
-import { getThemeColors } from '../../theme/tokens';
+import { useThemeColors } from '../../theme/theme-provider';
 
 /**
  * Marca do Vacina em Dia: escudo com um visto e o nome ao lado. O desenho é decorativo (o nome
@@ -11,8 +10,7 @@ import { getThemeColors } from '../../theme/tokens';
  * @param props.grande - Versão maior, para a tela de apresentação e a lateral das telas de entrada.
  */
 export function Logo({ grande = false }: { grande?: boolean }) {
-  const { theme } = useTheme();
-  const cores = getThemeColors(theme);
+  const cores = useThemeColors();
   const lado = grande ? 56 : 40;
   return (
     <View className="flex-row items-center gap-sm" accessibilityRole="header">
