@@ -10,6 +10,7 @@ import {
   doseEventInputSchema,
   doseIdSchema,
   doseResponseSchema,
+  forgotPasswordInputSchema,
   loginInputSchema,
   memberDosesResponseSchema,
   memberIdSchema,
@@ -18,6 +19,7 @@ import {
   memberResponseSchema,
   refreshInputSchema,
   registerInputSchema,
+  resetPasswordInputSchema,
 } from '@vacina/shared';
 import { z } from 'zod';
 
@@ -201,6 +203,46 @@ export function buildOpenApiDocument(): object {
       204: { description: 'Sessão encerrada.' },
       400: validationError,
       500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/auth/forgot-password',
+    tags: ['Login'],
+    summary: 'Pedir nova senha por e-mail',
+    description:
+      'Se existir uma conta com o e-mail, envia um link para criar nova senha (vale por 1 hora e só pode ser usado uma vez). A resposta é sempre a mesma, exista a conta ou não, para não revelar quais e-mails têm conta. Limite de 3 pedidos por hora por e-mail e 10 por origem.',
+    request: {
+      body: { required: true, content: jsonContent(forgotPasswordInputSchema) },
+    },
+    responses: {
+      202: { description: 'Pedido recebido (um e-mail é enviado só se a conta existir).' },
+      400: validationError,
+      429: tooMany,
+      500: internalError,
+      503: unavailable,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/auth/reset-password',
+    tags: ['Login'],
+    summary: 'Criar nova senha com o link do e-mail',
+    description:
+      'Troca a senha usando o token do link. O token só vale uma vez e por 1 hora. Ao trocar, todas as sessões da conta são encerradas.',
+    request: {
+      body: { required: true, content: jsonContent(resetPasswordInputSchema) },
+    },
+    responses: {
+      204: { description: 'Senha trocada.' },
+      400: errorResponse(
+        '`VALIDATION_ERROR` (campos inválidos) ou `INVALID_RESET_TOKEN` (link vencido, já usado ou inválido).',
+      ),
+      422: errorResponse('`WEAK_PASSWORD`: senha comum demais ou igual ao e-mail.'),
+      500: internalError,
+      503: unavailable,
     },
   });
 
