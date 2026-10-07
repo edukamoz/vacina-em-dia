@@ -15,7 +15,7 @@ import { SessionProvider, useSession } from '../src/session/session-provider';
 import { ThemeProvider } from '../src/theme/theme-provider';
 
 /**
- * Rotas conforme o login: sem sessão, só a apresentação, "Entrar" e "Criar conta"; com sessão, o
+ * Rotas conforme o login: sem sessão, só a apresentação, "Entrar", "Criar conta" e os textos legais (Termos e Privacidade, abertos também a quem entrou); com sessão, o
  * app (abas, consentimento, membros e doses). O `Stack.Protected` tira do mapa as rotas que a
  * situação atual não permite, então uma URL de dentro do app nunca abre para quem não entrou.
  */
@@ -46,6 +46,8 @@ function Rotas() {
         <Stack.Screen name="esqueci-senha" />
         <Stack.Screen name="redefinir-senha" />
       </Stack.Protected>
+      <Stack.Screen name="termos" />
+      <Stack.Screen name="privacidade" />
     </Stack>
   );
 }

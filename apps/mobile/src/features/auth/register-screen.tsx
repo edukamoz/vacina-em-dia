@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { View } from 'react-native';
 import { ApiRequestError } from '../../api/client';
+import { Alternar } from '../../components/alternar';
 import { Botao } from '../../components/botao';
 import { CampoTexto } from '../../components/campo-texto';
 import { LinkTexto } from '../../components/link-texto';
@@ -11,20 +13,26 @@ import { CampoSenha } from './campo-senha';
 import { validateCredentials, type FieldErrors } from './validate';
 
 /**
- * Tela "Criar conta" (RF01): só e-mail e senha. Nome e data de nascimento não são pedidos aqui:
- * o app guarda o mínimo (LGPD) e o consentimento vem na tela seguinte.
+ * Tela "Criar conta" (RF01): e-mail, senha e o aceite dos Termos de uso e da Política de
+ * privacidade. Nome e data de nascimento não são pedidos aqui: o app guarda o mínimo (LGPD) e o
+ * consentimento sobre os dados de saúde vem na tela seguinte.
  */
 export function RegisterScreen() {
   const router = useRouter();
   const { register } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [aceitou, setAceitou] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function submit() {
     if (pending) return;
+    if (!aceitou) {
+      setFailure('Para criar a conta, leia e aceite os termos de uso e a política de privacidade.');
+      return;
+    }
     const { errors: found, values } = validateCredentials('register', email, password);
     setErrors(found);
     setFailure(null);
@@ -67,6 +75,20 @@ export function RegisterScreen() {
         returnKeyType="go"
         onSubmitEditing={() => void submit()}
       />
+      <View className="gap-xs">
+        <Alternar
+          rotulo="Li e aceito os termos de uso e a política de privacidade"
+          marcado={aceitou}
+          aoAlterar={setAceitou}
+        />
+        <View className="flex-row flex-wrap gap-x-lg">
+          <LinkTexto titulo="Ler os termos de uso" onPress={() => router.push('/termos')} />
+          <LinkTexto
+            titulo="Ler a política de privacidade"
+            onPress={() => router.push('/privacidade')}
+          />
+        </View>
+      </View>
       <Texto className="text-textoSecundario">
         Na próxima tela você lê e aceita o termo de consentimento. O Vacina em Dia não pede CPF nem
         Cartão Nacional de Saúde.

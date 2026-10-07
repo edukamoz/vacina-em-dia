@@ -1,7 +1,9 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
+import { LinkTexto } from '../../components/link-texto';
 import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
@@ -26,6 +28,7 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: string }) {
  * uma confirmação.
  */
 export function AccountScreen() {
+  const router = useRouter();
   const { account, logout, endSession } = useSession();
   const consent = useConsent();
   const remove = useDeleteAccount();
@@ -62,6 +65,8 @@ export function AccountScreen() {
             Guardamos só nome ou apelido, data de nascimento e as doses de cada pessoa. Não pedimos
             CPF nem Cartão Nacional de Saúde.
           </Texto>
+          <LinkTexto titulo="Política de privacidade" onPress={() => router.push('/privacidade')} />
+          <LinkTexto titulo="Termos de uso" onPress={() => router.push('/termos')} />
         </Cartao>
         <Cartao className="gap-sm expandido:flex-1">
           <Texto variante="titulo3" accessibilityRole="header">

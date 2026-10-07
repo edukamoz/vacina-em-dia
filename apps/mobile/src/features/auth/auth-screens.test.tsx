@@ -38,6 +38,14 @@ async function fill(label: string, value: string) {
   await fireEvent.changeText(screen.getByLabelText(label), value);
 }
 
+async function aceitarTermos() {
+  await fireEvent.press(
+    screen.getByRole('checkbox', {
+      name: 'Li e aceito os termos de uso e a política de privacidade',
+    }),
+  );
+}
+
 describe('tela de apresentação', () => {
   test('CT-APP-L01: mostra a promessa, as vantagens, o aviso e leva a "Criar conta" e "Entrar"', async () => {
     await renderScreen(<WelcomeScreen />, createFakeFetch({}).fetchFn);
@@ -198,6 +206,7 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
     expect(fake.calls[0]?.body).toEqual({ email: 'mariana@exemplo.com.br', password: PASSWORD });
@@ -210,6 +219,7 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'sem-arroba');
     await fill('Senha', 'curta');
+    await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(/Informe um e-mail válido/)).toBeOnTheScreen();
     expect(screen.getByText(/Use pelo menos 8 caracteres\. Uma frase longa/)).toBeOnTheScreen();
@@ -229,9 +239,30 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(message)).toBeOnTheScreen();
     expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  test('CT-APP-L24: sem aceitar os termos e a política, a conta não é criada', async () => {
+    const { store } = memorySessionStore();
+    const fake = createFakeFetch({});
+    await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
+    await fill('E-mail', 'mariana@exemplo.com.br');
+    await fill('Senha', PASSWORD);
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+    expect(await screen.findByText(/leia e aceite os termos de uso/)).toBeOnTheScreen();
+    expect(fake.calls).toHaveLength(0);
+  });
+
+  test('CT-APP-L25: os links abrem os termos de uso e a política de privacidade', async () => {
+    const { store } = memorySessionStore();
+    await renderScreen(<RegisterScreen />, createFakeFetch({}).fetchFn, { store });
+    await fireEvent.press(screen.getByRole('link', { name: 'Ler os termos de uso' }));
+    expect(mockPush).toHaveBeenCalledWith('/termos');
+    await fireEvent.press(screen.getByRole('link', { name: 'Ler a política de privacidade' }));
+    expect(mockPush).toHaveBeenCalledWith('/privacidade');
   });
 
   test('CT-APP-L23: avisa que o consentimento vem a seguir e que não se pede CPF', async () => {
@@ -249,6 +280,7 @@ describe('tela "Criar conta"', () => {
     expect(mockReplace).toHaveBeenCalledWith('/entrar');
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(/Não foi possível falar com o servidor/)).toBeOnTheScreen();
   });
