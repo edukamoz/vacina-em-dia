@@ -24,7 +24,7 @@ RF10 a RF12 (versão completa) não foram iniciados, como previsto no escopo.
 
 | RNF | Como é verificado hoje | Onde está a evidência |
 |---|---|---|
-| RNF01 Desempenho | Carga leve com `scripts/carga-leve.mjs`: API local 100% abaixo de 3 s; `GET /health` real 96% a 98% abaixo de 3 s, **com 503 intermitentes a investigar**; medição pontual do PLN e da voz | `docs/21-seguranca-owasp-e-carga.md` (parte 2), `docs/11-assistente-pln.md`. Pendente: rotas autenticadas reais e telemetria no Application Insights |
+| RNF01 Desempenho | Carga leve com `scripts/carga-leve.mjs`: API local 100% abaixo de 3 s; `GET /health` real 99% a 100% abaixo de 3 s e 0 falhas com 1 instância sempre pronta (sem ela, havia 503 intermitentes); medição pontual do PLN e da voz | `docs/21-seguranca-owasp-e-carga.md` (parte 2), `docs/11-assistente-pln.md`. Pendente: rotas autenticadas reais e telemetria no Application Insights |
 | RNF02 Segurança | Hash scrypt, tokens de curta duração, limite de tentativas, propriedade de dados verificada em todo acesso, `npm audit` e GitGuardian no CI | `CT-AUTH-*`, `CT-SEG-*` (cabeçalho da sessão de demonstração, `api/identity.test.ts`), `CT-RL-*`; teste de que um usuário não alcança dado de outro (`CT-LEM-23`, `CT-FAM-*`); `.github/workflows/ci.yml`. Pendente: checklist OWASP Top 10 |
 | RNF03 Privacidade e LGPD | Sem CPF nem CNS; consentimento registrado; exclusão apaga tudo; logs sem dado pessoal | `CT-CP-K*`, `CT-APP-LG*`, `CT-LEM-40`/`41` (e-mail de lembrete só com quantidades); `docs/18-termos-e-privacidade.md` |
 | RNF04 Usabilidade e acessibilidade | Tokens com contraste calculado (WCAG 2.1 AA), área de toque de 48 dp, rótulos e papéis testados; contraste medido no navegador nos temas Escuro e Alto contraste | `CT-UI-*`, `CT-LAY-*` (`app/components/`); `docs/04-design-system/tokens.json`; handoff, item 4. Pendente: leitor de tela e conferência visual |
@@ -37,7 +37,7 @@ RF10 a RF12 (versão completa) não foram iniciados, como previsto no escopo.
 
 ## Lacunas conhecidas
 
-- RNF01: carga medida só na API local e no `GET /health` real; **503 intermitentes na produção** ainda sem causa (`docs/21`). RNF02: checklist OWASP escrito, com lacunas abertas (auditoria do Python, Key Vault, regra `AllowAzureServices`).
+- RNF01: carga medida só na API local e no `GET /health` real; 503 intermitentes da produção resolvidos com 1 instância sempre pronta (`docs/21`); rotas autenticadas reais ainda não medidas. RNF02: checklist OWASP escrito, com lacunas abertas (auditoria do Python, Key Vault, regra `AllowAzureServices`).
 - Painéis e alertas do Application Insights ainda não criados (RNF05).
 - Acessibilidade com leitor de tela e iOS sem execução (RNF04 e RNF09).
 - A tabela de execução (resultado obtido) existe para a caixa preta e para os estados da dose; os demais testes automatizados têm só o resultado do CI.
