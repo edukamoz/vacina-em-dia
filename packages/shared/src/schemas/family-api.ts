@@ -16,6 +16,31 @@ export const ageGroupSchema = z
   .enum(['CHILD', 'ADOLESCENT_YOUTH', 'ADULT', 'ELDERLY'])
   .meta({ description: 'Faixa etária do calendário nacional.' });
 
+/** Códigos de parentesco, na ordem em que o app os oferece. */
+export const RELATIONSHIPS = [
+  'SELF',
+  'MOTHER',
+  'FATHER',
+  'SON',
+  'DAUGHTER',
+  'GRANDMOTHER',
+  'GRANDFATHER',
+  'SISTER',
+  'BROTHER',
+  'SPOUSE',
+  'OTHER',
+] as const;
+
+/** Parentesco da pessoa com quem usa a conta (`SELF` é o próprio dono da conta). */
+export const relationshipSchema = z.enum(RELATIONSHIPS).meta({
+  id: 'Relationship',
+  description:
+    'Parentesco com o dono da conta: SELF (a própria pessoa), MOTHER, FATHER, SON, DAUGHTER, GRANDMOTHER, GRANDFATHER, SISTER, BROTHER, SPOUSE ou OTHER.',
+});
+
+/** Parentesco da pessoa com quem usa a conta. */
+export type Relationship = z.infer<typeof relationshipSchema>;
+
 /**
  * Esquema do corpo de criação e edição de um membro da família (RF02). Só o mínimo necessário
  * (CLAUDE.md §10): nome ou apelido, data de nascimento e, se for o caso, o grupo gestante. Não
@@ -34,6 +59,10 @@ export const memberInputSchema = z
       .boolean()
       .default(false)
       .meta({ description: 'Grupo específico: gestante (inclui as vacinas da gestação).' }),
+    relationship: relationshipSchema
+      .nullable()
+      .default(null)
+      .meta({ description: 'Parentesco com o dono da conta. Opcional; vazio se não informado.' }),
   })
   .meta({ id: 'MemberInput' });
 
@@ -44,6 +73,7 @@ export const memberResponseSchema = z
     name: z.string().meta({ example: 'Maria' }),
     birthDate: civilDateSchema,
     isPregnant: z.boolean(),
+    relationship: relationshipSchema.nullable(),
     ageGroup: ageGroupSchema,
   })
   .meta({ id: 'Member' });

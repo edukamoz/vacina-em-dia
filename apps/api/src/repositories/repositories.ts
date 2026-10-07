@@ -1,4 +1,4 @@
-import type { CivilDate, DoseSnapshot } from '@vacina/shared';
+import type { CivilDate, DoseSnapshot, Relationship } from '@vacina/shared';
 
 /** Membro guardado pelo repositório. */
 export interface StoredMember {
@@ -6,6 +6,8 @@ export interface StoredMember {
   readonly name: string;
   readonly birthDate: CivilDate;
   readonly isPregnant: boolean;
+  /** Parentesco com o dono da conta; `null` se não foi informado. */
+  readonly relationship: Relationship | null;
 }
 
 /** Dose guardada: a linha do calendário mais o estado da máquina de estados. */

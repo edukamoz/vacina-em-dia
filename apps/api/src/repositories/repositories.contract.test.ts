@@ -60,6 +60,7 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       name,
       birthDate: '2024-03-15',
       isPregnant: false,
+      relationship: 'DAUGHTER',
     });
     const dose = (id: string, memberId: string, over: Partial<StoredDose> = {}): StoredDose => ({
       id,

@@ -23,6 +23,7 @@ export function toMemberResponse(member: StoredMember, today: CivilDate): Member
     name: member.name,
     birthDate: member.birthDate,
     isPregnant: member.isPregnant,
+    relationship: member.relationship,
     ageGroup: ageGroupOf(member.birthDate, today),
   };
 }

@@ -1,4 +1,4 @@
-import type { DoseStatus } from '@vacina/shared';
+import type { DoseStatus, Relationship } from '@vacina/shared';
 import type {
   AccountRepository,
   AuthRepository,
@@ -47,7 +47,13 @@ const nullableStr = (value: string | null, length: number) =>
 /** Instante ISO 8601 (UTC) como parâmetro; o banco converte para DATETIME2 com o estilo 127. */
 const when = (value: string) => str(value, 30);
 
-const MEMBER_COLUMNS = `id, display_name, CONVERT(char(10), birth_date, 23) AS birth_date, is_pregnant`;
+const MEMBER_COLUMNS = `id, display_name, CONVERT(char(10), birth_date, 23) AS birth_date, is_pregnant, relationship`;
+
+/** Parentesco guardado; `null` quando não informado. O banco só aceita os códigos conhecidos. */
+function relationshipOf(row: SqlRow): Relationship | null {
+  const value = row['relationship'];
+  return typeof value === 'string' ? (value as Relationship) : null;
+}
 
 function toMember(row: SqlRow): StoredMember {
   return {
@@ -55,6 +61,7 @@ function toMember(row: SqlRow): StoredMember {
     name: text(row, 'display_name'),
     birthDate: text(row, 'birth_date'),
     isPregnant: flag(row, 'is_pregnant'),
+    relationship: relationshipOf(row),
   };
 }
 
@@ -123,17 +130,18 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     async save(ownerId, member) {
       await db.run(
         `UPDATE member SET display_name = @name, birth_date = CONVERT(date, @birth, 23),
-           is_pregnant = @pregnant
+           is_pregnant = @pregnant, relationship = @relationship
          WHERE id = @id AND account_id = @owner;
          IF @@ROWCOUNT = 0
-           INSERT INTO member (id, account_id, display_name, birth_date, is_pregnant)
-           VALUES (@id, @owner, @name, CONVERT(date, @birth, 23), @pregnant);`,
+           INSERT INTO member (id, account_id, display_name, birth_date, is_pregnant, relationship)
+           VALUES (@id, @owner, @name, CONVERT(date, @birth, 23), @pregnant, @relationship);`,
         {
           id: str(member.id),
           owner: str(ownerId),
           name: nstr(member.name, 80),
           birth: str(member.birthDate, 10),
           pregnant: { type: 'bit', value: member.isPregnant },
+          relationship: { type: 'varchar', value: member.relationship, length: 20 },
         },
       );
     },
