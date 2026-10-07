@@ -136,4 +136,54 @@ describe('repositórios SQL', () => {
     expect(await repos.auth.findAccountById('a')).toBeUndefined();
     expect(await repos.auth.findRefreshToken('h')).toBeUndefined();
   });
+
+  test('CT-SQL-20: candidatos ao e-mail só vêm de contas com consentimento e lembretes ligados', async () => {
+    const { executor, calls } = fakeDb([
+      {
+        account_id: 'a1',
+        email: 'a@b.c',
+        status: 'PENDING',
+        due_date: '2026-10-06',
+        scheduled_date: null,
+        applied_date: null,
+      },
+    ]);
+    const repos = createSqlRepositories(executor);
+    const found = await repos.reminders.listEmailCandidates('2026-10-06');
+    expect(found).toEqual([
+      {
+        accountId: 'a1',
+        email: 'a@b.c',
+        dose: { status: 'PENDING', dueDate: '2026-10-06', scheduledDate: null, appliedDate: null },
+      },
+    ]);
+    const sqlText = calls[0]?.text ?? '';
+    expect(sqlText).toContain('reminders_enabled = 1');
+    expect(sqlText).toContain('JOIN consent');
+    expect(sqlText).toContain('reminder_log');
+    expect(sqlText).not.toContain('2026-10-06');
+  });
+
+  test('CT-SQL-21: reservar o dia duas vezes devolve false; outro erro é propagado; soltar apaga', async () => {
+    const duplicate = createSqlRepositories(fakeDb([], { number: 2627 }).executor);
+    expect(await duplicate.reminders.claimEmailDay('a1', '2026-10-06')).toBe(false);
+    const broken = createSqlRepositories(fakeDb([], new Error('queda')).executor);
+    await expect(broken.reminders.claimEmailDay('a1', '2026-10-06')).rejects.toThrow('queda');
+    const { executor, calls } = fakeDb();
+    const repos = createSqlRepositories(executor);
+    expect(await repos.reminders.claimEmailDay('a1', '2026-10-06')).toBe(true);
+    await repos.reminders.releaseEmailDay('a1', '2026-10-06');
+    expect(calls[1]?.text).toContain('DELETE FROM reminder_log');
+  });
+
+  test('CT-SQL-22: a preferência de e-mail é lida e gravada só para a conta do dono', async () => {
+    const off = createSqlRepositories(fakeDb([{ reminders_enabled: false }]).executor);
+    expect(await off.reminders.getEmailEnabled('a1')).toBe(false);
+    const none = createSqlRepositories(fakeDb([]).executor);
+    expect(await none.reminders.getEmailEnabled('a1')).toBe(true);
+    const { executor, calls } = fakeDb();
+    await createSqlRepositories(executor).reminders.setEmailEnabled('a1', false);
+    expect(calls[0]?.text).toContain('WHERE id = @owner');
+    expect(calls[0]?.params['enabled']).toEqual({ type: 'bit', value: false });
+  });
 });
