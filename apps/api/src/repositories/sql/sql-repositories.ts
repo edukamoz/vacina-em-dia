@@ -5,6 +5,7 @@ import type {
   ConsentRepository,
   DoseRepository,
   MemberRepository,
+  ReminderRepository,
   StoredAccount,
   StoredDose,
   StoredPasswordResetToken,
@@ -28,6 +29,7 @@ export interface SqlRepositories {
   readonly doses: DoseRepository;
   readonly consents: ConsentRepository;
   readonly accounts: AccountRepository;
+  readonly reminders: ReminderRepository;
   readonly auth: AuthRepository;
 }
 
@@ -253,6 +255,71 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     },
   };
 
+  const reminders: ReminderRepository = {
+    async getEmailEnabled(ownerId) {
+      const result = await db.run('SELECT reminders_enabled FROM app_account WHERE id = @owner', {
+        owner: str(ownerId),
+      });
+      const row = result.rows[0];
+      return row ? flag(row, 'reminders_enabled') : true;
+    },
+    async setEmailEnabled(ownerId, enabled) {
+      await db.run('UPDATE app_account SET reminders_enabled = @enabled WHERE id = @owner', {
+        enabled: { type: 'bit', value: enabled },
+        owner: str(ownerId),
+      });
+    },
+    async listEmailCandidates(today) {
+      const result = await db.run(
+        `SELECT a.id AS account_id, a.email, d.status,
+           CONVERT(char(10), d.due_date, 23) AS due_date,
+           CONVERT(char(10), d.scheduled_date, 23) AS scheduled_date,
+           CONVERT(char(10), d.applied_date, 23) AS applied_date
+         FROM app_account a
+         JOIN consent c ON c.account_id = a.id
+         JOIN member m ON m.account_id = a.id
+         JOIN dose d ON d.member_id = m.id
+         WHERE a.reminders_enabled = 1
+           AND d.status IN ('PENDING', 'SCHEDULED')
+           AND COALESCE(CASE WHEN d.status = 'SCHEDULED' THEN d.scheduled_date END, d.due_date)
+             IN (CONVERT(date, @today, 23), DATEADD(day, 7, CONVERT(date, @today, 23)))
+           AND NOT EXISTS (
+             SELECT 1 FROM reminder_log r WHERE r.account_id = a.id AND r.sent_on = CONVERT(date, @today, 23)
+           )
+         ORDER BY a.id`,
+        { today: str(today, 10) },
+      );
+      return result.rows.map((row) => ({
+        accountId: text(row, 'account_id'),
+        email: text(row, 'email'),
+        dose: {
+          status: text(row, 'status') as DoseStatus,
+          dueDate: text(row, 'due_date'),
+          scheduledDate: nullableText(row, 'scheduled_date'),
+          appliedDate: nullableText(row, 'applied_date'),
+        },
+      }));
+    },
+    async claimEmailDay(accountId, today) {
+      try {
+        await db.run(
+          'INSERT INTO reminder_log (account_id, sent_on) VALUES (@account, CONVERT(date, @today, 23))',
+          { account: str(accountId), today: str(today, 10) },
+        );
+        return true;
+      } catch (error) {
+        if (isDuplicateKeyError(error)) return false;
+        throw error;
+      }
+    },
+    async releaseEmailDay(accountId, today) {
+      await db.run(
+        'DELETE FROM reminder_log WHERE account_id = @account AND sent_on = CONVERT(date, @today, 23)',
+        { account: str(accountId), today: str(today, 10) },
+      );
+    },
+  };
+
   const accountColumns = `id, email, password_hash, CONVERT(char(23), created_at, 127) AS created_at`;
   const auth: AuthRepository = {
     async createAccount(account) {
@@ -373,5 +440,5 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     },
   };
 
-  return { members, doses, consents, accounts, auth };
+  return { members, doses, consents, accounts, reminders, auth };
 }

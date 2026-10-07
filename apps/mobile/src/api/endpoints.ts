@@ -1,5 +1,9 @@
 import {
   accountInfoSchema,
+  reminderListResponseSchema,
+  reminderPreferencesInputSchema,
+  reminderPreferencesResponseSchema,
+  type ReminderPreferencesInput,
   assistantResponseSchema,
   authSessionSchema,
   type CustomDoseInput,
@@ -81,6 +85,24 @@ export const endpoints = {
       ctx,
       { path: '/consent', method: 'PUT', body: consentInputSchema.parse(input) },
       consentResponseSchema,
+    ),
+
+  getReminders: (ctx: ApiContext, signal?: AbortSignal) =>
+    apiRequest(
+      ctx,
+      { path: '/reminders', ...(signal ? { signal } : {}) },
+      reminderListResponseSchema,
+    ),
+
+  setReminderPreferences: (ctx: ApiContext, input: ReminderPreferencesInput) =>
+    apiRequest(
+      ctx,
+      {
+        path: '/reminders/preferences',
+        method: 'PUT',
+        body: reminderPreferencesInputSchema.parse(input),
+      },
+      reminderPreferencesResponseSchema,
     ),
 
   deleteAccount: (ctx: ApiContext) =>

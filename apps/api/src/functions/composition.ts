@@ -11,6 +11,7 @@ import { createConsentHandlers } from '../handlers/consent';
 import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
 import { createMemberHandlers } from '../handlers/members';
+import { createReminderHandlers } from '../handlers/reminders';
 import type { HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
@@ -23,6 +24,7 @@ import { createAuthService } from '../services/auth-service';
 import { createConsentService } from '../services/consent-service';
 import { createDoseService } from '../services/dose-service';
 import { createMemberService } from '../services/member-service';
+import { createReminderService } from '../services/reminder-service';
 import { createScryptHasher } from '../services/password-hasher';
 import { createFixedWindowLimiter } from '../services/rate-limiter';
 import { createTokenService, MIN_SECRET_LENGTH } from '../services/token-service';
@@ -100,6 +102,17 @@ const email =
         senderName: process.env['EMAIL_SENDER_NAME'] ?? 'Vacina em Dia',
       })
     : unavailableEmailClient;
+/** Lembretes (RF05): lista no app e rotina diária por e-mail (ADR-017). */
+export const reminderService = createReminderService({
+  members: store.members,
+  doseService,
+  reminders: store.reminders,
+  email,
+  clock,
+  ...(webBaseUrl ? { webBaseUrl } : {}),
+  reportError: (kind) => console.error(`Falha nos lembretes: ${kind}.`),
+});
+export const reminderHandlers = createReminderHandlers(reminderService);
 const authService = tokens
   ? createAuthService({
       accounts: authRepository,

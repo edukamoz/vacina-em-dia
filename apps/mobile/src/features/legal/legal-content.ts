@@ -101,7 +101,7 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
     {
       titulo: 'Quais dados guardamos',
       paragrafos: [
-        'Da sua conta: e-mail, senha (guardada de forma embaralhada, sem como ler a senha original) e a data e a versão do consentimento que você deu.',
+        'Da sua conta: e-mail, senha (guardada de forma embaralhada, sem como ler a senha original), a data e a versão do consentimento que você deu e a sua escolha de receber ou não lembretes por e-mail.',
         'De cada pessoa que você cadastra: nome ou apelido, data de nascimento, se está gestante e, se você quiser, o parentesco com você.',
         'Das doses: a vacina, a dose, as datas e a situação (pendente, agendada, atrasada, aplicada ou cancelada). Nas vacinas adicionadas por você, guardamos também o nome da vacina e a dose que você digitou.',
         'Dados técnicos: o aplicativo registra eventos de funcionamento e erros para manter o serviço estável. Esses registros usam identificadores que não revelam quem você é e não trazem nome, e-mail, data de nascimento nem texto de mensagens.',
@@ -110,8 +110,15 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
     {
       titulo: 'Para que usamos',
       paragrafos: [
-        'Usamos os dados apenas para mostrar o calendário vacinal e as doses das pessoas que você cadastrou, entrar na sua conta, recuperar sua senha e responder às suas dúvidas no assistente.',
+        'Usamos os dados apenas para mostrar o calendário vacinal e as doses das pessoas que você cadastrou, entrar na sua conta, recuperar sua senha, avisar você sobre vacinas próximas ou atrasadas e responder às suas dúvidas no assistente.',
         'A base legal é o seu consentimento (LGPD, art. 7º, inciso I, e art. 11, inciso I, para dados de saúde). No caso de crianças e adolescentes, o consentimento é dado pelo responsável legal (art. 14).',
+      ],
+    },
+    {
+      titulo: 'Lembretes',
+      paragrafos: [
+        'Na aba Doses, o aplicativo mostra as vacinas atrasadas, as de hoje e as dos próximos 7 dias.',
+        'Se você não desligar, enviamos também um e-mail às 8h (horário de Brasília), no dia da vacina e 7 dias antes, no máximo um por dia. O e-mail traz só a quantidade de vacinas, sem nome de pessoa nem de vacina. Você pode desligar esse e-mail a qualquer momento na aba Conta.',
       ],
     },
     {
@@ -126,7 +133,7 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
       paragrafos: [
         'Não vendemos nem cedemos seus dados para outras finalidades. Usamos dois prestadores para fazer o serviço funcionar:',
         'Microsoft Azure: hospeda o aplicativo e o banco de dados (região Brasil Sul) e faz o reconhecimento de voz.',
-        'Brevo: envia o e-mail de recuperação de senha. Ele recebe só o seu endereço de e-mail e o link de redefinição, sem nome nem outro dado.',
+        'Brevo: envia o e-mail de recuperação de senha e o e-mail de lembrete. Ele recebe só o seu endereço de e-mail e o texto da mensagem (o link de redefinição ou a quantidade de vacinas), sem nome nem outro dado.',
       ],
     },
     {
