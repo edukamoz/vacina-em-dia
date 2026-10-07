@@ -69,7 +69,7 @@ Ordem pelo ganho de pontos e pelas dependências. Itens com **(autor)** só o au
 7. **Roteiro de demonstração por persona** e slides.
 8. **(autor)** estado inicial (CN2), Product Owner, tempos reais, atas das reuniões, tenant do Entra, revisão do conteúdo do chatbot.
 
-## 4. Login: bloqueio no tenant
+## 4. Login: bloqueio no tenant (resolvido em 07/10/2026 com login próprio, ADR-014)
 
 O erro 401 "Insufficient privileges" ao abrir o Entra indica que o diretório da faculdade (Centro Paula Souza) não dá ao aluno permissão para criar tenants. Opções, na ordem que recomendo:
 
