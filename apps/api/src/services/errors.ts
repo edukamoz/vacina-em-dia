@@ -20,9 +20,16 @@ export interface InvalidBirthDateError {
   readonly code: 'INVALID_BIRTH_DATE';
 }
 
-/** Limite de membros por conta atingido. */
+/** Data prevista de uma dose avulsa fora do permitido (antes de hoje ou longe demais). */
+export interface InvalidDoseDateError {
+  readonly code: 'INVALID_DOSE_DATE';
+}
+
+/** Limite atingido: de membros por conta (padrão) ou de doses avulsas por pessoa. */
 export interface LimitReachedError {
   readonly code: 'LIMIT_REACHED';
+  /** O que atingiu o limite; muda só a mensagem. Sem valor, são as pessoas da conta. */
+  readonly scope?: 'members' | 'customDoses';
 }
 
 /** Limite de uso do assistente atingido (ADR-010). */
@@ -90,6 +97,7 @@ export type ServiceError =
   | ConsentRequiredError
   | GuardianDeclarationRequiredError
   | InvalidBirthDateError
+  | InvalidDoseDateError
   | LimitReachedError
   | RateLimitedError
   | AssistantUnavailableError

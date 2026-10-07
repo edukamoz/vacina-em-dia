@@ -43,6 +43,8 @@ const str = (value: string, length = 64) => ({ type: 'varchar', value, length })
 const nstr = (value: string, length: number) => ({ type: 'nvarchar', value, length }) as const;
 const nullableStr = (value: string | null, length: number) =>
   ({ type: 'varchar', value, length }) as const;
+const nullableNstr = (value: string | null, length: number) =>
+  ({ type: 'nvarchar', value, length }) as const;
 
 /** Instante ISO 8601 (UTC) como parâmetro; o banco converte para DATETIME2 com o estilo 127. */
 const when = (value: string) => str(value, 30);
@@ -65,7 +67,7 @@ function toMember(row: SqlRow): StoredMember {
   };
 }
 
-const DOSE_COLUMNS = `d.id, d.member_id, d.rule_id, d.status,
+const DOSE_COLUMNS = `d.id, d.member_id, d.rule_id, d.custom_vaccine, d.custom_dose_label, d.status,
   CONVERT(char(10), d.due_date, 23) AS due_date,
   CONVERT(char(10), d.scheduled_date, 23) AS scheduled_date,
   CONVERT(char(10), d.applied_date, 23) AS applied_date`;
@@ -73,10 +75,16 @@ const DOSE_COLUMNS = `d.id, d.member_id, d.rule_id, d.status,
 function toDose(row: SqlRow): StoredDose {
   const status = text(row, 'status');
   if (!DOSE_STATUSES.includes(status)) throw new Error('Estado de dose inesperado.');
+  const ruleId = nullableText(row, 'rule_id');
+  const customVaccine = nullableText(row, 'custom_vaccine');
   return {
     id: text(row, 'id'),
     memberId: text(row, 'member_id'),
-    ruleId: text(row, 'rule_id'),
+    ruleId,
+    custom:
+      ruleId === null && customVaccine !== null
+        ? { vaccine: customVaccine, doseLabel: text(row, 'custom_dose_label') }
+        : null,
     status: status as DoseStatus,
     dueDate: text(row, 'due_date'),
     scheduledDate: nullableText(row, 'scheduled_date'),
@@ -180,15 +188,18 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
              FROM dose d JOIN member m ON m.id = d.member_id
              WHERE d.id = @id AND m.account_id = @owner;
              IF @@ROWCOUNT = 0
-               INSERT INTO dose (id, member_id, rule_id, status, due_date, scheduled_date, applied_date)
-               SELECT @id, m.id, @rule, @status, CONVERT(date, @due, 23),
+               INSERT INTO dose (id, member_id, rule_id, custom_vaccine, custom_dose_label, status,
+                 due_date, scheduled_date, applied_date)
+               SELECT @id, m.id, @rule, @customVaccine, @customDoseLabel, @status, CONVERT(date, @due, 23),
                  CONVERT(date, @scheduled, 23), CONVERT(date, @applied, 23)
                FROM member m WHERE m.id = @member AND m.account_id = @owner;`,
             {
               id: str(dose.id),
               owner: str(ownerId),
               member: str(dose.memberId),
-              rule: str(dose.ruleId, 80),
+              rule: nullableStr(dose.ruleId, 80),
+              customVaccine: nullableNstr(dose.custom?.vaccine ?? null, 80),
+              customDoseLabel: nullableNstr(dose.custom?.doseLabel ?? null, 40),
               status: str(dose.status, 10),
               due: str(dose.dueDate, 10),
               scheduled: nullableStr(dose.scheduledDate, 10),

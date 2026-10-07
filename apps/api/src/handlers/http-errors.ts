@@ -34,10 +34,19 @@ export function toErrorResult(error: ServiceError): HttpResult {
         code: 'INVALID_BIRTH_DATE',
         message: 'A data de nascimento não pode ser no futuro.',
       });
+    case 'INVALID_DOSE_DATE':
+      return json(422, {
+        code: 'INVALID_DOSE_DATE',
+        message:
+          'A data prevista precisa ser de hoje em diante. Se a vacina já foi tomada, cadastre a dose e depois registre a aplicação.',
+      });
     case 'LIMIT_REACHED':
       return json(422, {
         code: 'LIMIT_REACHED',
-        message: 'Você chegou ao limite de pessoas cadastradas.',
+        message:
+          error.scope === 'customDoses'
+            ? 'Você chegou ao limite de doses cadastradas à mão para esta pessoa.'
+            : 'Você chegou ao limite de pessoas cadastradas.',
       });
     case 'RATE_LIMITED':
       return {

@@ -1,5 +1,5 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { ConsentInput, DoseEventInput, MemberInput } from '@vacina/shared';
+import type { ConsentInput, CustomDoseInput, DoseEventInput, MemberInput } from '@vacina/shared';
 import { endpoints } from '../../api/endpoints';
 import { useSession } from '../../session/session-provider';
 
@@ -38,6 +38,16 @@ export function useCreateMember() {
   return useMutation({
     mutationFn: (input: MemberInput) => endpoints.createMember(api, input),
     onSuccess: () => client.invalidateQueries({ queryKey: ['members'] }),
+  });
+}
+
+/** Cadastra uma dose avulsa de um membro; o calendário dele é recarregado. */
+export function useCreateCustomDose(memberId: string) {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CustomDoseInput) => endpoints.createCustomDose(api, memberId, input),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['member-doses', memberId] }),
   });
 }
 

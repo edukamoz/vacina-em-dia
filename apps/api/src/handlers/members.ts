@@ -1,4 +1,4 @@
-import { memberIdSchema, memberInputSchema } from '@vacina/shared';
+import { customDoseInputSchema, memberIdSchema, memberInputSchema } from '@vacina/shared';
 import type { HttpResult } from '../http';
 import type { DoseService } from '../services/dose-service';
 import type { Result } from '../services/errors';
@@ -20,6 +20,8 @@ export interface MemberHandlers {
   remove(ownerId: string, rawId: unknown): Promise<HttpResult>;
   /** `GET /api/members/{id}/doses`. */
   listDoses(ownerId: string, rawId: unknown): Promise<HttpResult>;
+  /** `POST /api/members/{id}/doses`. */
+  addCustomDose(ownerId: string, rawId: unknown, rawBody: unknown): Promise<HttpResult>;
 }
 
 function toResult<T>(result: Result<T>, status = 200): HttpResult {
@@ -69,6 +71,14 @@ export function createMemberHandlers(members: MemberService, doses: DoseService)
       const id = memberIdSchema.safeParse(rawId);
       if (!id.success) return validationErrorResult(['id']);
       return toResult(await doses.listForMember(ownerId, id.data));
+    },
+
+    async addCustomDose(ownerId, rawId, rawBody) {
+      const id = memberIdSchema.safeParse(rawId);
+      if (!id.success) return validationErrorResult(['id']);
+      const input = customDoseInputSchema.safeParse(rawBody);
+      if (!input.success) return validationErrorResult(fieldsOf(input.error, 'body'));
+      return toResult(await members.addCustomDose(ownerId, id.data, input.data), 201);
     },
   };
 }

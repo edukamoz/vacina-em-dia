@@ -169,6 +169,7 @@ export function dose(overrides: Partial<DoseResponse> = {}): DoseResponse {
   return {
     id: 'd-1',
     memberId: 'm-1',
+    origin: 'OFFICIAL',
     ruleId: 'crianca-penta-1',
     vaccine: 'penta (DTP+Hib+HB)',
     doseLabel: '1ª dose',

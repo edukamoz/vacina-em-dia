@@ -2,10 +2,13 @@ import {
   ageInMonths,
   compareCivilDates,
   createDose,
+  MAX_CUSTOM_DOSES,
   dueDateForRule,
   rulesForMember,
   selectDoseRulesToGenerate,
   type CalendarDataset,
+  type CustomDoseInput,
+  type DoseResponse,
   type MemberInput,
   type Relationship,
   type MemberResponse,
@@ -18,7 +21,7 @@ import type {
   StoredMember,
 } from '../repositories/repositories';
 import { failure, success, type Result } from './errors';
-import { toMemberResponse } from './mappers';
+import { toCustomDoseResponse, toMemberResponse } from './mappers';
 
 /** Dados de um membro vindos do cliente; o parentesco pode faltar (vale "não informado"). */
 export type MemberData = Omit<MemberInput, 'relationship'> & {
@@ -27,6 +30,9 @@ export type MemberData = Omit<MemberInput, 'relationship'> & {
 
 /** Quantidade máxima de membros por conta. */
 export const MAX_MEMBERS = 20;
+
+/** Até quantos anos à frente a data prevista de uma dose avulsa pode estar. */
+const MAX_YEARS_AHEAD = 10;
 
 /** Idade (em meses) a partir da qual não é preciso declaração de responsável: 18 anos. */
 const ADULT_AGE_MONTHS = 18 * 12;
@@ -43,6 +49,12 @@ export interface MemberService {
   update(ownerId: string, id: string, input: MemberData): Promise<Result<MemberResponse>>;
   /** Exclui o membro e as doses dele. */
   remove(ownerId: string, id: string): Promise<Result<null>>;
+  /** Cadastra uma dose avulsa (fora do calendário oficial) para o membro, em Pendente (T1). */
+  addCustomDose(
+    ownerId: string,
+    memberId: string,
+    input: CustomDoseInput,
+  ): Promise<Result<DoseResponse>>;
 }
 
 /** Dependências do serviço, todas injetadas para testar sem rede e sem relógio real. */
@@ -85,7 +97,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
     const missing = new Set(
       selectDoseRulesToGenerate(
         applicable.map((rule) => rule.id),
-        existing.map((dose) => dose.ruleId),
+        existing.flatMap((dose) => (dose.ruleId === null ? [] : [dose.ruleId])),
       ),
     );
     const created = applicable
@@ -116,7 +128,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
       const invalid = await validate(ownerId, input, today);
       if (invalid) return invalid;
       if ((await members.list(ownerId)).length >= MAX_MEMBERS) {
-        return failure({ code: 'LIMIT_REACHED' });
+        return failure({ code: 'LIMIT_REACHED', scope: 'members' });
       }
       const member: StoredMember = {
         id: newId(),
@@ -152,6 +164,33 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
       if (!(await members.get(ownerId, id))) return failure({ code: 'NOT_FOUND' });
       await members.remove(ownerId, id);
       return success(null);
+    },
+
+    async addCustomDose(ownerId, memberId, input) {
+      if (!(await consents.get(ownerId))) return failure({ code: 'CONSENT_REQUIRED' });
+      if (!(await members.get(ownerId, memberId))) return failure({ code: 'NOT_FOUND' });
+      const today = civilToday(clock);
+      const lastYear = Number(today.slice(0, 4)) + MAX_YEARS_AHEAD;
+      if (
+        compareCivilDates(input.dueDate, today) < 0 ||
+        Number(input.dueDate.slice(0, 4)) > lastYear
+      ) {
+        return failure({ code: 'INVALID_DOSE_DATE' });
+      }
+      const existing = await doses.listByMember(ownerId, memberId);
+      if (existing.filter((dose) => dose.ruleId === null).length >= MAX_CUSTOM_DOSES) {
+        return failure({ code: 'LIMIT_REACHED', scope: 'customDoses' });
+      }
+      const dose = {
+        id: newId(),
+        memberId,
+        ruleId: null,
+        custom: { vaccine: input.vaccine, doseLabel: input.doseLabel },
+        ...createDose(input.dueDate),
+      };
+      await doses.saveMany(ownerId, [dose]);
+      const response = toCustomDoseResponse(dose);
+      return response ? success(response) : failure({ code: 'NOT_FOUND' });
     },
   };
 }
