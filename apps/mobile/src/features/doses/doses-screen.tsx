@@ -11,6 +11,7 @@ import { Texto } from '../../components/texto';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useMemberDoses } from '../data/hooks';
 import { DoseCard } from './dose-card';
+import { LembretesCard } from './lembretes-card';
 
 /** Quantas aplicadas aparecem na tela; as demais ficam no Histórico. */
 export const LIMITE_APLICADAS = 5;
@@ -95,6 +96,7 @@ export function DosesScreen() {
         <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
       }
     >
+      <LembretesCard />
       {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
       {doses.error && (
         <EstadoErro mensagem={doses.error.message} onTentarDeNovo={() => void doses.refetch()} />

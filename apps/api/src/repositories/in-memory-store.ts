@@ -3,6 +3,7 @@ import type {
   ConsentRepository,
   DoseRepository,
   MemberRepository,
+  ReminderRepository,
   StoredConsent,
   StoredDose,
   StoredMember,
@@ -15,6 +16,7 @@ interface OwnerData {
   members: Map<string, StoredMember>;
   doses: Map<string, StoredDose>;
   consent: StoredConsent | undefined;
+  emailReminders: boolean;
 }
 
 /** Repositórios em memória que compartilham o mesmo armazenamento. */
@@ -23,6 +25,7 @@ export interface InMemoryStore {
   readonly doses: DoseRepository;
   readonly consents: ConsentRepository;
   readonly accounts: AccountRepository;
+  readonly reminders: ReminderRepository;
 }
 
 /**
@@ -42,7 +45,7 @@ export function createInMemoryStore(maxOwners: number = MAX_OWNERS): InMemorySto
         const oldest = owners.keys().next();
         if (!oldest.done) owners.delete(oldest.value);
       }
-      data = { members: new Map(), doses: new Map(), consent: undefined };
+      data = { members: new Map(), doses: new Map(), consent: undefined, emailReminders: true };
       owners.set(ownerId, data);
     }
     return data;
@@ -78,6 +81,17 @@ export function createInMemoryStore(maxOwners: number = MAX_OWNERS): InMemorySto
       save: async (ownerId, consent) => {
         ensure(ownerId).consent = consent;
       },
+    },
+    // Sem banco não há como listar contas de todos os donos: a rotina diária fica sem candidatos, e
+    // só a preferência é guardada (os e-mails reais dependem do Azure SQL).
+    reminders: {
+      getEmailEnabled: async (ownerId) => find(ownerId)?.emailReminders ?? true,
+      setEmailEnabled: async (ownerId, enabled) => {
+        ensure(ownerId).emailReminders = enabled;
+      },
+      listEmailCandidates: async () => [],
+      claimEmailDay: async () => true,
+      releaseEmailDay: async () => undefined,
     },
     accounts: {
       deleteAll: async (ownerId) => {

@@ -47,7 +47,10 @@ export function useCreateCustomDose(memberId: string) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (input: CustomDoseInput) => endpoints.createCustomDose(api, memberId, input),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['member-doses', memberId] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['member-doses', memberId] });
+      await client.invalidateQueries({ queryKey: ['reminders'] });
+    },
   });
 }
 
@@ -60,6 +63,7 @@ export function useUpdateMember(id: string) {
     onSuccess: async () => {
       await client.invalidateQueries({ queryKey: ['members'] });
       await client.invalidateQueries({ queryKey: ['member-doses', id] });
+      await client.invalidateQueries({ queryKey: ['reminders'] });
     },
   });
 }
@@ -116,7 +120,27 @@ export function useDoseEvent(id: string) {
     onSuccess: async (dose) => {
       client.setQueryData(['dose', id], dose);
       await client.invalidateQueries({ queryKey: ['member-doses'] });
+      await client.invalidateQueries({ queryKey: ['reminders'] });
     },
+  });
+}
+
+/** Lembretes de hoje (RF05): doses atrasadas, de hoje e dos próximos 7 dias, de toda a família. */
+export function useReminders() {
+  const { api } = useSession();
+  return useQuery({
+    queryKey: ['reminders'],
+    queryFn: ({ signal }) => endpoints.getReminders(api, signal),
+  });
+}
+
+/** Liga ou desliga os lembretes por e-mail e atualiza a lista. */
+export function useSetEmailReminders() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (emailEnabled: boolean) => endpoints.setReminderPreferences(api, { emailEnabled }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['reminders'] }),
   });
 }
 

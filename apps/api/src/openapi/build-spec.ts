@@ -6,6 +6,9 @@ import {
   assistantResponseSchema,
   authSessionSchema,
   consentInputSchema,
+  reminderListResponseSchema,
+  reminderPreferencesInputSchema,
+  reminderPreferencesResponseSchema,
   consentResponseSchema,
   doseEventInputSchema,
   doseIdSchema,
@@ -274,6 +277,56 @@ export function buildOpenApiDocument(): object {
         description: 'Situação do consentimento.',
         content: jsonContent(consentResponseSchema),
       },
+      401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/reminders',
+    tags: ['Lembretes'],
+    summary: 'Listar os lembretes de hoje',
+    description:
+      'Doses que pedem atenção (RF05): atrasadas, para hoje e com data nos próximos 7 dias, de todas as pessoas cadastradas. Aplicadas e canceladas não entram. Aplica o atraso antes de listar.',
+    security: secured,
+    responses: {
+      200: {
+        description: 'Lembretes e preferência de e-mail.',
+        content: jsonContent(reminderListResponseSchema),
+      },
+      401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'put',
+    path: '/reminders/preferences',
+    tags: ['Lembretes'],
+    summary: 'Ligar ou desligar os lembretes por e-mail',
+    description:
+      'Os e-mails de lembrete saem às 8h (Brasília), no máximo um por dia, e trazem só a quantidade de vacinas, sem nome de pessoa nem de vacina. Vêm ligados por padrão.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: reminderPreferencesInputSchema,
+            examples: {
+              desligar: { summary: 'Desligar o e-mail', value: { emailEnabled: false } },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Preferência gravada.',
+        content: jsonContent(reminderPreferencesResponseSchema),
+      },
+      400: validationError,
       401: unauthorized,
       500: internalError,
     },

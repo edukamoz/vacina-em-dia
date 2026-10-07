@@ -8,7 +8,8 @@ import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { useSession } from '../../session/session-provider';
-import { useConsent, useDeleteAccount } from '../data/hooks';
+import { Alternar } from '../../components/alternar';
+import { useConsent, useDeleteAccount, useReminders, useSetEmailReminders } from '../data/hooks';
 
 /** Um par "rótulo e valor" da lista de dados da conta. */
 function Dado({ rotulo, valor }: { rotulo: string; valor: string }) {
@@ -32,6 +33,8 @@ export function AccountScreen() {
   const { account, logout, endSession } = useSession();
   const consent = useConsent();
   const remove = useDeleteAccount();
+  const reminders = useReminders();
+  const setEmail = useSetEmailReminders();
   const [confirmando, setConfirmando] = useState(false);
 
   return (
@@ -67,6 +70,28 @@ export function AccountScreen() {
           </Texto>
           <LinkTexto titulo="Política de privacidade" onPress={() => router.push('/privacidade')} />
           <LinkTexto titulo="Termos de uso" onPress={() => router.push('/termos')} />
+        </Cartao>
+        <Cartao className="gap-sm expandido:flex-1">
+          <Texto variante="titulo3" accessibilityRole="header">
+            Lembretes
+          </Texto>
+          <Texto className="text-textoSecundario">
+            O aviso dentro do aplicativo sempre aparece na aba Doses. Se quiser, também enviamos um
+            e-mail às 8h, no dia da vacina e 7 dias antes. O e-mail traz só a quantidade de vacinas,
+            sem nomes.
+          </Texto>
+          {reminders.data ? (
+            <Alternar
+              rotulo="Receber lembretes por e-mail"
+              marcado={reminders.data.emailEnabled}
+              aoAlterar={(valor) => setEmail.mutate(valor)}
+            />
+          ) : null}
+          {setEmail.error ? (
+            <Texto className="text-erro" accessibilityRole="alert">
+              Não foi possível salvar. Tente de novo.
+            </Texto>
+          ) : null}
         </Cartao>
         <Cartao className="gap-sm expandido:flex-1">
           <Texto variante="titulo3" accessibilityRole="header">
