@@ -1,6 +1,6 @@
 # ADR-005: Autenticação com Microsoft Entra External ID
 
-- **Status:** Aceita
+- **Status:** Substituída pela [ADR-014](ADR-014-autenticacao-propria.md) em 2026-10-07 (o diretório da faculdade bloqueou a criação do tenant)
 - **Data:** 2026-10-06
 - **Decisor:** autor
 - **Requisitos relacionados:** RF01, RF09, RNF02, RNF03, RNF09

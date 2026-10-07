@@ -58,7 +58,7 @@ Com a API no ar (`npm run dev:api`), a documentação interativa (Swagger UI) fi
 
 ## Tecnologias
 
-React Native com Expo e TypeScript no app; Azure Functions (Node.js) na API; Azure Function em Python (scikit-learn, TF-IDF + SVM) no chatbot; Azure AI Speech, Azure SQL, Key Vault, Application Insights e Entra External ID; Jest e pytest nos testes; GitHub Actions e Docker. A lista completa e as versões exatas ficam em [`docs/tech-versions.md`](docs/tech-versions.md).
+React Native com Expo e TypeScript no app; Azure Functions (Node.js) na API; Azure Function em Python (scikit-learn, TF-IDF + SVM) no chatbot; Azure AI Speech, Azure SQL (inclui as contas do login próprio), Key Vault e Application Insights; Jest e pytest nos testes; GitHub Actions e Docker. A lista completa e as versões exatas ficam em [`docs/tech-versions.md`](docs/tech-versions.md).
 
 ## Estrutura de pastas
 
