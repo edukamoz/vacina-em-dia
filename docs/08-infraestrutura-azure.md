@@ -24,7 +24,7 @@ O fluxo `.github/workflows/deploy.yml` publica a API e o app web ao integrar na 
 
 ## Pendências
 - Criar o usuário do banco para a identidade da Function e as tabelas (SCRUM-13, 15, 18).
-- Tenant do Entra External ID (SCRUM-13); Azure AI Speech (SCRUM-20).
+- Login próprio (ADR-014, SCRUM-13): a chave de assinatura do token vai para o Key Vault. O tenant do Entra foi descartado.
 - O plano Linux Consumo (Y1) foi descartado em 06/10/2026: o app ficou preso em erro 503, inclusive no Kudu. Trocado por Flex Consumption (sucessor recomendado pelo Azure). O Flex não aceita perfil de publicação, por isso o deploy usa OIDC.
 - Custos: confirmar na calculadora oficial (SCRUM-26). Custo esperado hoje: zero ou perto disso.
 - Recursos antigos do DelBicos (`rg-delbicos`) continuam intocados.
@@ -52,7 +52,7 @@ O projeto do semestre anterior usava AWS; este nasceu direto na Azure. A tabela 
 | Site estático | S3 + CloudFront / Amplify | Static Web Apps (Free) | HTTPS e CDN incluídos |
 | Banco relacional | RDS / Aurora Serverless | Azure SQL Database (serverless, oferta gratuita) | Pausa automática |
 | Segredos | Secrets Manager | Key Vault | Acesso por identidade gerenciada |
-| Identidade e login | Cognito | Microsoft Entra External ID (ou login próprio, ver ADR) | |
+| Identidade e login | Cognito | Login próprio no Azure SQL (ADR-014); o Entra External ID foi descartado | |
 | Monitoramento e logs | CloudWatch | Application Insights + Log Analytics | |
 | Fala para texto | Transcribe | Azure AI Speech (F0) | pt-BR |
 | Armazenamento de objetos | S3 | Storage Account (Blob) | Usado nos pacotes de implantação |
