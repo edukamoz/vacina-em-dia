@@ -65,8 +65,13 @@ export function FamilyScreen() {
   const doses = useDosesOfMembers(pessoas.map((pessoa) => pessoa.id));
 
   return (
-    <Tela reservaBalao titulo="Família">
-      <Botao titulo="Adicionar pessoa" icone="mais" onPress={() => router.push('/membro/novo')} />
+    <Tela
+      reservaBalao
+      titulo="Família"
+      acao={
+        <Botao titulo="Adicionar pessoa" icone="mais" onPress={() => router.push('/membro/novo')} />
+      }
+    >
       {isPending && <EstadoCarregando rotulo="Carregando a família" />}
       {error && <EstadoErro mensagem={error.message} onTentarDeNovo={() => void refetch()} />}
       {data && pessoas.length === 0 && (

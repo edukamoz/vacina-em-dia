@@ -9,9 +9,9 @@ import { View } from 'react-native';
  */
 export function Grade({ children }: { children: ReactNode }) {
   return (
-    <View className="gap-md expandido:flex-row expandido:flex-wrap">
+    <View className="gap-lg expandido:flex-row expandido:flex-wrap expandido:justify-between">
       {Children.toArray(children).map((filho, indice) => (
-        <View key={indice} className="expandido:basis-[48.5%]">
+        <View key={indice} className="expandido:basis-[49.1%]">
           {filho}
         </View>
       ))}

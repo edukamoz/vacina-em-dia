@@ -37,18 +37,18 @@ describe('navegação principal', () => {
     expect(mockPush).toHaveBeenCalledWith('/historico');
   });
 
-  test('CT-LAY-05: no computador mostra o nome do app, o aviso e o texto de cada aba', async () => {
+  test('CT-LAY-05: no computador mostra o logo com o nome do app e o texto de cada aba', async () => {
     await render(<BarraDeNavegacao largura={1280} />);
-    expect(screen.getByRole('header', { name: 'Vacina em Dia' })).toBeOnTheScreen();
-    expect(screen.getByText('Carteira de vacinação da família')).toBeOnTheScreen();
-    expect(screen.getByText(/Projeto acadêmico, versão de demonstração/)).toBeOnTheScreen();
+    expect(screen.getByText('em Dia')).toBeOnTheScreen();
+    expect(screen.getByText('Doses')).toBeOnTheScreen();
+    expect(screen.getByText('Conta')).toBeOnTheScreen();
   });
 
   test.each([390, 800])(
     'CT-LAY-06: com %i px não mostra o cabeçalho nem o aviso da barra larga',
     async (largura) => {
       await render(<BarraDeNavegacao largura={largura} />);
-      expect(screen.queryByRole('header', { name: 'Vacina em Dia' })).not.toBeOnTheScreen();
+      expect(screen.queryByText('em Dia')).not.toBeOnTheScreen();
       expect(screen.queryByText(/Versão de demonstração/)).not.toBeOnTheScreen();
       expect(screen.getByRole('link', { name: 'Conta' })).toBeOnTheScreen();
     },
