@@ -74,8 +74,9 @@ describe('doses (RF03 e RF04)', () => {
     });
     await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByRole('header', { name: 'Doses de Maria' })).toBeOnTheScreen();
+    // O título aparece com a família; os grupos só depois de as doses carregarem.
     for (const titulo of ['Precisam de atenção', 'Próximas', 'Aplicadas']) {
-      expect(screen.getByRole('header', { name: titulo })).toBeOnTheScreen();
+      expect(await screen.findByRole('header', { name: titulo })).toBeOnTheScreen();
     }
     expect(screen.getByText('hepatite B, 1 dose')).toBeOnTheScreen();
     expect(screen.getByText('BCG, dose única')).toBeOnTheScreen();
