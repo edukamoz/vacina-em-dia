@@ -8,6 +8,7 @@ export type NomeDoIcone =
   | 'conta'
   | 'assistente'
   | 'mais'
+  | 'info'
   | 'pendente'
   | 'agendada'
   | 'atrasada'
@@ -47,6 +48,13 @@ function Desenho({ nome }: { nome: NomeDoIcone }) {
         <>
           <Path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4h0A2.5 2.5 0 0 1 4 13.5z" />
           <Path d="M8.5 8.5h7M8.5 11.5h4" />
+        </>
+      );
+    case 'info':
+      return (
+        <>
+          <Circle cx="12" cy="12" r="9" />
+          <Path d="M12 11v5.5M12 7.8v.1" />
         </>
       );
     case 'mais':
