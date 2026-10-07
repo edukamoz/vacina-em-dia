@@ -2,13 +2,15 @@ import type * as Dates from '../lib/dates';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { AccountScreen } from './account/account-screen';
 import { ConsentScreen } from './consent/consent-screen';
-import { FamilyScreen } from './family/family-screen';
+import { FamilyScreen, resumoDaPessoa } from './family/family-screen';
 import { EditMemberScreen, NewMemberScreen } from './family/member-form-screen';
 import {
   ACCEPTED,
   MEMBER,
   OTHER_MEMBER,
   createFakeFetch,
+  dose,
+  memberDoses,
   renderScreen,
   type FakeRoutes,
 } from '../test-utils';
@@ -104,8 +106,45 @@ describe('família (RF02)', () => {
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ver vacinas de Maria' }));
     expect(mockPush).toHaveBeenCalledWith('/');
-    await fireEvent.press(screen.getByRole('button', { name: 'Editar João' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Editar João' }));
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/membro/[id]', params: { id: 'm-2' } });
+  });
+
+  test('CT-APP-F04: cada cartão mostra o resumo das doses da pessoa', async () => {
+    const fake = createFakeFetch({
+      'GET /members': { status: 200, body: { items: [MEMBER, OTHER_MEMBER] } },
+      'GET /members/m-1/doses': {
+        status: 200,
+        body: memberDoses([
+          dose({ id: 'a', status: 'OVERDUE' }),
+          dose({ id: 'b', status: 'OVERDUE' }),
+        ]),
+      },
+      'GET /members/m-2/doses': {
+        status: 200,
+        body: memberDoses(
+          [dose({ id: 'c', status: 'SCHEDULED', scheduledDate: '2026-11-04' })],
+          OTHER_MEMBER,
+        ),
+      },
+    });
+    await renderScreen(<FamilyScreen />, fake.fetchFn);
+    expect(await screen.findByLabelText('2 doses atrasadas')).toBeOnTheScreen();
+    expect(await screen.findByLabelText('1 dose agendada')).toBeOnTheScreen();
+  });
+
+  test('CT-APP-F05: resumoDaPessoa dá preferência às atrasadas e depois às agendadas', () => {
+    expect(resumoDaPessoa([{ status: 'OVERDUE' }, { status: 'SCHEDULED' }])).toEqual({
+      status: 'OVERDUE',
+      rotulo: '1 dose atrasada',
+    });
+    expect(resumoDaPessoa([{ status: 'SCHEDULED' }, { status: 'SCHEDULED' }]).rotulo).toBe(
+      '2 doses agendadas',
+    );
+    expect(resumoDaPessoa([{ status: 'PENDING' }, { status: 'APPLIED' }])).toEqual({
+      status: 'APPLIED',
+      rotulo: 'Nenhuma dose atrasada',
+    });
   });
 
   test('CT-APP-F03: com a API fora do ar mostra erro simples e permite tentar de novo', async () => {
