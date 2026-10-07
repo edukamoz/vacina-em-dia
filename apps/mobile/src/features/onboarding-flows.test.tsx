@@ -103,7 +103,7 @@ describe('família (RF02)', () => {
     expect(screen.getByText('36 anos · Adulto · gestante')).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ver vacinas de Maria' }));
-    expect(mockPush).toHaveBeenCalledWith('/calendario');
+    expect(mockPush).toHaveBeenCalledWith('/');
     await fireEvent.press(screen.getByRole('button', { name: 'Editar João' }));
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/membro/[id]', params: { id: 'm-2' } });
   });
@@ -145,7 +145,7 @@ describe('formulário de pessoa (RF02)', () => {
     await fireEvent.press(screen.getByRole('checkbox', { name: /está grávida/ }));
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar e ver as vacinas' }));
 
-    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/calendario'));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
     expect(fake.calls[0]).toMatchObject({
       key: 'POST /members',
       body: { name: 'Maria', birthDate: '2025-05-20', isPregnant: true },
