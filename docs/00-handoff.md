@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 07/10/2026. Na `main`: calendário oficial, família, doses, consentimento, layout web e deploy no Azure. **Branches abertas para PR:** `feature/SCRUM-21-chatbot-pln` (serviço Python, avaliação, CI, guia do tenant) e `feature/SCRUM-20-assistente-voz` (empilhada sobre a anterior: API do assistente, voz, chat no app, deploy do PLN). Mesclar nessa ordem.
+**Última atualização:** 07/10/2026 (noite; ver 0.7). Na `main`: calendário oficial, família, doses, consentimento, layout web e deploy no Azure. **Branches abertas para PR:** `feature/SCRUM-21-chatbot-pln` (serviço Python, avaliação, CI, guia do tenant) e `feature/SCRUM-20-assistente-voz` (empilhada sobre a anterior: API do assistente, voz, chat no app, deploy do PLN). Mesclar nessa ordem.
 
 ### 0.1 Como retomar em casa
 
@@ -70,6 +70,16 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 3. **Lembretes (SCRUM-19)** e rotina de atraso agendada; **voz no celular** (módulo de áudio do Expo validado em aparelho).
 4. **SCRUM-26:** confirmar custos na calculadora (inclui a instância sempre pronta do PLN). **SCRUM-35, 34, 36, 37:** documentações em Word e panfleto; só com dados reais informados pelo autor.
 5. **Figma (SCRUM-32):** terminar telas restantes, tablet e web.
+
+### 0.7 Estado de 07/10/2026 (noite): login, banco e infraestrutura como código
+
+**Branches empilhadas, a mesclar nesta ordem** (cada uma sobre a anterior; o autor abre os PRs): `docs/SCRUM-13-adr-login-proprio` (ADR-014; a branch `feature/SCRUM-22-bicep` já vai junto com o Bicep) → `feature/SCRUM-13-login-api` (rotas `/auth/*`) → `feature/SCRUM-15-persistencia-sql` (Azure SQL) → `feature/SCRUM-13-telas-login` (telas e sessão no app). Em separado: `docs/SCRUM-26-custos-azure`.
+
+- **Decisão:** login próprio (ADR-014 substitui o Entra, bloqueado pelo diretório da faculdade). Docs: `14-login-proprio.md`, `15-persistencia-sql.md`, `16-custos-azure.md`, `13-avaliacao-criterios-banca.md` (avaliação contra os critérios da banca) e `infra/README.md` (Bicep).
+- **No Azure já feito:** `AUTH_TOKEN_SECRET` na Function App; esquema no `sqldb-vacinaemdia`; usuário do banco para a identidade da API; `httpsOnly` do PLN corrigido. **Ainda não ligado:** `SQL_SERVER`, `SQL_DATABASE` e `DEMO_SESSION_ENABLED=false` na API (ligar **depois** de publicar o app com as telas de login).
+- **Pendências do autor:** o Douglas mover o `rg-delbicos` para a assinatura dele (já é Owner); mover chaves ao Key Vault (papel de escrita); testar a voz com microfone real; revisar o dataset do chatbot e o termo de consentimento; tempos reais no Jira.
+- **Próximos passos do Claude:** ligar o banco na API publicada e conferir o ponto a ponto na nuvem; recuperação de senha com e-mail (a decidir: Brevo ou Azure Communication Services, ver `16-custos-azure.md`); Bicep: adicionar `AUTH_TOKEN_SECRET`, `SQL_SERVER` e `SQL_DATABASE` à API; tabela de execução dos testes (caixa preta), busca semântica com LSA, seção de manutenção do Docker; telas restantes conforme `design-vacina-em-dia`.
+- **Armadilhas novas:** `.expo/types` desatualizado quebra o typecheck local (mover para `types.old`); heredoc do shell com aspas falha (usar a ferramenta de escrita); a porta 7071 pode estar ocupada por um `func` do autor (usar outra porta); o navegador embutido não tira captura com o painel oculto (medir pelo DOM); a API de preços da Azure limita a taxa (429).
 
 ### 0.9 Histórico detalhado das sessões (referência; a retomada está em 0.1 a 0.6)
 
