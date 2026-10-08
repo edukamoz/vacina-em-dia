@@ -1,5 +1,5 @@
 import { Pressable, type PressableProps } from 'react-native';
-import { useThemeColors } from '../theme/theme-provider';
+import { useThemeColors, useVisual } from '../theme/theme-provider';
 import { Icone, type NomeDoIcone } from './icone';
 import { Texto } from './texto';
 
@@ -7,14 +7,17 @@ import { Texto } from './texto';
 export type BotaoVariante = 'principal' | 'secundario' | 'perigo';
 
 const ESTILOS: Readonly<Record<BotaoVariante, { caixa: string; texto: string }>> = {
-  principal: { caixa: 'min-h-principal bg-primaria border-primaria', texto: 'text-sobrePrimaria' },
-  secundario: { caixa: 'min-h-principal bg-fundo border-borda', texto: 'text-texto' },
-  perigo: { caixa: 'min-h-principal bg-fundo border-erro', texto: 'text-erro' },
+  principal: {
+    caixa: 'min-h-principal bg-primaria',
+    texto: 'text-sobrePrimaria',
+  },
+  secundario: { caixa: 'min-h-principal bg-superficie border-borda', texto: 'text-texto' },
+  perigo: { caixa: 'min-h-principal bg-superficie border-erro', texto: 'text-erro' },
 };
 
 /**
- * Botão do design system: altura mínima de 56 dp em todos os tipos (como nas telas de referência), texto sempre
- * visível e papel de acessibilidade `button`.
+ * Botão do design system: altura mínima de 56 dp em todos os tipos, texto sempre visível, gradiente
+ * da marca no principal e papel de acessibilidade `button`.
  *
  * @param props.titulo - Texto do botão (também é o rótulo de acessibilidade).
  * @param props.variante - Tipo de botão; por padrão `principal`.
@@ -36,6 +39,7 @@ export function Botao({
 }) {
   const estilo = ESTILOS[variante];
   const cores = useThemeColors();
+  const { altoContraste, gradienteMarca, sombra } = useVisual();
   const corDoIcone = {
     principal: cores.sobrePrimaria,
     secundario: cores.texto,
@@ -52,7 +56,10 @@ export function Botao({
       // Na web, o estado de seleção só chega ao leitor de tela pela propriedade `aria-selected`.
       {...(selecionado === undefined ? {} : { 'aria-selected': selecionado })}
       disabled={disabled}
-      className={`flex-row items-center justify-center gap-sm rounded-botao border-padrao px-xl py-md ${estilo.caixa}`}
+      style={variante === 'principal' ? [gradienteMarca, sombra(1)] : undefined}
+      className={`flex-row items-center justify-center gap-sm rounded-botao border-padrao px-xl py-md ${estilo.caixa} ${
+        variante === 'principal' ? (altoContraste ? 'border-borda' : 'border-transparent') : ''
+      }`}
       {...rest}
     >
       {icone ? <Icone nome={icone} cor={corDoIcone} /> : null}

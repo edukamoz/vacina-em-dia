@@ -1,5 +1,11 @@
 import tokensJson from '../../../../docs/04-design-system/tokens.json';
-import { THEME_NAMES, getThemeColors } from './tokens';
+import {
+  THEME_NAMES,
+  getBackgroundGradient,
+  getBrandGradient,
+  getShadow,
+  getThemeColors,
+} from './tokens';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const tailwindConfig = require('../../tailwind.config.js') as {
@@ -69,4 +75,19 @@ describe('tokens do design system', () => {
       }
     },
   );
+
+  test('CT-TOK-07: sombras e gradientes existem nos temas Claro e Escuro e somem no Alto contraste', () => {
+    for (const nivel of ['1', '2', '3'] as const) {
+      expect(getShadow(nivel, 'light')).toContain('rgba');
+      expect(getShadow(nivel, 'dark')).toContain('rgba');
+      expect(getShadow(nivel, 'highContrast')).toBe('none');
+    }
+    const claro = getThemeColors('light');
+    expect(getBrandGradient('light')).toBe(
+      `linear-gradient(135deg, ${claro.primaria}, ${claro.primariaProfunda})`,
+    );
+    expect(getBackgroundGradient('dark')).toContain('linear-gradient(180deg');
+    expect(getBrandGradient('highContrast')).toBe(getThemeColors('highContrast').primaria);
+    expect(getBackgroundGradient('highContrast')).toBe('#ffffff');
+  });
 });

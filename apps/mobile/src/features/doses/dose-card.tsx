@@ -1,9 +1,11 @@
 import type { DoseResponse, DoseStatus } from '@vacina/shared';
 import { Pressable, View } from 'react-native';
 import { Cartao } from '../../components/cartao';
-import { SeloEstadoDose } from '../../components/selo-estado-dose';
+import { Icone } from '../../components/icone';
+import { SELO_POR_ESTADO, SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
 import { Texto } from '../../components/texto';
+import { useThemeColors } from '../../theme/theme-provider';
 import { formatCivilDate } from './format-date';
 
 const DICA: Readonly<Record<DoseStatus, string>> = {
@@ -14,7 +16,7 @@ const DICA: Readonly<Record<DoseStatus, string>> = {
   CANCELLED: 'Não é mais necessária',
 };
 
-/** Classe da faixa lateral de cada estado (usada nos cartões de dose e do histórico). */
+/** Classe da faixa lateral de cada estado (ainda usada no Histórico; sai com o redesenho dele). */
 export const FAIXA_POR_ESTADO: Readonly<Record<DoseStatus, string>> = {
   PENDING: 'bg-pendente',
   SCHEDULED: 'bg-agendada',
@@ -58,17 +60,23 @@ export function doseDateRow(
 }
 
 /**
- * Cartão de dose: faixa lateral de 6 px na cor do estado, nome da vacina, quando é indicada, selo
+ * Cartão de dose: quadro de 56 px com o ícone do estado, nome da vacina, quando é indicada, selo
  * e dica de leitura. Com `aoAbrir`, o cartão inteiro vira um botão que abre o detalhe.
  *
  * @param props.dose - Dose a exibir.
  * @param props.aoAbrir - Chamada ao tocar no cartão.
  */
 export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () => void }) {
+  const cores = useThemeColors();
+  const selo = SELO_POR_ESTADO[dose.status];
   const conteudo = (
-    <Cartao className="flex-row overflow-hidden p-0">
-      <View className={`w-[6px] ${FAIXA_POR_ESTADO[dose.status]}`} />
-      <View className="flex-1 gap-sm p-lg">
+    <Cartao className="flex-row items-start gap-lg">
+      <View
+        className={`h-[56px] w-[56px] items-center justify-center rounded-quadro border-padrao ${selo.caixa}`}
+      >
+        <Icone nome={selo.icone} cor={cores[selo.cor]} tamanho={28} />
+      </View>
+      <View className="flex-1 gap-sm">
         <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
         <Texto variante="apoio" className="text-textoSecundario">
           {dose.timingLabel}

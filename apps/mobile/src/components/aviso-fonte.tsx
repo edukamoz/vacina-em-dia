@@ -1,4 +1,5 @@
 import type { CalendarSourceResponse } from '@vacina/shared';
+import { View } from 'react-native';
 import { Texto } from './texto';
 
 /**
@@ -9,9 +10,11 @@ import { Texto } from './texto';
  */
 export function AvisoFonte({ fonte }: { fonte: CalendarSourceResponse }) {
   return (
-    <Texto variante="apoio" className="text-textoSecundario" accessibilityRole="text">
-      {fonte.isFictitious ? 'Calendário de exemplo (dados fictícios). ' : ''}
-      {`Fonte: ${fonte.name}, ${fonte.publisher}, versão ${fonte.version}. ${fonte.notice}`}
-    </Texto>
+    <View className="rounded-[16px] border-fina border-bordaSuave bg-superficieSuave p-lg">
+      <Texto variante="apoio" className="text-textoSecundario" accessibilityRole="text">
+        {fonte.isFictitious ? 'Calendário de exemplo (dados fictícios). ' : ''}
+        {`Fonte: ${fonte.name}, ${fonte.publisher}, versão ${fonte.version}. ${fonte.notice}`}
+      </Texto>
+    </View>
   );
 }
