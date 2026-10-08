@@ -103,7 +103,7 @@ test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/members
 test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -d '{}' http://localhost:7072/api/chat)" = "401"   # PLN exige chave
 ```
 
-O **CI repete isso a cada push** (job "Imagens Docker e teste de fumaça" em `.github/workflows/ci.yml`): sobe o compose, confere a API, o app, o PLN, o login (cadastro de uma conta) e uma pergunta ao chatbot de ponta a ponta (API chamando o PLN com a chave local), e derruba tudo. Se esse job falhar, os registros (`docker compose logs`) aparecem na própria execução.
+O **CI repete isso a cada push na main** (para economizar minutos do GitHub Actions, não em cada branch; job "Imagens Docker e teste de fumaça" em `.github/workflows/ci.yml`): sobe o compose, confere a API, o app, o PLN, o login (cadastro de uma conta) e uma pergunta ao chatbot de ponta a ponta (API chamando o PLN com a chave local), e derruba tudo. Se esse job falhar, os registros (`docker compose logs`) aparecem na própria execução.
 
 ## 8. Segurança do ambiente local
 
