@@ -44,12 +44,12 @@ function ItemDeNavegacao({
         accessibilityLabel={titulo}
         accessibilityState={{ selected: ativa }}
         aria-current={ativa ? 'page' : undefined}
-        className={`items-center justify-center rounded-botao border-padrao hover:bg-superficieSuave ${
+        className={`items-center rounded-botao border-padrao hover:bg-superficieSuave ${
           lateral && expandido
-            ? 'min-h-principal flex-row justify-start gap-md px-lg'
+            ? 'min-h-principal flex-row gap-md px-lg'
             : lateral
-              ? 'min-h-[68px] gap-xs px-xs py-sm'
-              : 'min-h-principal flex-1 gap-xs px-xs py-sm'
+              ? 'min-h-[68px] justify-center gap-xs px-xs py-sm'
+              : 'min-h-principal flex-1 justify-center gap-xs px-xs py-sm'
         } ${
           ativa
             ? `bg-primariaSuave ${altoContraste ? 'border-borda' : 'border-transparent'}`
