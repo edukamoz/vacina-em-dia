@@ -78,3 +78,9 @@ Thumbs.db
 
 # Gerado pelo Expo
 expo-env.d.ts
+
+# --- Material acadêmico: fica só na máquina do autor (repositório público) ---
+doctos/
+docs/referencias-disciplinas/
+docs/*.docx
+design/
