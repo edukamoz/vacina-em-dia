@@ -50,7 +50,7 @@ describe('tela de apresentação', () => {
   test('CT-APP-L01: mostra a promessa, as vantagens, o aviso e leva a "Criar conta" e "Entrar"', async () => {
     await renderScreen(<WelcomeScreen />, createFakeFetch({}).fetchFn);
     expect(
-      screen.getByRole('header', { name: 'Suas vacinas e as da sua família, em dia.' }),
+      screen.getByRole('header', { name: 'As vacinas da sua família, em dia' }),
     ).toBeOnTheScreen();
     for (const titulo of ['Fácil de ler', 'Para toda a família', 'Com fonte oficial']) {
       expect(screen.getByText(titulo)).toBeOnTheScreen();
@@ -58,7 +58,8 @@ describe('tela de apresentação', () => {
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
 
     expect(screen.getByText('Exemplo com dados inventados.')).toBeOnTheScreen();
-    expect(screen.getByText('Comece a acompanhar suas doses.')).toBeOnTheScreen();
+    expect(screen.getByText('Comece a acompanhar as doses da família.')).toBeOnTheScreen();
+    expect(screen.getByText('Para cada fase da vida')).toBeOnTheScreen();
 
     const criar = screen.getAllByRole('button', { name: 'Criar conta' });
     expect(criar).toHaveLength(2);
@@ -192,7 +193,7 @@ describe('tela "Entrar"', () => {
       const { store } = memorySessionStore();
       await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn, { store });
       expect(screen.getByRole('header', { name: 'Entrar' })).toBeOnTheScreen();
-      expect(screen.getByText('Suas vacinas e as da sua família, em dia.')).toBeOnTheScreen();
+      expect(screen.getByText('As vacinas da sua família, em dia')).toBeOnTheScreen();
     } finally {
       spy.mockRestore();
     }
