@@ -1,11 +1,11 @@
 import { View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { Texto } from '../../components/texto';
 import { useThemeColors } from '../../theme/theme-provider';
 
 /**
- * Marca do Vacina em Dia: escudo com um visto e o nome ao lado. O desenho é decorativo (o nome
- * escrito já diz tudo ao leitor de tela) e usa as cores do tema atual.
+ * Marca do Vacina em Dia: um visto formado por um adulto e uma criança, com o nome ao lado. O
+ * desenho é decorativo (o nome escrito já diz tudo ao leitor de tela) e usa as cores do tema atual.
  *
  * @param props.grande - Versão maior, para a tela de apresentação e a lateral das telas de entrada.
  */
@@ -14,22 +14,23 @@ export function Logo({ grande = false }: { grande?: boolean }) {
   const lado = grande ? 64 : 40;
   return (
     <View className="flex-row items-center gap-sm" accessibilityRole="header">
-      <Svg width={lado} height={lado} viewBox="0 0 48 48" aria-hidden>
+      <Svg width={lado} height={lado} viewBox="0 0 64 64" aria-hidden>
         <Path
-          d="M24 4 L40 10 V22 C40 32 33.5 40 24 44 C14.5 40 8 32 8 22 V10 Z"
-          fill={cores.primaria}
-          stroke={cores.primaria}
-          strokeWidth={2}
-          strokeLinejoin="round"
-        />
-        <Path
-          d="M16 23.5 L22 29.5 L33 17.5"
+          d="M27 50C36 42 44 31 49 20"
           fill="none"
-          stroke={cores.sobrePrimaria}
-          strokeWidth={4}
+          stroke={cores.primaria}
+          strokeWidth={9}
           strokeLinecap="round"
-          strokeLinejoin="round"
         />
+        <Circle cx={52.5} cy={9} r={6.2} fill={cores.primaria} />
+        <Path
+          d="M27 50 17.5 38"
+          fill="none"
+          stroke={cores.marcaCrianca}
+          strokeWidth={9}
+          strokeLinecap="round"
+        />
+        <Circle cx={12} cy={28} r={5.2} fill={cores.marcaPonto} />
       </Svg>
       <Texto variante={grande ? 'titulo1' : 'titulo2'}>
         {'Vacina '}

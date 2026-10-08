@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="176" viewBox="0 0 160 176" role="img" aria-label="Vacina em Dia">
+<g transform="translate(40 0) scale(1.25)"><path d="M27 50C36 42 44 31 49 20" fill="none" stroke="#6fd0aa" stroke-width="9" stroke-linecap="round"/><circle cx="52.5" cy="9" r="6.2" fill="#6fd0aa"/><path d="M27 50 17.500 38" fill="none" stroke="#bfe9d8" stroke-width="9" stroke-linecap="round"/><circle cx="12" cy="28" r="5.2" fill="#f2b84b"/></g>
+<text x="80" y="118" font-size="26" text-anchor="middle" font-family="'Atkinson Hyperlegible', system-ui, sans-serif" font-weight="700" fill="#ecf4f0">Vacina</text>
+<text x="80" y="148" font-size="26" text-anchor="middle" font-family="'Atkinson Hyperlegible', system-ui, sans-serif" font-weight="700" fill="#6fd0aa">em Dia</text>
+</svg>
