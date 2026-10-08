@@ -5,11 +5,12 @@ import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
-import { Logo } from './logo';
+import { useVisual } from '../../theme/theme-provider';
+import { Logo, Simbolo } from './logo';
 
 /**
- * Moldura das telas de entrada (Entrar e Criar conta). No computador, duas colunas: a lateral com a
- * marca e a promessa do app, e o formulário ao lado. No celular e no tablet, uma coluna só, com a
+ * Moldura das telas de entrada (Entrar e Criar conta). No computador, duas colunas: a lateral em
+ * gradiente com o símbolo da marca e a promessa do app, e o formulário ao lado. No celular e no tablet, uma coluna só, com a
  * marca no alto (`docs/04-design-system.md`, seção 2.5).
  *
  * @param props.titulo - Título da tela (cabeçalho para o leitor de tela).
@@ -17,6 +18,7 @@ import { Logo } from './logo';
 export function AuthFrame({ titulo, children }: { titulo: string; children: ReactNode }) {
   const router = useRouter();
   const expandido = modoDeLayout(useWindowDimensions().width) === 'expandido';
+  const { gradienteMarca, altoContraste } = useVisual();
 
   const formulario = (
     <View className="w-full max-w-form gap-xl">
@@ -31,10 +33,15 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
     return (
       <SafeAreaView className="flex-1 bg-fundo">
         <View className="flex-1 flex-row">
-          <View className="w-lateral justify-center gap-xl border-r-padrao border-borda bg-primariaSuave p-[64px]">
-            <Logo grande />
-            <Texto variante="titulo2" className="max-w-sm">
-              Suas vacinas e as da sua família, em dia.
+          <View
+            style={gradienteMarca}
+            className={`w-lateral justify-center gap-xl bg-primaria p-[64px] ${
+              altoContraste ? 'border-r-altoContraste border-borda' : ''
+            }`}
+          >
+            <Simbolo tamanho={132} invertido />
+            <Texto variante="exibicao" className="max-w-[420px] text-sobrePrimaria">
+              As vacinas da sua família, em dia
             </Texto>
           </View>
           <ScrollView
