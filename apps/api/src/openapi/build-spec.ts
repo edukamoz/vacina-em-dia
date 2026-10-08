@@ -20,6 +20,8 @@ import {
   memberIdSchema,
   memberInputSchema,
   memberListResponseSchema,
+  nearbyUnitsQuerySchema,
+  nearbyUnitsResponseSchema,
   memberResponseSchema,
   refreshInputSchema,
   registerInputSchema,
@@ -278,6 +280,27 @@ export function buildOpenApiDocument(): object {
         content: jsonContent(consentResponseSchema),
       },
       401: unauthorized,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/units/nearby',
+    tags: ['Postos de saúde'],
+    summary: 'Unidades básicas de saúde perto de uma posição',
+    description:
+      'Mapa de postos (RF10). Devolve, da mais perto para a mais longe, as unidades básicas de saúde do cadastro oficial (CNES, Ministério da Saúde) dentro do raio. Usa o arquivo de unidades que acompanha a API e, se a API oficial responder em até 4 s, acrescenta telefone, turno e número do endereço (`source.live`). A posição não é guardada nem registrada em log. A lista não diz quais unidades têm sala de vacina.',
+    security: secured,
+    request: { query: nearbyUnitsQuerySchema },
+    responses: {
+      200: {
+        description: 'Unidades encontradas (a lista pode vir vazia).',
+        content: jsonContent(nearbyUnitsResponseSchema),
+      },
+      400: errorResponse('Parâmetros inválidos (a resposta lista só os nomes dos campos).'),
+      401: unauthorized,
+      429: errorResponse('`RATE_LIMITED`: mais de 60 buscas em 10 minutos.'),
       500: internalError,
     },
   });

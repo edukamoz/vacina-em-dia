@@ -108,7 +108,7 @@ export function toErrorResult(error: ServiceError): HttpResult {
 }
 
 function rateLimitedMessage(
-  scope: 'assistant' | 'login' | 'register' | 'reset' | undefined,
+  scope: 'assistant' | 'login' | 'register' | 'reset' | 'units' | undefined,
 ): string {
   switch (scope) {
     case 'reset':
@@ -117,6 +117,8 @@ function rateLimitedMessage(
       return 'Muitas tentativas de entrar. Aguarde um pouco e tente de novo.';
     case 'register':
       return 'Muitos cadastros em pouco tempo. Tente de novo mais tarde.';
+    case 'units':
+      return 'Muitas buscas de postos em pouco tempo. Tente de novo mais tarde.';
     default:
       return 'Você fez muitas perguntas em pouco tempo. Tente de novo mais tarde.';
   }
