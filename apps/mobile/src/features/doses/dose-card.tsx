@@ -1,11 +1,10 @@
 import type { DoseResponse, DoseStatus } from '@vacina/shared';
 import { Pressable, View } from 'react-native';
 import { Cartao } from '../../components/cartao';
-import { Icone } from '../../components/icone';
-import { SELO_POR_ESTADO, SeloEstadoDose } from '../../components/selo-estado-dose';
+import { QuadroEstado } from '../../components/quadro-estado';
+import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
 import { Texto } from '../../components/texto';
-import { useThemeColors } from '../../theme/theme-provider';
 import { formatCivilDate } from './format-date';
 
 const DICA: Readonly<Record<DoseStatus, string>> = {
@@ -14,15 +13,6 @@ const DICA: Readonly<Record<DoseStatus, string>> = {
   OVERDUE: 'Era para',
   APPLIED: 'Aplicada em',
   CANCELLED: 'Não é mais necessária',
-};
-
-/** Classe da faixa lateral de cada estado (ainda usada no Histórico; sai com o redesenho dele). */
-export const FAIXA_POR_ESTADO: Readonly<Record<DoseStatus, string>> = {
-  PENDING: 'bg-pendente',
-  SCHEDULED: 'bg-agendada',
-  OVERDUE: 'bg-atrasada',
-  APPLIED: 'bg-aplicada',
-  CANCELLED: 'bg-cancelada',
 };
 
 /**
@@ -67,15 +57,9 @@ export function doseDateRow(
  * @param props.aoAbrir - Chamada ao tocar no cartão.
  */
 export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () => void }) {
-  const cores = useThemeColors();
-  const selo = SELO_POR_ESTADO[dose.status];
   const conteudo = (
     <Cartao className="flex-row items-start gap-lg">
-      <View
-        className={`h-[56px] w-[56px] items-center justify-center rounded-quadro border-padrao ${selo.caixa}`}
-      >
-        <Icone nome={selo.icone} cor={cores[selo.cor]} tamanho={28} />
-      </View>
+      <QuadroEstado status={dose.status} />
       <View className="flex-1 gap-sm">
         <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
         <Texto variante="apoio" className="text-textoSecundario">
