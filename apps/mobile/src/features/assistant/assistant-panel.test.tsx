@@ -1,7 +1,7 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import type { AssistantResponse } from '@vacina/shared';
 import { createFakeFetch, renderScreen } from '../../test-utils';
-import { AssistantScreen } from './assistant-screen';
+import { AssistantPanel } from './assistant-panel';
 import { VoiceError } from './voice-types';
 
 const mockRecorder = { start: jest.fn(), stop: jest.fn(), cancel: jest.fn() };
@@ -57,7 +57,7 @@ beforeEach(() => {
 
 describe('assistente: chat por texto (RF07)', () => {
   test('CT-APP-I01: abre com a apresentação do assistente e perguntas sugeridas', async () => {
-    await renderScreen(<AssistantScreen />, api().fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, api().fetchFn);
     expect(screen.getByRole('header', { name: 'Assistente' })).toBeOnTheScreen();
     expect(screen.getByText(/Eu sou o assistente do Vacina em Dia/)).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Para que serve a BCG?' })).toBeOnTheScreen();
@@ -67,7 +67,7 @@ describe('assistente: chat por texto (RF07)', () => {
 
   test('CT-APP-I02: envia o que foi digitado, mostra a resposta com a fonte e limpa o campo', async () => {
     const fake = api();
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     expect(screen.getByRole('button', { name: 'Enviar' })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText('Sua pergunta'), '  para que serve a BCG ');
@@ -91,7 +91,7 @@ describe('assistente: chat por texto (RF07)', () => {
 
   test('CT-APP-I03: tocar numa pergunta sugerida a envia', async () => {
     const fake = api();
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'O que significa dose atrasada?' }));
     expect(await screen.findByText(REPLY.text)).toBeOnTheScreen();
     expect(fake.calls[0]?.body).toEqual({ text: 'O que significa dose atrasada?' });
@@ -109,10 +109,10 @@ describe('assistente: chat por texto (RF07)', () => {
         suggestions: [],
       },
     });
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.changeText(screen.getByLabelText('Sua pergunta'), 'meu filho está com febre');
     await fireEvent.press(screen.getByRole('button', { name: 'Enviar' }));
-    expect(await screen.findByText('⚠ Converse com um profissional de saúde')).toBeOnTheScreen();
+    expect(await screen.findByText('Converse com um profissional de saúde')).toBeOnTheScreen();
   });
 
   test('CT-APP-I05: resposta de "não entendi" não cita fonte', async () => {
@@ -125,7 +125,7 @@ describe('assistente: chat por texto (RF07)', () => {
         suggestions: [],
       },
     });
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.changeText(screen.getByLabelText('Sua pergunta'), 'asdf');
     await fireEvent.press(screen.getByRole('button', { name: 'Enviar' }));
     expect(await screen.findByText('Não tenho certeza de que entendi.')).toBeOnTheScreen();
@@ -148,7 +148,7 @@ describe('assistente: chat por texto (RF07)', () => {
       },
     ],
   ])('CT-APP-I06: erro %i do servidor aparece em linguagem simples', async (status, body) => {
-    await renderScreen(<AssistantScreen />, api({}, status, body).fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, api({}, status, body).fetchFn);
     await fireEvent.changeText(screen.getByLabelText('Sua pergunta'), 'oi');
     await fireEvent.press(screen.getByRole('button', { name: 'Enviar' }));
     expect(await screen.findByText(body.message)).toBeOnTheScreen();
@@ -158,7 +158,7 @@ describe('assistente: chat por texto (RF07)', () => {
 describe('assistente: pergunta por voz (RF06)', () => {
   test('CT-APP-V01: sem suporte a voz, avisa e mantém o campo de texto', async () => {
     mockSupported = false;
-    await renderScreen(<AssistantScreen />, api().fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, api().fetchFn);
     expect(screen.queryByRole('button', { name: 'Falar a pergunta' })).not.toBeOnTheScreen();
     expect(
       screen.getByText(/pergunta por voz não está disponível neste navegador/),
@@ -168,13 +168,13 @@ describe('assistente: pergunta por voz (RF06)', () => {
 
   test('CT-APP-V02: grava, envia o áudio WAV e mostra o que foi entendido e as vacinas encontradas', async () => {
     const fake = api();
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
     expect(await screen.findByText(/Gravando\.\.\. fale a sua pergunta/)).toBeOnTheScreen();
     expect(mockRecorder.start).toHaveBeenCalledTimes(1);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Parar e enviar' }));
-    expect(await screen.findByText('🎤 para que serve a BCG')).toBeOnTheScreen();
+    expect(await screen.findByLabelText('Você falou: para que serve a BCG')).toBeOnTheScreen();
     expect(await screen.findByText(REPLY.text)).toBeOnTheScreen();
     expect(screen.getByText('Vacinas encontradas no calendário')).toBeOnTheScreen();
     expect(screen.getByText('Criança: dose única, ao nascer')).toBeOnTheScreen();
@@ -186,7 +186,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
 
   test('CT-APP-V03: cancelar a gravação solta o microfone e não envia nada', async () => {
     const fake = api();
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Cancelar' }));
     expect(mockRecorder.cancel).toHaveBeenCalled();
@@ -199,7 +199,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
     ['NO_MICROPHONE', /Não encontramos um microfone/],
   ] as const)('CT-APP-V04: %s ao começar mostra a orientação', async (kind, mensagem) => {
     mockRecorder.start.mockRejectedValue(new VoiceError(kind));
-    await renderScreen(<AssistantScreen />, api().fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, api().fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
     expect(await screen.findByText(mensagem)).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Falar a pergunta' })).toBeOnTheScreen();
@@ -207,7 +207,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
 
   test('CT-APP-V05: erro inesperado ao gravar vira mensagem genérica em linguagem simples', async () => {
     mockRecorder.start.mockRejectedValue(new Error('detalhe técnico'));
-    await renderScreen(<AssistantScreen />, api().fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, api().fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
     expect(await screen.findByText(/Não foi possível gravar o áudio/)).toBeOnTheScreen();
     expect(screen.queryByText(/detalhe técnico/)).not.toBeOnTheScreen();
@@ -216,7 +216,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
   test('CT-APP-V06: gravação vazia mostra a orientação e não envia', async () => {
     mockRecorder.stop.mockRejectedValue(new VoiceError('EMPTY_RECORDING'));
     const fake = api();
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Parar e enviar' }));
     expect(await screen.findByText(/Não ouvimos nada/)).toBeOnTheScreen();
@@ -229,7 +229,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
       message:
         'Não consegui entender o áudio. Fale mais perto do microfone ou digite a sua pergunta.',
     });
-    await renderScreen(<AssistantScreen />, fake.fetchFn);
+    await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Parar e enviar' }));
     expect(await screen.findByText(/Não consegui entender o áudio/)).toBeOnTheScreen();
@@ -239,7 +239,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
     jest.useFakeTimers();
     try {
       const fake = api();
-      await renderScreen(<AssistantScreen />, fake.fetchFn);
+      await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
       await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
       await screen.findByText(/Gravando/);
       await act(async () => {

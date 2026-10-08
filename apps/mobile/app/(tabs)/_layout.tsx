@@ -4,13 +4,14 @@ import { BalaoAssistente } from '../../src/components/balao-assistente';
 import { ABAS, BarraDeNavegacao } from '../../src/components/barra-de-navegacao';
 import { EstadoCarregando, EstadoErro } from '../../src/components/estados';
 import { Tela } from '../../src/components/tela';
+import { AssistenteProvider } from '../../src/features/assistant/assistente-contexto';
+import { JanelaDoAssistente } from '../../src/features/assistant/janela-do-assistente';
 import { useConsent } from '../../src/features/data/hooks';
 import { modoDeLayout, posicaoDaBarra } from '../../src/lib/layout';
 import { useThemeColors } from '../../src/theme/theme-provider';
 
 /**
- * Abas do app (Doses, Família, Histórico e Conta) mais a conversa com o assistente, aberta pelo
- * balão flutuante, com a navegação própria de `BarraDeNavegacao` (embaixo no celular, lateral no
+ * Abas do app (Doses, Família, Histórico e Conta) com a navegação própria de `BarraDeNavegacao` (embaixo no celular, lateral no
  * computador). Antes de mostrá-las, confere o consentimento (RF09): quem ainda não aceitou o termo
  * é levado à tela de consentimento.
  */
@@ -39,24 +40,25 @@ export default function TabsLayout() {
   if (!consent.data.accepted) return <Redirect href="/consentimento" />;
 
   return (
-    <View className="flex-1">
-      <Tabs
-        tabBar={() => <BarraDeNavegacao />}
-        screenOptions={{
-          headerShown: false,
-          // O fundo padrão do navegador é um cinza claro fixo; sem isto ele aparece nos temas Escuro e Alto contraste.
-          sceneStyle: { backgroundColor: cores.fundo },
-          // Celular: barra embaixo. Tablet e computador: barra lateral (design system, seção 2.5).
-          tabBarPosition: posicaoDaBarra(modoDeLayout(largura)),
-        }}
-      >
-        {ABAS.map(({ name, titulo }) => (
-          <Tabs.Screen key={name} name={name} options={{ title: titulo }} />
-        ))}
-        {/* Fora da barra: abre pelo balão flutuante, mantendo a navegação à vista. */}
-        <Tabs.Screen name="assistente" options={{ title: 'Assistente' }} />
-      </Tabs>
-      <BalaoAssistente />
-    </View>
+    <AssistenteProvider>
+      <View className="flex-1">
+        <Tabs
+          tabBar={() => <BarraDeNavegacao />}
+          screenOptions={{
+            headerShown: false,
+            // O fundo padrão do navegador é um cinza claro fixo; sem isto ele aparece nos temas Escuro e Alto contraste.
+            sceneStyle: { backgroundColor: cores.fundo },
+            // Celular: barra embaixo. Tablet e computador: barra lateral (design system, seção 2.5).
+            tabBarPosition: posicaoDaBarra(modoDeLayout(largura)),
+          }}
+        >
+          {ABAS.map(({ name, titulo }) => (
+            <Tabs.Screen key={name} name={name} options={{ title: titulo }} />
+          ))}
+        </Tabs>
+        <BalaoAssistente />
+        <JanelaDoAssistente />
+      </View>
+    </AssistenteProvider>
   );
 }
