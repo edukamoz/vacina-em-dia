@@ -8,6 +8,10 @@ name: Deploy
 on:
   push:
     branches: [main]
+    # Documentos Word e arte não mudam o que vai para a Azure.
+    paths-ignore:
+      - 'doctos/**'
+      - 'assets/**'
   workflow_dispatch:
 
 permissions:

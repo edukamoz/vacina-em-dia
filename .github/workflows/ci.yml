@@ -1,10 +1,16 @@
 name: CI
 
-# Executa em todo push e em todo pull request (SCRUM-24). O pipeline falha se algum teste falhar,
-# se a cobertura ficar abaixo de 80% ou se houver vulnerabilidade grave nas dependências.
+# Executa a cada push em qualquer branch (SCRUM-24). Não escuta `pull_request`: o pull request já
+# mostra o resultado do push da própria branch, e rodar os dois dobrava os minutos mensais do GitHub
+# Actions. O pipeline falha se algum teste falhar, se a cobertura ficar abaixo de 80% ou se houver
+# vulnerabilidade grave nas dependências. Mudanças só em `doctos/` (Word) e `assets/` (arte) não têm
+# o que testar. O job de Docker (o mais demorado) roda na main e à mão, não em cada branch.
 on:
   push:
-  pull_request:
+    paths-ignore:
+      - 'doctos/**'
+      - 'assets/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -133,6 +139,8 @@ jobs:
 
   docker:
     name: Imagens Docker e teste de fumaça
+    # Só depois da integração na main (ou à mão): economiza ~4 min por push em branch.
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
