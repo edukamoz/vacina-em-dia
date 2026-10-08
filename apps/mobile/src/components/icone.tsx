@@ -11,6 +11,13 @@ export type NomeDoIcone =
   | 'info'
   | 'sair'
   | 'lembrete'
+  | 'bebe'
+  | 'pessoa'
+  | 'bengala'
+  | 'coracao'
+  | 'frasco'
+  | 'curativo'
+  | 'celula'
   | 'local'
   | 'voz'
   | 'seta'
@@ -69,6 +76,57 @@ function Desenho({ nome }: { nome: NomeDoIcone }) {
     case 'sair':
       return (
         <Path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 8l4 4-4 4M19 12H9" />
+      );
+    case 'bebe':
+      return (
+        <>
+          <Circle cx="12" cy="9" r="4.5" />
+          <Path d="M10.5 5c.3-1.2 1.8-1.7 2.7-.8M6.5 20c.3-2.9 2.6-5 5.5-5s5.2 2.1 5.5 5" />
+        </>
+      );
+    case 'pessoa':
+      return (
+        <>
+          <Circle cx="12" cy="7" r="3.5" />
+          <Path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7" />
+        </>
+      );
+    case 'bengala':
+      return (
+        <>
+          <Circle cx="10" cy="6.5" r="3" />
+          <Path d="M4.5 20c0-3.6 2.4-6.5 5.5-6.5 1.6 0 3 .7 4 1.9M17 20v-7.5a1.8 1.8 0 0 1 3.6 0" />
+        </>
+      );
+    case 'coracao':
+      return (
+        <Path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20zM7.5 12.5h2.3l1.4-2.5 1.9 4.6 1.4-2.1h2" />
+      );
+    case 'frasco':
+      return (
+        <>
+          <Rect x="8" y="3" width="8" height="3.5" rx="1" />
+          <Path d="M9 6.5V9l-1.5 1.5V19a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2v-8.5L15 9V6.5M7.5 14h9" />
+        </>
+      );
+    case 'curativo':
+      return (
+        <G transform="rotate(-45 12 12)">
+          <Rect x="3" y="8" width="18" height="8" rx="4" />
+          <Path d="M9 8v8M15 8v8M12 11v.1M12 13v.1" />
+        </G>
+      );
+    case 'celula':
+      return (
+        <>
+          <Circle cx="12" cy="12" r="4" />
+          <Circle cx="12" cy="3.5" r="1.5" />
+          <Circle cx="19.4" cy="7.8" r="1.5" />
+          <Circle cx="19.4" cy="16.2" r="1.5" />
+          <Circle cx="12" cy="20.5" r="1.5" />
+          <Circle cx="4.6" cy="16.2" r="1.5" />
+          <Circle cx="4.6" cy="7.8" r="1.5" />
+        </>
       );
     case 'lembrete':
       return <Path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 21.5h4" />;
