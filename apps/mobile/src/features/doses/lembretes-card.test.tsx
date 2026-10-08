@@ -109,7 +109,7 @@ describe('lembretes por e-mail na aba Conta', () => {
       'PUT /reminders/preferences': { status: 200, body: { emailEnabled: false } },
     });
     await renderScreen(<AccountScreen />, fake.fetchFn, { store });
-    const caixa = await screen.findByRole('checkbox', { name: 'Receber lembretes por e-mail' });
+    const caixa = await screen.findByRole('switch', { name: 'Receber lembretes por e-mail' });
     expect(caixa).toBeChecked();
     await fireEvent.press(caixa);
     await waitFor(() =>

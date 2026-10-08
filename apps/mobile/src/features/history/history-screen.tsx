@@ -5,13 +5,14 @@ import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
+import { QuadroEstado } from '../../components/quadro-estado';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
+import { useVisual } from '../../theme/theme-provider';
 import { useDosesOfMembers, useMembers } from '../data/hooks';
-import { FAIXA_POR_ESTADO } from '../doses/dose-card';
 import { formatCivilDate } from '../doses/format-date';
 
 /** Uma linha do histórico: a dose, de quem é e a data que a coloca no ano. */
@@ -65,7 +66,7 @@ function textoDaData({ dose, data }: LinhaDoHistorico): string {
   return dose.status === 'CANCELLED' ? `prevista para ${formatada}` : formatada;
 }
 
-/** Linha como cartão (celular e tablet): faixa na cor do estado, vacina, "Pessoa, data" e selos. */
+/** Linha como cartão (celular e tablet): quadro com o ícone do estado, vacina, "Pessoa, data" e selos. */
 function CartaoDoHistorico({ linha, aoAbrir }: { linha: LinhaDoHistorico; aoAbrir: () => void }) {
   const { dose, pessoa } = linha;
   return (
@@ -74,9 +75,9 @@ function CartaoDoHistorico({ linha, aoAbrir }: { linha: LinhaDoHistorico; aoAbri
       accessibilityLabel={`${dose.vaccine}, ${dose.doseLabel}, ${pessoa}. Abrir detalhes`}
       onPress={aoAbrir}
     >
-      <Cartao className="flex-row overflow-hidden p-0">
-        <View className={`w-[6px] ${FAIXA_POR_ESTADO[dose.status]}`} />
-        <View className="flex-1 gap-sm p-lg">
+      <Cartao className="flex-row items-start gap-lg">
+        <QuadroEstado status={dose.status} />
+        <View className="flex-1 gap-sm">
           <Texto
             variante="titulo3"
             importantForAccessibility="no"
@@ -104,12 +105,15 @@ function TabelaDoHistorico({
   linhas: readonly LinhaDoHistorico[];
   aoAbrir: (dose: DoseResponse) => void;
 }) {
+  const { altoContraste, sombra } = useVisual();
+  const fio = altoContraste ? 'border-altoContraste border-borda' : 'border-fina border-bordaSuave';
   return (
     <View
       role="table"
-      className="overflow-hidden rounded-cartao border-padrao border-borda bg-superficie"
+      style={sombra(1)}
+      className={`overflow-hidden rounded-cartao bg-superficie ${fio}`}
     >
-      <View role="row" className="flex-row">
+      <View role="row" className="flex-row bg-superficieSuave">
         {COLUNAS.map((coluna) => (
           <View key={coluna} role="columnheader" className="flex-1 px-lg py-md">
             <Texto variante="rotulo" className="text-textoSecundario">
@@ -124,7 +128,11 @@ function TabelaDoHistorico({
           role="row"
           accessibilityLabel={`${linha.dose.vaccine}, ${linha.dose.doseLabel}, ${linha.pessoa}. Abrir detalhes`}
           onPress={() => aoAbrir(linha.dose)}
-          className="flex-row items-center border-t-padrao border-borda hover:bg-primariaSuave"
+          className={`flex-row items-center hover:bg-superficieSuave ${
+            altoContraste
+              ? 'border-t-altoContraste border-borda'
+              : 'border-t-fina border-bordaSuave'
+          }`}
         >
           <View role="cell" className="flex-1 px-lg py-md">
             <Texto variante="corpoNegrito">{`${linha.dose.vaccine}, ${linha.dose.doseLabel}`}</Texto>
