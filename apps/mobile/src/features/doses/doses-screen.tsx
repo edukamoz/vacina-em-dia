@@ -4,14 +4,18 @@ import { View } from 'react-native';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
+import { CarrosselDePessoas } from '../../components/carrossel-de-pessoas';
 import { Grade } from '../../components/grade';
 import { LinkTexto } from '../../components/link-texto';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
+import { todayCivil } from '../../lib/dates';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useMemberDoses } from '../data/hooks';
 import { DoseCard } from './dose-card';
+import { Festa } from './festa';
 import { LembretesCard } from './lembretes-card';
+import { contarDoses, ResumoDoses } from './resumo-doses';
 
 /** Quantas aplicadas aparecem na tela; as demais ficam no Histórico. */
 export const LIMITE_APLICADAS = 5;
@@ -40,12 +44,12 @@ export function agruparDoses(doses: readonly DoseResponse[]) {
 
 /**
  * Aba "Doses" (RF03 e RF04): as doses da pessoa escolhida em três grupos ("Precisam de atenção",
- * "Próximas" e "Aplicadas"), sempre com a fonte e a versão do calendário oficial. A troca de pessoa
- * é pela aba Família.
+ * "Próximas" e "Aplicadas"), sempre com a fonte e a versão do calendário oficial. Antes dos grupos, o
+ * carrossel de pessoas (troca de quem se vê) e o resumo com anel de progresso.
  */
 export function DosesScreen() {
   const router = useRouter();
-  const { members, selected } = useSelectedMember();
+  const { members, items, selected, selectMember } = useSelectedMember();
   const doses = useMemberDoses(selected?.id ?? null);
 
   if (members.isPending) {
@@ -77,6 +81,7 @@ export function DosesScreen() {
     );
   }
 
+  const primeiroNome = selected.name.split(' ')[0] ?? selected.name;
   const grupos = doses.data ? agruparDoses(doses.data.items) : null;
   const aplicadasVisiveis = grupos?.aplicadas.slice(0, LIMITE_APLICADAS) ?? [];
   const secoes = grupos
@@ -90,22 +95,22 @@ export function DosesScreen() {
   return (
     <Tela
       reservaBalao
-      titulo={`Doses de ${selected.name.split(' ')[0] ?? selected.name}`}
-      abaixoDoTitulo={<LinkTexto titulo="Trocar pessoa" onPress={() => router.push('/familia')} />}
+      titulo={`Doses de ${primeiroNome}`}
       acao={
         <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
       }
     >
+      <CarrosselDePessoas pessoas={items} selecionadaId={selected.id} aoEscolher={selectMember} />
       <LembretesCard />
+      {doses.data && (
+        <ResumoDoses nome={primeiroNome} contagem={contarDoses(doses.data.items, todayCivil())} />
+      )}
       {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
       {doses.error && (
         <EstadoErro mensagem={doses.error.message} onTentarDeNovo={() => void doses.refetch()} />
       )}
       {grupos && grupos.atencao.length + grupos.proximas.length === 0 && (
-        <EstadoVazio
-          titulo="Tudo em dia por aqui"
-          descricao="Não há doses abertas para esta pessoa."
-        />
+        <Festa nome={primeiroNome} />
       )}
       {secoes.map(({ titulo, lista }) =>
         lista.length === 0 ? null : (

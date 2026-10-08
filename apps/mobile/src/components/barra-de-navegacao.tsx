@@ -1,8 +1,8 @@
-import { Link, usePathname } from 'expo-router';
+import { Link, usePathname, type Href } from 'expo-router';
 import { Pressable, useWindowDimensions, View } from 'react-native';
-import { modoDeLayout } from '../lib/layout';
-import { useThemeColors } from '../theme/theme-provider';
 import { Logo } from '../features/auth/logo';
+import { modoDeLayout } from '../lib/layout';
+import { useThemeColors, useVisual } from '../theme/theme-provider';
 import { Icone, type NomeDoIcone } from './icone';
 import { Texto } from './texto';
 
@@ -19,12 +19,63 @@ export const ABAS = [
   icone: NomeDoIcone;
 }[];
 
+/** Item de navegação: link com ícone e texto, destaque que não depende só da cor. */
+function ItemDeNavegacao({
+  caminho,
+  titulo,
+  icone,
+  ativa,
+  expandido,
+  lateral,
+}: {
+  caminho: Href;
+  titulo: string;
+  icone: NomeDoIcone;
+  ativa: boolean;
+  expandido: boolean;
+  lateral: boolean;
+}) {
+  const cores = useThemeColors();
+  const { altoContraste } = useVisual();
+  return (
+    <Link href={caminho} asChild>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={titulo}
+        accessibilityState={{ selected: ativa }}
+        aria-current={ativa ? 'page' : undefined}
+        className={`items-center justify-center rounded-botao border-padrao hover:bg-superficieSuave ${
+          lateral && expandido
+            ? 'min-h-principal flex-row justify-start gap-md px-lg'
+            : lateral
+              ? 'min-h-[68px] gap-xs px-xs py-sm'
+              : 'min-h-principal flex-1 gap-xs px-xs py-sm'
+        } ${
+          ativa
+            ? `bg-primariaSuave ${altoContraste ? 'border-borda' : 'border-transparent'}`
+            : 'border-transparent'
+        }`}
+      >
+        <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />
+        <Texto
+          variante={expandido ? (ativa ? 'corpoNegrito' : 'corpo') : ativa ? 'rotulo' : 'apoio'}
+          className={`${ativa ? 'text-primaria' : 'text-texto'} ${ativa && altoContraste ? 'underline' : ''}`}
+          importantForAccessibility="no"
+        >
+          {titulo}
+        </Texto>
+      </Pressable>
+    </Link>
+  );
+}
+
 /**
  * Navegação principal, que muda de forma conforme a largura (`docs/04-design-system.md`, 2.5):
- * barra **inferior** no celular; barra **lateral compacta** (ícone e texto) no tablet; barra
- * **lateral fixa** com texto, nome do app e aviso no computador. Cada item é um link de verdade
- * (na web, abre com o botão do meio e é navegável por teclado), com o estado "página atual"
- * anunciado ao leitor de tela e um destaque que não depende só da cor.
+ * barra **inferior** no celular; barra **lateral compacta** (ícone sobre o texto) no tablet; barra
+ * **lateral fixa** com o logo e o texto ao lado do ícone no computador. Nas barras laterais o
+ * assistente é o último item; no celular ele é o botão flutuante (`BalaoAssistente`). Cada item é
+ * um link de verdade (na web, abre com o botão do meio e é navegável por teclado), com o estado
+ * "página atual" anunciado ao leitor de tela e um destaque que não depende só da cor.
  *
  * @param props.largura - Largura a considerar; por padrão, a da janela (útil para testar).
  */
@@ -34,53 +85,51 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
   const modo = modoDeLayout(largura ?? janela);
   const lateral = modo !== 'compacto';
   const expandido = modo === 'expandido';
-  const cores = useThemeColors();
+  const { altoContraste, sombra } = useVisual();
 
   return (
     <View
       role="navigation"
       accessibilityLabel="Menu principal"
-      className={
+      style={sombra(1)}
+      className={`bg-superficie ${
         lateral
-          ? `border-r-padrao border-borda bg-superficie ${expandido ? 'w-[248px] gap-xxl px-lg py-xl' : 'w-[96px] px-xs py-lg'}`
-          : 'min-h-[64px] flex-row border-t-padrao border-borda bg-superficie'
-      }
+          ? `${altoContraste ? 'border-r-altoContraste border-borda' : 'border-r-fina border-bordaSuave'} ${
+              expandido ? 'w-[248px] gap-xl px-lg py-xl' : 'w-[96px] gap-lg px-sm py-lg'
+            }`
+          : `min-h-[72px] flex-row p-sm ${altoContraste ? 'border-t-altoContraste border-borda' : 'border-t-fina border-bordaSuave'}`
+      }`}
     >
       {expandido ? (
         <View className="px-sm">
-          <Logo />
+          <Logo pequena />
         </View>
       ) : null}
 
-      <View className={lateral ? 'gap-sm' : 'flex-1 flex-row'}>
-        {ABAS.map(({ caminho, titulo, icone }) => {
-          const ativa = pathname === caminho;
-          return (
-            <Link key={caminho} href={caminho} asChild>
-              <Pressable
-                accessibilityRole="link"
-                accessibilityLabel={titulo}
-                accessibilityState={{ selected: ativa }}
-                aria-current={ativa ? 'page' : undefined}
-                className={`items-center justify-center hover:bg-primariaSuave ${
-                  lateral && expandido
-                    ? 'min-h-principal flex-row justify-start gap-md rounded-cartao px-lg'
-                    : 'min-h-toque flex-1 gap-xs rounded-botao px-xs py-sm'
-                } ${ativa ? 'bg-primariaSuave' : ''}`}
-              >
-                <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />
-                <Texto
-                  variante={ativa ? 'corpoNegrito' : 'corpo'}
-                  className={ativa ? 'text-primaria' : 'text-texto'}
-                  importantForAccessibility="no"
-                >
-                  {titulo}
-                </Texto>
-                {ativa && !expandido ? <View className="h-[3px] w-[24px] bg-primaria" /> : null}
-              </Pressable>
-            </Link>
-          );
-        })}
+      <View className={lateral ? 'flex-1 gap-sm' : 'flex-1 flex-row gap-sm'}>
+        {ABAS.map(({ caminho, titulo, icone }) => (
+          <ItemDeNavegacao
+            key={caminho}
+            caminho={caminho}
+            titulo={titulo}
+            icone={icone}
+            ativa={pathname === caminho}
+            expandido={expandido}
+            lateral={lateral}
+          />
+        ))}
+        {lateral ? (
+          <View className="mt-auto">
+            <ItemDeNavegacao
+              caminho="/assistente"
+              titulo="Assistente"
+              icone="assistente"
+              ativa={pathname === '/assistente'}
+              expandido={expandido}
+              lateral
+            />
+          </View>
+        ) : null}
       </View>
     </View>
   );
