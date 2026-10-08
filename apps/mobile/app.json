@@ -15,6 +15,12 @@
       "expo-font",
       "expo-secure-store",
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O Vacina em Dia usa a sua localização só para mostrar os postos de saúde perto de você. A posição não é guardada."
+        }
+      ],
+      [
         "expo-audio",
         {
           "microphonePermission": "O Vacina em Dia usa o microfone só para ouvir a sua pergunta por voz. O áudio não é guardado."

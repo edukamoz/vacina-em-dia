@@ -13,6 +13,8 @@ import {
   memberDosesResponseSchema,
   memberListResponseSchema,
   memberResponseSchema,
+  nearbyUnitsResponseSchema,
+  type NearbyUnitsQuery,
   type AssistantMessageInput,
   type ConsentInput,
   type ForgotPasswordInput,
@@ -86,6 +88,20 @@ export const endpoints = {
       { path: '/consent', method: 'PUT', body: consentInputSchema.parse(input) },
       consentResponseSchema,
     ),
+
+  /**
+   * Unidades básicas de saúde perto de uma posição (RF10). A posição vai arredondada para 3 casas
+   * decimais (cerca de 110 m): basta para achar o posto e revela menos.
+   */
+  getNearbyUnits: (ctx: ApiContext, query: NearbyUnitsQuery, signal?: AbortSignal) => {
+    const round = (value: number) => Math.round(value * 1000) / 1000;
+    const params = `lat=${round(query.lat)}&lon=${round(query.lon)}&radiusKm=${query.radiusKm}&limit=${query.limit}`;
+    return apiRequest(
+      ctx,
+      { path: `/units/nearby?${params}`, ...(signal ? { signal } : {}) },
+      nearbyUnitsResponseSchema,
+    );
+  },
 
   getReminders: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(
