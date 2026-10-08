@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useVisual } from '../theme/theme-provider';
 import { Botao } from './botao';
 import { Texto } from './texto';
 
@@ -36,8 +37,9 @@ export function Tela({
   children: ReactNode;
 }) {
   const router = useRouter();
+  const { gradienteFundo } = useVisual();
   return (
-    <SafeAreaView className="flex-1 bg-fundo">
+    <SafeAreaView className="flex-1 bg-fundo" style={gradienteFundo}>
       <ScrollView
         contentContainerClassName={`gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem ${
           reservaBalao ? 'pb-[96px]' : ''
