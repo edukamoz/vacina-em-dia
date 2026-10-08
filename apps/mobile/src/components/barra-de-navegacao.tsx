@@ -1,5 +1,6 @@
 import { Link, usePathname, type Href } from 'expo-router';
 import { Pressable, useWindowDimensions, View } from 'react-native';
+import { useAssistente } from '../features/assistant/assistente-contexto';
 import { Logo } from '../features/auth/logo';
 import { modoDeLayout } from '../lib/layout';
 import { useThemeColors, useVisual } from '../theme/theme-provider';
@@ -22,13 +23,15 @@ export const ABAS = [
 /** Item de navegação: link com ícone e texto, destaque que não depende só da cor. */
 function ItemDeNavegacao({
   caminho,
+  aoPressionar,
   titulo,
   icone,
   ativa,
   expandido,
   lateral,
 }: {
-  caminho: Href;
+  caminho?: Href;
+  aoPressionar?: () => void;
   titulo: string;
   icone: NomeDoIcone;
   ativa: boolean;
@@ -37,34 +40,39 @@ function ItemDeNavegacao({
 }) {
   const cores = useThemeColors();
   const { altoContraste } = useVisual();
+  const botao = (
+    <Pressable
+      {...(aoPressionar ? { onPress: aoPressionar } : {})}
+      accessibilityRole={aoPressionar ? 'button' : 'link'}
+      accessibilityLabel={titulo}
+      accessibilityState={{ selected: ativa }}
+      aria-current={ativa && !aoPressionar ? 'page' : undefined}
+      className={`items-center rounded-botao border-padrao hover:bg-superficieSuave ${
+        lateral && expandido
+          ? 'min-h-principal flex-row gap-md px-lg'
+          : lateral
+            ? 'min-h-[68px] justify-center gap-xs px-xs py-sm'
+            : 'min-h-principal flex-1 justify-center gap-xs px-xs py-sm'
+      } ${
+        ativa
+          ? `bg-primariaSuave ${altoContraste ? 'border-borda' : 'border-transparent'}`
+          : 'border-transparent'
+      }`}
+    >
+      <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />
+      <Texto
+        variante={expandido ? (ativa ? 'corpoNegrito' : 'corpo') : ativa ? 'rotulo' : 'apoio'}
+        className={`${ativa ? 'text-primaria' : 'text-texto'} ${ativa && altoContraste ? 'underline' : ''}`}
+        importantForAccessibility="no"
+      >
+        {titulo}
+      </Texto>
+    </Pressable>
+  );
+  if (aoPressionar || !caminho) return botao;
   return (
     <Link href={caminho} asChild>
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel={titulo}
-        accessibilityState={{ selected: ativa }}
-        aria-current={ativa ? 'page' : undefined}
-        className={`items-center rounded-botao border-padrao hover:bg-superficieSuave ${
-          lateral && expandido
-            ? 'min-h-principal flex-row gap-md px-lg'
-            : lateral
-              ? 'min-h-[68px] justify-center gap-xs px-xs py-sm'
-              : 'min-h-principal flex-1 justify-center gap-xs px-xs py-sm'
-        } ${
-          ativa
-            ? `bg-primariaSuave ${altoContraste ? 'border-borda' : 'border-transparent'}`
-            : 'border-transparent'
-        }`}
-      >
-        <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />
-        <Texto
-          variante={expandido ? (ativa ? 'corpoNegrito' : 'corpo') : ativa ? 'rotulo' : 'apoio'}
-          className={`${ativa ? 'text-primaria' : 'text-texto'} ${ativa && altoContraste ? 'underline' : ''}`}
-          importantForAccessibility="no"
-        >
-          {titulo}
-        </Texto>
-      </Pressable>
+      {botao}
     </Link>
   );
 }
@@ -73,8 +81,8 @@ function ItemDeNavegacao({
  * Navegação principal, que muda de forma conforme a largura (`docs/04-design-system.md`, 2.5):
  * barra **inferior** no celular; barra **lateral compacta** (ícone sobre o texto) no tablet; barra
  * **lateral fixa** com o logo e o texto ao lado do ícone no computador. Nas barras laterais o
- * assistente é o último item; no celular ele é o botão flutuante (`BalaoAssistente`). Cada item é
- * um link de verdade (na web, abre com o botão do meio e é navegável por teclado), com o estado
+ * assistente é o último item e abre a janela de conversa; no celular, o botão flutuante
+ * (`BalaoAssistente`) faz o mesmo. Cada aba é um link de verdade (na web, abre com o botão do meio e é navegável por teclado), com o estado
  * "página atual" anunciado ao leitor de tela e um destaque que não depende só da cor.
  *
  * @param props.largura - Largura a considerar; por padrão, a da janela (útil para testar).
@@ -86,6 +94,7 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
   const lateral = modo !== 'compacto';
   const expandido = modo === 'expandido';
   const { altoContraste, sombra } = useVisual();
+  const { aberto: assistenteAberto, abrir: abrirAssistente } = useAssistente();
 
   return (
     <View
@@ -121,10 +130,10 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
         {lateral ? (
           <View className="mt-auto">
             <ItemDeNavegacao
-              caminho="/assistente"
+              aoPressionar={abrirAssistente}
               titulo="Assistente"
               icone="assistente"
-              ativa={pathname === '/assistente'}
+              ativa={assistenteAberto}
               expandido={expandido}
               lateral
             />
