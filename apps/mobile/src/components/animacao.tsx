@@ -1,5 +1,13 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, Easing, Platform } from 'react-native';
+import { forwardRef, useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  Animated,
+  Easing,
+  Platform,
+  ScrollView,
+  View,
+  type ScrollViewProps,
+  type ViewProps,
+} from 'react-native';
 import { useMovimentoReduzido } from '../theme/theme-provider';
 
 /** Durações do design system, em milissegundos (`duracoes` em `tokens.json`). */
@@ -11,6 +19,28 @@ export const CURVA = {
   saida: Easing.bezier(0.2, 0.8, 0.2, 1),
   mola: Easing.bezier(0.34, 1.56, 0.64, 1),
 } as const;
+
+// O `Animated` do React Native força `collapsable={false}` em tudo que anima; na web esse atributo
+// vai parar no DOM e o React reclama no console. Estes dois componentes o descartam.
+const VistaSemColapso = forwardRef<View, ViewProps & { collapsable?: boolean }>(
+  function VistaSemColapso(props, ref) {
+    const { collapsable, ...rest } = props;
+    void collapsable;
+    return <View ref={ref} {...rest} />;
+  },
+);
+const RolagemSemColapso = forwardRef<ScrollView, ScrollViewProps & { collapsable?: boolean }>(
+  function RolagemSemColapso(props, ref) {
+    const { collapsable, ...rest } = props;
+    void collapsable;
+    return <ScrollView ref={ref} {...rest} />;
+  },
+);
+
+/** `View` animável (use no lugar de `Animated.View`). */
+export const VistaAnimada = Animated.createAnimatedComponent(VistaSemColapso);
+/** `ScrollView` animável (use no lugar de `Animated.ScrollView`). */
+export const RolagemAnimadaBase = Animated.createAnimatedComponent(RolagemSemColapso);
 
 /** A web não usa o driver nativo (ele só existe no Android e no iOS). */
 export const USA_DRIVER_NATIVO = Platform.OS !== 'web';
@@ -46,7 +76,7 @@ export function Entrada({ indice = 0, children }: { indice?: number; children: R
 
   if (reduzido) return <>{children}</>;
   return (
-    <Animated.View
+    <VistaAnimada
       style={{
         opacity: progresso,
         transform: [
@@ -55,7 +85,7 @@ export function Entrada({ indice = 0, children }: { indice?: number; children: R
       }}
     >
       {children}
-    </Animated.View>
+    </VistaAnimada>
   );
 }
 

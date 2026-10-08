@@ -2,6 +2,7 @@ import type { DoseStatus } from '@vacina/shared';
 import { View } from 'react-native';
 import { useThemeColors } from '../theme/theme-provider';
 import { Icone } from './icone';
+import { VistoDesenhado } from './indicadores-animados';
 import { SELO_POR_ESTADO } from './selo-estado-dose';
 
 /**
@@ -18,7 +19,11 @@ export function QuadroEstado({ status }: { status: DoseStatus }) {
       aria-hidden
       className={`h-[56px] w-[56px] items-center justify-center rounded-quadro border-padrao ${selo.caixa}`}
     >
-      <Icone nome={selo.icone} cor={cores[selo.cor]} tamanho={28} />
+      {status === 'APPLIED' ? (
+        <VistoDesenhado cor={cores[selo.cor]} tamanho={28} />
+      ) : (
+        <Icone nome={selo.icone} cor={cores[selo.cor]} tamanho={28} />
+      )}
     </View>
   );
 }

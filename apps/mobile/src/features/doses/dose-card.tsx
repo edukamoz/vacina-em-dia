@@ -6,6 +6,7 @@ import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
 import { Texto } from '../../components/texto';
 import { formatCivilDate } from './format-date';
+import { useMovimentoReduzido, useVisual } from '../../theme/theme-provider';
 
 const DICA: Readonly<Record<DoseStatus, string>> = {
   PENDING: 'Prevista para',
@@ -57,8 +58,10 @@ export function doseDateRow(
  * @param props.aoAbrir - Chamada ao tocar no cartão.
  */
 export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () => void }) {
-  const conteudo = (
-    <Cartao className="flex-row items-start gap-lg">
+  const reduzido = useMovimentoReduzido();
+  const { sombra } = useVisual();
+  const cartao = (elevado: boolean) => (
+    <Cartao className="flex-row items-start gap-lg" style={elevado ? sombra(2) : undefined}>
       <QuadroEstado status={dose.status} />
       <View className="flex-1 gap-sm">
         <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
@@ -76,14 +79,24 @@ export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () =
       </View>
     </Cartao>
   );
-  if (!aoAbrir) return conteudo;
+  if (!aoAbrir) return cartao(false);
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${dose.vaccine}, ${dose.doseLabel}. Abrir detalhes`}
       onPress={aoAbrir}
+      // Elevar ao passar (só na web, com mouse): sobe 3 px e ganha a sombra 2; "Reduzir movimento" mantém só a sombra.
+      style={(estado) => {
+        const passando = Boolean((estado as { hovered?: boolean }).hovered);
+        return [
+          reduzido
+            ? null
+            : ({ transitionProperty: 'transform', transitionDuration: '200ms' } as object),
+          passando && !reduzido ? { transform: [{ translateY: -3 }] } : null,
+        ];
+      }}
     >
-      {conteudo}
+      {(estado) => cartao(Boolean((estado as { hovered?: boolean }).hovered))}
     </Pressable>
   );
 }

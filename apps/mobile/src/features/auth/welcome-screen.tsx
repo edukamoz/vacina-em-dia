@@ -1,6 +1,6 @@
 import type { DoseStatus } from '@vacina/shared';
 import { useRouter } from 'expo-router';
-import { ScrollView, useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Bolha } from '../../components/bolha';
@@ -8,6 +8,7 @@ import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { Icone, type NomeDoIcone } from '../../components/icone';
 import { QuadroEstado } from '../../components/quadro-estado';
+import { Paralaxe, Revelar, RolagemAnimada } from '../../components/rolagem-animada';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
@@ -109,7 +110,7 @@ export function WelcomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-fundo">
-      <ScrollView>
+      <RolagemAnimada>
         <View className={`${SECAO} min-h-[72px] flex-row items-center justify-between gap-lg`}>
           <Logo />
           <Botao titulo="Entrar" variante="secundario" onPress={() => router.push('/entrar')} />
@@ -166,10 +167,12 @@ export function WelcomeScreen() {
             className={`${SECAO} relative pb-[64px] pt-[32px] expandido:pb-[96px] expandido:pt-[56px]`}
           >
             {expandido && !altoContraste
-              ? FLUTUANTES.map(({ icone, lugar, tamanho, fundo }) => (
-                  <View
+              ? FLUTUANTES.map(({ icone, lugar, tamanho, fundo }, indice) => (
+                  <Paralaxe
                     key={icone}
                     aria-hidden
+                    fator={0.1 + indice * 0.04}
+                    maximo={12 + indice * 5}
                     className={`absolute items-center justify-center rounded-[28px] border-fina border-bordaSuave ${lugar}`}
                     style={{ width: tamanho, height: tamanho, backgroundColor: cores[fundo] }}
                   >
@@ -182,7 +185,7 @@ export function WelcomeScreen() {
                       }
                       tamanho={38}
                     />
-                  </View>
+                  </Paralaxe>
                 ))
               : null}
             <View className="gap-xxl expandido:flex-row expandido:items-center expandido:gap-[48px]">
@@ -229,83 +232,89 @@ export function WelcomeScreen() {
           </View>
         </View>
 
-        <View className={`${SECAO} gap-xl py-xxl`}>
-          <View className="max-w-[640px] gap-sm">
-            <Texto variante="titulo2" accessibilityRole="header">
-              Para cada fase da vida
-            </Texto>
-            <Texto className="text-textoSecundario">
-              O calendário oficial muda com a idade. O aplicativo mostra o que vale para cada pessoa
-              da família.
-            </Texto>
-          </View>
-          <View className="flex-row flex-wrap items-end justify-around gap-xl pt-lg">
-            {FASES.map(({ icone, rotulo, tamanho, cor }) => (
-              <View key={rotulo} className="w-[140px] items-center gap-md">
-                <View
-                  aria-hidden
-                  className="items-center justify-center rounded-selo"
-                  style={{ width: tamanho, height: tamanho, backgroundColor: cores[cor] }}
-                >
-                  <Icone
-                    nome={icone}
-                    cor={cores.sobreAvatar}
-                    tamanho={Math.round(tamanho * 0.46)}
-                  />
-                </View>
-                <Texto variante="corpoNegrito" className="text-center">
-                  {rotulo}
-                </Texto>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <View className={`${SECAO} gap-xl pb-xxl`}>
-          <Texto variante="titulo2" accessibilityRole="header">
-            Feito para ser simples
-          </Texto>
-          <View className="gap-lg expandido:flex-row expandido:gap-xl">
-            {VANTAGENS.map(({ titulo, texto, icone }) => (
-              <Cartao key={titulo} className="gap-md expandido:flex-1 expandido:p-xl">
-                <View
-                  aria-hidden
-                  className="h-[64px] w-[64px] items-center justify-center rounded-[22px] border-padrao border-primaria bg-primariaSuave"
-                >
-                  {icone === 'texto' ? (
-                    <Texto variante="titulo2" className="text-primaria">
-                      Aa
-                    </Texto>
-                  ) : (
-                    <Icone nome={icone} cor={cores.primaria} tamanho={32} />
-                  )}
-                </View>
-                <Texto variante="titulo3" accessibilityRole="header">
-                  {titulo}
-                </Texto>
-                <Texto className="text-textoSecundario">{texto}</Texto>
-              </Cartao>
-            ))}
-          </View>
-        </View>
-
-        <View className={`${SECAO} pb-xl`}>
-          <Cartao className="gap-xl overflow-hidden p-xl expandido:flex-row expandido:items-center expandido:justify-between expandido:p-[40px]">
-            <View className="flex-row items-center gap-lg expandido:flex-1">
-              <Simbolo tamanho={72} />
-              <Texto variante="titulo2" accessibilityRole="header" className="flex-1">
-                Comece a acompanhar as doses da família.
+        <Revelar>
+          <View className={`${SECAO} gap-xl py-xxl`}>
+            <View className="max-w-[640px] gap-sm">
+              <Texto variante="titulo2" accessibilityRole="header">
+                Para cada fase da vida
+              </Texto>
+              <Texto className="text-textoSecundario">
+                O calendário oficial muda com a idade. O aplicativo mostra o que vale para cada
+                pessoa da família.
               </Texto>
             </View>
-            <View>
-              <Botao
-                titulo="Criar conta"
-                variante="secundario"
-                onPress={() => router.push('/criar-conta')}
-              />
+            <View className="flex-row flex-wrap items-end justify-around gap-xl pt-lg">
+              {FASES.map(({ icone, rotulo, tamanho, cor }) => (
+                <View key={rotulo} className="w-[140px] items-center gap-md">
+                  <View
+                    aria-hidden
+                    className="items-center justify-center rounded-selo"
+                    style={{ width: tamanho, height: tamanho, backgroundColor: cores[cor] }}
+                  >
+                    <Icone
+                      nome={icone}
+                      cor={cores.sobreAvatar}
+                      tamanho={Math.round(tamanho * 0.46)}
+                    />
+                  </View>
+                  <Texto variante="corpoNegrito" className="text-center">
+                    {rotulo}
+                  </Texto>
+                </View>
+              ))}
             </View>
-          </Cartao>
-        </View>
+          </View>
+        </Revelar>
+
+        <Revelar>
+          <View className={`${SECAO} gap-xl pb-xxl`}>
+            <Texto variante="titulo2" accessibilityRole="header">
+              Feito para ser simples
+            </Texto>
+            <View className="gap-lg expandido:flex-row expandido:gap-xl">
+              {VANTAGENS.map(({ titulo, texto, icone }) => (
+                <Cartao key={titulo} className="gap-md expandido:flex-1 expandido:p-xl">
+                  <View
+                    aria-hidden
+                    className="h-[64px] w-[64px] items-center justify-center rounded-[22px] border-padrao border-primaria bg-primariaSuave"
+                  >
+                    {icone === 'texto' ? (
+                      <Texto variante="titulo2" className="text-primaria">
+                        Aa
+                      </Texto>
+                    ) : (
+                      <Icone nome={icone} cor={cores.primaria} tamanho={32} />
+                    )}
+                  </View>
+                  <Texto variante="titulo3" accessibilityRole="header">
+                    {titulo}
+                  </Texto>
+                  <Texto className="text-textoSecundario">{texto}</Texto>
+                </Cartao>
+              ))}
+            </View>
+          </View>
+        </Revelar>
+
+        <Revelar>
+          <View className={`${SECAO} pb-xl`}>
+            <Cartao className="gap-xl overflow-hidden p-xl expandido:flex-row expandido:items-center expandido:justify-between expandido:p-[40px]">
+              <View className="flex-row items-center gap-lg expandido:flex-1">
+                <Simbolo tamanho={72} />
+                <Texto variante="titulo2" accessibilityRole="header" className="flex-1">
+                  Comece a acompanhar as doses da família.
+                </Texto>
+              </View>
+              <View>
+                <Botao
+                  titulo="Criar conta"
+                  variante="secundario"
+                  onPress={() => router.push('/criar-conta')}
+                />
+              </View>
+            </Cartao>
+          </View>
+        </Revelar>
 
         <View className={`${SECAO} pb-xxl pt-lg`}>
           <Texto variante="apoio" className="text-textoSecundario">
@@ -313,7 +322,7 @@ export function WelcomeScreen() {
             profissionais de saúde.
           </Texto>
         </View>
-      </ScrollView>
+      </RolagemAnimada>
     </SafeAreaView>
   );
 }
