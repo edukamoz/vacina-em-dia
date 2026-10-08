@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 07/10/2026 (fim do dia, computador de casa; **leia a seção 0.10 primeiro**, que está em dia; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 08/10/2026 (**leia a seção 0.11 primeiro**: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,39 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.11 Estado em 08/10/2026: redesenho concluído, mapa de postos e repositório público
+
+**Na `main` (PRs #65 a #76, todos mesclados; não há PR aberto):**
+- **Redesenho fiel à pasta `design/` (tokens v2):** tokens, marca e componentes; navegação (barra inferior, lateral compacta e lateral fixa); Doses, Família, Histórico, Conta; apresentação, Entrar e Criar conta. O assistente virou uma **janela de chat** (modal; folha no celular), aberta pelo balão (celular) ou pelo item "Assistente" da lateral.
+- **Mapa de postos de saúde (RF10, SCRUM-32; ADR-018):** rota `GET /api/units/nearby` com base local `apps/api/src/data/ubs.json` (45.588 unidades do CNES) e enriquecimento pela API oficial (cache de 12 h; falha vira `live:false`; `UNITS_OFFICIAL_API=off` desliga). No app, a tela `/postos` tem lista e mapa Leaflet/OpenStreetMap (web direto; celular em `WebView`), localização só ao tocar em "Usar minha localização" (arredondada a 3 casas, nunca guardada), lista guardada no aparelho (offline primeiro) e apagada ao sair da conta. **Não exige chave de API.** Política de privacidade na versão `2026-10-08`.
+- **Movimento e texto (etapa 8):** "Reduzir movimento" e "Tamanho do texto" (Normal, Grande, Maior) na Conta, guardados no aparelho; entrada escalonada, pressionar, anel e contador, visto, brilhos, onda da voz, "escrevendo", cartão que sobe ao passar o mouse, revelar na rolagem e paralaxe na apresentação. Tudo parado com "Reduzir movimento", preferência do sistema ou Alto contraste. Código em `apps/mobile/src/components/animacao.tsx`, `indicadores-animados.tsx` e `rolagem-animada.tsx`.
+- Testes do app: 402 passando, cobertura 95%; lint, typecheck e Prettier limpos.
+
+**Repositório agora é PÚBLICO (mudança de 08/10/2026):** foi feito para o GitHub Actions deixar de consumir os 2000 min (estava em 1766; o limite bloqueava os jobs). O histórico foi **reescrito com `git filter-repo`** para tirar `doctos/`, `docs/referencias-disciplinas/` e a Fase 0 em Word; esses arquivos estão no `.gitignore` e **só existem na máquina do autor** (faça backup fora do Git). Uma cópia do repositório antes da reescrita ficou em `%TEMP%\vacina-bkp\backup.git` (pode ser apagada). As versões antigas dos PRs já mesclados (`refs/pull/*`) ainda guardam esses arquivos no GitHub; só o suporte do GitHub limpa isso. **Clones antigos divergiram: re-clone ou `git fetch` + `git reset --hard origin/main`.** Varredura do histórico: nenhum segredo encontrado.
+Configurações aplicadas com o `gh`: *secret scanning* e *push protection* ligados; workflows só com leitura e sem aprovar PRs; PRs de colaboradores externos exigem aprovação; `main` sem force push nem exclusão, exigindo o check "Lint, tipos, build, testes e cobertura" (o administrador não é obrigado, então o autor ainda mescla).
+CI em `push` (sem `pull_request`); o job de Docker roda só na `main` ou manualmente; o deploy ignora `doctos/` e `assets/`.
+
+**Pendências do autor (novas e antigas):**
+1. Fazer backup de `doctos/` e dos PDFs de referência (não estão mais no Git). Apagar a pasta `design/` quando quiser (já foi adaptada; os assets estão em `assets/`).
+2. Confirmar com o professor a **licença dos dados dos postos** (CC BY-SemDerivações 3.0) e o uso do CNES.
+3. Testar **em celular físico e no iOS**: o mapa (WebView), a localização e o `tel:` não foram testados; o mapa no celular carrega o Leaflet do CDN unpkg e precisa de internet (a lista funciona offline).
+4. Conferir **a olho** as animações (o navegador dos meus testes estava com "reduzir movimento" ligado, então só vi o modo reduzido ao vivo).
+5. Antigas: regra de firewall do SQL e chave da Brevo (ver 0.10), Douglas e `rg-delbicos`, Key Vault, voz com microfone real, revisar o dataset do chatbot e o termo de consentimento, tempos reais no Jira, apagar `D:\c`.
+
+**Próximos passos do Claude, em ordem sugerida:**
+1. **Documentação de Desenvolvimento (SCRUM-35)**, só com dados reais do autor (horas, reuniões e aprendizados são dele); depois atualizar a Técnica com o mapa de postos (ADR-018), o redesenho e o repositório público; gerar os **PDFs e o zip** só na entrega (19/11).
+2. Registrar Jest versus JUnit no `CLAUDE.md` §14 depois da resposta do professor; Computação em Nuvem II (data a confirmar).
+3. Opcionais do design que ficaram de fora: inclinação 3D por mouse (pilha de cartões e escudo de Entrar), painel lateral e folha inferior animados, "Editar dados" e painel lateral do detalhe da dose (só com aprovação). Tablet (600 a 1023 px) não foi desenhado.
+4. A lista de postos não diz quais unidades têm **sala de vacina** (nenhuma fonte oficial verificada diz); a tela avisa "Ligue antes de ir". A API oficial paginada de 20 em 20 pode estourar o limite de 4 s em municípios grandes (cai para a base local).
+
+**Armadilhas novas (além das de 0.5 e 0.10):**
+- **Metro/NativeWind com cache velho:** classe nova de variante (como `expandido:w-[400px]`) pode não gerar CSS; reinicie o Metro com o cache limpo (apague `apps/mobile/node_modules/.cache`).
+- **RNTL 14 é assíncrono:** `await render(...)`, `await fireEvent...`; `describe` nunca é `async`.
+- **Porta 7071:** o proxy CORS de teste pode ocupá-la; suba a API com `API_PORT=7081 docker compose up -d api`. O contêiner em memória perde as contas ao reiniciar.
+- **Aviso `collapsable` no console da web** vem do `ScrollView` do react-native-web (antigo, só em desenvolvimento). Use `VistaAnimada` em vez de `Animated.View`.
+- Reescrita de histórico: use `git filter-repo` (`python -m git_filter_repo`) num clone espelho e envie só `refs/heads/*`.
+- Antes de cada PR: formatar só os arquivos alterados (`prettier --write` em pasta inteira reformata arquivos alheios), commit com tipo válido (`chore`, nunca `style`) e sem linha de coautoria.
 
 ### 0.10 Estado em 07/10/2026 (fim do dia): o que está pronto, o que está aberto e o que falta
 
