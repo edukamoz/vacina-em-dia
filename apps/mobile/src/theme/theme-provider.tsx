@@ -1,8 +1,14 @@
 import { vars } from 'nativewind';
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { Platform, useColorScheme, View, type ViewStyle } from 'react-native';
 import { resolveTheme, type ThemePreference } from './resolve-theme';
-import { getThemeColors, type ThemeName } from './tokens';
+import {
+  getBackgroundGradient,
+  getBrandGradient,
+  getShadow,
+  getThemeColors,
+  type ThemeName,
+} from './tokens';
 
 /** Valor entregue pelo contexto de tema. */
 export interface ThemeContextValue {
@@ -72,4 +78,32 @@ export function useTheme(): ThemeContextValue {
 export function useThemeColors() {
   const context = useContext(ThemeContext);
   return getThemeColors(context?.theme ?? 'light');
+}
+
+/**
+ * Imagem de fundo CSS (gradiente) como estilo. A web lê `backgroundImage`; o React Native, a
+ * propriedade `experimental_backgroundImage`. Uma cor chapada (Alto contraste) vira `backgroundColor`.
+ */
+function imagemDeFundo(valor: string): ViewStyle {
+  if (!valor.startsWith('linear-gradient')) return { backgroundColor: valor };
+  return (
+    Platform.OS === 'web' ? { backgroundImage: valor } : { experimental_backgroundImage: valor }
+  ) as ViewStyle;
+}
+
+/**
+ * Estilos visuais que dependem do tema e não cabem em classe: sombra (`boxShadow`) e gradientes.
+ * No Alto contraste todos viram "sem efeito" (sem sombra e sem gradiente). Fora do
+ * `ThemeProvider` devolve os do tema Claro.
+ */
+export function useVisual() {
+  const tema = useContext(ThemeContext)?.theme ?? 'light';
+  return {
+    tema,
+    altoContraste: tema === 'highContrast',
+    sombra: (nivel: 1 | 2 | 3): ViewStyle =>
+      tema === 'highContrast' ? {} : { boxShadow: getShadow(`${nivel}`, tema) },
+    gradienteMarca: imagemDeFundo(getBrandGradient(tema)),
+    gradienteFundo: imagemDeFundo(getBackgroundGradient(tema)),
+  };
 }
