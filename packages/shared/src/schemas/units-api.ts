@@ -61,13 +61,10 @@ export const healthUnitSchema = z
       .string()
       .nullable()
       .meta({ example: 'Manhã e tarde', description: 'Turno de atendimento do cadastro oficial.' }),
-    updatedAt: z
-      .string()
-      .nullable()
-      .meta({
-        example: '2025-09-03',
-        description: 'Data da última atualização do cadastro oficial.',
-      }),
+    updatedAt: z.string().nullable().meta({
+      example: '2025-09-03',
+      description: 'Data da última atualização do cadastro oficial.',
+    }),
   })
   .meta({ id: 'HealthUnit' });
 
