@@ -2,6 +2,10 @@ import { randomUUID } from 'node:crypto';
 import type { HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
 import { PNI_2026 } from '@vacina/shared';
 import { createBrevoEmailClient, unavailableEmailClient } from '../clients/brevo-email-client';
+import {
+  createOfficialUnitsClient,
+  unavailableOfficialUnitsClient,
+} from '../clients/official-units-client';
 import { createHttpNlpClient, unavailableNlpClient } from '../clients/nlp-http-client';
 import { createHttpSpeechClient, unavailableSpeechClient } from '../clients/speech-http-client';
 import { createAccountHandlers } from '../handlers/account';
@@ -12,6 +16,7 @@ import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
 import { createMemberHandlers } from '../handlers/members';
 import { createReminderHandlers } from '../handlers/reminders';
+import { createUnitsHandlers } from '../handlers/units';
 import { withSecurityHeaders, type HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
@@ -25,6 +30,8 @@ import { createConsentService } from '../services/consent-service';
 import { createDoseService } from '../services/dose-service';
 import { createMemberService } from '../services/member-service';
 import { createReminderService } from '../services/reminder-service';
+import { loadBundledUnits } from '../services/units-dataset';
+import { createUnitsService } from '../services/units-service';
 import { createScryptHasher } from '../services/password-hasher';
 import { createFixedWindowLimiter } from '../services/rate-limiter';
 import { createTokenService, MIN_SECRET_LENGTH } from '../services/token-service';
@@ -156,6 +163,24 @@ const speech =
     : unavailableSpeechClient;
 export const assistantHandlers = createAssistantHandlers(
   createAssistantService({ nlp, speech, limiter: createFixedWindowLimiter(clock) }),
+);
+
+/**
+ * Mapa de postos (RF10): unidades básicas de saúde do arquivo do Ministério da Saúde que acompanha
+ * a API; telefone e turno vêm da API oficial quando ela responde a tempo. Sem `UNITS_OFFICIAL_API=on`
+ * nada sai para a internet (testes e desenvolvimento sem rede).
+ */
+export const unitsHandlers = createUnitsHandlers(
+  createUnitsService({
+    dataset: loadBundledUnits(),
+    official:
+      process.env['UNITS_OFFICIAL_API'] === 'off'
+        ? unavailableOfficialUnitsClient
+        : createOfficialUnitsClient(),
+    limiter: createFixedWindowLimiter(clock),
+    clock,
+    reportError: (kind) => console.error(`Falha na API oficial de unidades: ${kind}.`),
+  }),
 );
 
 /**
