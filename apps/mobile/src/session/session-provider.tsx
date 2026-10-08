@@ -13,6 +13,7 @@ import {
 import { API_BASE_URL } from '../api/config';
 import { ApiRequestError, type ApiContext } from '../api/client';
 import { endpoints } from '../api/endpoints';
+import { clearUnitsCache } from '../features/units/units-cache';
 import type { SessionStore, StoredSession } from './auth-storage';
 import { sessionStore as defaultStore } from './session-store';
 
@@ -114,6 +115,8 @@ export function SessionProvider({
     await open(null);
     selectMember(null);
     queryClient.clear();
+    // A lista de postos guardada no aparelho também sai com a conta.
+    await clearUnitsCache();
   }, [open, queryClient]);
 
   useEffect(() => {

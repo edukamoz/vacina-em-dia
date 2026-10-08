@@ -128,6 +128,16 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
           />
         ))}
         {lateral ? (
+          <ItemDeNavegacao
+            caminho="/postos"
+            titulo="Postos"
+            icone="local"
+            ativa={pathname === '/postos'}
+            expandido={expandido}
+            lateral
+          />
+        ) : null}
+        {lateral ? (
           <View className="mt-auto">
             <ItemDeNavegacao
               aoPressionar={abrirAssistente}
