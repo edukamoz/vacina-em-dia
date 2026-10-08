@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "dist/src/functions/*.js",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node -e \"require('fs').cpSync('src/data','dist/src/data',{recursive:true})\"",
     "start": "npm run build && func start",
     "typecheck": "tsc --noEmit",
     "test": "jest",

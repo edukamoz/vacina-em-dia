@@ -23,6 +23,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-015](ADR-015-email-transacional-brevo.md) | E-mail transacional com o Brevo (recuperação de senha) | Aceita |
 | [ADR-016](ADR-016-dose-avulsa.md) | Dose avulsa (vacina cadastrada à mão, fora do calendário oficial) | Aceita |
 | [ADR-017](ADR-017-lembretes.md) | Lembretes: aviso no app e e-mail diário (RF05) | Aceita |
+| [ADR-018](ADR-018-mapa-de-postos.md) | Mapa de postos de saúde com dados oficiais e funcionamento sem internet (RF10) | Aceita |
 
 ## Estados possíveis
 
