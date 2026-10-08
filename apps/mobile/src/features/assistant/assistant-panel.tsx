@@ -12,6 +12,7 @@ import { Icone } from '../../components/icone';
 import { Texto } from '../../components/texto';
 import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import { Simbolo } from '../auth/logo';
+import { OndaDaVoz, PontosEscrevendo } from '../../components/indicadores-animados';
 import { ChatMessageView } from './chat-message';
 import { useAssistantChat } from './use-assistant-chat';
 import { MAX_RECORDING_SECONDS, VoiceError, type VoiceRecorder } from './voice-types';
@@ -21,7 +22,7 @@ const MAX_LENGTH = 300;
 
 type VoiceState = 'idle' | 'recording' | 'processing';
 
-/** Barras da "onda" mostrada enquanto grava (alturas fixas; a animação vem depois). */
+/** Alturas das barras da "onda" mostrada enquanto grava. */
 const ONDA = [14, 26, 36, 22, 30, 16, 24] as const;
 
 /**
@@ -173,9 +174,7 @@ export function AssistantPanel({
               accessibilityLabel="Entendendo a sua pergunta..."
               className="flex-row items-center gap-sm self-start rounded-[22px] border-fina border-bordaSuave bg-superficie px-lg py-md"
             >
-              {[0, 1, 2].map((ponto) => (
-                <View key={ponto} className="h-[10px] w-[10px] rounded-selo bg-textoSecundario" />
-              ))}
+              <PontosEscrevendo />
               <Texto
                 variante="apoio"
                 className="text-textoSecundario"
@@ -204,15 +203,7 @@ export function AssistantPanel({
       <View className="gap-sm border-t-fina border-bordaSuave bg-superficie p-md">
         {voiceState === 'recording' ? (
           <View className="gap-sm">
-            <View className="h-[48px] flex-row items-center justify-center gap-[5px]" aria-hidden>
-              {ONDA.map((altura, indice) => (
-                <View
-                  key={indice}
-                  className="w-[6px] rounded-selo bg-primaria"
-                  style={{ height: altura }}
-                />
-              ))}
-            </View>
+            <OndaDaVoz alturas={ONDA} />
             <Texto variante="corpoNegrito" accessibilityLiveRegion="polite">
               {`Gravando... fale a sua pergunta (${segundos} s)`}
             </Texto>
