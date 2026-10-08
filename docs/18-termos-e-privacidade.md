@@ -33,3 +33,7 @@ Ao mudar um texto, mude `LEGAL_VERSION`.
 - **Contato para pedidos do titular:** e-mail do autor (constante `PRIVACY_CONTACT`). Trocar se o professor indicar outro canal.
 - **A confirmar pelo autor:** prazo de cópias de segurança do banco (o texto não promete prazo), quem é o controlador formalmente (aqui: o aluno, no contexto acadêmico) e se a faculdade exige texto próprio.
 - **Static Web Apps fica em Central US** (só serve o site, sem dados pessoais); não consta no texto.
+
+## Atualização de 08/10/2026: localização (mapa de postos)
+
+A Política de privacidade (versão `2026-10-08`) ganhou a seção "Postos de saúde e localização": a posição só é pedida ao tocar em "Usar minha localização"; vai arredondada (cerca de 110 m) para a API, que **não a guarda nem a registra em log**; a lista de postos fica no aparelho (sem a posição) e é apagada ao sair da conta; só o código do município vai à base oficial do Ministério da Saúde; as imagens do mapa vêm do OpenStreetMap. Ver `docs/05-adrs/ADR-018-mapa-de-postos.md`.

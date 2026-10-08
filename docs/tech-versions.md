@@ -111,4 +111,9 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 |---|---|---|
 | expo-secure-store | ~57.0.4 | Token de sessão no celular (Keychain e Keystore), conforme a ADR-009 |
 | expo-audio | ~57.0.5 | Microfone no celular (`AudioStream`, PCM) para a pergunta por voz (RF06) |
+| expo-location | ~57.0.20 | Posição atual, só ao tocar em "Usar minha localização" (mapa de postos, RF10; ADR-018) |
+| react-native-webview | 13.16.1 | Mapa Leaflet no celular, sem chave de API (ADR-018) |
+| leaflet | 1.9.4 | Mapa na web, com os mapas do OpenStreetMap (ADR-018); no celular a mesma versão vem do CDN unpkg com verificação de integridade (SRI) |
+| @types/leaflet | 1.9.22 | Tipos do Leaflet (desenvolvimento) |
+| @react-native-async-storage/async-storage | 2.2.0 | Lista de postos guardada no aparelho, para funcionar sem internet (ADR-018) |
 | react-native-svg | 15.15.4 | Marca do Vacina em Dia nas telas de entrada (versão indicada pelo `expo install`) |

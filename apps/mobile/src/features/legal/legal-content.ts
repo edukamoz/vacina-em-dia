@@ -17,7 +17,7 @@ export interface LegalDocument {
  *
  * Rascunho para validação do autor antes da apresentação; não é parecer jurídico.
  */
-export const LEGAL_VERSION = '2026-10-07';
+export const LEGAL_VERSION = '2026-10-08';
 
 /** Contato para pedidos sobre dados pessoais (LGPD, art. 18). */
 export const PRIVACY_CONTACT = 'eduardokamoz@gmail.com';
@@ -119,6 +119,14 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
       paragrafos: [
         'Na aba Doses, o aplicativo mostra as vacinas atrasadas, as de hoje e as dos próximos 7 dias.',
         'Se você não desligar, enviamos também um e-mail às 8h (horário de Brasília), no dia da vacina e 7 dias antes, no máximo um por dia. O e-mail traz só a quantidade de vacinas, sem nome de pessoa nem de vacina. Você pode desligar esse e-mail a qualquer momento na aba Conta.',
+      ],
+    },
+    {
+      titulo: 'Postos de saúde e localização',
+      paragrafos: [
+        'Na tela Postos de saúde, o aplicativo só pede a sua localização quando você toca em "Usar minha localização", e só enquanto está em uso. Se você não permitir, o resto do aplicativo funciona normalmente.',
+        'A sua posição é usada para achar as unidades básicas de saúde mais perto de você. Ela é enviada ao nosso serviço arredondada (cerca de 110 metros), não é guardada nem registrada, e não vai para nenhum outro serviço. Só o código do município das unidades encontradas é consultado na base oficial do Ministério da Saúde.',
+        'O aplicativo guarda neste aparelho a última lista de postos recebida, para você ver sem internet. A lista não traz a sua posição e é apagada quando você sai da conta. O mapa usa imagens do OpenStreetMap, que recebem o endereço de internet do seu aparelho, como qualquer site.',
       ],
     },
     {
