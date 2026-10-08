@@ -1,12 +1,13 @@
-import { View } from 'react-native';
-import { Botao } from '../../components/botao';
+import { Pressable, View } from 'react-native';
+import { Icone } from '../../components/icone';
 import { Texto } from '../../components/texto';
+import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import type { ChatMessage } from './use-assistant-chat';
 
 /**
- * Uma mensagem do chat. A da pessoa fica à direita; a do assistente à esquerda, com a fonte que
- * embasa a resposta, o aviso quando a pergunta foi encaminhada a um profissional de saúde e as
- * perguntas sugeridas (que, ao tocar, são enviadas).
+ * Uma mensagem do chat, em balões. A da pessoa fica à direita, em verde; a do assistente à
+ * esquerda, com a fonte que embasa a resposta, o aviso (em azul, com ícone) quando a pergunta foi
+ * encaminhada a um profissional de saúde e as perguntas sugeridas (que, ao tocar, são enviadas).
  *
  * @param props.mensagem - Mensagem a exibir.
  * @param props.aoSugerir - Chamada com a pergunta sugerida tocada.
@@ -21,16 +22,23 @@ export function ChatMessageView({
   aoSugerir: (pergunta: string) => void;
   desativado: boolean;
 }) {
+  const cores = useThemeColors();
+  const { gradienteMarca, sombra, altoContraste } = useVisual();
+
   if (mensagem.role === 'user') {
     return (
       <View className="items-end">
         <View
           accessible
           accessibilityLabel={`${mensagem.spoken ? 'Você falou' : 'Você'}: ${mensagem.text}`}
-          className="max-w-[88%] rounded-cartao border-padrao border-primaria bg-primariaSuave p-md"
+          style={gradienteMarca}
+          className={`max-w-[88%] flex-row items-center gap-sm rounded-[22px] rounded-br-[6px] bg-primaria px-lg py-md ${
+            altoContraste ? 'border-padrao border-borda' : ''
+          }`}
         >
-          <Texto importantForAccessibility="no">
-            {mensagem.spoken ? `🎤 ${mensagem.text}` : mensagem.text}
+          {mensagem.spoken ? <Icone nome="voz" cor={cores.sobrePrimaria} tamanho={20} /> : null}
+          <Texto className="flex-shrink text-sobrePrimaria" importantForAccessibility="no">
+            {mensagem.text}
           </Texto>
         </View>
       </View>
@@ -39,32 +47,48 @@ export function ChatMessageView({
 
   const resposta = mensagem.reply;
   const mostrarFonte = resposta && resposta.intent !== 'saudacao' && !resposta.fallback;
+  const cuidado = Boolean(resposta?.safety);
   return (
     <View className="items-start gap-sm">
       <View
         accessibilityLabel={`Assistente: ${mensagem.text}`}
         accessible
-        className={`max-w-[92%] gap-sm rounded-cartao border-padrao bg-superficie p-md ${
-          resposta?.safety ? 'border-pendente' : 'border-borda'
+        style={cuidado ? undefined : sombra(1)}
+        className={`max-w-[92%] gap-sm rounded-[22px] rounded-bl-[6px] px-lg py-md ${
+          cuidado
+            ? 'border-padrao border-agendada bg-agendadaSuave'
+            : altoContraste
+              ? 'border-altoContraste border-borda bg-superficie'
+              : 'border-fina border-bordaSuave bg-superficie'
         }`}
       >
-        {resposta?.safety ? (
-          <Texto variante="rotulo" className="text-pendente" importantForAccessibility="no">
-            ⚠ Converse com um profissional de saúde
-          </Texto>
+        {cuidado ? (
+          <View className="flex-row items-center gap-sm">
+            <Icone nome="info" cor={cores.agendada} tamanho={22} />
+            <Texto variante="rotulo" className="text-agendada" importantForAccessibility="no">
+              Converse com um profissional de saúde
+            </Texto>
+          </View>
         ) : null}
         <Texto importantForAccessibility="no">{mensagem.text}</Texto>
         {mostrarFonte ? (
-          <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-            {`Fonte: ${resposta.source.name}${
-              resposta.source.version ? `, versão ${resposta.source.version}` : ''
-            }`}
-          </Texto>
+          <View className="flex-row gap-sm border-t-fina border-bordaSuave pt-sm">
+            <Icone nome="info" cor={cores.textoSecundario} tamanho={20} />
+            <Texto
+              variante="apoio"
+              className="flex-1 text-textoSecundario"
+              importantForAccessibility="no"
+            >
+              {`Fonte: ${resposta.source.name}${
+                resposta.source.version ? `, versão ${resposta.source.version}` : ''
+              }`}
+            </Texto>
+          </View>
         ) : null}
       </View>
 
       {mensagem.results && mensagem.results.length > 0 ? (
-        <View className="max-w-[92%] gap-xs rounded-cartao border-padrao border-borda bg-fundo p-md">
+        <View className="max-w-[92%] gap-xs rounded-[16px] border-fina border-bordaSuave bg-superficieSuave p-md">
           <Texto variante="rotulo">Vacinas encontradas no calendário</Texto>
           {mensagem.results.map((hit) => (
             <View key={hit.vaccine} className="gap-xs">
@@ -78,15 +102,23 @@ export function ChatMessageView({
       ) : null}
 
       {resposta && resposta.suggestions.length > 0 ? (
-        <View className="max-w-[92%] gap-sm">
+        <View className="max-w-[92%] flex-row flex-wrap gap-sm">
           {resposta.suggestions.map((sugestao) => (
-            <Botao
+            <Pressable
               key={sugestao}
-              titulo={sugestao}
-              variante="secundario"
+              accessibilityRole="button"
+              accessibilityLabel={sugestao}
+              accessibilityState={{ disabled: desativado }}
               disabled={desativado}
               onPress={() => aoSugerir(sugestao)}
-            />
+              className={`min-h-toque justify-center rounded-selo border-padrao border-borda bg-superficie px-lg py-sm hover:bg-superficieSuave ${
+                desativado ? 'opacity-50' : ''
+              }`}
+            >
+              <Texto variante="apoio" className="text-texto" importantForAccessibility="no">
+                {sugestao}
+              </Texto>
+            </Pressable>
           ))}
         </View>
       ) : null}
