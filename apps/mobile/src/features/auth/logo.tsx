@@ -8,27 +8,25 @@ import { useThemeColors } from '../../theme/theme-provider';
  * diz tudo ao leitor de tela) e usa as cores do tema atual.
  *
  * @param props.tamanho - Lado em pixels.
+ * @param props.invertido - Cores para fundo da marca (gradiente verde): adulto claro.
  */
-export function Simbolo({ tamanho }: { tamanho: number }) {
+export function Simbolo({ tamanho, invertido = false }: { tamanho: number; invertido?: boolean }) {
   const cores = useThemeColors();
+  const adulto = invertido ? cores.sobrePrimaria : cores.primaria;
+  const crianca = invertido ? cores.marcaInvCrianca : cores.marcaCrianca;
+  const ponto = invertido ? cores.marcaInvPonto : cores.marcaPonto;
   return (
     <Svg width={tamanho} height={tamanho} viewBox="0 0 64 64" aria-hidden>
       <Path
         d="M27 50C36 42 44 31 49 20"
         fill="none"
-        stroke={cores.primaria}
+        stroke={adulto}
         strokeWidth={9}
         strokeLinecap="round"
       />
-      <Circle cx={52.5} cy={9} r={6.2} fill={cores.primaria} />
-      <Path
-        d="M27 50 17.5 38"
-        fill="none"
-        stroke={cores.marcaCrianca}
-        strokeWidth={9}
-        strokeLinecap="round"
-      />
-      <Circle cx={12} cy={28} r={5.2} fill={cores.marcaPonto} />
+      <Circle cx={52.5} cy={9} r={6.2} fill={adulto} />
+      <Path d="M27 50 17.5 38" fill="none" stroke={crianca} strokeWidth={9} strokeLinecap="round" />
+      <Circle cx={12} cy={28} r={5.2} fill={ponto} />
     </Svg>
   );
 }
