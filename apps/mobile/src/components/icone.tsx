@@ -10,6 +10,12 @@ export type NomeDoIcone =
   | 'mais'
   | 'info'
   | 'sair'
+  | 'lembrete'
+  | 'local'
+  | 'voz'
+  | 'seta'
+  | 'enviar'
+  | 'fechar'
   | 'pendente'
   | 'agendada'
   | 'atrasada'
@@ -64,6 +70,28 @@ function Desenho({ nome }: { nome: NomeDoIcone }) {
       return (
         <Path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 8l4 4-4 4M19 12H9" />
       );
+    case 'lembrete':
+      return <Path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 21.5h4" />;
+    case 'local':
+      return (
+        <>
+          <Path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" />
+          <Circle cx="12" cy="10" r="2.3" />
+        </>
+      );
+    case 'voz':
+      return (
+        <>
+          <Rect x="9" y="3" width="6" height="11" rx="3" />
+          <Path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+        </>
+      );
+    case 'seta':
+      return <Path d="M9 5l7 7-7 7" />;
+    case 'enviar':
+      return <Path d="M4 12h15M13 6l6 6-6 6" />;
+    case 'fechar':
+      return <Path d="M6 6l12 12M18 6L6 18" />;
     case 'pendente':
       return (
         <>

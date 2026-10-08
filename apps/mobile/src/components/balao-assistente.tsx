@@ -1,35 +1,36 @@
 import { usePathname, useRouter } from 'expo-router';
 import { Pressable, useWindowDimensions } from 'react-native';
 import { modoDeLayout } from '../lib/layout';
-import { useThemeColors } from '../theme/theme-provider';
+import { useThemeColors, useVisual } from '../theme/theme-provider';
 import { Icone } from './icone';
-import { Texto } from './texto';
 
 /**
- * Balão do assistente: botão flutuante no canto inferior direito, presente em todas as abas, que
- * abre a conversa com o assistente (texto e voz). Tem ícone e texto, nunca só o desenho, e fica
- * acima da barra inferior no celular. Some na própria tela do assistente.
+ * Botão flutuante do assistente, só no celular (nas barras laterais o assistente é um item do
+ * menu): círculo de 64 px no canto inferior direito, acima da barra inferior, que abre a conversa
+ * (texto e voz). O ícone é decorativo; o rótulo de acessibilidade diz "Abrir o assistente". Some
+ * na própria tela do assistente.
+ *
+ * @param props.largura - Largura a considerar; por padrão, a da janela (útil para testar).
  */
-export function BalaoAssistente() {
+export function BalaoAssistente({ largura }: { largura?: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const cores = useThemeColors();
-  const compacto = modoDeLayout(useWindowDimensions().width) === 'compacto';
-  if (pathname === '/assistente') return null;
+  const { altoContraste, gradienteMarca, sombra } = useVisual();
+  const janela = useWindowDimensions().width;
+  if (modoDeLayout(largura ?? janela) !== 'compacto' || pathname === '/assistente') return null;
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="Abrir o assistente"
       accessibilityHint="Pergunte sobre vacinas por texto ou por voz"
       onPress={() => router.push('/assistente')}
-      className={`absolute min-h-principal flex-row items-center gap-sm rounded-selo border-padrao border-primaria bg-primaria px-lg ${
-        compacto ? 'bottom-[88px] right-lg' : 'bottom-xl right-xl'
+      style={[gradienteMarca, sombra(3)]}
+      className={`absolute bottom-[88px] right-lg h-[64px] w-[64px] items-center justify-center rounded-selo bg-primaria ${
+        altoContraste ? 'border-altoContraste border-borda' : ''
       }`}
     >
-      <Icone nome="assistente" cor={cores.sobrePrimaria} />
-      <Texto variante="botao" className="text-sobrePrimaria" importantForAccessibility="no">
-        Assistente
-      </Texto>
+      <Icone nome="assistente" cor={cores.sobrePrimaria} tamanho={28} />
     </Pressable>
   );
 }

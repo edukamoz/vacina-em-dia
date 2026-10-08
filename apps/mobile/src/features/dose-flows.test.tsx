@@ -88,15 +88,38 @@ describe('doses (RF03 e RF04)', () => {
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/dose/[id]', params: { id: 'd-over' } });
   });
 
-  test('CT-APP-K02: "Trocar pessoa" leva à aba Família', async () => {
+  test('CT-APP-K02: o carrossel mostra a família e trocar de pessoa carrega as doses dela', async () => {
     const fake = createFakeFetch({
       ...FAMILY,
       'GET /members/m-1/doses': { status: 200, body: memberDoses([PENDING]) },
+      'GET /members/m-2/doses': { status: 200, body: memberDoses([OVERDUE]) },
     });
     await renderScreen(<DosesScreen />, fake.fetchFn);
     expect(await screen.findByText('tríplice viral SCR, 1ª dose')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('link', { name: 'Trocar pessoa' }));
-    expect(mockPush).toHaveBeenCalledWith('/familia');
+    expect(screen.getByRole('radio', { name: 'Maria' })).toBeSelected();
+    await fireEvent.press(screen.getByRole('radio', { name: 'João' }));
+    expect(await screen.findByText('hepatite B, 1 dose')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Doses de João' })).toBeOnTheScreen();
+  });
+
+  test('CT-APP-K05: o resumo mostra o anel e os contadores de atrasadas e de até 7 dias', async () => {
+    const fake = createFakeFetch({
+      'GET /members': { status: 200, body: { items: [MEMBER] } },
+      'GET /members/m-1/doses': {
+        status: 200,
+        body: memberDoses([
+          OVERDUE,
+          dose({ id: 'd-soon', status: 'SCHEDULED', scheduledDate: '2026-10-10' }),
+          dose({ id: 'd-far', status: 'SCHEDULED', scheduledDate: '2026-12-10' }),
+          APPLIED,
+          CANCELLED,
+        ]),
+      },
+    });
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    expect(await screen.findByLabelText('1 de 4 doses aplicadas')).toBeOnTheScreen();
+    expect(screen.getByLabelText('1 atrasada')).toBeOnTheScreen();
+    expect(screen.getByLabelText('1 em até 7 dias')).toBeOnTheScreen();
   });
 
   test('CT-APP-K03: quando não há dose aberta, diz que está tudo em dia e mostra as aplicadas', async () => {

@@ -53,4 +53,18 @@ describe('navegação principal', () => {
       expect(screen.getByRole('link', { name: 'Conta' })).toBeOnTheScreen();
     },
   );
+
+  test.each([800, 1280])(
+    'CT-LAY-10: com %i px o assistente é o último item da barra lateral',
+    async (largura) => {
+      await render(<BarraDeNavegacao largura={largura} />);
+      await fireEvent.press(screen.getByRole('link', { name: 'Assistente' }));
+      expect(mockPush).toHaveBeenCalledWith('/assistente');
+    },
+  );
+
+  test('CT-LAY-11: no celular o assistente não está na barra (é o botão flutuante)', async () => {
+    await render(<BarraDeNavegacao largura={390} />);
+    expect(screen.queryByRole('link', { name: 'Assistente' })).not.toBeOnTheScreen();
+  });
 });
