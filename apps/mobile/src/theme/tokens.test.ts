@@ -50,4 +50,23 @@ describe('tokens do design system', () => {
     const cores = getThemeColors('highContrast');
     expect(contrast(cores.texto, cores.fundo)).toBeGreaterThanOrEqual(7);
   });
+
+  test.each(THEME_NAMES)(
+    'CT-TOK-06: superfícies, gradiente da marca e estados do tema %s mantêm o contraste mínimo de 4,5:1',
+    (nome) => {
+      const c = getThemeColors(nome);
+      for (const fundo of [c.fundo, c.fundoProfundo, c.superficie, c.superficieSuave]) {
+        expect(contrast(c.texto, fundo)).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(c.textoSecundario, fundo)).toBeGreaterThanOrEqual(4.5);
+      }
+      expect(contrast(c.sobrePrimaria, c.primariaProfunda)).toBeGreaterThanOrEqual(4.5);
+      for (const estado of ['pendente', 'agendada', 'atrasada', 'aplicada', 'cancelada'] as const) {
+        expect(contrast(c[estado], c[`${estado}Suave`])).toBeGreaterThanOrEqual(4.5);
+      }
+      expect(contrast(c.erro, c.erroSuave)).toBeGreaterThanOrEqual(4.5);
+      for (const avatar of [c.avatarA, c.avatarB, c.avatarC, c.avatarD]) {
+        expect(contrast(c.sobreAvatar, avatar)).toBeGreaterThanOrEqual(4.5);
+      }
+    },
+  );
 });
