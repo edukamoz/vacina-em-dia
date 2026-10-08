@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useThemeColors } from '../theme/theme-provider';
+import { useProgresso } from './animacao';
 import { Texto } from './texto';
 
 const RAIO = 48;
@@ -15,7 +16,10 @@ const CIRCUNFERENCIA = 2 * Math.PI * RAIO;
  */
 export function AnelProgresso({ aplicadas, total }: { aplicadas: number; total: number }) {
   const cores = useThemeColors();
-  const fracao = total > 0 ? Math.min(aplicadas / total, 1) : 0;
+  const fracaoFinal = total > 0 ? Math.min(aplicadas / total, 1) : 0;
+  // O traço se desenha em 900 ms e o número sobe em 600 ms; com "Reduzir movimento" já chegam prontos.
+  const fracao = useProgresso(fracaoFinal, 900);
+  const contagem = Math.round(useProgresso(aplicadas, 600));
   return (
     <View
       accessible
@@ -39,7 +43,7 @@ export function AnelProgresso({ aplicadas, total }: { aplicadas: number; total: 
         />
       </Svg>
       <Texto variante="titulo2" importantForAccessibility="no">
-        {String(aplicadas)}
+        {String(contagem)}
       </Texto>
       <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
         {`de ${total}`}

@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVisual } from '../theme/theme-provider';
+import { Children } from 'react';
+import { Entrada } from './animacao';
 import { Botao } from './botao';
 import { Texto } from './texto';
 
@@ -52,17 +54,23 @@ export function Tela({
             onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           />
         ) : null}
-        <View className="gap-md expandido:flex-row expandido:items-start expandido:justify-between expandido:gap-xl">
-          <View className="expandido:flex-1">
-            <Texto variante="titulo1" accessibilityRole="header">
-              {titulo}
-            </Texto>
-            {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
-            {abaixoDoTitulo}
+        <Entrada>
+          <View className="gap-md expandido:flex-row expandido:items-start expandido:justify-between expandido:gap-xl">
+            <View className="expandido:flex-1">
+              <Texto variante="titulo1" accessibilityRole="header">
+                {titulo}
+              </Texto>
+              {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
+              {abaixoDoTitulo}
+            </View>
+            {acao}
           </View>
-          {acao}
-        </View>
-        {children}
+        </Entrada>
+        {Children.toArray(children).map((filho, indice) => (
+          <Entrada key={indice} indice={indice + 1}>
+            {filho}
+          </Entrada>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,5 +1,5 @@
 import { Pressable, type PressableProps } from 'react-native';
-import { useThemeColors, useVisual } from '../theme/theme-provider';
+import { useMovimentoReduzido, useThemeColors, useVisual } from '../theme/theme-provider';
 import { Icone, type NomeDoIcone } from './icone';
 import { Texto } from './texto';
 
@@ -39,6 +39,7 @@ export function Botao({
 }) {
   const estilo = ESTILOS[variante];
   const cores = useThemeColors();
+  const reduzido = useMovimentoReduzido();
   const { altoContraste, gradienteMarca, sombra } = useVisual();
   const corDoIcone = {
     principal: cores.sobrePrimaria,
@@ -56,7 +57,14 @@ export function Botao({
       // Na web, o estado de seleção só chega ao leitor de tela pela propriedade `aria-selected`.
       {...(selecionado === undefined ? {} : { 'aria-selected': selecionado })}
       disabled={disabled}
-      style={variante === 'principal' ? [gradienteMarca, sombra(1)] : undefined}
+      // Pressionar: encolhe a 0,97 em 120 ms (na web a transição vem do CSS); parado com "Reduzir movimento".
+      style={({ pressed }) => [
+        variante === 'principal' ? [gradienteMarca, sombra(1)] : null,
+        reduzido
+          ? null
+          : ({ transitionProperty: 'transform', transitionDuration: '120ms' } as object),
+        pressed && !reduzido && !disabled ? { transform: [{ scale: 0.97 }] } : null,
+      ]}
       className={`flex-row items-center justify-center gap-sm rounded-botao border-padrao px-xl py-md ${estilo.caixa} ${
         variante === 'principal' ? (altoContraste ? 'border-borda' : 'border-transparent') : ''
       }`}
