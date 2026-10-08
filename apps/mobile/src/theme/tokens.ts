@@ -36,3 +36,36 @@ export const baseTokens = {
   breakpoints: tokensJson.breakpoints,
   layout: tokensJson.layout,
 } as const;
+
+/** Nível de elevação das sombras do design system (`sombras` em `tokens.json`). */
+export type NivelDeSombra = keyof typeof tokensJson.sombras;
+
+/**
+ * Sombra de um nível, no formato CSS aceito por `boxShadow`. No Alto contraste vale `none`: a
+ * borda de 3 px separa as superfícies.
+ *
+ * @param nivel - `1` (cartão em repouso), `2` (elevado) ou `3` (painel, folha, botão flutuante).
+ * @param tema - Tema ativo.
+ */
+export function getShadow(nivel: NivelDeSombra, tema: ThemeName): string {
+  return tokensJson.sombras[nivel][THEME_KEYS[tema]];
+}
+
+/**
+ * Gradiente da marca (135 graus, de `primaria` até `primariaProfunda`). No Alto contraste não há
+ * gradiente: devolve a cor chapada.
+ */
+export function getBrandGradient(tema: ThemeName): string {
+  const cores = getThemeColors(tema);
+  return tema === 'highContrast'
+    ? cores.primaria
+    : `linear-gradient(135deg, ${cores.primaria}, ${cores.primariaProfunda})`;
+}
+
+/** Gradiente do fundo da tela, de `fundo` até `fundoProfundo`; chapado no Alto contraste. */
+export function getBackgroundGradient(tema: ThemeName): string {
+  const cores = getThemeColors(tema);
+  return tema === 'highContrast'
+    ? cores.fundo
+    : `linear-gradient(180deg, ${cores.fundo}, ${cores.fundoProfundo})`;
+}
