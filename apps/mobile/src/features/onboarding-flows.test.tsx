@@ -101,8 +101,7 @@ describe('família (RF02)', () => {
       },
     });
     await renderScreen(<FamilyScreen />, fake.fetchFn);
-    expect(await screen.findByText('16 meses · Criança')).toBeOnTheScreen();
-    expect(screen.getByText('Filha')).toBeOnTheScreen();
+    expect(await screen.findByText('Filha · 16 meses · Criança')).toBeOnTheScreen();
     expect(screen.getByText('36 anos · Adulto · gestante')).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ver vacinas de Maria' }));

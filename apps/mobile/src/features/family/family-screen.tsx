@@ -1,8 +1,10 @@
 import type { DoseResponse, DoseStatus, MemberResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { Avatar } from '../../components/avatar';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
+import { Icone } from '../../components/icone';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
 import { Grade } from '../../components/grade';
 import { LinkTexto } from '../../components/link-texto';
@@ -10,6 +12,7 @@ import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { describeAge, todayCivil } from '../../lib/dates';
+import { useThemeColors } from '../../theme/theme-provider';
 import { useSession } from '../../session/session-provider';
 import { useDosesOfMembers, useMembers } from '../data/hooks';
 import { PARENTESCO_ROTULO } from './parentesco';
@@ -60,6 +63,7 @@ export function FamilyScreen() {
   const router = useRouter();
   const { selectMember } = useSession();
   const { data, error, isPending, refetch } = useMembers();
+  const cores = useThemeColors();
   const today = todayCivil();
   const pessoas = data?.items ?? [];
   const doses = useDosesOfMembers(pessoas.map((pessoa) => pessoa.id));
@@ -94,26 +98,32 @@ export function FamilyScreen() {
                     selectMember(membro.id);
                     router.push('/');
                   }}
-                  className="gap-sm"
+                  className="flex-row items-center gap-lg"
                 >
-                  <Texto variante="titulo3" importantForAccessibility="no">
-                    {membro.name}
-                  </Texto>
-                  {membro.relationship ? (
+                  <Avatar nome={membro.name} indice={indice} tamanho={64} />
+                  <View className="flex-1 gap-xs">
+                    <Texto variante="titulo3" importantForAccessibility="no">
+                      {membro.name}
+                    </Texto>
                     <Texto
-                      variante="corpoNegrito"
-                      className="text-primaria"
+                      variante="apoio"
+                      className="text-textoSecundario"
                       importantForAccessibility="no"
                     >
-                      {PARENTESCO_ROTULO[membro.relationship]}
+                      {[
+                        membro.relationship ? PARENTESCO_ROTULO[membro.relationship] : null,
+                        describeAge(membro.birthDate, today),
+                        GRUPO_ROTULO[membro.ageGroup],
+                        membro.isPregnant ? 'gestante' : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
                     </Texto>
-                  ) : null}
-                  <Texto className="text-textoSecundario" importantForAccessibility="no">
-                    {`${describeAge(membro.birthDate, today)} · ${GRUPO_ROTULO[membro.ageGroup]}${
-                      membro.isPregnant ? ' · gestante' : ''
-                    }`}
-                  </Texto>
-                  {resumo ? <SeloEstadoDose status={resumo.status} rotulo={resumo.rotulo} /> : null}
+                    {resumo ? (
+                      <SeloEstadoDose status={resumo.status} rotulo={resumo.rotulo} />
+                    ) : null}
+                  </View>
+                  <Icone nome="seta" cor={cores.textoSecundario} />
                 </Pressable>
                 <LinkTexto
                   titulo={`Editar ${membro.name}`}
