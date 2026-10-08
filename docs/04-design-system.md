@@ -83,7 +83,8 @@ Nenhum texto fica abaixo de 16 dp.
 
 - **Alvos:** mínimo 48 dp, ações principais 56 dp, folga de 8 dp entre alvos vizinhos. O WCAG 2.5.5 pede 44, nível AAA; a pesquisa com pessoas idosas aponta alvos maiores e folga entre eles.
 - **Foco visível:** anel de 3 px com contraste de no mínimo 3:1 contra o que está ao redor, em todo elemento interativo. Obrigatório na web (teclado).
-- **Movimento:** transições de 120 a 200 ms, sem animação essencial; respeitar a configuração "reduzir movimento" do sistema.
+- **Movimento:** durações de 120 a 400 ms e curvas `padrao`, `saida` e `mola` (`tokens.json`); nenhuma animação é essencial. Há "Reduzir movimento" na Conta (guardado no aparelho), que soma-se à configuração do sistema e ao tema Alto contraste: com qualquer um deles as telas aparecem prontas. Implementação: `Entrada` (entrada escalonada de cada bloco, em `Tela`), `Botao` (escala 0,97 ao pressionar) e `AnelProgresso` (traço em 900 ms e número em 600 ms), todos em `apps/mobile/src/components/animacao.tsx`.
+- **Tamanho do texto:** Normal, Grande (×1,15) e Maior (×1,3) na Conta, somados ao tamanho de fonte do sistema; `Texto` escala o corpo e a altura da linha.
 
 ### 2.5 Responsividade (celular e web)
 

@@ -1,5 +1,6 @@
 import { Text, type TextProps } from 'react-native';
-import { getThemeColors } from '../theme/tokens';
+import { useEscalaDoTexto } from '../theme/theme-provider';
+import { baseTokens, getThemeColors } from '../theme/tokens';
 
 /** Estilos de texto do design system (`tokens.json`, `tipografia.estilos`). */
 export type TextoVariante =
@@ -45,7 +46,8 @@ export function textColorClass(className: string): string {
 }
 
 /**
- * Texto com a fonte e o tamanho do design system. Escala com o tamanho de fonte do sistema.
+ * Texto com a fonte e o tamanho do design system. Escala com o tamanho de fonte do sistema e com
+ * o "Tamanho do texto" escolhido na Conta.
  *
  * @param props.variante - Estilo tipográfico; por padrão `corpo`.
  * @param props.className - Classes extras (por exemplo a cor, `text-textoSecundario`).
@@ -53,9 +55,21 @@ export function textColorClass(className: string): string {
 export function Texto({
   variante = 'corpo',
   className = '',
+  style,
   ...rest
 }: TextProps & { variante?: TextoVariante; className?: string }) {
+  const escala = useEscalaDoTexto();
+  const base = baseTokens.typography.estilos[variante];
+  // Com o tamanho "Normal" a classe basta; nos maiores, o estilo troca o corpo e a altura da linha.
+  const escalado =
+    escala === 1
+      ? style
+      : [{ fontSize: base.tamanho * escala, lineHeight: base.alturaDeLinha * escala }, style];
   return (
-    <Text className={`${textColorClass(className)} ${CLASSES[variante]} ${className}`} {...rest} />
+    <Text
+      className={`${textColorClass(className)} ${CLASSES[variante]} ${className}`}
+      style={escalado}
+      {...rest}
+    />
   );
 }

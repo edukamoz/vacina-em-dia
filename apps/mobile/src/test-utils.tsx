@@ -122,7 +122,7 @@ export async function renderScreen(
           ? { store: options.store, ...(options.now ? { now: options.now } : {}) }
           : { sessionId: TEST_SESSION })}
       >
-        <ThemeProvider>{ui}</ThemeProvider>
+        <ThemeProvider initialReduceMotion>{ui}</ThemeProvider>
       </SessionProvider>
     </QueryClientProvider>,
   );

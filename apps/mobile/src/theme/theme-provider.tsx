@@ -1,6 +1,12 @@
 import { vars } from 'nativewind';
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
-import { Platform, useColorScheme, View, type ViewStyle } from 'react-native';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { AccessibilityInfo, Platform, useColorScheme, View, type ViewStyle } from 'react-native';
+import {
+  ESCALA_DO_TEXTO,
+  guardarPreferencias,
+  lerPreferencias,
+  type TamanhoDoTexto,
+} from './preferencias';
 import { resolveTheme, type ThemePreference } from './resolve-theme';
 import {
   getBackgroundGradient,
@@ -18,6 +24,16 @@ export interface ThemeContextValue {
   readonly preference: ThemePreference;
   /** Troca a escolha do usuário. */
   readonly setPreference: (preference: ThemePreference) => void;
+  /** Se o movimento deve ficar parado: escolha da pessoa, preferência do sistema ou Alto contraste. */
+  readonly movimentoReduzido: boolean;
+  /** Escolha da pessoa na Conta ("Reduzir movimento"), sem contar o sistema. */
+  readonly reduzirMovimento: boolean;
+  /** Liga ou desliga "Reduzir movimento". */
+  readonly setReduzirMovimento: (valor: boolean) => void;
+  /** Tamanho do texto escolhido. */
+  readonly tamanhoDoTexto: TamanhoDoTexto;
+  /** Troca o tamanho do texto. */
+  readonly setTamanhoDoTexto: (valor: TamanhoDoTexto) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -27,20 +43,70 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
  * NativeWind (`bg-fundo`, `text-texto`...) consomem. Guarda a escolha do usuário na Context API
  * (ADR-006).
  *
+ * Também guarda, neste aparelho, "Reduzir movimento" e o tamanho do texto, e acompanha a
+ * preferência de movimento do sistema.
+ *
  * @param props.initialPreference - Escolha inicial; por padrão segue o sistema.
+ * @param props.initialReduceMotion - "Reduzir movimento" inicial (os testes ligam para não animar).
+ * @param props.initialTextSize - Tamanho do texto inicial.
  */
 export function ThemeProvider({
   children,
   initialPreference = 'system',
+  initialReduceMotion = false,
+  initialTextSize = 'normal',
 }: {
   children: ReactNode;
   initialPreference?: ThemePreference;
+  initialReduceMotion?: boolean;
+  initialTextSize?: TamanhoDoTexto;
 }) {
   const [preference, setPreference] = useState<ThemePreference>(initialPreference);
+  const [reduzirMovimento, setReduzirMovimento] = useState(initialReduceMotion);
+  const [tamanhoDoTexto, setTamanhoDoTexto] = useState<TamanhoDoTexto>(initialTextSize);
+  const [movimentoDoSistema, setMovimentoDoSistema] = useState(false);
   const systemScheme = useColorScheme();
   const theme = resolveTheme(preference, systemScheme);
 
-  const value = useMemo(() => ({ theme, preference, setPreference }), [theme, preference]);
+  useEffect(() => {
+    let ativo = true;
+    void lerPreferencias().then((guardadas) => {
+      if (!ativo) return;
+      if (guardadas.reduzirMovimento !== undefined) setReduzirMovimento(guardadas.reduzirMovimento);
+      if (guardadas.tamanhoDoTexto !== undefined) setTamanhoDoTexto(guardadas.tamanhoDoTexto);
+    });
+    void AccessibilityInfo.isReduceMotionEnabled?.()
+      .then((ligado) => ativo && setMovimentoDoSistema(ligado))
+      .catch(() => undefined);
+    const assinatura = AccessibilityInfo.addEventListener?.(
+      'reduceMotionChanged',
+      setMovimentoDoSistema,
+    );
+    return () => {
+      ativo = false;
+      assinatura?.remove();
+    };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      theme,
+      preference,
+      setPreference,
+      movimentoReduzido: reduzirMovimento || movimentoDoSistema || theme === 'highContrast',
+      reduzirMovimento,
+      setReduzirMovimento: (valor: boolean) => {
+        setReduzirMovimento(valor);
+        void guardarPreferencias({ reduzirMovimento: valor, tamanhoDoTexto });
+      },
+      tamanhoDoTexto,
+      setTamanhoDoTexto: (valor: TamanhoDoTexto) => {
+        setTamanhoDoTexto(valor);
+        void guardarPreferencias({ reduzirMovimento, tamanhoDoTexto: valor });
+      },
+    }),
+    [theme, preference, reduzirMovimento, movimentoDoSistema, tamanhoDoTexto],
+  );
   const cssVars = useMemo(
     () =>
       vars(
@@ -106,4 +172,17 @@ export function useVisual() {
     gradienteMarca: imagemDeFundo(getBrandGradient(tema)),
     gradienteFundo: imagemDeFundo(getBackgroundGradient(tema)),
   };
+}
+
+/**
+ * Se o movimento deve ficar parado (escolha da pessoa, preferência do sistema ou Alto contraste).
+ * Fora do `ThemeProvider` (testes isolados) vale `true`: nada anima.
+ */
+export function useMovimentoReduzido(): boolean {
+  return useContext(ThemeContext)?.movimentoReduzido ?? true;
+}
+
+/** Multiplicador do tamanho do texto escolhido na Conta; `1` fora do `ThemeProvider`. */
+export function useEscalaDoTexto(): number {
+  return ESCALA_DO_TEXTO[useContext(ThemeContext)?.tamanhoDoTexto ?? 'normal'];
 }
