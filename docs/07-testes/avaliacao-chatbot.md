@@ -1,6 +1,6 @@
 # Avaliação do chatbot (classificador de intenções)
 
-Gerado em 06/10/2026 por `python -m vacina_nlp.evaluate --write-report`. Não edite à mão: rode o comando de novo.
+Gerado em 10/10/2026 por `python -m vacina_nlp.evaluate --write-report`. Não edite à mão: rode o comando de novo. Os mesmos números, em gráficos, estão no painel `painel-pln.html` (mesma pasta), gerado com `--write-dashboard`.
 
 ## Método
 

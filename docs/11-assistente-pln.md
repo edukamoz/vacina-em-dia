@@ -24,6 +24,8 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 
 `docs/07-testes/avaliacao-chatbot.md` (gerado por `python -m vacina_nlp.evaluate --write-report ...`): acurácia, F1 macro, métricas por intenção, erros, análise do limiar e limitações. Resultado atual e meta de F1 ≥ 0,85 (a validar com o professor): ver o relatório. O relatório registra, com honestidade, que a validação cruzada no treino é bem menor que o teste e que o treino **não** foi ajustado a partir dos erros do teste.
 
+**Painel de métricas:** `docs/07-testes/painel-pln.html` é uma página única (abre direto no navegador, sem internet) com os mesmos números em gráficos: cartões de resumo, F1 por intenção, matriz de confusão, a curva de cobertura e acerto por limiar e a lista de erros. Gere com `python -m vacina_nlp.evaluate --write-dashboard ../../docs/07-testes/painel-pln.html` (dentro de `apps/nlp`) e tire a captura para os documentos com `node scripts/documentos/captura-painel.mjs`.
+
 ## Busca (voz)
 
 `POST /api/search` recebe a transcrição e devolve até 5 vacinas parecidas, com doenças e indicações do calendário. Não é IA generativa. A nota de cada vacina combina duas medidas sobre um documento por vacina (nome, apelidos populares, doenças evitadas, faixas, momentos e observações do calendário):

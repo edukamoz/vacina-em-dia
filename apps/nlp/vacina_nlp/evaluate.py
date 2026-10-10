@@ -4,6 +4,7 @@ Uso (dentro de ``apps/nlp``)::
 
     python -m vacina_nlp.evaluate                      # imprime o resumo
     python -m vacina_nlp.evaluate --write-report ../../docs/07-testes/avaliacao-chatbot.md
+    python -m vacina_nlp.evaluate --write-dashboard ../../docs/07-testes/painel-pln.html
 
 O conjunto de teste (``data/test_set.json``) é separado do treino e nunca é usado para treinar.
 """
@@ -12,12 +13,17 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
 import sklearn
-from sklearn.metrics import accuracy_score, f1_score, precision_recall_fscore_support
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_recall_fscore_support,
+)
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
 from .calendar_data import DATA_DIR
@@ -64,6 +70,8 @@ class Evaluation:
     noise_total: int
     noise_fallback: int
     threshold_in_use: float
+    labels: list[str] = field(default_factory=list)
+    confusion: list[list[int]] = field(default_factory=list)
 
 
 def load_noise(path: Path | None = None) -> list[str]:
@@ -151,6 +159,8 @@ def evaluate(
         noise_total=len(noise),
         noise_fallback=noise_fallback,
         threshold_in_use=threshold,
+        labels=labels,
+        confusion=confusion_matrix(y_true, y_pred, labels=labels).tolist(),
     )
 
 
@@ -169,7 +179,8 @@ def render_report(result: Evaluation, today: date) -> str:
         "# Avaliação do chatbot (classificador de intenções)",
         "",
         f"Gerado em {today.strftime('%d/%m/%Y')} por `python -m vacina_nlp.evaluate --write-report`. "
-        "Não edite à mão: rode o comando de novo.",
+        "Não edite à mão: rode o comando de novo. Os mesmos números, em gráficos, estão no painel "
+        "`painel-pln.html` (mesma pasta), gerado com `--write-dashboard`.",
         "",
         "## Método",
         "",
@@ -251,6 +262,9 @@ def main(argv: list[str] | None = None) -> int:
     """Linha de comando."""
     parser = argparse.ArgumentParser(description="Avalia o classificador de intenções.")
     parser.add_argument("--write-report", type=Path, help="Grava o relatório Markdown neste caminho.")
+    parser.add_argument(
+        "--write-dashboard", type=Path, help="Grava o painel de métricas (HTML) neste caminho."
+    )
     args = parser.parse_args(argv)
 
     result = evaluate()
@@ -261,6 +275,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.write_report:
         args.write_report.write_text(render_report(result, date.today()), encoding="utf-8")
         print(f"Relatório gravado em {args.write_report}")
+    if args.write_dashboard:
+        from .dashboard import render_dashboard  # import tardio: o painel importa este módulo
+
+        args.write_dashboard.write_text(render_dashboard(result, date.today()), encoding="utf-8")
+        print(f"Painel gravado em {args.write_dashboard}")
     return 0
 
 
