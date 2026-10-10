@@ -84,3 +84,6 @@ doctos/
 docs/referencias-disciplinas/
 docs/*.docx
 design/
+
+# --- Entrega final (gerada por scripts/empacotar-entrega.ps1) ---
+entrega/

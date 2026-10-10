@@ -1,0 +1,55 @@
+erDiagram
+    app_account ||--o{ refresh_token : "emite"
+    app_account ||--o{ password_reset_token : "pede"
+    app_account ||--o| consent : "aceita"
+    app_account ||--o{ member : "cuida de"
+    app_account ||--o{ reminder_log : "recebe"
+    member ||--o{ dose : "tem"
+    app_account {
+        varchar id PK
+        nvarchar email UK
+        varchar password_hash
+        datetime2 created_at
+        bit reminders_enabled
+    }
+    refresh_token {
+        char token_hash PK
+        varchar account_id FK
+        datetime2 expires_at
+        datetime2 revoked_at
+    }
+    password_reset_token {
+        char token_hash PK
+        varchar account_id FK
+        datetime2 expires_at
+        datetime2 used_at
+    }
+    consent {
+        varchar account_id PK
+        varchar term_version
+        datetime2 accepted_at
+        bit guardian_declaration
+    }
+    member {
+        varchar id PK
+        varchar account_id FK
+        nvarchar display_name
+        date birth_date
+        bit is_pregnant
+        varchar relationship
+    }
+    dose {
+        varchar id PK
+        varchar member_id FK
+        varchar rule_id
+        nvarchar custom_vaccine
+        nvarchar custom_dose_label
+        varchar status
+        date due_date
+        date scheduled_date
+        date applied_date
+    }
+    reminder_log {
+        varchar account_id PK
+        date sent_on PK
+    }
