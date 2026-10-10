@@ -1,6 +1,6 @@
 import type { DoseStatus } from '@vacina/shared';
 import { useRouter } from 'expo-router';
-import { Image, useWindowDimensions, View, type ImageStyle } from 'react-native';
+import { Image, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Bolha } from '../../components/bolha';
@@ -51,23 +51,36 @@ const EXEMPLOS: readonly { vacina: string; dica: string; status: DoseStatus; inc
 ];
 
 /** Fases da vida da seção "Para cada fase": foto (pessoa fictícia), rótulo e diâmetro do círculo. */
-const FASES: readonly { foto: Foto; rotulo: string; tamanho: number }[] = [
-  { foto: FOTOS.bebe, rotulo: 'Bebês', tamanho: 112 },
-  { foto: FOTOS.crianca, rotulo: 'Crianças', tamanho: 128 },
-  { foto: FOTOS.gestante, rotulo: 'Adultos e gestantes', tamanho: 144 },
-  { foto: FOTOS.jose, rotulo: 'Pessoas idosas', tamanho: 132 },
+const FASES: readonly {
+  foto: Foto;
+  rotulo: string;
+  tamanho: number;
+  cor: 'avatarA' | 'avatarB' | 'avatarC' | 'avatarD';
+}[] = [
+  { foto: FOTOS.bebe, rotulo: 'Bebês', tamanho: 120, cor: 'avatarC' },
+  { foto: FOTOS.crianca, rotulo: 'Crianças', tamanho: 136, cor: 'avatarB' },
+  { foto: FOTOS.gestante, rotulo: 'Adultos e gestantes', tamanho: 152, cor: 'avatarA' },
+  { foto: FOTOS.jose, rotulo: 'Pessoas idosas', tamanho: 140, cor: 'avatarD' },
 ];
 
 /** Para quem o app é feito: as três personas do projeto (pessoas fictícias). */
-const PERSONAS: readonly { foto: Foto; nome: string; papel: string; texto: string }[] = [
+const PERSONAS: readonly {
+  foto: Foto;
+  nome: string;
+  papel: string;
+  texto: string;
+  cor: 'primariaSuave' | 'agendadaSuave' | 'avatarD';
+}[] = [
   {
     foto: FOTOS.mariana,
+    cor: 'primariaSuave',
     nome: 'Mariana, 32 anos',
     papel: 'Mãe de primeira viagem',
     texto: 'Quer saber quais doses do bebê estão chegando, sem procurar a caderneta de papel.',
   },
   {
     foto: FOTOS.jose,
+    cor: 'agendadaSuave',
     nome: 'Sr. José, 68 anos',
     papel: 'Prefere falar a digitar',
     texto:
@@ -75,6 +88,7 @@ const PERSONAS: readonly { foto: Foto; nome: string; papel: string; texto: strin
   },
   {
     foto: FOTOS.carla,
+    cor: 'avatarD',
     nome: 'Carla, 45 anos',
     papel: 'Cuida de vários familiares',
     texto: 'Vê as doses de todas as pessoas da família em um só lugar e não esquece nenhuma.',
@@ -92,32 +106,41 @@ const FLUTUANTES = [
 /** Largura útil das seções da página: 1184 px com margem, centralizada. */
 const SECAO = 'w-full max-w-pagina self-center px-lg expandido:px-xxl';
 
-/** Foto recortada em círculo (ou em cartão), com o rosto no centro do recorte. */
-function FotoRecortada({
+/** Proporção dos recortes das pessoas: 640 x 856. */
+const ALTURA_POR_LARGURA = 856 / 640;
+
+/**
+ * Pessoa recortada do fundo, de busto, sobre um quadro colorido (círculo ou cartão): a cabeça fica
+ * no alto e o corpo é cortado pela borda do quadro.
+ *
+ * @param props.largura - Largura da pessoa, em pixels.
+ * @param props.topo - Distância da pessoa até o alto do quadro, em pixels.
+ * @param props.esquerda - Distância da pessoa até a esquerda do quadro, em pixels.
+ */
+function PessoaNoQuadro({
   foto,
   largura,
-  altura,
-  raio,
+  topo,
+  esquerda,
 }: {
   foto: Foto;
-  largura: number | `${number}%`;
-  altura: number;
-  raio: number;
+  largura: number;
+  topo: number;
+  esquerda: number;
 }) {
-  // `objectPosition` existe só na web (RN Web); no celular o recorte é centralizado.
-  const estilo = {
-    width: largura,
-    height: altura,
-    borderRadius: raio,
-    objectPosition: `center ${foto.rosto}`,
-  } as ImageStyle;
   return (
     <Image
       source={foto.fonte}
       accessibilityLabel={foto.alt}
       accessibilityIgnoresInvertColors
-      resizeMode="cover"
-      style={estilo}
+      resizeMode="stretch"
+      style={{
+        position: 'absolute',
+        width: largura,
+        height: largura * ALTURA_POR_LARGURA,
+        top: topo,
+        left: esquerda,
+      }}
     />
   );
 }
@@ -286,18 +309,23 @@ export function WelcomeScreen() {
               </Texto>
             </View>
             <View className="flex-row flex-wrap items-end justify-around gap-xl pt-lg">
-              {FASES.map(({ foto, rotulo, tamanho }) => (
-                <View key={rotulo} className="w-[160px] items-center gap-md">
+              {FASES.map(({ foto, rotulo, tamanho, cor }) => (
+                <View key={rotulo} className="w-[170px] items-center gap-md">
                   <Inclinar graus={14}>
                     <View
-                      style={{ width: tamanho, height: tamanho, borderRadius: tamanho / 2 }}
+                      style={{
+                        width: tamanho,
+                        height: tamanho,
+                        borderRadius: tamanho / 2,
+                        backgroundColor: cores[cor],
+                      }}
                       className="overflow-hidden border-[4px] border-superficie"
                     >
-                      <FotoRecortada
+                      <PessoaNoQuadro
                         foto={foto}
-                        largura="100%"
-                        altura={tamanho}
-                        raio={tamanho / 2}
+                        largura={tamanho * 1.05}
+                        topo={tamanho * 0.1}
+                        esquerda={tamanho * -0.025}
                       />
                     </View>
                   </Inclinar>
@@ -322,11 +350,16 @@ export function WelcomeScreen() {
               </Texto>
             </View>
             <View className="gap-lg expandido:flex-row expandido:gap-xl">
-              {PERSONAS.map(({ foto, nome, papel, texto }) => (
+              {PERSONAS.map(({ foto, nome, papel, texto, cor }) => (
                 <View key={nome} className="expandido:flex-1">
                   <Inclinar graus={6}>
-                    <Cartao className="gap-md overflow-hidden p-0">
-                      <FotoRecortada foto={foto} largura="100%" altura={260} raio={0} />
+                    <Cartao className="gap-md overflow-hidden">
+                      <View
+                        style={{ backgroundColor: cores[cor] }}
+                        className="-mx-lg -mt-lg h-[300px] items-center overflow-hidden"
+                      >
+                        <PessoaNoQuadro foto={foto} largura={290} topo={16} esquerda={40} />
+                      </View>
                       <View className="gap-xs p-lg">
                         <Texto variante="titulo3" accessibilityRole="header">
                           {nome}

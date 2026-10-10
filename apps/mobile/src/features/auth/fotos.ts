@@ -1,13 +1,13 @@
 import type { ImageSourcePropType } from 'react-native';
-import mariana_e_bebe from '../../../assets/images/pessoas/mariana-e-bebe.jpg';
-import sr_jose from '../../../assets/images/pessoas/sr-jose.jpg';
-import carla_cuidadora from '../../../assets/images/pessoas/carla-cuidadora.jpg';
-import bebe from '../../../assets/images/pessoas/bebe.jpg';
-import crianca from '../../../assets/images/pessoas/crianca.jpg';
-import gestante from '../../../assets/images/pessoas/gestante.jpg';
+import mariana_e_bebe from '../../../assets/images/pessoas/mariana-e-bebe.webp';
+import sr_jose from '../../../assets/images/pessoas/sr-jose.webp';
+import carla_cuidadora from '../../../assets/images/pessoas/carla-cuidadora.webp';
+import bebe from '../../../assets/images/pessoas/bebe.webp';
+import crianca from '../../../assets/images/pessoas/crianca.webp';
+import gestante from '../../../assets/images/pessoas/gestante.webp';
 import fundo from '../../../assets/images/pessoas/fundo.jpg';
 
-/** Uma foto da apresentação: arquivo, descrição para o leitor de tela e onde fica o rosto. */
+/** Uma pessoa da apresentação: arquivo, descrição para o leitor de tela e onde fica o rosto. */
 export interface Foto {
   readonly fonte: ImageSourcePropType;
   readonly alt: string;
@@ -16,7 +16,7 @@ export interface Foto {
 }
 
 /**
- * Fotos da apresentação. São imagens geradas por inteligência artificial: as pessoas não existem.
+ * Pessoas da apresentação, recortadas do fundo (WebP com transparência). São imagens geradas por inteligência artificial: as pessoas não existem.
  * A apresentação avisa isso ao pé da página.
  */
 export const FOTOS = {
