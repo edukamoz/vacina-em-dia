@@ -1,0 +1,33 @@
+flowchart LR
+    subgraph CLI["Cliente"]
+        APP["App Expo (web, Android, iOS)<br/>React Native, Expo Router, NativeWind<br/>Context API + TanStack Query"]
+    end
+    subgraph AZ["Microsoft Azure (Brazil South)"]
+        SWA["Static Web Apps<br/>(app web)"]
+        subgraph FN["Function App: API (Node.js 24, TypeScript)"]
+            HTTP["Gatilhos HTTP<br/>handlers"]
+            SRV["services → domain → repositories"]
+            TMR["Gatilho de tempo<br/>(lembretes às 8h)"]
+        end
+        NLP["Function App: PLN (Python 3.13)<br/>TF-IDF + SVM, busca com LSA"]
+        SQL[("Azure SQL Database<br/>oferta gratuita")]
+        SPEECH["Azure AI Speech<br/>fala para texto"]
+        KV["Key Vault"]
+        AI["Application Insights"]
+    end
+    BREVO["Brevo<br/>e-mail transacional"]
+    APP -- "HTTPS" --> SWA
+    APP -- "HTTPS + token de acesso" --> HTTP
+    HTTP --> SRV
+    TMR --> SRV
+    SRV --> SQL
+    SRV -- "HTTPS + chave da função" --> NLP
+    SRV -- "áudio WAV (só em memória)" --> SPEECH
+    SRV -- "recuperação de senha e lembretes" --> BREVO
+    FN -.-> AI
+    NLP -.-> AI
+    FN -. "identidade gerenciada" .-> SQL
+    FN -. "segredos (a migrar para o cofre)" .-> KV
+    SHARED["packages/shared<br/>tipos, esquemas Zod, máquina de estados, calendário"]
+    SHARED -. "build" .-> APP
+    SHARED -. "build" .-> FN

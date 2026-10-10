@@ -1,6 +1,6 @@
 # Roteiro de demonstração por persona
 
-Item do Jira: SCRUM-27 (critério 5 da banca: funcionalidades por persona). Estado em 07/10/2026. Serve para a apresentação: cada persona do `docs/01-visao-e-escopo.md` tem um caminho curto, com o que dizer e o que mostrar. Os nomes dos botões são os do app.
+Item do backlog: B35 (e SCRUM-27; critério 5 da banca: funcionalidades por persona). Estado em 10/10/2026. Serve para a apresentação: cada persona do `docs/01-visao-e-escopo.md` tem um caminho curto, com o que dizer e o que mostrar. Os nomes dos botões são os do app.
 
 **Antes de começar:** suba o ambiente (`docker compose up --build`, ou a API e o app web em desenvolvimento), crie uma conta nova e aceite o consentimento. Para a voz, use o navegador ou o emulador Android com o microfone virtual ligado. Tenha à mão a caderneta de papel para a comparação final. Tempo total sugerido: 8 a 10 minutos.
 
@@ -30,8 +30,8 @@ Item do Jira: SCRUM-27 (critério 5 da banca: funcionalidades por persona). Esta
 
 | Passo | O que fazer | O que mostrar ou dizer |
 |---|---|---|
-| 1 | Aba **Conta** > **Tema** > **Alto contraste** | Contraste calculado pelo WCAG 2.1 AA; botões grandes (48 dp) |
-| 2 | Aba **Assistente** (ou o balão flutuante em qualquer aba) > **Falar a pergunta** > "Para que serve a vacina BCG?" > **Parar e enviar** | A transcrição aparece ("🎤 ..."), seguida da resposta curada com a **fonte oficial** e as vacinas encontradas no calendário |
+| 1 | Aba **Conta** > **Tema** > **Alto contraste** e **Texto** > **Maior** | Contraste calculado pelo WCAG 2.1 AA; botões grandes (48 dp); o texto cresce em toda a interface; há ainda **Reduzir movimento** |
+| 2 | Balão do **assistente** no canto da tela (abre a janela de conversa) > **Falar a pergunta** > "Para que serve a vacina BCG?" > **Parar e enviar** | A transcrição aparece ("🎤 ..."), seguida da resposta curada com a **fonte oficial** e as vacinas encontradas no calendário |
 | 3 | Digitar "Meu filho está com febre, pode vacinar?" (pergunta de saúde individual, caso testado no PLN) | O assistente **não** dá orientação médica: encaminha a um profissional ou unidade de saúde (192 SAMU) |
 | 4 | Negar o microfone (se der tempo) | Mensagem clara e o campo de texto continua disponível |
 
@@ -46,13 +46,15 @@ Item do Jira: SCRUM-27 (critério 5 da banca: funcionalidades por persona). Esta
 | 1 | Aba **Família** > adicionar o pai (parentesco "Pai") e a mãe (parentesco "Mãe") | Resumo da família no alto; **Trocar pessoa** muda o calendário mostrado |
 | 2 | Aba **Doses** de um idoso > **Adicionar dose** (dose avulsa): nome "Febre tifoide", "1ª dose", data pelo calendário | A dose recebe a etiqueta **Adicionada por você**, diferente da **Oficial**, e segue o mesmo ciclo de estados |
 | 3 | Aba **Histórico** | Aplicadas e canceladas de **toda a família**, por ano; sem registros, o app explica como o histórico se preenche |
-| 4 | Aba **Conta** > **Excluir minha conta** (só se for encerrar a demonstração) | Pede confirmação; apaga conta, pessoas e doses (LGPD) |
+| 4 | Aba **Doses** > cartão **Postos de saúde perto de você** (ou **Postos** na lateral do computador) > **Usar minha localização** | Mapa e lista de unidades básicas de saúde perto, com distância; a posição não é guardada; sem internet a última lista continua; aviso "Ligue antes de ir" |
+| 5 | Aba **Conta** > **Excluir minha conta** (só se for encerrar a demonstração) | Pede confirmação; apaga conta, pessoas e doses (LGPD) |
 
 ## Fecho (1 min)
 
-- Rastreabilidade e testes: `docs/19-rastreabilidade.md`; 179 casos de caixa preta aprovados; 42 casos do ciclo da dose; CI com lint, tipos, testes, cobertura, `npm audit` e teste de fumaça do Docker.
+- Rastreabilidade e testes: `docs/19-rastreabilidade.md`; 179 casos de caixa preta aprovados; 42 casos do ciclo da dose; 1.192 testes automatizados; CI com lint, tipos, testes, cobertura, `npm audit` e teste de fumaça do Docker.
 - Infraestrutura como código (Bicep), custos estimados e equivalência AWS para Azure: `docs/08`, `docs/16`.
-- Limites assumidos: a versão completa (mapa de unidades, PDF, compartilhar com cuidador) não foi iniciada; a voz não foi testada em celular físico nem em iOS; lembretes por e-mail não têm push no celular.
+- Backlog no GitHub Projects ("proj-vacina-em-dia"): 47 itens em 9 épicos, com prioridade e critérios de aceite (`docs/24-backlog.md`).
+- Limites assumidos: o mapa de postos (RF10) foi entregue, mas PDF e compartilhar com cuidador (RF11 e RF12) não foram iniciados; a voz, o mapa e a localização não foram testados em celular físico nem em iOS; as personas não foram validadas com usuários; lembretes por e-mail não têm push no celular.
 
 ## Pontos de atenção antes de apresentar
 

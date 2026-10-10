@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant U as Usuário
+    participant A as App
+    participant API as API (Functions)
+    participant S as Azure AI Speech
+    participant P as Serviço de PLN
+    U->>A: toca em "Falar a pergunta" e fala
+    A->>A: captura o microfone e monta o WAV de 16 kHz, mono
+    A->>API: POST /api/assistant/voice (audio/wav, token)
+    API->>API: valida token, tipo e tamanho e aplica o limite de uso
+    API->>S: áudio curto (pt-BR)
+    S-->>API: transcrição
+    par chatbot
+        API->>P: POST /chat
+    and busca
+        API->>P: POST /search
+    end
+    P-->>API: resposta curada, fonte e vacinas parecidas
+    API-->>A: transcrição, resposta e resultados
+    A-->>U: mostra o que entendeu e a resposta com a fonte
+    Note over API,S: o áudio fica só em memória e nunca é gravado

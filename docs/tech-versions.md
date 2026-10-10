@@ -111,6 +111,7 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 |---|---|---|
 | expo-secure-store | ~57.0.4 | Token de sessão no celular (Keychain e Keystore), conforme a ADR-009 |
 | expo-audio | ~57.0.5 | Microfone no celular (`AudioStream`, PCM) para a pergunta por voz (RF06) |
+| expo-splash-screen | ~57.0.9 | Tela de abertura do app no Android e no iOS, com a marca sobre o verde-saúde |
 | expo-location | ~57.0.20 | Posição atual, só ao tocar em "Usar minha localização" (mapa de postos, RF10; ADR-018) |
 | react-native-webview | 13.16.1 | Mapa Leaflet no celular, sem chave de API (ADR-018) |
 | leaflet | 1.9.4 | Mapa na web, com os mapas do OpenStreetMap (ADR-018); no celular a mesma versão vem do CDN unpkg com verificação de integridade (SRI) |

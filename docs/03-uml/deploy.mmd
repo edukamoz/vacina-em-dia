@@ -1,0 +1,12 @@
+flowchart LR
+    DEV["Desenvolvedor<br/>branch + pull request"] --> GH["GitHub"]
+    GH --> CI["GitHub Actions: CI<br/>lint, tipos, build, testes e cobertura,<br/>npm audit, pip-audit, Docker"]
+    GH -- "merge na main" --> DEP["GitHub Actions: Deploy<br/>login federado (OIDC)"]
+    DEP --> FAPI["Function App (API)<br/>Flex Consumption"]
+    DEP --> SWA["Static Web Apps<br/>(app web)"]
+    NLPD["Publicação do PLN"] --> FNLP["Function App (PLN)<br/>1 instância sempre pronta"]
+    MIG["scripts/db-migrate.mjs<br/>(manual, com az login)"] --> SQL[("Azure SQL")]
+    FAPI --> SQL
+    FAPI --> FNLP
+    FAPI --> SP["Azure AI Speech"]
+    LOCAL["Local: docker compose up<br/>API, PLN, web, Azurite"] -. "mesma base de código" .-> DEV
