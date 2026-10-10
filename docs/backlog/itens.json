@@ -680,10 +680,10 @@
     "Passo a passo das telas principais, com capturas de tela.",
     "Perguntas frequentes e aviso de que não substitui a caderneta."
    ],
-   "estado": "Em andamento",
+   "estado": "Em análise",
    "sprint": 6,
    "evidencia": "doctos/Documentacao_do_Usuario.docx (local)",
-   "nota": "Falta revisar e incluir capturas de tela.",
+   "nota": "Capturas de tela incluídas em 10/10/2026; falta a revisão da autora.",
    "curto": "Documentação do Usuário"
   },
   {
@@ -716,10 +716,10 @@
     "Roteiro cronometrado com o caminho feliz de cada persona.",
     "Slides (ou equivalente) com problema, solução, arquitetura, testes e custos."
    ],
-   "estado": "Em andamento",
+   "estado": "Em análise",
    "sprint": 6,
    "evidencia": "docs/20-roteiro-de-demonstracao.md",
-   "nota": "O roteiro existe; faltam os slides.",
+   "nota": "Roteiro e slides prontos (doctos/Apresentacao.pptx); falta ensaiar.",
    "curto": "Roteiro e apresentação final"
   },
   {
@@ -734,7 +734,7 @@
     "PDFs convertidos do Word só no momento da entrega.",
     "Zip do repositório sem segredos nem arquivos gerados."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": 6,
    "evidencia": "",
    "nota": "",
@@ -864,10 +864,10 @@
     "Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).",
     "Componentes e telas atualizados."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": 6,
    "evidencia": "",
-   "nota": "Depende do app de computador do Figma ou de um plano com mais chamadas.",
+   "nota": "Plugin pronto em docs/04-design-system/figma-plugin; falta a autora rodá-lo no app de computador do Figma.",
    "curto": "Atualizar o Figma para a versão 2"
   },
   {
@@ -882,10 +882,10 @@
     "Barra lateral compacta e grade de duas colunas validadas.",
     "Sem texto cortado em 200%."
    ],
-   "estado": "A fazer",
+   "estado": "Em análise",
    "sprint": 6,
    "evidencia": "",
-   "nota": "Não foi desenhado no protótipo.",
+   "nota": "Conferido em 820 px (barra lateral compacta, sem rolagem horizontal); falta olhar em tablet real.",
    "curto": "Tela para tablet"
   },
   {
@@ -900,7 +900,7 @@
     "Inclinação em até 10 graus, só na apresentação e em Entrar.",
     "Tudo parado com \"Reduzir movimento\"."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": 6,
    "evidencia": "",
    "nota": "",
@@ -918,10 +918,10 @@
     "Ícone iOS e Android (adaptativo e monocromático) e favicon configurados.",
     "Tela de abertura (splash) com a marca."
    ],
-   "estado": "Em andamento",
+   "estado": "Em análise",
    "sprint": 6,
    "evidencia": "PR #79",
-   "nota": "Falta a tela de abertura e a conferência em aparelho.",
+   "nota": "Falta conferir o ícone e a tela de abertura em aparelho.",
    "curto": "Ícones do app e da aba"
   },
   {

@@ -6,6 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Bolha } from '../../components/bolha';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
+import { Inclinar } from '../../components/inclinar';
 import { Icone, type NomeDoIcone } from '../../components/icone';
 import { QuadroEstado } from '../../components/quadro-estado';
 import { Paralaxe, Revelar, RolagemAnimada } from '../../components/rolagem-animada';
@@ -209,21 +210,23 @@ export function WelcomeScreen() {
                 accessibilityLabel="Exemplo de como as doses aparecem"
                 className="gap-md expandido:w-[480px]"
               >
-                {EXEMPLOS.map(({ vacina, dica, status, inclina }, indice) => (
-                  <View
-                    key={vacina}
-                    style={
-                      expandido
-                        ? {
-                            transform: [{ rotate: inclina }],
-                            marginLeft: indice === 1 ? 40 : indice === 2 ? 14 : 0,
-                          }
-                        : undefined
-                    }
-                  >
-                    <ExemploDeDose vacina={vacina} dica={dica} status={status} />
-                  </View>
-                ))}
+                <Inclinar>
+                  {EXEMPLOS.map(({ vacina, dica, status, inclina }, indice) => (
+                    <View
+                      key={vacina}
+                      style={
+                        expandido
+                          ? {
+                              transform: [{ rotate: inclina }],
+                              marginLeft: indice === 1 ? 40 : indice === 2 ? 14 : 0,
+                            }
+                          : undefined
+                      }
+                    >
+                      <ExemploDeDose vacina={vacina} dica={dica} status={status} />
+                    </View>
+                  ))}
+                </Inclinar>
                 <Texto variante="apoio" className="text-textoSecundario">
                   Exemplo com dados inventados.
                 </Texto>

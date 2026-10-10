@@ -6,6 +6,7 @@ import { Pressable } from 'react-native';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
 import { useVisual } from '../../theme/theme-provider';
+import { Inclinar } from '../../components/inclinar';
 import { Logo, Simbolo } from './logo';
 
 /**
@@ -39,7 +40,9 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
               altoContraste ? 'border-r-altoContraste border-borda' : ''
             }`}
           >
-            <Simbolo tamanho={132} invertido />
+            <Inclinar>
+              <Simbolo tamanho={132} invertido />
+            </Inclinar>
             <Texto variante="exibicao" className="max-w-[420px] text-sobrePrimaria">
               As vacinas da sua família, em dia
             </Texto>

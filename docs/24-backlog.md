@@ -21,10 +21,10 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B30 | SCRUM-33 | Como equipe, quero as decisões técnicas registradas em ADRs, para defender as escolhas na apresentação | Must | Em análise | Sprint 1 |
 | B31 | SCRUM-35 | Como autora, quero a Documentação de Desenvolvimento (horas, atividades, reuniões, aprendizados e Scrum) mantida ao longo do projeto, para entregá-la em PDF no fim | Must | Em andamento | Sprint 1 |
 | B32 | SCRUM-34 | Como autora, quero a Documentação Técnica conforme o modelo da disciplina, para a entrega final | Must | Em andamento | Sprint 5 |
-| B33 | SCRUM-36 | Como autora, quero a Documentação do Usuário em linguagem simples (passo a passo e perguntas frequentes), para quem vai usar o app | Must | Em andamento | Sprint 6 |
+| B33 | SCRUM-36 | Como autora, quero a Documentação do Usuário em linguagem simples (passo a passo e perguntas frequentes), para quem vai usar o app | Must | Em análise | Sprint 6 |
 | B34 | SCRUM-37 | Como autora, quero o panfleto A4 do projeto para a mostra, para apresentar o app ao público | Should | Em andamento | Sprint 6 |
-| B35 | novo | Como autora, quero o roteiro de demonstração e a apresentação final, para defender o projeto em 19/11 | Must | Em andamento | Sprint 6 |
-| B36 | novo | Como autora, quero empacotar a entrega (PDFs das três documentações, panfleto e zip do repositório), para entregar em 19/11 | Must | A fazer | Sprint 6 |
+| B35 | novo | Como autora, quero o roteiro de demonstração e a apresentação final, para defender o projeto em 19/11 | Must | Em análise | Sprint 6 |
+| B36 | novo | Como autora, quero empacotar a entrega (PDFs das três documentações, panfleto e zip do repositório), para entregar em 19/11 | Must | Em andamento | Sprint 6 |
 | B38 | novo | Como autora, quero registrar as decisões sobre a licença dos dados dos postos, o uso de Jest no lugar de JUnit e as datas de entrega, para defender as escolhas na apresentação | Should | Em análise | Sprint 3 |
 
 **B29** (todas; requisitos: RNF06)
@@ -58,7 +58,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Passo a passo das telas principais, com capturas de tela.
 - Perguntas frequentes e aviso de que não substitui a caderneta.
 - Evidência: doctos/Documentacao_do_Usuario.docx (local)
-- Atenção: Falta revisar e incluir capturas de tela.
+- Atenção: Capturas de tela incluídas em 10/10/2026; falta a revisão da autora.
 
 **B34** (todas; requisitos: -)
 
@@ -71,7 +71,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Roteiro cronometrado com o caminho feliz de cada persona.
 - Slides (ou equivalente) com problema, solução, arquitetura, testes e custos.
 - Evidência: docs/20-roteiro-de-demonstracao.md
-- Atenção: O roteiro existe; faltam os slides.
+- Atenção: Roteiro e slides prontos (doctos/Apresentacao.pptx); falta ensaiar.
 
 **B36** (autora; requisitos: -)
 
@@ -370,10 +370,10 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B41 | SCRUM-32 | Como equipe, quero o design system (cores, fontes, layout) para mobile e web, para o app ter identidade e ser acessível | Must | Em andamento | Sprint 1 |
 | B42 | novo | Como usuária, quero um visual bonito e dinâmico, com telas próprias para web e celular, para gostar de usar o app | Should | Em análise | Sprint 6 |
 | B43 | novo | Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto | Should | Em análise | Sprint 6 |
-| B44 | novo | Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app | Could | A fazer | Sprint 6 |
-| B45 | novo | Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada | Could | A fazer | Sprint 6 |
-| B46 | novo | Como usuária, quero animações extras (inclinação 3D da apresentação, painel e folha animados), para uma experiência mais viva | Could | A fazer | Sprint 6 |
-| B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em andamento | Sprint 6 |
+| B44 | novo | Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app | Could | Em andamento | Sprint 6 |
+| B45 | novo | Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada | Could | Em análise | Sprint 6 |
+| B46 | novo | Como usuária, quero animações extras (inclinação 3D da apresentação, painel e folha animados), para uma experiência mais viva | Could | Em andamento | Sprint 6 |
+| B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em análise | Sprint 6 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -400,13 +400,13 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 - Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).
 - Componentes e telas atualizados.
-- Atenção: Depende do app de computador do Figma ou de um plano com mais chamadas.
+- Atenção: Plugin pronto em docs/04-design-system/figma-plugin; falta a autora rodá-lo no app de computador do Figma.
 
 **B45** (PE1; requisitos: RNF04, RNF09)
 
 - Barra lateral compacta e grade de duas colunas validadas.
 - Sem texto cortado em 200%.
-- Atenção: Não foi desenhado no protótipo.
+- Atenção: Conferido em 820 px (barra lateral compacta, sem rolagem horizontal); falta olhar em tablet real.
 
 **B46** (PE1; requisitos: RNF04)
 
@@ -418,7 +418,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Ícone iOS e Android (adaptativo e monocromático) e favicon configurados.
 - Tela de abertura (splash) com a marca.
 - Evidência: PR #79
-- Atenção: Falta a tela de abertura e a conferência em aparelho.
+- Atenção: Falta conferir o ícone e a tela de abertura em aparelho.
 
 ## Não migrados do Jira
 
