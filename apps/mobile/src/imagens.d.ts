@@ -5,3 +5,10 @@ declare module '*.jpg' {
   const fonte: ImageSourcePropType;
   export default fonte;
 }
+
+declare module '*.webp' {
+  import type { ImageSourcePropType } from 'react-native';
+
+  const fonte: ImageSourcePropType;
+  export default fonte;
+}
