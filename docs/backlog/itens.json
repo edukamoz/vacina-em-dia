@@ -1,0 +1,969 @@
+{
+ "epicos": [
+  [
+   "E1",
+   "Fundação e documentação",
+   "SCRUM-5"
+  ],
+  [
+   "E2",
+   "Infraestrutura, Azure e DevOps",
+   "SCRUM-6"
+  ],
+  [
+   "E3",
+   "Conta e privacidade",
+   "SCRUM-7"
+  ],
+  [
+   "E4",
+   "Família e calendário vacinal",
+   "SCRUM-8"
+  ],
+  [
+   "E5",
+   "Doses e lembretes",
+   "SCRUM-9"
+  ],
+  [
+   "E6",
+   "PLN: voz e chatbot",
+   "SCRUM-10"
+  ],
+  [
+   "E7",
+   "Qualidade e testes",
+   "SCRUM-11"
+  ],
+  [
+   "E8",
+   "Versão completa",
+   "SCRUM-12"
+  ],
+  [
+   "E9",
+   "Experiência e design",
+   null
+  ]
+ ],
+ "sprints": {
+  "1": [
+   "Sprint 1",
+   "06/10 a 12/10"
+  ],
+  "2": [
+   "Sprint 2",
+   "13/10 a 19/10"
+  ],
+  "3": [
+   "Sprint 3",
+   "20/10 a 26/10"
+  ],
+  "4": [
+   "Sprint 4",
+   "27/10 a 02/11"
+  ],
+  "5": [
+   "Sprint 5",
+   "03/11 a 09/11"
+  ],
+  "6": [
+   "Sprint 6",
+   "10/11 a 19/11"
+  ]
+ },
+ "itens": [
+  {
+   "id": "B01",
+   "jira": "SCRUM-13",
+   "titulo": "Como responsável por uma família, quero criar uma conta e entrar com e-mail e senha, para ter minha carteira em qualquer aparelho (RF01)",
+   "epico": "E3",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF01; RNF02, RNF03, RNF09",
+   "criterios": [
+    "Cadastro e login com e-mail e senha; senha guardada só como hash.",
+    "A sessão expira em 15 minutos e se renova sem pedir a senha de novo.",
+    "Excesso de tentativas de login é bloqueado por um tempo.",
+    "Mensagens de erro em linguagem simples, sem revelar se o e-mail existe."
+   ],
+   "estado": "Em análise",
+   "sprint": 2,
+   "evidencia": "ADR-014; CT-AUTH-*; docs/14-login-proprio.md",
+   "nota": "",
+   "curto": "Cadastro e login (RF01)"
+  },
+  {
+   "id": "B02",
+   "jira": null,
+   "titulo": "Como usuária que esqueceu a senha, quero recebê-la por e-mail para redefinir, para voltar a usar o app sem perder meus dados",
+   "epico": "E3",
+   "prioridade": "Should",
+   "personas": "PE1, PE3",
+   "requisitos": "RF01; RNF02",
+   "criterios": [
+    "O pedido de recuperação responde igual exista ou não o e-mail.",
+    "O e-mail traz um link de uso único e de validade curta.",
+    "Depois de redefinir, as sessões antigas deixam de valer."
+   ],
+   "estado": "Em análise",
+   "sprint": 2,
+   "evidencia": "ADR-015; CT-AUTH-*; reset-screens.test.tsx",
+   "nota": "",
+   "curto": "Recuperar a senha por e-mail"
+  },
+  {
+   "id": "B03",
+   "jira": "SCRUM-14",
+   "titulo": "Como responsável, quero aceitar um termo de consentimento claro e poder excluir minha conta e todos os dados, para ter controle sobre meus dados de saúde (RF09)",
+   "epico": "E3",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF09; RNF02, RNF03",
+   "criterios": [
+    "O primeiro acesso exige aceitar o termo; o aceite fica registrado com a versão.",
+    "Termos de uso e Política de privacidade acessíveis antes e depois do login.",
+    "Excluir a conta apaga a conta, os membros e as doses, com confirmação.",
+    "Nenhum CPF nem Cartão Nacional de Saúde é coletado."
+   ],
+   "estado": "Em análise",
+   "sprint": 4,
+   "evidencia": "docs/18-termos-e-privacidade.md; CT-APP-C*, CT-APP-X*",
+   "nota": "O texto dos termos é rascunho a validar (ver B39).",
+   "curto": "Consentimento, privacidade e exclusão de dados (RF09)"
+  },
+  {
+   "id": "B04",
+   "jira": "SCRUM-15",
+   "titulo": "Como cuidadora, quero cadastrar as pessoas da minha família (com parentesco), para acompanhar a vacinação de todas em uma só conta (RF02)",
+   "epico": "E4",
+   "prioridade": "Must",
+   "personas": "PE1, PE3",
+   "requisitos": "RF02; RNF03, RNF04",
+   "criterios": [
+    "Incluir, editar e excluir pessoas com nome, data de nascimento e, opcionalmente, gestante e parentesco.",
+    "Cada pessoa mostra o resumo de doses (aplicadas, pendentes e atrasadas).",
+    "Só o dono da conta enxerga e altera seus membros."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "CT-FAM-*; telas Família e Nova pessoa",
+   "nota": "",
+   "curto": "Gerenciar a família (RF02)"
+  },
+  {
+   "id": "B05",
+   "jira": "SCRUM-16",
+   "titulo": "Como mãe, quero ver o calendário vacinal de cada pessoa conforme a idade, com fonte e versão, para saber o que é indicado e quando (RF03)",
+   "epico": "E4",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF03; RNF04, RNF10",
+   "criterios": [
+    "As doses são geradas pela data de nascimento e pelo calendário oficial do PNI.",
+    "Toda tela com conteúdo vacinal mostra fonte e versão do calendário.",
+    "O aviso de que o app não substitui a caderneta oficial está sempre visível."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "docs/10-calendario-vacinal.md; CT-CAL-*, CT-G*",
+   "nota": "Confirmar com o autor a fonte e a data do calendário em uso (CLAUDE.md §8).",
+   "curto": "Calendário vacinal por idade (RF03)"
+  },
+  {
+   "id": "B06",
+   "jira": "SCRUM-17",
+   "titulo": "Como cuidadora, quero consultar o histórico de doses de cada pessoa, para ter a caderneta digital à mão (RF08)",
+   "epico": "E4",
+   "prioridade": "Must",
+   "personas": "PE1, PE3",
+   "requisitos": "RF08; RNF01, RNF04",
+   "criterios": [
+    "O histórico lista aplicadas e canceladas com data, em até 3 toques da tela inicial.",
+    "Doses avulsas aparecem com a etiqueta \"Adicionada por você\"."
+   ],
+   "estado": "Em análise",
+   "sprint": 4,
+   "evidencia": "CT-APP-H*",
+   "nota": "",
+   "curto": "Histórico de doses (RF08)"
+  },
+  {
+   "id": "B07",
+   "jira": "SCRUM-18",
+   "titulo": "Como responsável, quero agendar, registrar como aplicada, reagendar ou cancelar uma dose, para manter o registro certo (RF04)",
+   "epico": "E5",
+   "prioridade": "Must",
+   "personas": "PE1, PE3",
+   "requisitos": "RF04; RNF01, RNF07, RNF10",
+   "criterios": [
+    "Só as transições válidas do ciclo de vida são aceitas; as demais respondem com erro 409 e o estado não muda.",
+    "Atrasar só acontece pela rotina de prazo, nunca pelo app.",
+    "Cancelar pede confirmação; datas respeitam as regras (agendar e reagendar de hoje em diante; aplicar até hoje)."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "docs/03-uml/estados-dose.md; CT-T*, CT-E*, 42 casos de estados",
+   "nota": "",
+   "curto": "Registrar e acompanhar doses (RF04)"
+  },
+  {
+   "id": "B08",
+   "jira": null,
+   "titulo": "Como cuidadora, quero cadastrar uma dose que não está no calendário (dose avulsa), para registrar tudo que a pessoa tomou",
+   "epico": "E5",
+   "prioridade": "Should",
+   "personas": "PE1, PE3",
+   "requisitos": "RF04; RNF10",
+   "criterios": [
+    "A dose avulsa tem nome e dose em texto livre e segue o mesmo ciclo de estados.",
+    "Aparece com a etiqueta \"Adicionada por você\", distinta das doses oficiais."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "ADR-016; caixa preta de dose avulsa",
+   "nota": "",
+   "curto": "Dose avulsa"
+  },
+  {
+   "id": "B09",
+   "jira": "SCRUM-19",
+   "titulo": "Como mãe, quero receber lembretes antes da data de cada dose e ver as atrasadas em destaque, para não esquecer (RF05)",
+   "epico": "E5",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF05; RNF01, RNF05",
+   "criterios": [
+    "Dose pendente com data gera lembrete com antecedência de 7 dias e de 1 dia (configurável).",
+    "Dose atrasada aparece em \"Precisam de atenção\" com texto, ícone e cor.",
+    "O e-mail de lembrete traz só quantidades, nunca nomes nem datas de nascimento."
+   ],
+   "estado": "Em análise",
+   "sprint": 4,
+   "evidencia": "CT-LEM-*; docs/02-requisitos.md",
+   "nota": "",
+   "curto": "Lembretes e doses atrasadas (RF05)"
+  },
+  {
+   "id": "B10",
+   "jira": "SCRUM-20",
+   "titulo": "Como idoso, quero perguntar por voz sobre vacinas e o calendário, para consultar sem digitar (RF06)",
+   "epico": "E6",
+   "prioridade": "Must",
+   "personas": "PE2, PE1",
+   "requisitos": "RF06; RNF01, RNF04, RNF09",
+   "criterios": [
+    "A resposta chega em até 3 s em 90% das requisições.",
+    "Se o reconhecimento falhar, a pessoa vê uma mensagem clara e pode digitar.",
+    "O áudio não é guardado.",
+    "Funciona no celular e na web (com limitações documentadas)."
+   ],
+   "estado": "Em análise",
+   "sprint": 4,
+   "evidencia": "docs/11-assistente-pln.md; CT-AST-*, CT-WAV-*",
+   "nota": "Falta testar com microfone real e com o público (ver B40).",
+   "curto": "Busca por voz (RF06)"
+  },
+  {
+   "id": "B11",
+   "jira": "SCRUM-21",
+   "titulo": "Como mãe, quero tirar dúvidas frequentes no chat, com respostas curadas e fonte, para me informar sem orientação médica individual (RF07)",
+   "epico": "E6",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF07; RNF01, RNF04, RNF10",
+   "criterios": [
+    "A intenção é classificada por TF-IDF e SVM; F1 meta de 0,85 ou mais em conjunto de teste separado.",
+    "Confiança baixa devolve a resposta padrão que orienta procurar um profissional ou uma unidade de saúde.",
+    "Toda resposta cita a fonte oficial; nenhuma orientação médica individual."
+   ],
+   "estado": "Em análise",
+   "sprint": 5,
+   "evidencia": "apps/nlp; docs/11-assistente-pln.md; pytest",
+   "nota": "Dataset ainda precisa de revisão manual (ver B39).",
+   "curto": "Chatbot de dúvidas (RF07)"
+  },
+  {
+   "id": "B12",
+   "jira": null,
+   "titulo": "Como usuária, quero abrir o assistente em uma janela de conversa sobre a tela em que estou, para perguntar sem perder o lugar",
+   "epico": "E6",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF06, RF07; RNF04",
+   "criterios": [
+    "O balão do canto abre a janela (folha no celular, janela de 400 px no computador).",
+    "Fechar a janela cancela uma gravação em andamento.",
+    "O assistente não aparece como item do menu lateral."
+   ],
+   "estado": "Em análise",
+   "sprint": 5,
+   "evidencia": "PRs #70 e #78; janela-do-assistente.test.tsx",
+   "nota": "",
+   "curto": "Assistente em janela de chat"
+  },
+  {
+   "id": "B13",
+   "jira": "SCRUM-38",
+   "titulo": "Como mãe, quero ver no mapa os postos de saúde perto de mim, para saber onde procurar a vacina (RF10)",
+   "epico": "E8",
+   "prioridade": "Could",
+   "personas": "PE1, PE3",
+   "requisitos": "RF10; RNF01, RNF03, RNF04",
+   "criterios": [
+    "Lista e mapa de unidades básicas de saúde por distância, na web e no celular, sem chave de API.",
+    "A localização só é pedida ao tocar em \"Usar minha localização\" e a posição não é guardada.",
+    "Sem internet, a última lista fica visível e o mapa avisa; com internet, os dados oficiais são atualizados.",
+    "A tela avisa que nem toda unidade tem sala de vacina (\"Ligue antes de ir\")."
+   ],
+   "estado": "Em análise",
+   "sprint": 6,
+   "evidencia": "ADR-018; PRs #72, #73, #78",
+   "nota": "Testar em celular físico e iOS (ver B40); confirmar a licença dos dados (ver B38).",
+   "curto": "Mapa de postos de saúde (RF10)"
+  },
+  {
+   "id": "B14",
+   "jira": "SCRUM-39",
+   "titulo": "Como mãe, quero exportar a carteira de vacinação em PDF, para levar à escola ou à consulta (RF11)",
+   "epico": "E8",
+   "prioridade": "Could",
+   "personas": "PE1, PE3",
+   "requisitos": "RF11; RNF03, RNF10",
+   "criterios": [
+    "O PDF traz as doses aplicadas, a fonte e a versão do calendário e o aviso de que não substitui a caderneta.",
+    "Não inclui dados além dos já cadastrados."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "Só se o cronograma permitir (CLAUDE.md §3).",
+   "curto": "Exportar carteira em PDF (RF11)"
+  },
+  {
+   "id": "B15",
+   "jira": "SCRUM-40",
+   "titulo": "Como cuidadora, quero compartilhar a carteira de uma pessoa com outro cuidador autorizado, para dividirmos o cuidado (RF12)",
+   "epico": "E8",
+   "prioridade": "Won't (por enquanto)",
+   "personas": "PE3",
+   "requisitos": "RF12; RNF02, RNF03",
+   "criterios": [
+    "O compartilhamento exige autorização explícita e pode ser revogado.",
+    "A exclusão da conta remove os compartilhamentos."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "Fica para depois da entrega, salvo decisão do autor.",
+   "curto": "Compartilhar com cuidador (RF12)"
+  },
+  {
+   "id": "B16",
+   "jira": "SCRUM-22",
+   "titulo": "Como equipe, quero a API, o banco, o cofre de segredos e o monitoramento na Azure, para o app rodar na nuvem",
+   "epico": "E2",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF02, RNF05, RNF09",
+   "criterios": [
+    "API em Azure Functions, banco Azure SQL, segredos no Key Vault e Application Insights ligados.",
+    "Infraestrutura descrita como código (Bicep).",
+    "Banco acessado por identidade gerenciada, sem senha de SQL."
+   ],
+   "estado": "Em análise",
+   "sprint": 2,
+   "evidencia": "infra/; docs/08-infraestrutura-azure.md",
+   "nota": "",
+   "curto": "Provisionar recursos na Azure"
+  },
+  {
+   "id": "B17",
+   "jira": "SCRUM-23",
+   "titulo": "Como desenvolvedora, quero o monorepo com TypeScript estrito, ESLint, Prettier e TypeDoc, para manter a qualidade do código",
+   "epico": "E2",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF06",
+   "criterios": [
+    "Scripts padrão (lint, typecheck, test, docs) funcionam em todos os pacotes.",
+    "Hooks do Git e commitlint ativos."
+   ],
+   "estado": "Em análise",
+   "sprint": 2,
+   "evidencia": "CLAUDE.md §6",
+   "nota": "",
+   "curto": "Monorepo, ESLint, Prettier e TypeDoc"
+  },
+  {
+   "id": "B18",
+   "jira": "SCRUM-24",
+   "titulo": "Como desenvolvedora, quero um pipeline de CI que rode lint, tipos, build, testes com cobertura, TypeDoc e auditoria, para barrar regressões",
+   "epico": "E2",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF06, RNF07",
+   "criterios": [
+    "O pipeline falha se algum teste falhar ou a cobertura ficar abaixo de 80%.",
+    "Roda em todo push e o job de Docker só na main."
+   ],
+   "estado": "Em análise",
+   "sprint": 2,
+   "evidencia": ".github/workflows/ci.yml",
+   "nota": "",
+   "curto": "Pipeline de CI"
+  },
+  {
+   "id": "B19",
+   "jira": "SCRUM-25",
+   "titulo": "Como equipe, quero o projeto em contêineres Docker, para rodar em qualquer máquina com um comando",
+   "epico": "E2",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF08",
+   "criterios": [
+    "`docker compose up --build` sobe a API, o app web, o PLN e o Azurite.",
+    "Há guia de manutenção do Docker."
+   ],
+   "estado": "Em análise",
+   "sprint": 5,
+   "evidencia": "docker-compose.yml; docs/17-docker-manutencao.md",
+   "nota": "",
+   "curto": "Containerizar com Docker"
+  },
+  {
+   "id": "B20",
+   "jira": "SCRUM-26",
+   "titulo": "Como autora, quero estimar o custo mensal na Azure e ter alertas de orçamento, para não gastar além do crédito",
+   "epico": "E2",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF05",
+   "criterios": [
+    "Estimativa mensal por serviço registrada.",
+    "Alerta de orçamento configurado na assinatura."
+   ],
+   "estado": "Em andamento",
+   "sprint": 5,
+   "evidencia": "docs/16-custos-azure.md",
+   "nota": "A estimativa existe; confirmar o alerta de orçamento na Azure.",
+   "curto": "Custo na Azure e alertas de orçamento"
+  },
+  {
+   "id": "B21",
+   "jira": null,
+   "titulo": "Como autora, quero manter o banco com migrações versionadas e a persistência no Azure SQL, para os dados sobreviverem a reinícios",
+   "epico": "E2",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF02, RNF03",
+   "criterios": [
+    "Migrações aplicadas por script antes do deploy.",
+    "Contrato do repositório testado em memória e no SQL real."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "ADR-004; docs/15-persistencia-sql.md; scripts/db-migrate.mjs",
+   "nota": "",
+   "curto": "Migrações e persistência no Azure SQL"
+  },
+  {
+   "id": "B22",
+   "jira": null,
+   "titulo": "Como usuária, quero que o primeiro login depois de um tempo sem uso não demore, para não achar que o app travou",
+   "epico": "E2",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RNF01",
+   "criterios": [
+    "O app acorda o banco ao abrir (GET /api/warmup), no máximo uma consulta por minuto por instância.",
+    "Sem manter o banco sempre ligado, para não esgotar a franquia gratuita."
+   ],
+   "estado": "Em análise",
+   "sprint": 6,
+   "evidencia": "PR #78; docs/16-custos-azure.md",
+   "nota": "A espera pode continuar se a pessoa entrar antes de o banco acordar (até ~1 min).",
+   "curto": "Aquecer o banco para o primeiro login"
+  },
+  {
+   "id": "B23",
+   "jira": null,
+   "titulo": "Como autora, quero o repositório público com proteção ativada, para usar o GitHub Actions sem limite de minutos e sem expor segredos",
+   "epico": "E2",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF02",
+   "criterios": [
+    "Varredura do histórico sem segredos; secret scanning e push protection ligados.",
+    "Branch main protegida e workflows só com permissão de leitura."
+   ],
+   "estado": "Em análise",
+   "sprint": 6,
+   "evidencia": "docs/00-handoff.md §0.11",
+   "nota": "",
+   "curto": "Repositório público e proteção do GitHub"
+  },
+  {
+   "id": "B24",
+   "jira": "SCRUM-27",
+   "titulo": "Como equipe, quero o plano de teste com requisitos relevantes e papéis do processo, para a entrega de Qualidade e Testes de 12/11",
+   "epico": "E7",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Plano segue o modelo da disciplina.",
+    "Cada requisito relevante liga-se a casos de teste."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "docs/07-testes/",
+   "nota": "",
+   "curto": "Plano de teste"
+  },
+  {
+   "id": "B25",
+   "jira": "SCRUM-28",
+   "titulo": "Como equipe, quero casos de caixa preta com tabela de execução, para provar o comportamento por fora",
+   "epico": "E7",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Casos por requisito com entrada, saída esperada e resultado.",
+    "Tabela de execução atualizada a cada entrega.",
+    "Revisão por outra pessoa (por exemplo, o professor)."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "docs/07-testes/caixa-preta-*.md (179 casos)",
+   "nota": "Falta a revisão por outra pessoa.",
+   "curto": "Teste de caixa preta"
+  },
+  {
+   "id": "B26",
+   "jira": "SCRUM-29",
+   "titulo": "Como equipe, quero o diagrama UML de estados da dose e os casos de teste de estados e transições, para a entrega de 12/11",
+   "epico": "E7",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RF04; RNF07",
+   "criterios": [
+    "As 12 transições e as guardas estão cobertas por teste.",
+    "Transições inválidas respondem erro e preservam o estado."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "docs/03-uml/estados-dose.md; docs/07-testes/casos-teste-estados-dose.md",
+   "nota": "",
+   "curto": "UML de estados e casos de teste"
+  },
+  {
+   "id": "B27",
+   "jira": "SCRUM-30",
+   "titulo": "Como equipe, quero os testes automatizados em Jest 100% aprovados e com cobertura de 90%, para a entrega de 12/11",
+   "epico": "E7",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "100% dos testes passam no pipeline.",
+    "Cobertura acima de 80% (exigida) e meta própria de 90%.",
+    "O nome do teste traz o ID do caso (CT-...)."
+   ],
+   "estado": "Em análise",
+   "sprint": 4,
+   "evidencia": "app 404 e API 552 testes; cobertura do app 95%",
+   "nota": "",
+   "curto": "Testes automatizados com Jest"
+  },
+  {
+   "id": "B28",
+   "jira": null,
+   "titulo": "Como equipe, quero a verificação de segurança (OWASP) e uma carga leve, para mostrar que a API aguenta e está protegida",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF01, RNF02",
+   "criterios": [
+    "Checklist OWASP Top 10 revisada.",
+    "Carga leve com 99% das requisições abaixo de 3 s."
+   ],
+   "estado": "Em análise",
+   "sprint": 5,
+   "evidencia": "docs/21-seguranca-owasp-e-carga.md",
+   "nota": "",
+   "curto": "Segurança (OWASP) e carga leve"
+  },
+  {
+   "id": "B29",
+   "jira": "SCRUM-31",
+   "titulo": "Como equipe, quero a modelagem UML (casos de uso, classes, sequência) e o DER, para documentar o sistema",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF06",
+   "criterios": [
+    "Diagramas versionados em docs/03-uml.",
+    "DER coerente com as migrações do banco."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "docs/03-uml/",
+   "nota": "",
+   "curto": "Modelagem UML e DER"
+  },
+  {
+   "id": "B30",
+   "jira": "SCRUM-33",
+   "titulo": "Como equipe, quero as decisões técnicas registradas em ADRs, para defender as escolhas na apresentação",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF06",
+   "criterios": [
+    "Toda decisão relevante tem um ADR com contexto, decisão e consequências.",
+    "Índice de ADRs atualizado."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "docs/05-adrs/ (18 ADRs)",
+   "nota": "",
+   "curto": "Decisões técnicas em ADRs"
+  },
+  {
+   "id": "B31",
+   "jira": "SCRUM-35",
+   "titulo": "Como autora, quero a Documentação de Desenvolvimento (horas, atividades, reuniões, aprendizados e Scrum) mantida ao longo do projeto, para entregá-la em PDF no fim",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "autora",
+   "requisitos": "RNF06",
+   "criterios": [
+    "Segue o modelo da disciplina e a ABNT.",
+    "Horas, datas de reunião e atividades são registradas pela autora, nunca inventadas."
+   ],
+   "estado": "Em andamento",
+   "sprint": 1,
+   "evidencia": "docs/09-documentacao-de-desenvolvimento.md",
+   "nota": "Depende dos registros da autora.",
+   "curto": "Documentação de Desenvolvimento"
+  },
+  {
+   "id": "B32",
+   "jira": "SCRUM-34",
+   "titulo": "Como autora, quero a Documentação Técnica conforme o modelo da disciplina, para a entrega final",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "autora",
+   "requisitos": "RNF06",
+   "criterios": [
+    "Tecnologias e versões, DER, APIs, serviços Azure, custos, testes, PLN e riscos.",
+    "Atualizada com o mapa de postos, o redesenho e o repositório público.",
+    "PDF gerado só na entrega."
+   ],
+   "estado": "Em andamento",
+   "sprint": 5,
+   "evidencia": "doctos/Documentacao_Tecnica.docx (local)",
+   "nota": "",
+   "curto": "Documentação Técnica"
+  },
+  {
+   "id": "B33",
+   "jira": "SCRUM-36",
+   "titulo": "Como autora, quero a Documentação do Usuário em linguagem simples (passo a passo e perguntas frequentes), para quem vai usar o app",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RNF04",
+   "criterios": [
+    "Passo a passo das telas principais, com capturas de tela.",
+    "Perguntas frequentes e aviso de que não substitui a caderneta."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "doctos/Documentacao_do_Usuario.docx (local)",
+   "nota": "Falta revisar e incluir capturas de tela.",
+   "curto": "Documentação do Usuário"
+  },
+  {
+   "id": "B34",
+   "jira": "SCRUM-37",
+   "titulo": "Como autora, quero o panfleto A4 do projeto para a mostra, para apresentar o app ao público",
+   "epico": "E1",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "",
+   "criterios": [
+    "Cabe em uma folha A4 e usa a identidade visual.",
+    "Traz a proposta, os ODS 3 e 10 e como acessar."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "doctos/Panfleto.docx (local)",
+   "nota": "",
+   "curto": "Panfleto A4"
+  },
+  {
+   "id": "B35",
+   "jira": null,
+   "titulo": "Como autora, quero o roteiro de demonstração e a apresentação final, para defender o projeto em 19/11",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "autora",
+   "requisitos": "",
+   "criterios": [
+    "Roteiro cronometrado com o caminho feliz de cada persona.",
+    "Slides (ou equivalente) com problema, solução, arquitetura, testes e custos."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "docs/20-roteiro-de-demonstracao.md",
+   "nota": "O roteiro existe; faltam os slides.",
+   "curto": "Roteiro e apresentação final"
+  },
+  {
+   "id": "B36",
+   "jira": null,
+   "titulo": "Como autora, quero empacotar a entrega (PDFs das três documentações, panfleto e zip do repositório), para entregar em 19/11",
+   "epico": "E1",
+   "prioridade": "Must",
+   "personas": "autora",
+   "requisitos": "",
+   "criterios": [
+    "PDFs convertidos do Word só no momento da entrega.",
+    "Zip do repositório sem segredos nem arquivos gerados."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "",
+   "curto": "Empacotar a entrega (PDFs e zip)"
+  },
+  {
+   "id": "B37",
+   "jira": null,
+   "titulo": "Como autora, quero conversar com pessoas parecidas com as personas e registrar o que aprendi, para confirmar (ou corrigir) problemas e personas",
+   "epico": "E1",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "PR1 a PR4",
+   "criterios": [
+    "Pelo menos uma conversa por persona, com o resumo do que foi dito.",
+    "Problemas, expectativas e requisitos ajustados se algo mudar."
+   ],
+   "estado": "A fazer",
+   "sprint": 3,
+   "evidencia": "docs/23-do-problema-ao-backlog.md",
+   "nota": "Só a autora pode fazer; nada deve ser inventado.",
+   "curto": "Conversar com usuários e registrar"
+  },
+  {
+   "id": "B38",
+   "jira": null,
+   "titulo": "Como autora, quero confirmar com o professor a licença dos dados dos postos e o uso de Jest em vez de JUnit, para registrar as decisões",
+   "epico": "E1",
+   "prioridade": "Should",
+   "personas": "autora",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Resposta registrada no ADR-018 e no CLAUDE.md §14.",
+    "Data de entrega de Computação em Nuvem II confirmada."
+   ],
+   "estado": "A fazer",
+   "sprint": 3,
+   "evidencia": "",
+   "nota": "",
+   "curto": "Confirmar licença dos dados, Jest e data de CN2 com o professor"
+  },
+  {
+   "id": "B39",
+   "jira": null,
+   "titulo": "Como equipe, quero revisar o dataset do chatbot e o texto do termo de consentimento com outra pessoa, para garantir segurança e clareza",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF03, RNF10",
+   "criterios": [
+    "Dataset revisado manualmente, sem dados pessoais.",
+    "Termo e política validados por quem entende de LGPD (ou pelo professor)."
+   ],
+   "estado": "A fazer",
+   "sprint": 4,
+   "evidencia": "",
+   "nota": "",
+   "curto": "Revisar dataset do chatbot e termo de consentimento"
+  },
+  {
+   "id": "B40",
+   "jira": null,
+   "titulo": "Como equipe, quero testar o app em celulares reais (Android e iOS) e com leitor de tela, para achar o que o emulador não mostra",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "PE2",
+   "requisitos": "RNF04, RNF09",
+   "criterios": [
+    "Mapa, localização, voz, lembretes e ligações testados em ao menos um Android e um iOS.",
+    "Leitor de tela percorre as telas principais.",
+    "Defeitos viram itens com prioridade."
+   ],
+   "estado": "A fazer",
+   "sprint": 5,
+   "evidencia": "",
+   "nota": "",
+   "curto": "Testar em celulares reais e com leitor de tela"
+  },
+  {
+   "id": "B41",
+   "jira": "SCRUM-32",
+   "titulo": "Como equipe, quero o design system (cores, fontes, layout) para mobile e web, para o app ter identidade e ser acessível",
+   "epico": "E9",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF04",
+   "criterios": [
+    "Tokens com contraste WCAG 2.1 AA nos três temas.",
+    "Estados nunca só pela cor; alvos de toque de 48 dp.",
+    "Documentação do porquê das escolhas (docs/22)."
+   ],
+   "estado": "Em andamento",
+   "sprint": 1,
+   "evidencia": "docs/04-design-system.md; docs/22-identidade-visual.md",
+   "nota": "Figma ainda na versão 1 (ver B44).",
+   "curto": "Design system para mobile e web"
+  },
+  {
+   "id": "B42",
+   "jira": null,
+   "titulo": "Como usuária, quero um visual bonito e dinâmico, com telas próprias para web e celular, para gostar de usar o app",
+   "epico": "E9",
+   "prioridade": "Should",
+   "personas": "PE1, PE3",
+   "requisitos": "RNF04, RNF09",
+   "criterios": [
+    "Navegação por barra inferior no celular e lateral no computador.",
+    "Telas fiéis ao protótipo (Doses, Família, Histórico, Conta, apresentação, Entrar e Criar conta).",
+    "Efeitos de passar o mouse, clicar e entrada de telas, parados com \"Reduzir movimento\"."
+   ],
+   "estado": "Em análise",
+   "sprint": 6,
+   "evidencia": "PRs #65 a #78",
+   "nota": "",
+   "curto": "Redesenho visual web e celular"
+  },
+  {
+   "id": "B43",
+   "jira": null,
+   "titulo": "Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto",
+   "epico": "E9",
+   "prioridade": "Should",
+   "personas": "PE2",
+   "requisitos": "RNF04",
+   "criterios": [
+    "Tamanho do texto Normal, Grande e Maior na Conta.",
+    "\"Reduzir movimento\" na Conta, além da preferência do sistema e do tema Alto contraste."
+   ],
+   "estado": "Em análise",
+   "sprint": 6,
+   "evidencia": "PR #75",
+   "nota": "",
+   "curto": "Tamanho do texto e reduzir movimento"
+  },
+  {
+   "id": "B44",
+   "jira": null,
+   "titulo": "Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "autora",
+   "requisitos": "RNF04",
+   "criterios": [
+    "Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).",
+    "Componentes e telas atualizados."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "Depende do app de computador do Figma ou de um plano com mais chamadas.",
+   "curto": "Atualizar o Figma para a versão 2"
+  },
+  {
+   "id": "B45",
+   "jira": null,
+   "titulo": "Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "PE1",
+   "requisitos": "RNF04, RNF09",
+   "criterios": [
+    "Barra lateral compacta e grade de duas colunas validadas.",
+    "Sem texto cortado em 200%."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "Não foi desenhado no protótipo.",
+   "curto": "Tela para tablet"
+  },
+  {
+   "id": "B46",
+   "jira": null,
+   "titulo": "Como usuária, quero animações extras (inclinação 3D da apresentação, painel e folha animados), para uma experiência mais viva",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "PE1",
+   "requisitos": "RNF04",
+   "criterios": [
+    "Inclinação em até 10 graus, só na apresentação e em Entrar.",
+    "Tudo parado com \"Reduzir movimento\"."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "",
+   "curto": "Animações extras (inclinação 3D, painel e folha)"
+  },
+  {
+   "id": "B47",
+   "jira": null,
+   "titulo": "Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "todas",
+   "requisitos": "",
+   "criterios": [
+    "Ícone iOS e Android (adaptativo e monocromático) e favicon configurados.",
+    "Tela de abertura (splash) com a marca."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "PR #79",
+   "nota": "Falta a tela de abertura e a conferência em aparelho.",
+   "curto": "Ícones do app e da aba"
+  },
+  {
+   "id": "B48",
+   "jira": null,
+   "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",
+   "epico": "E3",
+   "prioridade": "Won't (por enquanto)",
+   "personas": "PE1",
+   "requisitos": "RNF02",
+   "criterios": [
+    "O cadastro só vale depois de clicar no link do e-mail."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Não existe hoje; decidir depois da entrega.",
+   "curto": "Confirmar e-mail no cadastro"
+  }
+ ],
+ "remover": [
+  [
+   "SCRUM-4",
+   "Subtarefa 2.1",
+   "Item de exemplo criado com o projeto, sem relação com o backlog."
+  ]
+ ]
+}
