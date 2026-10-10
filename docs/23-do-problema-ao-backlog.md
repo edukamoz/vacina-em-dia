@@ -57,15 +57,15 @@ Os épicos dos requisitos funcionais foram associados pelo nome e pela ordem dos
 
 Para cada requisito, onde ele aparece no app, em qual rota da API e em quais testes: `docs/19-rastreabilidade.md`. Os casos de teste seguem o padrão `CT-...` (plano em `docs/07-testes/`).
 
-## 6. O que a documentação já atende e o que ainda falta
+## 6. O que a documentação atende e as lacunas
 
 **Atende:** problemas com metas mensuráveis, expectativas ligadas a cada problema, três personas, 12 requisitos funcionais e 10 não funcionais, cada um ligado a personas e a RNFs, escopo (MVP, versão completa e fora do escopo), backlog em épicos e itens com sprints, e a rastreabilidade até os testes.
 
 **Lacunas que o professor pode apontar** (e como fechá-las):
 
-1. **Validação com usuários reais.** A Fase 0 declara que problemas e personas são "hipóteses de trabalho, a serem confirmadas em conversas com potenciais usuários". Não há registro dessas conversas no repositório. *Como fechar:* conversar com algumas pessoas parecidas com as personas (uma mãe, um idoso, um cuidador), anotar o que disseram e registrar em um anexo; só o autor pode fazer isso e nenhum dado deve ser inventado.
-2. **Prioridade dos requisitos.** Há a divisão MVP e versão completa, mas não uma prioridade por requisito (por exemplo MoSCoW: deve, deveria, poderia, não agora). *Como fechar:* acrescentar uma coluna "Prioridade" no Quadro 4, decidida pelo autor.
-3. **Critérios de aceite por requisito.** Existem metas nos problemas e casos de teste por regra, mas não uma lista curta de "aceite" por RF no mesmo lugar dos requisitos. *Como fechar:* escrever 2 ou 3 critérios por RF (a partir dos casos de teste que já existem) e copiá-los para a descrição de cada item no Jira.
-4. **Histórias de usuário.** O backlog está em itens técnicos. *Como fechar (opcional):* reescrever o título de cada item como "Como [persona], quero [ação], para [benefício]".
+1. **Validação com usuários reais: abandonada por decisão da autora (10/10/2026).** Não foi possível reunir pessoas parecidas com as personas; por isso problemas e personas seguem como **hipóteses de trabalho**, como a Fase 0 já declara, e isso fica registrado como limitação do projeto. Nada foi inventado para suprir a falta.
+2. **Prioridade dos requisitos.** *Fechada em 10/10/2026:* cada item do backlog tem prioridade MoSCoW (`docs/24-backlog.md`), proposta a ser confirmada pela autora.
+3. **Critérios de aceite por requisito.** *Fechada em 10/10/2026:* cada item do backlog traz seus critérios de aceite, derivados das metas dos problemas e dos casos de teste.
+4. **Histórias de usuário.** *Fechada em 10/10/2026:* os itens estão no formato "Como [persona], quero [ação], para [benefício]".
 
-Posso preparar o texto dos itens 2, 3 e 4 como rascunho para o autor revisar; o item 1 depende de conversas que só o autor pode fazer.
+O backlog vivo está no projeto "proj-vacina-em-dia" do GitHub Projects, que passou a substituir o Jira.
