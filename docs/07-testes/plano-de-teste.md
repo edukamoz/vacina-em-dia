@@ -75,7 +75,7 @@ RNF05, RNF06, RNF08 e RNF09 são verificados por outros meios (alertas, pipeline
 
 ### 4.1 Níveis e proporção
 
-Pirâmide de testes: **muitos testes unitários** (domínio, serviços e validação), **alguns de integração** (API com Supertest; app com React Native Testing Library) e **poucos de ponta a ponta**, apenas nos fluxos críticos (cadastro, registrar dose, exclusão de conta).
+Pirâmide de testes: **muitos testes unitários** (domínio, serviços e validação), **alguns de integração** (API com Supertest; app com React Native Testing Library) e **poucos de ponta a ponta**, apenas nos fluxos críticos (cadastro, registrar dose, exclusão de conta). Os de ponta a ponta usam o **Playwright** sobre o app web, com uma API falsa, e incluem a verificação automática de acessibilidade com o **axe-core**; veja `ponta-a-ponta-e-acessibilidade.md`.
 
 ### 4.2 Técnicas
 
@@ -87,7 +87,7 @@ Pirâmide de testes: **muitos testes unitários** (domínio, serviços e valida�
 | Teste de autorização | API | Para todo recurso: usuário A não acessa dado do usuário B |
 | Teste de conteúdo | Calendário e chatbot | Fonte, versão e aviso presentes; resposta padrão quando a confiança é baixa |
 | Teste de desempenho leve | API | Verifica o RNF01 sem ferramenta pesada |
-| Inspeção de acessibilidade | Telas principais | Checklist WCAG 2.1 AA |
+| Inspeção de acessibilidade | Telas principais | Checklist WCAG 2.1 AA e verificação automática com axe-core (`ponta-a-ponta-e-acessibilidade.md`) |
 
 ### 4.3 Princípios
 

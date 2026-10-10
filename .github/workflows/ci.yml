@@ -52,6 +52,13 @@ jobs:
       - name: Testes com cobertura (mínimo de 80%)
         run: npm run test:coverage
 
+      - name: Navegador dos testes de ponta a ponta (Chromium)
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/mobile
+
+      - name: Testes de ponta a ponta e de acessibilidade (Playwright)
+        run: npm run test:e2e --workspace apps/mobile
+
       - name: Documentação do código (TypeDoc)
         run: npm run docs
 
@@ -63,6 +70,15 @@ jobs:
           path: |
             packages/shared/coverage
             apps/api/coverage
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Guardar o relatório dos testes de ponta a ponta
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: relatorio-e2e
+          path: apps/mobile/e2e/relatorio
           if-no-files-found: ignore
           retention-days: 14
 
