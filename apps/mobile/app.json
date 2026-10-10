@@ -8,7 +8,8 @@
     "userInterfaceStyle": "automatic",
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -29,6 +30,17 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "icon": "./assets/images/icon.png",
+    "ios": {
+      "icon": "./assets/images/icon.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon-foreground.png",
+        "backgroundColor": "#0B6B52",
+        "monochromeImage": "./assets/images/adaptive-icon-monochrome.png"
+      }
     }
   }
 }
