@@ -17,8 +17,9 @@ Legenda de pastas: `api` = `apps/api/src`, `app` = `apps/mobile/src`, `shared` =
 | RF07 Chatbot | Aba Assistente (texto), balão flutuante | `POST /assistant/message` | `CT-AST-*`, `CT-AST-H*` (`api/handlers/assistant.test.ts`); `CT-APP-I*`; pytest do PLN (`nlp/test_classifier.py`, `nlp/test_chatbot.py`, `nlp/test_evaluate.py`, `nlp/test_handlers.py`); avaliação em `docs/07-testes/avaliacao-chatbot.md` e `avaliacao-busca-semantica.md` |
 | RF08 Histórico | Aba Histórico | `GET /members/{id}/doses` (mesma rota do calendário) | `CT-APP-H*` (`app/features/dose-flows.test.tsx`) |
 | RF09 Consentimento e exclusão | Tela de consentimento, aba Conta (exclusão), Termos de uso e Política de privacidade | `GET/PUT /consent`, `DELETE /account` | `CT-APP-C*` tela de consentimento e `CT-APP-X*` aba Conta (`app/features/onboarding-flows.test.tsx`); `CT-FAM-01` e `CT-FAM-03` (sem consentimento não cadastra; menor exige declaração); `CT-APP-L30`, `L31` (`app/features/auth/auth-screens.test.tsx`); `CT-APP-LG*` (`app/features/legal/legal-screen.test.tsx`); caixa preta `CT-CP-K*` |
+| RF11 Exportar PDF | Cartão "Levar a carteira com você" na aba Doses (botão "Baixar PDF") | `GET /members/{id}/doses/pdf` | `CT-PDF-*` (`api/pdf/carteira-pdf.test.ts`, `api/services/carteira-service.test.ts`); `CT-APP-PDF*` e `CT-APP-ARQ*` (`app/features/doses/baixar-carteira.test.tsx`, `app/lib/salvar-arquivo.test.ts`); ADR-019 |
 
-RF10 a RF12 (versão completa) não foram iniciados, como previsto no escopo.
+O RF10 (mapa de postos) e o RF11 (PDF) foram entregues; o RF12 (compartilhar com cuidador) não foi iniciado, como previsto no escopo.
 
 ## Requisitos não funcionais
 

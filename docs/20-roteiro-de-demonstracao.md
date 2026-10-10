@@ -47,14 +47,15 @@ Item do backlog: B35 (e SCRUM-27; critério 5 da banca: funcionalidades por pers
 | 2 | Aba **Doses** de um idoso > **Adicionar dose** (dose avulsa): nome "Febre tifoide", "1ª dose", data pelo calendário | A dose recebe a etiqueta **Adicionada por você**, diferente da **Oficial**, e segue o mesmo ciclo de estados |
 | 3 | Aba **Histórico** | Aplicadas e canceladas de **toda a família**, por ano; sem registros, o app explica como o histórico se preenche |
 | 4 | Aba **Doses** > cartão **Postos de saúde perto de você** (ou **Postos** na lateral do computador) > **Usar minha localização** | Mapa e lista de unidades básicas de saúde perto, com distância; a posição não é guardada; sem internet a última lista continua; aviso "Ligue antes de ir" |
-| 5 | Aba **Conta** > **Excluir minha conta** (só se for encerrar a demonstração) | Pede confirmação; apaga conta, pessoas e doses (LGPD) |
+| 5 | Aba **Doses** de uma pessoa > cartão **Levar a carteira com você** > **Baixar PDF** (RF11) | O PDF traz a pessoa, o resumo, a tabela de doses com a situação e, em **toda página**, a fonte, a versão do calendário e o aviso de que **não substitui a caderneta oficial** |
+| 6 | Aba **Conta** > **Excluir minha conta** (só se for encerrar a demonstração) | Pede confirmação; apaga conta, pessoas e doses (LGPD) |
 
 ## Fecho (1 min)
 
 - Rastreabilidade e testes: `docs/19-rastreabilidade.md`; 179 casos de caixa preta aprovados; 42 casos do ciclo da dose; 1.192 testes automatizados; CI com lint, tipos, testes, cobertura, `npm audit` e teste de fumaça do Docker.
 - Infraestrutura como código (Bicep), custos estimados e equivalência AWS para Azure: `docs/08`, `docs/16`.
 - Backlog no GitHub Projects ("proj-vacina-em-dia"): 47 itens em 9 épicos, com prioridade e critérios de aceite (`docs/24-backlog.md`).
-- Limites assumidos: o mapa de postos (RF10) foi entregue, mas PDF e compartilhar com cuidador (RF11 e RF12) não foram iniciados; a voz, o mapa e a localização não foram testados em celular físico nem em iOS; as personas não foram validadas com usuários; lembretes por e-mail não têm push no celular.
+- Limites assumidos: o mapa de postos (RF10) e o PDF da carteira (RF11) foram entregues, mas compartilhar com cuidador (RF12) não foi iniciado; a voz, o mapa e a localização não foram testados em celular físico nem em iOS; as personas não foram validadas com usuários; lembretes por e-mail não têm push no celular.
 
 ## Pontos de atenção antes de apresentar
 

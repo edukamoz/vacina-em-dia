@@ -14,6 +14,7 @@ import { todayCivil } from '../../lib/dates';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useMemberDoses } from '../data/hooks';
+import { BaixarCarteira } from './baixar-carteira';
 import { DoseCard } from './dose-card';
 import { Festa } from './festa';
 import { LembretesCard } from './lembretes-card';
@@ -136,6 +137,7 @@ export function DosesScreen() {
       {grupos && grupos.aplicadas.length > LIMITE_APLICADAS && (
         <LinkTexto titulo="Ver todas no Histórico" onPress={() => router.push('/historico')} />
       )}
+      {doses.data && <BaixarCarteira memberId={selected.id} nome={primeiroNome} />}
       <Pressable
         accessibilityRole="link"
         accessibilityLabel="Postos de saúde perto de você. Veja no mapa onde tomar as doses."

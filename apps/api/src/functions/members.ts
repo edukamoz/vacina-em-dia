@@ -108,6 +108,23 @@ export async function addCustomDose(
   });
 }
 
+/** `GET /api/members/{id}/doses/pdf`: a carteira de vacinação do membro em PDF. */
+export async function exportMemberDosesPdf(
+  request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  return authenticated(request, context, (ownerId) =>
+    memberHandlers.exportDosesPdf(ownerId, request.params['id']),
+  );
+}
+
+app.http('exportMemberDosesPdf', {
+  methods: ['GET'],
+  authLevel: 'anonymous',
+  route: 'members/{id}/doses/pdf',
+  handler: exportMemberDosesPdf,
+});
+
 app.http('listMemberDoses', {
   methods: ['GET'],
   authLevel: 'anonymous',

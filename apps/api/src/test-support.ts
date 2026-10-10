@@ -5,6 +5,7 @@ import { createDoseHandlers } from './handlers/doses';
 import { createMemberHandlers } from './handlers/members';
 import { createInMemoryStore } from './repositories/in-memory-store';
 import { createAccountService } from './services/account-service';
+import { createCarteiraService } from './services/carteira-service';
 import { createConsentService } from './services/consent-service';
 import { createDoseService } from './services/dose-service';
 import { createMemberService } from './services/member-service';
@@ -43,6 +44,7 @@ export function buildApp(startAt: string = NOW) {
   });
   const doses = createDoseService({ members: store.members, doses: store.doses, clock, calendar });
   const accounts = createAccountService(store.accounts);
+  const carteira = createCarteiraService({ doses, clock });
 
   return {
     store,
@@ -50,8 +52,9 @@ export function buildApp(startAt: string = NOW) {
     members,
     doses,
     accounts,
+    carteira,
     handlers: {
-      members: createMemberHandlers(members, doses),
+      members: createMemberHandlers(members, doses, carteira),
       doses: createDoseHandlers(doses),
       consent: createConsentHandlers(consents),
       account: createAccountHandlers(accounts),

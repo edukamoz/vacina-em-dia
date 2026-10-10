@@ -22,6 +22,12 @@ export function useAcceptConsent() {
   });
 }
 
+/** Baixa a carteira de vacinação de uma pessoa em PDF (RF11): devolve os bytes do arquivo. */
+export function useBaixarCarteiraPdf(memberId: string) {
+  const { api } = useSession();
+  return useMutation({ mutationFn: () => endpoints.downloadCarteiraPdf(api, memberId) });
+}
+
 /** Membros da família (RF02). */
 export function useMembers() {
   const { api } = useSession();

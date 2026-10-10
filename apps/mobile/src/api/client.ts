@@ -129,6 +129,26 @@ export async function apiRequest<S extends z.ZodType>(
 }
 
 /**
+ * Faz uma chamada cuja resposta de sucesso é um arquivo (por exemplo, o PDF da carteira) e devolve
+ * os bytes.
+ *
+ * @param context - Endereço da API, sessão e `fetch`.
+ * @param options - Caminho, método e sinal.
+ * @throws ApiRequestError quando a rede falha, a API devolve erro ou a resposta não pode ser lida.
+ */
+export async function apiRequestBytes(
+  context: ApiContext,
+  options: RequestOptions,
+): Promise<Uint8Array> {
+  const response = await send(context, options);
+  try {
+    return new Uint8Array(await response.arrayBuffer());
+  } catch {
+    throw new ApiRequestError('invalid-response', response.status);
+  }
+}
+
+/**
  * Faz uma chamada cuja resposta de sucesso não tem corpo (HTTP 204).
  *
  * @param context - Endereço da API, sessão e `fetch`.

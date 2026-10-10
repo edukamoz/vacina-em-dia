@@ -564,6 +564,29 @@ export function buildOpenApiDocument(): object {
   });
 
   registry.registerPath({
+    method: 'get',
+    path: '/members/{id}/doses/pdf',
+    tags: ['Calendário e doses'],
+    summary: 'Baixar a carteira de vacinação em PDF',
+    description:
+      'Gera o PDF da carteira de vacinação do membro (RF11): quem é a pessoa, o resumo, a lista de doses com a situação e a data, e, em todas as páginas, a fonte e a versão do calendário oficial e o aviso de que o documento não substitui a caderneta oficial. É uma cópia de conferência, sem valor legal. O arquivo vem como anexo (`Content-Disposition: attachment`) e nunca fica em cache.',
+    security: secured,
+    request: { params: memberPathParams },
+    responses: {
+      200: {
+        description: 'Arquivo PDF da carteira.',
+        content: {
+          'application/pdf': { schema: z.string().meta({ format: 'binary' }) },
+        },
+      },
+      400: errorResponse('Identificador inválido.'),
+      401: unauthorized,
+      404: errorResponse('Membro não encontrado (ou de outro usuário).'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
     method: 'post',
     path: '/members/{id}/doses',
     tags: ['Calendário e doses'],

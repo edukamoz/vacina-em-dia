@@ -3,8 +3,8 @@ export interface HttpResult {
   readonly status: number;
   /** Corpo JSON. */
   readonly jsonBody?: unknown;
-  /** Corpo em texto (por exemplo, a página HTML do Swagger UI). */
-  readonly body?: string;
+  /** Corpo em texto (a página HTML do Swagger UI) ou em bytes (o PDF da carteira). */
+  readonly body?: string | Uint8Array;
   readonly headers?: Readonly<Record<string, string>>;
 }
 

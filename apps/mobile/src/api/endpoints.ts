@@ -24,7 +24,7 @@ import {
   type DoseEventInput,
   type MemberInput,
 } from '@vacina/shared';
-import { apiRequest, apiRequestNoContent, type ApiContext } from './client';
+import { apiRequest, apiRequestBytes, apiRequestNoContent, type ApiContext } from './client';
 
 /**
  * Funções de cada endpoint da API. Os dados enviados já passam pelo esquema Zod do
@@ -153,6 +153,13 @@ export const endpoints = {
       { path: `/members/${encodeURIComponent(id)}/doses`, ...(signal ? { signal } : {}) },
       memberDosesResponseSchema,
     ),
+
+  /** Carteira de vacinação da pessoa em PDF (RF11): os bytes do arquivo. */
+  downloadCarteiraPdf: (ctx: ApiContext, memberId: string, signal?: AbortSignal) =>
+    apiRequestBytes(ctx, {
+      path: `/members/${encodeURIComponent(memberId)}/doses/pdf`,
+      ...(signal ? { signal } : {}),
+    }),
 
   getDose: (ctx: ApiContext, id: string, signal?: AbortSignal) =>
     apiRequest(
