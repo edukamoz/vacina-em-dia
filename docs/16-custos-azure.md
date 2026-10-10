@@ -10,6 +10,7 @@ Critério da banca de CN2 ("Apresentação dos custos de serviços no Azure") e 
 |---|---|
 | **Hoje** (demonstração, tráfego baixo, créditos do Azure for Students) | **cerca de US$ 13** desde 07/10/2026: uma instância sempre pronta para o PLN e outra para a API (a da API elimina os 503 intermitentes; ver `docs/21`). Antes disso eram cerca de US$ 6,50 |
 | Mesmo cenário **sem** a instância sempre pronta | **cerca de US$ 0**, mas a primeira pergunta ao assistente depois de ociosidade leva ~50 s (partida a frio) |
+| Primeiro login depois de ociosidade | O banco gratuito **pausa após 60 min parado** e a primeira consulta leva até ~1 min. O app chama `GET /api/warmup` ao abrir (uma vez por abertura), o que acorda o banco enquanto a pessoa digita; a API consulta o banco no máximo 1 vez por minuto por instância. **Não** se mantém o banco acordado o tempo todo: a franquia gratuita (100 mil vCore-segundos por mês) acabaria em poucas semanas e o banco pausaria até o mês virar |
 | Se o banco gratuito esgotar a franquia | O banco **pausa** (configurado como `AutoPause`): não gera cobrança, mas fica indisponível até o mês virar |
 
 ## Por serviço

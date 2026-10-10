@@ -99,6 +99,7 @@ describe('especificação OpenAPI', () => {
   test('CT-API-O08: toda rota de dados exige a sessão e declara o esquema de segurança', () => {
     const open = new Set([
       '/health',
+      '/warmup',
       '/openapi.json',
       '/auth/register',
       '/auth/login',

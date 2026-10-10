@@ -6,11 +6,12 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, Stack, ThemeProvider as NavigationTheme } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EstadoCarregando } from '../src/components/estados';
 import { Tela } from '../src/components/tela';
 import '../global.css';
 import { createQueryClient } from '../src/api/query-client';
+import { aquecerServidor } from '../src/api/warmup';
 import { SessionProvider, useSession } from '../src/session/session-provider';
 import { ThemeProvider, useThemeColors } from '../src/theme/theme-provider';
 
@@ -70,6 +71,9 @@ export default function RootLayout() {
     AtkinsonHyperlegible_400Regular,
     AtkinsonHyperlegible_700Bold,
   });
+
+  // Acorda a API e o banco antes de a pessoa tentar entrar (o banco gratuito pausa quando parado).
+  useEffect(() => aquecerServidor(), []);
 
   // Sem a fonte o app ainda funciona com a fonte do sistema; só espera enquanto carrega.
   if (!fontsLoaded && !fontError) return null;

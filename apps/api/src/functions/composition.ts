@@ -17,6 +17,8 @@ import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors
 import { createMemberHandlers } from '../handlers/members';
 import { createReminderHandlers } from '../handlers/reminders';
 import { createUnitsHandlers } from '../handlers/units';
+import { createWarmupHandler } from '../handlers/warmup';
+import { createWarmupService } from '../services/warmup-service';
 import { withSecurityHeaders, type HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
@@ -219,3 +221,14 @@ export async function authenticated(
     return ownerId ? run(ownerId) : unauthorizedResult();
   });
 }
+
+/**
+ * Aquecimento (`GET /api/warmup`): acorda o Azure SQL pausado enquanto a pessoa ainda está na
+ * tela de entrada. Sem banco (memória), responde "ready" sem consultar nada.
+ */
+export const warmupHandler = createWarmupHandler(
+  createWarmupService({
+    ping: sql ? sql.ping : async () => undefined,
+    clock: () => Date.now(),
+  }),
+);

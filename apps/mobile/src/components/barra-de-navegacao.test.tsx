@@ -77,8 +77,8 @@ describe('navegação principal', () => {
     },
   );
 
-  test.each([800, 1280])(
-    'CT-LAY-10: com %i px o assistente é o último item da barra lateral e abre a janela',
+  test.each([390, 800, 1280])(
+    'CT-LAY-10: com %i px o assistente não é item do menu (o botão flutuante abre a janela)',
     async (largura) => {
       await render(
         <AssistenteProvider>
@@ -86,18 +86,9 @@ describe('navegação principal', () => {
           <Estado />
         </AssistenteProvider>,
       );
+      expect(screen.queryByRole('button', { name: 'Assistente' })).not.toBeOnTheScreen();
+      expect(screen.queryByRole('link', { name: 'Assistente' })).not.toBeOnTheScreen();
       expect(screen.getByText('janela fechada')).toBeOnTheScreen();
-      await fireEvent.press(screen.getByRole('button', { name: 'Assistente' }));
-      expect(screen.getByText('janela aberta')).toBeOnTheScreen();
     },
   );
-
-  test('CT-LAY-11: no celular o assistente não está na barra (é o botão flutuante)', async () => {
-    await render(
-      <AssistenteProvider>
-        <BarraDeNavegacao largura={390} />
-      </AssistenteProvider>,
-    );
-    expect(screen.queryByRole('button', { name: 'Assistente' })).not.toBeOnTheScreen();
-  });
 });

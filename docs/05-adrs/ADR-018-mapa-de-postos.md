@@ -36,6 +36,7 @@ Nenhuma das duas diz **quais unidades têm sala de vacina**. O cadastro de salas
 - **Tamanho:** o arquivo tem cerca de 5 MB (1,3 MB compactado no Git) e é lido uma vez por instância (cerca de 200 ms na partida).
 - **Sem serviço Azure novo** e sem custo: a consulta à API oficial sai da função da API.
 - **Limite honesto:** o comportamento da API oficial em grande volume (municípios com centenas de unidades levam muitas páginas de 20) não foi medido; o tempo máximo de 4 s protege a resposta, e o cache de 12 horas evita repetir a consulta.
+- **Cabeçalhos de segurança na web (corrigido em 09/10/2026):** a política de conteúdo (CSP) só deixava imagens do próprio site e a política de permissões desligava a localização (`geolocation=()`); na versão publicada o mapa ficava sem imagens e o botão de localização não funcionava. Agora `img-src` inclui `https://tile.openstreetmap.org` e `Permissions-Policy` tem `geolocation=(self)`, em `apps/mobile/public/staticwebapp.config.json` e `apps/mobile/nginx.conf`.
 
 ## Alternativas consideradas
 
