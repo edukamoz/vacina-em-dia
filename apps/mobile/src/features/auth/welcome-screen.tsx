@@ -1,6 +1,6 @@
 import type { DoseStatus } from '@vacina/shared';
 import { useRouter } from 'expo-router';
-import { useWindowDimensions, View } from 'react-native';
+import { Image, useWindowDimensions, View, type ImageStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Bolha } from '../../components/bolha';
@@ -15,6 +15,8 @@ import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
 import { useThemeColors, useVisual } from '../../theme/theme-provider';
+import { CenaDoHero } from './cena-do-hero';
+import { FOTOS, type Foto } from './fotos';
 import { Logo, Simbolo } from './logo';
 
 /** Vantagens do app; "Aa" (texto grande) ou um desenho no quadro. */
@@ -48,18 +50,36 @@ const EXEMPLOS: readonly { vacina: string; dica: string; status: DoseStatus; inc
   { vacina: 'Febre amarela', dica: 'Aplicada em 12/04/2026', status: 'APPLIED', inclina: '-1deg' },
 ];
 
-/** Fases da vida da seção "Para cada fase": ícone, rótulo, diâmetro e tom do avatar. */
-const FASES = [
-  { icone: 'bebe', rotulo: 'Bebês', tamanho: 84, cor: 'avatarC' },
-  { icone: 'pessoa', rotulo: 'Crianças', tamanho: 100, cor: 'avatarB' },
-  { icone: 'familia', rotulo: 'Adultos e gestantes', tamanho: 116, cor: 'avatarA' },
-  { icone: 'bengala', rotulo: 'Pessoas idosas', tamanho: 104, cor: 'avatarD' },
-] as const satisfies readonly {
-  icone: NomeDoIcone;
-  rotulo: string;
-  tamanho: number;
-  cor: 'avatarA' | 'avatarB' | 'avatarC' | 'avatarD';
-}[];
+/** Fases da vida da seção "Para cada fase": foto (pessoa fictícia), rótulo e diâmetro do círculo. */
+const FASES: readonly { foto: Foto; rotulo: string; tamanho: number }[] = [
+  { foto: FOTOS.bebe, rotulo: 'Bebês', tamanho: 112 },
+  { foto: FOTOS.crianca, rotulo: 'Crianças', tamanho: 128 },
+  { foto: FOTOS.gestante, rotulo: 'Adultos e gestantes', tamanho: 144 },
+  { foto: FOTOS.jose, rotulo: 'Pessoas idosas', tamanho: 132 },
+];
+
+/** Para quem o app é feito: as três personas do projeto (pessoas fictícias). */
+const PERSONAS: readonly { foto: Foto; nome: string; papel: string; texto: string }[] = [
+  {
+    foto: FOTOS.mariana,
+    nome: 'Mariana, 32 anos',
+    papel: 'Mãe de primeira viagem',
+    texto: 'Quer saber quais doses do bebê estão chegando, sem procurar a caderneta de papel.',
+  },
+  {
+    foto: FOTOS.jose,
+    nome: 'Sr. José, 68 anos',
+    papel: 'Prefere falar a digitar',
+    texto:
+      'Pergunta ao assistente de voz e lê tudo em letras grandes, com o contraste que precisar.',
+  },
+  {
+    foto: FOTOS.carla,
+    nome: 'Carla, 45 anos',
+    papel: 'Cuida de vários familiares',
+    texto: 'Vê as doses de todas as pessoas da família em um só lugar e não esquece nenhuma.',
+  },
+];
 
 /** Objetos de saúde que ficam atrás do texto no computador (só decoração). */
 const FLUTUANTES = [
@@ -71,6 +91,36 @@ const FLUTUANTES = [
 
 /** Largura útil das seções da página: 1184 px com margem, centralizada. */
 const SECAO = 'w-full max-w-pagina self-center px-lg expandido:px-xxl';
+
+/** Foto recortada em círculo (ou em cartão), com o rosto no centro do recorte. */
+function FotoRecortada({
+  foto,
+  largura,
+  altura,
+  raio,
+}: {
+  foto: Foto;
+  largura: number | `${number}%`;
+  altura: number;
+  raio: number;
+}) {
+  // `objectPosition` existe só na web (RN Web); no celular o recorte é centralizado.
+  const estilo = {
+    width: largura,
+    height: altura,
+    borderRadius: raio,
+    objectPosition: `center ${foto.rosto}`,
+  } as ImageStyle;
+  return (
+    <Image
+      source={foto.fonte}
+      accessibilityLabel={foto.alt}
+      accessibilityIgnoresInvertColors
+      resizeMode="cover"
+      style={estilo}
+    />
+  );
+}
 
 /** Cartão de exemplo de dose, como o app mostra (dados inventados). */
 function ExemploDeDose({
@@ -208,28 +258,16 @@ export function WelcomeScreen() {
               </View>
 
               <View
-                accessibilityLabel="Exemplo de como as doses aparecem"
-                className="gap-md expandido:w-[480px]"
+                accessibilityLabel="Exemplo de como o aplicativo aparece"
+                className="gap-md expandido:w-[520px]"
               >
-                <Inclinar>
-                  {EXEMPLOS.map(({ vacina, dica, status, inclina }, indice) => (
-                    <View
-                      key={vacina}
-                      style={
-                        expandido
-                          ? {
-                              transform: [{ rotate: inclina }],
-                              marginLeft: indice === 1 ? 40 : indice === 2 ? 14 : 0,
-                            }
-                          : undefined
-                      }
-                    >
-                      <ExemploDeDose vacina={vacina} dica={dica} status={status} />
-                    </View>
+                <CenaDoHero
+                  cartoes={EXEMPLOS.slice(0, 2).map(({ vacina, dica, status }) => (
+                    <ExemploDeDose key={vacina} vacina={vacina} dica={dica} status={status} />
                   ))}
-                </Inclinar>
+                />
                 <Texto variante="apoio" className="text-textoSecundario">
-                  Exemplo com dados inventados.
+                  Exemplo com dados inventados. As pessoas das fotos são fictícias.
                 </Texto>
               </View>
             </View>
@@ -248,22 +286,58 @@ export function WelcomeScreen() {
               </Texto>
             </View>
             <View className="flex-row flex-wrap items-end justify-around gap-xl pt-lg">
-              {FASES.map(({ icone, rotulo, tamanho, cor }) => (
-                <View key={rotulo} className="w-[140px] items-center gap-md">
-                  <View
-                    aria-hidden
-                    className="items-center justify-center rounded-selo"
-                    style={{ width: tamanho, height: tamanho, backgroundColor: cores[cor] }}
-                  >
-                    <Icone
-                      nome={icone}
-                      cor={cores.sobreAvatar}
-                      tamanho={Math.round(tamanho * 0.46)}
-                    />
-                  </View>
+              {FASES.map(({ foto, rotulo, tamanho }) => (
+                <View key={rotulo} className="w-[160px] items-center gap-md">
+                  <Inclinar graus={14}>
+                    <View
+                      style={{ width: tamanho, height: tamanho, borderRadius: tamanho / 2 }}
+                      className="overflow-hidden border-[4px] border-superficie"
+                    >
+                      <FotoRecortada
+                        foto={foto}
+                        largura="100%"
+                        altura={tamanho}
+                        raio={tamanho / 2}
+                      />
+                    </View>
+                  </Inclinar>
                   <Texto variante="corpoNegrito" className="text-center">
                     {rotulo}
                   </Texto>
+                </View>
+              ))}
+            </View>
+          </View>
+        </Revelar>
+
+        <Revelar>
+          <View className={`${SECAO} gap-xl pb-xxl`}>
+            <View className="max-w-[640px] gap-sm">
+              <Texto variante="titulo2" accessibilityRole="header">
+                Feito para quem cuida de gente
+              </Texto>
+              <Texto className="text-textoSecundario">
+                Três jeitos de usar o mesmo aplicativo. As pessoas são fictícias e as fotos foram
+                geradas por inteligência artificial.
+              </Texto>
+            </View>
+            <View className="gap-lg expandido:flex-row expandido:gap-xl">
+              {PERSONAS.map(({ foto, nome, papel, texto }) => (
+                <View key={nome} className="expandido:flex-1">
+                  <Inclinar graus={6}>
+                    <Cartao className="gap-md overflow-hidden p-0">
+                      <FotoRecortada foto={foto} largura="100%" altura={260} raio={0} />
+                      <View className="gap-xs p-lg">
+                        <Texto variante="titulo3" accessibilityRole="header">
+                          {nome}
+                        </Texto>
+                        <Texto variante="rotulo" className="text-primaria">
+                          {papel}
+                        </Texto>
+                        <Texto className="text-textoSecundario">{texto}</Texto>
+                      </View>
+                    </Cartao>
+                  </Inclinar>
                 </View>
               ))}
             </View>

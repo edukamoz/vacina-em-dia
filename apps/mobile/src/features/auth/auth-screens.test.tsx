@@ -57,7 +57,14 @@ describe('tela de apresentação', () => {
     }
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
 
-    expect(screen.getByText('Exemplo com dados inventados.')).toBeOnTheScreen();
+    expect(
+      screen.getByText(/Exemplo com dados inventados\. As pessoas das fotos são fictícias/),
+    ).toBeOnTheScreen();
+    expect(screen.getByText('Feito para quem cuida de gente')).toBeOnTheScreen();
+    for (const nome of ['Mariana, 32 anos', 'Sr. José, 68 anos', 'Carla, 45 anos']) {
+      expect(screen.getByRole('header', { name: nome })).toBeOnTheScreen();
+    }
+    expect(screen.getAllByLabelText(/personagem fict/).length).toBeGreaterThanOrEqual(6);
     expect(screen.getByText('Comece a acompanhar as doses da família.')).toBeOnTheScreen();
     expect(screen.getByText('Para cada fase da vida')).toBeOnTheScreen();
 

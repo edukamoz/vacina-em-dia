@@ -80,6 +80,8 @@ Português do Brasil, frases curtas, voz ativa, **sem "por favor", exclamação,
 
 Ícones de traço simples, todos no mesmo estilo (traço de 2 px, pontas arredondadas), legíveis em 24 px e sempre acompanhados de texto nos itens de navegação. As ilustrações de estados vazios, de erro e de carregamento são leves e neutras, sem rostos nem situações de doença, para não assustar. Arquivos em `assets/icones/` e `assets/ilustracoes/`.
 
+**Fotografias da apresentação.** A página inicial usa seis retratos (mãe com bebê, pessoa idosa, cuidadora, bebê, criança e gestante) e um fundo de vidro. Todos foram **gerados por inteligência artificial (Gemini)**: as pessoas não existem. Isso evita direito de imagem e privacidade de pessoas reais (LGPD), e a própria página avisa que as pessoas são fictícias. As fotos entram como cartões com moldura, em camadas de profundidade, para o efeito de paralaxe com o mouse, e valem como as personas PE1 (Mariana), PE2 (Sr. José) e PE3 (Carla). Ficam em `apps/mobile/assets/images/pessoas/`, reduzidas para 640 px (cerca de 50 KB cada); os arquivos originais não vão para o Git. O texto alternativo de cada foto diz que é um personagem fictício.
+
 ## 10. Onde cada decisão está no projeto
 
 | Assunto | Arquivo |
