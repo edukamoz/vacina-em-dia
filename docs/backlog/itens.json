@@ -925,6 +925,25 @@
    "curto": "Ícones do app e da aba"
   },
   {
+   "id": "B49",
+   "jira": null,
+   "titulo": "Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "PE1, PE2",
+   "requisitos": "RF01, RF04, RF07, RF09; RNF04",
+   "criterios": [
+    "Fluxos de cadastro, consentimento, pessoa, dose, entrar e assistente automatizados no navegador (Playwright).",
+    "axe-core sem violações graves nas telas de antes do login, nos temas claro e escuro.",
+    "Roda no CI depois do build e guarda o relatório."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/",
+   "nota": "Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).",
+   "curto": "Testes de ponta a ponta e de acessibilidade"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",

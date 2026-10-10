@@ -288,6 +288,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B28 | novo | Como equipe, quero a verificação de segurança (OWASP) e uma carga leve, para mostrar que a API aguenta e está protegida | Should | Em análise | Sprint 5 |
 | B39 | novo | Como equipe, quero revisar o dataset do chatbot e o texto do termo de consentimento com outra pessoa, para garantir segurança e clareza | Should | A fazer | Sprint 4 |
 | B40 | novo | Como equipe, quero testar o app em celulares reais (Android e iOS) e com leitor de tela, para achar o que o emulador não mostra | Should | A fazer | Sprint 5 |
+| B49 | novo | Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança | Should | Em análise | Sprint 1 |
 
 **B24** (todas; requisitos: RNF07)
 
@@ -333,6 +334,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Leitor de tela percorre as telas principais.
 - Defeitos viram itens com prioridade.
 - Atenção: A autora fará o teste nos aparelhos depois.
+
+**B49** (PE1, PE2; requisitos: RF01, RF04, RF07, RF09; RNF04)
+
+- Fluxos de cadastro, consentimento, pessoa, dose, entrar e assistente automatizados no navegador (Playwright).
+- axe-core sem violações graves nas telas de antes do login, nos temas claro e escuro.
+- Roda no CI depois do build e guarda o relatório.
+- Evidência: docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/
+- Atenção: Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).
 
 ## E8 Versão completa (SCRUM-12)
 
