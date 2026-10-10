@@ -297,7 +297,9 @@ describe('conta (RF09)', () => {
     expect(await screen.findByText(/versão 2026-10-06/)).toBeOnTheScreen();
     expect(screen.getByRole('radio', { name: 'Escuro' })).toBeOnTheScreen();
     expect(screen.getAllByRole('radio', { name: 'Seguir o aparelho' })).toHaveLength(2);
-    expect(screen.getByRole('radio', { name: 'Reduzir movimento', checked: true })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('radio', { name: 'Reduzir movimento', checked: true }),
+    ).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Seus dados' })).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Tema' })).toBeOnTheScreen();
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
