@@ -1,3 +1,54 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Movimento da web (design system, "Movimento"): tudo que se clica reage ao passar o mouse e ao
+ * apertar. O ThemeProvider marca <html data-movimento="reduzido"> com "Reduzir movimento", com a
+ * preferência do sistema ou no Alto contraste; nesses casos nada disto se aplica.
+ */
+html:not([data-movimento='reduzido']) [role='button'],
+html:not([data-movimento='reduzido']) [role='link'],
+html:not([data-movimento='reduzido']) [role='radio'],
+html:not([data-movimento='reduzido']) [role='switch'],
+html:not([data-movimento='reduzido']) [role='tab'],
+html:not([data-movimento='reduzido']) a[href] {
+  transition:
+    transform 160ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 200ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 200ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 200ms cubic-bezier(0.2, 0, 0, 1),
+    filter 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (hover: hover) {
+  html:not([data-movimento='reduzido']) [role='button']:not([aria-disabled='true']):hover,
+  html:not([data-movimento='reduzido']) [role='radio']:hover,
+  html:not([data-movimento='reduzido']) [role='switch']:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+  }
+
+  html:not([data-movimento='reduzido']) [role='link']:hover,
+  html:not([data-movimento='reduzido']) [role='tab']:hover,
+  html:not([data-movimento='reduzido']) a[href]:hover {
+    filter: brightness(1.08);
+  }
+}
+
+html:not([data-movimento='reduzido']) [role='button']:not([aria-disabled='true']):active,
+html:not([data-movimento='reduzido']) [role='radio']:active,
+html:not([data-movimento='reduzido']) [role='switch']:active,
+html:not([data-movimento='reduzido']) [role='link']:active,
+html:not([data-movimento='reduzido']) a[href]:active {
+  transform: translateY(0) scale(0.97);
+  filter: brightness(0.96);
+  transition-duration: 80ms;
+}
+
+html:not([data-movimento='reduzido']) input,
+html:not([data-movimento='reduzido']) textarea {
+  transition:
+    border-color 200ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 200ms cubic-bezier(0.2, 0, 0, 1);
+}

@@ -88,12 +88,20 @@ export function ThemeProvider({
     };
   }, []);
 
+  const movimentoReduzido = reduzirMovimento || movimentoDoSistema || theme === 'highContrast';
+
+  // A web usa o CSS global (global.css), que só anima quando <html> não está marcado como reduzido.
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    document.documentElement.dataset.movimento = movimentoReduzido ? 'reduzido' : 'normal';
+  }, [movimentoReduzido]);
+
   const value = useMemo(
     () => ({
       theme,
       preference,
       setPreference,
-      movimentoReduzido: reduzirMovimento || movimentoDoSistema || theme === 'highContrast',
+      movimentoReduzido,
       reduzirMovimento,
       setReduzirMovimento: (valor: boolean) => {
         setReduzirMovimento(valor);
@@ -105,7 +113,7 @@ export function ThemeProvider({
         void guardarPreferencias({ reduzirMovimento, tamanhoDoTexto: valor });
       },
     }),
-    [theme, preference, reduzirMovimento, movimentoDoSistema, tamanhoDoTexto],
+    [theme, preference, reduzirMovimento, movimentoReduzido, tamanhoDoTexto],
   );
   const cssVars = useMemo(
     () =>
