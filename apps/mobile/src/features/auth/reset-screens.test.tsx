@@ -128,6 +128,10 @@ describe('tela "Criar nova senha"', () => {
     });
     expect(replaceState).toHaveBeenCalledWith(null, '', '/redefinir-senha');
     await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'outra frase longa e boa');
+    await fireEvent.changeText(
+      screen.getByLabelText('Repita a nova senha'),
+      'outra frase longa e boa',
+    );
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar a nova senha' }));
     expect(await screen.findByText(/Agora entre com a sua nova senha/)).toBeOnTheScreen();
     expect(fake.calls[0]).toMatchObject({
@@ -167,6 +171,10 @@ describe('tela "Criar nova senha"', () => {
       store: memorySessionStore().store,
     });
     await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'outra frase longa e boa');
+    await fireEvent.changeText(
+      screen.getByLabelText('Repita a nova senha'),
+      'outra frase longa e boa',
+    );
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar a nova senha' }));
     expect(await screen.findByText(/Este link não vale mais/)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Pedir um novo link' }));
@@ -192,7 +200,24 @@ describe('tela "Criar nova senha"', () => {
       store: memorySessionStore().store,
     });
     await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'outra frase longa e boa');
+    await fireEvent.changeText(
+      screen.getByLabelText('Repita a nova senha'),
+      'outra frase longa e boa',
+    );
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar a nova senha' }));
     expect(await screen.findByText(/Não foi possível falar com o servidor/)).toBeOnTheScreen();
+  });
+
+  test('CT-RST-W26: senha repetida diferente mostra o erro; nada é enviado', async () => {
+    fakeWindow(`#token=${TOKEN}`);
+    const fake = createFakeFetch({});
+    await renderScreen(<ResetPasswordScreen />, fake.fetchFn, {
+      store: memorySessionStore().store,
+    });
+    await fireEvent.changeText(screen.getByLabelText('Nova senha'), 'outra frase longa e boa');
+    await fireEvent.changeText(screen.getByLabelText('Repita a nova senha'), 'outra frase');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar a nova senha' }));
+    expect(await screen.findByText(/As senhas não são iguais/)).toBeOnTheScreen();
+    expect(fake.calls).toHaveLength(0);
   });
 });

@@ -8,6 +8,7 @@ import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { Inclinar } from '../../components/inclinar';
 import { Icone, type NomeDoIcone } from '../../components/icone';
+import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
 import { QuadroEstado } from '../../components/quadro-estado';
 import { Paralaxe, Revelar, RolagemAnimada } from '../../components/rolagem-animada';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
@@ -319,11 +320,14 @@ export function WelcomeScreen() {
           </View>
         </Revelar>
 
-        <View className={`${SECAO} pb-xxl pt-lg`}>
+        <View className={`${SECAO} gap-md pb-xxl pt-lg`}>
           <Texto variante="apoio" className="text-textoSecundario">
             O Vacina em Dia não substitui a caderneta oficial de vacinação nem a orientação de
             profissionais de saúde.
           </Texto>
+          <View className="max-w-[360px]">
+            <AtalhoDeMovimento />
+          </View>
         </View>
       </RolagemAnimada>
     </SafeAreaView>

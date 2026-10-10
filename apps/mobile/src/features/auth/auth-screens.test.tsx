@@ -207,6 +207,7 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await fill('Repita a senha', PASSWORD);
     await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
@@ -220,6 +221,7 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'sem-arroba');
     await fill('Senha', 'curta');
+    await fill('Repita a senha', 'curta');
     await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(/Informe um e-mail válido/)).toBeOnTheScreen();
@@ -240,6 +242,7 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await fill('Repita a senha', PASSWORD);
     await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(message)).toBeOnTheScreen();
@@ -252,9 +255,32 @@ describe('tela "Criar conta"', () => {
     await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await fill('Repita a senha', PASSWORD);
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(/leia e aceite os termos de uso/)).toBeOnTheScreen();
     expect(fake.calls).toHaveLength(0);
+  });
+
+  test('CT-APP-L26: senha repetida diferente mostra o erro no campo; nada é enviado', async () => {
+    const { store } = memorySessionStore();
+    const fake = createFakeFetch({});
+    await renderScreen(<RegisterScreen />, fake.fetchFn, { store });
+    await fill('E-mail', 'mariana@exemplo.com.br');
+    await fill('Senha', PASSWORD);
+    await fill('Repita a senha', `${PASSWORD}x`);
+    await aceitarTermos();
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+    expect(await screen.findByText(/As senhas não são iguais/)).toBeOnTheScreen();
+    expect(fake.calls).toHaveLength(0);
+  });
+
+  test('CT-APP-L27: o botão "Mostrar" mostra e esconde os dois campos de senha juntos', async () => {
+    const { store } = memorySessionStore();
+    await renderScreen(<RegisterScreen />, createFakeFetch({}).fetchFn, { store });
+    expect(screen.getByLabelText('Repita a senha').props.secureTextEntry).toBe(true);
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Mostrar a senha' })[0]!);
+    expect(screen.getByLabelText('Senha').props.secureTextEntry).toBe(false);
+    expect(screen.getByLabelText('Repita a senha').props.secureTextEntry).toBe(false);
   });
 
   test('CT-APP-L25: os links abrem os termos de uso e a política de privacidade', async () => {
@@ -281,6 +307,7 @@ describe('tela "Criar conta"', () => {
     expect(mockReplace).toHaveBeenCalledWith('/entrar');
     await fill('E-mail', 'mariana@exemplo.com.br');
     await fill('Senha', PASSWORD);
+    await fill('Repita a senha', PASSWORD);
     await aceitarTermos();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(await screen.findByText(/Não foi possível falar com o servidor/)).toBeOnTheScreen();
