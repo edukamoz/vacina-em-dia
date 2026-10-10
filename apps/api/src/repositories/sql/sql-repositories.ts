@@ -31,6 +31,8 @@ export interface SqlRepositories {
   readonly accounts: AccountRepository;
   readonly reminders: ReminderRepository;
   readonly auth: AuthRepository;
+  /** Consulta mínima que acorda o banco pausado (Azure SQL gratuito) e confirma que responde. */
+  readonly ping: () => Promise<void>;
 }
 
 const DOSE_STATUSES: readonly string[] = [
@@ -440,5 +442,9 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     },
   };
 
-  return { members, doses, consents, accounts, reminders, auth };
+  const ping = async () => {
+    await db.run('SELECT 1 AS ok');
+  };
+
+  return { members, doses, consents, accounts, reminders, auth, ping };
 }

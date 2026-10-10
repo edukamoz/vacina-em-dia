@@ -98,6 +98,27 @@ export function buildOpenApiDocument(): object {
 
   registry.registerPath({
     method: 'get',
+    path: '/warmup',
+    tags: ['Sistema'],
+    summary: 'Acordar o banco de dados',
+    description:
+      'O app chama ao abrir a tela de entrada para acordar o banco gratuito, que pausa quando fica parado, antes de a pessoa fazer o login. Não exige login, não traz dados pessoais e, para não gastar a franquia do banco, consulta no máximo uma vez por minuto em cada instância.',
+    responses: {
+      200: {
+        description:
+          'Aquecimento feito. `database` diz se o banco já respondeu ou ainda está acordando.',
+        content: jsonContent(
+          z.object({
+            status: z.literal('ok'),
+            database: z.enum(['ready', 'waking']).meta({ example: 'ready' }),
+          }),
+        ),
+      },
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
     path: '/openapi.json',
     tags: ['Sistema'],
     summary: 'Obter a especificação OpenAPI',
