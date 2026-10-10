@@ -741,40 +741,23 @@
    "curto": "Empacotar a entrega (PDFs e zip)"
   },
   {
-   "id": "B37",
-   "jira": null,
-   "titulo": "Como autora, quero conversar com pessoas parecidas com as personas e registrar o que aprendi, para confirmar (ou corrigir) problemas e personas",
-   "epico": "E1",
-   "prioridade": "Should",
-   "personas": "PE1, PE2, PE3",
-   "requisitos": "PR1 a PR4",
-   "criterios": [
-    "Pelo menos uma conversa por persona, com o resumo do que foi dito.",
-    "Problemas, expectativas e requisitos ajustados se algo mudar."
-   ],
-   "estado": "A fazer",
-   "sprint": 3,
-   "evidencia": "docs/23-do-problema-ao-backlog.md",
-   "nota": "Só a autora pode fazer; nada deve ser inventado.",
-   "curto": "Conversar com usuários e registrar"
-  },
-  {
    "id": "B38",
    "jira": null,
-   "titulo": "Como autora, quero confirmar com o professor a licença dos dados dos postos e o uso de Jest em vez de JUnit, para registrar as decisões",
+   "titulo": "Como autora, quero registrar as decisões sobre a licença dos dados dos postos, o uso de Jest no lugar de JUnit e as datas de entrega, para defender as escolhas na apresentação",
    "epico": "E1",
    "prioridade": "Should",
    "personas": "autora",
    "requisitos": "RNF07",
    "criterios": [
-    "Resposta registrada no ADR-018 e no CLAUDE.md §14.",
-    "Data de entrega de Computação em Nuvem II confirmada."
+    "Decisão de manter o Jest registrada no CLAUDE.md §14, sem confirmação do professor.",
+    "Licença dos dados dos postos (CC BY-SemDerivações 3.0) e a limpeza de nomes registradas como premissa no ADR-018.",
+    "Entregas de 12/11, 16/11 e 19/11 mantidas como estão; a data de Computação em Nuvem II segue em aberto."
    ],
-   "estado": "A fazer",
+   "estado": "Em análise",
    "sprint": 3,
-   "evidencia": "",
-   "nota": "",
-   "curto": "Confirmar licença dos dados, Jest e data de CN2 com o professor"
+   "evidencia": "CLAUDE.md §14; ADR-018",
+   "nota": "A autora decidiu não consultar o professor sobre esses pontos.",
+   "curto": "Registrar as decisões sobre licença dos dados, Jest e datas"
   },
   {
    "id": "B39",
@@ -810,7 +793,7 @@
    "estado": "A fazer",
    "sprint": 5,
    "evidencia": "",
-   "nota": "",
+   "nota": "A autora fará o teste nos aparelhos depois.",
    "curto": "Testar em celulares reais e com leitor de tela"
   },
   {
@@ -963,7 +946,7 @@
   [
    "SCRUM-4",
    "Subtarefa 2.1",
-   "Item de exemplo criado com o projeto, sem relação com o backlog."
+   "Item de exemplo criado com o projeto, sem relação com o backlog (não migrado)."
   ]
  ]
 }

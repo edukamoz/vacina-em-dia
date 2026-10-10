@@ -37,7 +37,7 @@ def item(id_, jira, titulo, epico, prio, pessoas, reqs, criterios, estado, sprin
     }
 
 
-CURTOS = {'B01': 'Cadastro e login (RF01)', 'B02': 'Recuperar a senha por e-mail', 'B03': 'Consentimento, privacidade e exclusão de dados (RF09)', 'B04': 'Gerenciar a família (RF02)', 'B05': 'Calendário vacinal por idade (RF03)', 'B06': 'Histórico de doses (RF08)', 'B07': 'Registrar e acompanhar doses (RF04)', 'B08': 'Dose avulsa', 'B09': 'Lembretes e doses atrasadas (RF05)', 'B10': 'Busca por voz (RF06)', 'B11': 'Chatbot de dúvidas (RF07)', 'B12': 'Assistente em janela de chat', 'B13': 'Mapa de postos de saúde (RF10)', 'B14': 'Exportar carteira em PDF (RF11)', 'B15': 'Compartilhar com cuidador (RF12)', 'B16': 'Provisionar recursos na Azure', 'B17': 'Monorepo, ESLint, Prettier e TypeDoc', 'B18': 'Pipeline de CI', 'B19': 'Containerizar com Docker', 'B20': 'Custo na Azure e alertas de orçamento', 'B21': 'Migrações e persistência no Azure SQL', 'B22': 'Aquecer o banco para o primeiro login', 'B23': 'Repositório público e proteção do GitHub', 'B24': 'Plano de teste', 'B25': 'Teste de caixa preta', 'B26': 'UML de estados e casos de teste', 'B27': 'Testes automatizados com Jest', 'B28': 'Segurança (OWASP) e carga leve', 'B29': 'Modelagem UML e DER', 'B30': 'Decisões técnicas em ADRs', 'B31': 'Documentação de Desenvolvimento', 'B32': 'Documentação Técnica', 'B33': 'Documentação do Usuário', 'B34': 'Panfleto A4', 'B35': 'Roteiro e apresentação final', 'B36': 'Empacotar a entrega (PDFs e zip)', 'B37': 'Conversar com usuários e registrar', 'B38': 'Confirmar licença dos dados, Jest e data de CN2 com o professor', 'B39': 'Revisar dataset do chatbot e termo de consentimento', 'B40': 'Testar em celulares reais e com leitor de tela', 'B41': 'Design system para mobile e web', 'B42': 'Redesenho visual web e celular', 'B43': 'Tamanho do texto e reduzir movimento', 'B44': 'Atualizar o Figma para a versão 2', 'B45': 'Tela para tablet', 'B46': 'Animações extras (inclinação 3D, painel e folha)', 'B47': 'Ícones do app e da aba', 'B48': 'Confirmar e-mail no cadastro'}
+CURTOS = {'B01': 'Cadastro e login (RF01)', 'B02': 'Recuperar a senha por e-mail', 'B03': 'Consentimento, privacidade e exclusão de dados (RF09)', 'B04': 'Gerenciar a família (RF02)', 'B05': 'Calendário vacinal por idade (RF03)', 'B06': 'Histórico de doses (RF08)', 'B07': 'Registrar e acompanhar doses (RF04)', 'B08': 'Dose avulsa', 'B09': 'Lembretes e doses atrasadas (RF05)', 'B10': 'Busca por voz (RF06)', 'B11': 'Chatbot de dúvidas (RF07)', 'B12': 'Assistente em janela de chat', 'B13': 'Mapa de postos de saúde (RF10)', 'B14': 'Exportar carteira em PDF (RF11)', 'B15': 'Compartilhar com cuidador (RF12)', 'B16': 'Provisionar recursos na Azure', 'B17': 'Monorepo, ESLint, Prettier e TypeDoc', 'B18': 'Pipeline de CI', 'B19': 'Containerizar com Docker', 'B20': 'Custo na Azure e alertas de orçamento', 'B21': 'Migrações e persistência no Azure SQL', 'B22': 'Aquecer o banco para o primeiro login', 'B23': 'Repositório público e proteção do GitHub', 'B24': 'Plano de teste', 'B25': 'Teste de caixa preta', 'B26': 'UML de estados e casos de teste', 'B27': 'Testes automatizados com Jest', 'B28': 'Segurança (OWASP) e carga leve', 'B29': 'Modelagem UML e DER', 'B30': 'Decisões técnicas em ADRs', 'B31': 'Documentação de Desenvolvimento', 'B32': 'Documentação Técnica', 'B33': 'Documentação do Usuário', 'B34': 'Panfleto A4', 'B35': 'Roteiro e apresentação final', 'B36': 'Empacotar a entrega (PDFs e zip)', 'B38': 'Registrar as decisões sobre licença dos dados, Jest e datas', 'B39': 'Revisar dataset do chatbot e termo de consentimento', 'B40': 'Testar em celulares reais e com leitor de tela', 'B41': 'Design system para mobile e web', 'B42': 'Redesenho visual web e celular', 'B43': 'Tamanho do texto e reduzir movimento', 'B44': 'Atualizar o Figma para a versão 2', 'B45': 'Tela para tablet', 'B46': 'Animações extras (inclinação 3D, painel e folha)', 'B47': 'Ícones do app e da aba', 'B48': 'Confirmar e-mail no cadastro'}
 
 ITENS = [
     # ---------------- E3 Conta e privacidade
@@ -178,18 +178,15 @@ ITENS = [
     item('B36', None, 'Como autora, quero empacotar a entrega (PDFs das três documentações, panfleto e zip do repositório), para entregar em 19/11',
          'E1', M, 'autora', '', ['PDFs convertidos do Word só no momento da entrega.', 'Zip do repositório sem segredos nem arquivos gerados.'],
          AF, 6),
-    item('B37', None, 'Como autora, quero conversar com pessoas parecidas com as personas e registrar o que aprendi, para confirmar (ou corrigir) problemas e personas',
-         'E1', S, 'PE1, PE2, PE3', 'PR1 a PR4', ['Pelo menos uma conversa por persona, com o resumo do que foi dito.', 'Problemas, expectativas e requisitos ajustados se algo mudar.'],
-         AF, 3, 'docs/23-do-problema-ao-backlog.md', 'Só a autora pode fazer; nada deve ser inventado.'),
-    item('B38', None, 'Como autora, quero confirmar com o professor a licença dos dados dos postos e o uso de Jest em vez de JUnit, para registrar as decisões',
-         'E1', S, 'autora', 'RNF07', ['Resposta registrada no ADR-018 e no CLAUDE.md §14.', 'Data de entrega de Computação em Nuvem II confirmada.'],
-         AF, 3),
+    item('B38', None, 'Como autora, quero registrar as decisões sobre a licença dos dados dos postos, o uso de Jest no lugar de JUnit e as datas de entrega, para defender as escolhas na apresentação',
+         'E1', S, 'autora', 'RNF07', ['Decisão de manter o Jest registrada no CLAUDE.md §14, sem confirmação do professor.', 'Licença dos dados dos postos (CC BY-SemDerivações 3.0) e a limpeza de nomes registradas como premissa no ADR-018.', 'Entregas de 12/11, 16/11 e 19/11 mantidas como estão; a data de Computação em Nuvem II segue em aberto.'],
+         AN, 3, 'CLAUDE.md §14; ADR-018', 'A autora decidiu não consultar o professor sobre esses pontos.'),
     item('B39', None, 'Como equipe, quero revisar o dataset do chatbot e o texto do termo de consentimento com outra pessoa, para garantir segurança e clareza',
          'E7', S, 'todas', 'RNF03, RNF10', ['Dataset revisado manualmente, sem dados pessoais.', 'Termo e política validados por quem entende de LGPD (ou pelo professor).'],
          AF, 4),
     item('B40', None, 'Como equipe, quero testar o app em celulares reais (Android e iOS) e com leitor de tela, para achar o que o emulador não mostra',
          'E7', S, 'PE2', 'RNF04, RNF09', ['Mapa, localização, voz, lembretes e ligações testados em ao menos um Android e um iOS.', 'Leitor de tela percorre as telas principais.', 'Defeitos viram itens com prioridade.'],
-         AF, 5),
+         AF, 5, '', 'A autora fará o teste nos aparelhos depois.'),
     # ---------------- E9 Experiência e design
     item('B41', 'SCRUM-32', 'Como equipe, quero o design system (cores, fontes, layout) para mobile e web, para o app ter identidade e ser acessível',
          'E9', M, 'todas', 'RNF04', ['Tokens com contraste WCAG 2.1 AA nos três temas.', 'Estados nunca só pela cor; alvos de toque de 48 dp.', 'Documentação do porquê das escolhas (docs/22).'],
@@ -219,7 +216,7 @@ ITENS = [
 ]
 
 REMOVER = [
-    ('SCRUM-4', 'Subtarefa 2.1', 'Item de exemplo criado com o projeto, sem relação com o backlog.'),
+    ('SCRUM-4', 'Subtarefa 2.1', 'Item de exemplo criado com o projeto, sem relação com o backlog (não migrado).'),
 ]
 
 
@@ -235,7 +232,7 @@ def main():
     linhas = [
         '# Vacina em Dia: backlog do produto',
         '',
-        'Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, requisitos e personas de cada item. Gerado de `docs/backlog/dados.py` (rode `python docs/backlog/dados.py` depois de editar). A versão viva fica no projeto "proj-vacina-em-dia" do GitHub Projects; a ligação problema, requisito e item está em `docs/23-do-problema-ao-backlog.md`.',
+        'Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, requisitos e personas de cada item. Gerado de `docs/backlog/dados.py` (rode `python docs/backlog/dados.py` depois de editar). A versão viva fica no projeto "proj-vacina-em-dia" do GitHub Projects, que substitui o Jira; a ligação problema, requisito e item está em `docs/23-do-problema-ao-backlog.md`.',
         '',
         '**Convenção de estados (professor):** A fazer, Em andamento, Em análise (terminou dentro da data da sprint) e Concluído (só depois de analisado na reunião de encerramento da sprint). Nenhum item aqui está como Concluído; quem decide é a autora. **Prioridade (MoSCoW):** Must (deve), Should (deveria), Could (poderia) e Won\'t (não agora). As prioridades são uma proposta a ser confirmada pela autora.',
         '',
@@ -256,7 +253,7 @@ def main():
                 linhas.append('- Evidência: ' + it['evidencia'])
             if it['nota']:
                 linhas.append('- Atenção: ' + it['nota'])
-    linhas += ['', '## Itens a remover do Jira', '']
+    linhas += ['', '## Não migrados do Jira', '']
     for k, t, why in REMOVER:
         linhas.append('- %s "%s": %s' % (k, t, why))
     with open(os.path.join(pasta, '..', '24-backlog.md'), 'w', encoding='utf-8', newline='\n') as f:

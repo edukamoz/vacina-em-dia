@@ -1,6 +1,6 @@
 # Vacina em Dia: backlog do produto
 
-Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, requisitos e personas de cada item. Gerado de `docs/backlog/dados.py` (rode `python docs/backlog/dados.py` depois de editar). A versão viva fica no projeto "proj-vacina-em-dia" do GitHub Projects; a ligação problema, requisito e item está em `docs/23-do-problema-ao-backlog.md`.
+Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, requisitos e personas de cada item. Gerado de `docs/backlog/dados.py` (rode `python docs/backlog/dados.py` depois de editar). A versão viva fica no projeto "proj-vacina-em-dia" do GitHub Projects, que substitui o Jira; a ligação problema, requisito e item está em `docs/23-do-problema-ao-backlog.md`.
 
 **Convenção de estados (professor):** A fazer, Em andamento, Em análise (terminou dentro da data da sprint) e Concluído (só depois de analisado na reunião de encerramento da sprint). Nenhum item aqui está como Concluído; quem decide é a autora. **Prioridade (MoSCoW):** Must (deve), Should (deveria), Could (poderia) e Won't (não agora). As prioridades são uma proposta a ser confirmada pela autora.
 
@@ -25,8 +25,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B34 | SCRUM-37 | Como autora, quero o panfleto A4 do projeto para a mostra, para apresentar o app ao público | Should | Em andamento | Sprint 6 |
 | B35 | novo | Como autora, quero o roteiro de demonstração e a apresentação final, para defender o projeto em 19/11 | Must | Em andamento | Sprint 6 |
 | B36 | novo | Como autora, quero empacotar a entrega (PDFs das três documentações, panfleto e zip do repositório), para entregar em 19/11 | Must | A fazer | Sprint 6 |
-| B37 | novo | Como autora, quero conversar com pessoas parecidas com as personas e registrar o que aprendi, para confirmar (ou corrigir) problemas e personas | Should | A fazer | Sprint 3 |
-| B38 | novo | Como autora, quero confirmar com o professor a licença dos dados dos postos e o uso de Jest em vez de JUnit, para registrar as decisões | Should | A fazer | Sprint 3 |
+| B38 | novo | Como autora, quero registrar as decisões sobre a licença dos dados dos postos, o uso de Jest no lugar de JUnit e as datas de entrega, para defender as escolhas na apresentação | Should | Em análise | Sprint 3 |
 
 **B29** (todas; requisitos: RNF06)
 
@@ -79,17 +78,13 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - PDFs convertidos do Word só no momento da entrega.
 - Zip do repositório sem segredos nem arquivos gerados.
 
-**B37** (PE1, PE2, PE3; requisitos: PR1 a PR4)
-
-- Pelo menos uma conversa por persona, com o resumo do que foi dito.
-- Problemas, expectativas e requisitos ajustados se algo mudar.
-- Evidência: docs/23-do-problema-ao-backlog.md
-- Atenção: Só a autora pode fazer; nada deve ser inventado.
-
 **B38** (autora; requisitos: RNF07)
 
-- Resposta registrada no ADR-018 e no CLAUDE.md §14.
-- Data de entrega de Computação em Nuvem II confirmada.
+- Decisão de manter o Jest registrada no CLAUDE.md §14, sem confirmação do professor.
+- Licença dos dados dos postos (CC BY-SemDerivações 3.0) e a limpeza de nomes registradas como premissa no ADR-018.
+- Entregas de 12/11, 16/11 e 19/11 mantidas como estão; a data de Computação em Nuvem II segue em aberto.
+- Evidência: CLAUDE.md §14; ADR-018
+- Atenção: A autora decidiu não consultar o professor sobre esses pontos.
 
 ## E2 Infraestrutura, Azure e DevOps (SCRUM-6)
 
@@ -337,6 +332,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Mapa, localização, voz, lembretes e ligações testados em ao menos um Android e um iOS.
 - Leitor de tela percorre as telas principais.
 - Defeitos viram itens com prioridade.
+- Atenção: A autora fará o teste nos aparelhos depois.
 
 ## E8 Versão completa (SCRUM-12)
 
@@ -424,6 +420,6 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Evidência: PR #79
 - Atenção: Falta a tela de abertura e a conferência em aparelho.
 
-## Itens a remover do Jira
+## Não migrados do Jira
 
-- SCRUM-4 "Subtarefa 2.1": Item de exemplo criado com o projeto, sem relação com o backlog.
+- SCRUM-4 "Subtarefa 2.1": Item de exemplo criado com o projeto, sem relação com o backlog (não migrado).

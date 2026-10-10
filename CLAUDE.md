@@ -26,7 +26,7 @@ A data de Computação em Nuvem II ainda será confirmada.
 
 Consulte sempre estes arquivos antes de implementar algo (se não existirem, avise):
 
-- `docs/00-handoff.md`: estado atual do projeto, Jira, sprints, pendências e próximos passos.
+- `docs/00-handoff.md`: estado atual do projeto, backlog, sprints, pendências e próximos passos.
 - `docs/referencias-disciplinas/`: PDFs da faculdade (PI-VI, modelos das 3 documentações, exigências de Qualidade e Testes e de PLN). São somente leitura e definem o que é cobrado.
 - `docs/01-visao-e-escopo.md` e `docs/02-requisitos.md`: requisitos RF01 a RF12 e RNF01 a RNF10.
 - `docs/03-uml/`: diagramas (estados da dose em `estados-dose.md`).
@@ -174,20 +174,20 @@ Dados de vacinação são dados pessoais sobre saúde, portanto **sensíveis** (
 - Testes devem ser determinísticos (sem dependência de ordem, hora real ou aleatoriedade sem semente).
 - O serviço Python usa pytest. **Em aberto:** confirmar com o professor se o código Python entra na meta de cobertura (a disciplina cita Jest).
 
-## 12. Git, CI e Jira
+## 12. Git, CI e backlog
 
-- **Branches:** `feature/SCRUM-<n>-descricao-curta`, `fix/SCRUM-<n>-...`, `docs/SCRUM-<n>-...`.
+- **Branches:** `feature/<item>-descricao-curta`, `fix/<item>-...`, `docs/<item>-...`, em que `<item>` é o código do backlog (`B07`) ou, nos itens herdados do Jira, a chave `SCRUM-<n>`.
 - **Commits** (Conventional Commits, em português): `feat(api): registrar aplicação de dose (SCRUM-18)`. Tipos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`.
-- Um commit por mudança lógica; PRs pequenos referenciando a chave do Jira.
+- Um commit por mudança lógica; PRs pequenos referenciando o item do backlog (código `Bnn`, número da issue ou a chave `SCRUM-n` dos itens herdados).
 - **Descrição do PR:** siga `.github/pull_request_template.md`. Ao terminar cada item, deixe pronto o texto do PR preenchido (resumo, o que mudou, como verificar, resultados reais dos testes, atenção antes de publicar, pendências e limites). **O Claude abre o PR com o `gh`** (título no formato do commit, descrição pelo template) e **mantém a descrição e os comentários atualizados** conforme o item evolui; **quem mescla é o autor**, salvo pedido explícito. Se o `gh pr create` falhar (GraphQL fora do ar), tente a API REST (`gh api repos/<dono>/<repo>/pulls`) e, se ainda falhar, avise o autor e guarde o texto para abrir depois. Nunca inclua linha de coautoria nem "Generated with" (seção 15, regra 9).
 - **CI (GitHub Actions)** em todo push e PR: instalar, lint, typecheck, build, testes com cobertura, TypeDoc e `npm audit`. O pipeline deve falhar se algum teste falhar ou a cobertura ficar abaixo do limite.
-- **Jira (projeto SCRUM)** segue a convenção exigida pelo professor:
+- **Backlog no GitHub Projects ("proj-vacina-em-dia", que substituiu o Jira em 10/10/2026)** segue a convenção exigida pelo professor no campo Status:
   - **A fazer:** item ainda a planejar (reunião inicial da sprint).
   - **Em andamento:** a sprint foi iniciada e o item está sendo feito.
   - **Em análise:** o item foi finalizado, mas ainda estamos dentro da data da sprint.
   - **Concluído:** só depois de analisado e confirmado na reunião de encerramento da sprint.
   - **Você nunca marca um item como Concluído.** Pode sugerir "Em análise" quando terminar; quem decide é o autor.
-- Backlog: épicos SCRUM-5 a SCRUM-12; trabalhe **um item por vez**, na ordem da sprint ativa.
+- Backlog: `docs/24-backlog.md` (fonte em `docs/backlog/dados.py`, importado para o projeto com `scripts/backlog-github.mjs`), com épicos E1 a E9, prioridade MoSCoW e critérios de aceite. Trabalhe **um item por vez**, na ordem da sprint ativa. O Jira não é mais usado.
 
 ## 13. Documentação e entregas
 
@@ -210,14 +210,14 @@ Decididas em 06/10/2026 (ver `docs/05-adrs/`):
 
 Ainda em aberto:
 
-- **Jest versus JUnit:** o PI-VI cita JUnit/Selenium; o autor decidiu usar Jest, e deve registrar a confirmação do professor.
-- **Data da entrega de Computação em Nuvem II.**
+- **Jest versus JUnit:** o PI-VI cita JUnit/Selenium; **decisão do autor (10/10/2026): manter o Jest, sem consultar o professor.**
+- **Data da entrega de Computação em Nuvem II:** segue em aberto; o autor decidiu usar as datas conhecidas (12/11, 16/11 e 19/11) e não consultar o professor.
 
 Quando um desses pontos for decidido, atualize esta seção e crie o ADR.
 
 ## 15. Como trabalhar comigo (regras para o Claude)
 
-1. **Comece lendo** `CLAUDE.md` e os docs relevantes; confirme o item do Jira (SCRUM-n) e seus critérios de aceite.
+1. **Comece lendo** `CLAUDE.md` e os docs relevantes; confirme o item do backlog (código Bnn ou issue) e seus critérios de aceite.
 2. Em tarefas maiores que um ajuste pequeno, **proponha um plano curto antes de codar** e espere o ok.
 3. **Um item por vez.** Não misture escopos nem refatore o que não foi pedido.
 4. **Teste primeiro** onde a regra é clara (domínio, máquina de estados). Escreva os testes dos casos `CT-...` correspondentes.
@@ -233,7 +233,7 @@ Quando um desses pontos for decidido, atualize esta seção e crie o ADR.
 
 Um item só está pronto para ir a **Em análise** quando:
 
-- [ ] Atende todos os critérios de aceite do item no Jira.
+- [ ] Atende todos os critérios de aceite do item no backlog.
 - [ ] Testes escritos e passando (incluindo erros e limites); cobertura sem cair abaixo do limite.
 - [ ] `lint`, `typecheck` e `build` limpos; pipeline verde.
 - [ ] TSDoc nos símbolos exportados novos; `npm run docs` sem erro.
