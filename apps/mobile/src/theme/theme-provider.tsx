@@ -5,6 +5,8 @@ import {
   ESCALA_DO_TEXTO,
   guardarPreferencias,
   lerPreferencias,
+  MOVIMENTO_PADRAO,
+  type ModoDeMovimento,
   type TamanhoDoTexto,
 } from './preferencias';
 import { resolveTheme, type ThemePreference } from './resolve-theme';
@@ -26,10 +28,10 @@ export interface ThemeContextValue {
   readonly setPreference: (preference: ThemePreference) => void;
   /** Se o movimento deve ficar parado: escolha da pessoa, preferência do sistema ou Alto contraste. */
   readonly movimentoReduzido: boolean;
-  /** Escolha da pessoa na Conta ("Reduzir movimento"), sem contar o sistema. */
-  readonly reduzirMovimento: boolean;
-  /** Liga ou desliga "Reduzir movimento". */
-  readonly setReduzirMovimento: (valor: boolean) => void;
+  /** Escolha da pessoa na Conta: animar sempre, seguir o aparelho ou reduzir. */
+  readonly movimento: ModoDeMovimento;
+  /** Troca o modo de movimento. */
+  readonly setMovimento: (valor: ModoDeMovimento) => void;
   /** Tamanho do texto escolhido. */
   readonly tamanhoDoTexto: TamanhoDoTexto;
   /** Troca o tamanho do texto. */
@@ -43,11 +45,11 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
  * NativeWind (`bg-fundo`, `text-texto`...) consomem. Guarda a escolha do usuário na Context API
  * (ADR-006).
  *
- * Também guarda, neste aparelho, "Reduzir movimento" e o tamanho do texto, e acompanha a
+ * Também guarda, neste aparelho, o modo de movimento e o tamanho do texto, e acompanha a
  * preferência de movimento do sistema.
  *
  * @param props.initialPreference - Escolha inicial; por padrão segue o sistema.
- * @param props.initialReduceMotion - "Reduzir movimento" inicial (os testes ligam para não animar).
+ * @param props.initialReduceMotion - `true` começa em "Reduzir movimento" (os testes ligam para não animar); senão começa em "Animar sempre".
  * @param props.initialTextSize - Tamanho do texto inicial.
  */
 export function ThemeProvider({
@@ -62,7 +64,9 @@ export function ThemeProvider({
   initialTextSize?: TamanhoDoTexto;
 }) {
   const [preference, setPreference] = useState<ThemePreference>(initialPreference);
-  const [reduzirMovimento, setReduzirMovimento] = useState(initialReduceMotion);
+  const [movimento, setMovimento] = useState<ModoDeMovimento>(
+    initialReduceMotion ? 'reduzir' : MOVIMENTO_PADRAO,
+  );
   const [tamanhoDoTexto, setTamanhoDoTexto] = useState<TamanhoDoTexto>(initialTextSize);
   const [movimentoDoSistema, setMovimentoDoSistema] = useState(false);
   const systemScheme = useColorScheme();
@@ -72,7 +76,7 @@ export function ThemeProvider({
     let ativo = true;
     void lerPreferencias().then((guardadas) => {
       if (!ativo) return;
-      if (guardadas.reduzirMovimento !== undefined) setReduzirMovimento(guardadas.reduzirMovimento);
+      if (guardadas.movimento !== undefined) setMovimento(guardadas.movimento);
       if (guardadas.tamanhoDoTexto !== undefined) setTamanhoDoTexto(guardadas.tamanhoDoTexto);
     });
     void AccessibilityInfo.isReduceMotionEnabled?.()
@@ -88,7 +92,10 @@ export function ThemeProvider({
     };
   }, []);
 
-  const movimentoReduzido = reduzirMovimento || movimentoDoSistema || theme === 'highContrast';
+  const movimentoReduzido =
+    theme === 'highContrast' ||
+    movimento === 'reduzir' ||
+    (movimento === 'sistema' && movimentoDoSistema);
 
   // A web usa o CSS global (global.css), que só anima quando <html> não está marcado como reduzido.
   useEffect(() => {
@@ -102,18 +109,18 @@ export function ThemeProvider({
       preference,
       setPreference,
       movimentoReduzido,
-      reduzirMovimento,
-      setReduzirMovimento: (valor: boolean) => {
-        setReduzirMovimento(valor);
-        void guardarPreferencias({ reduzirMovimento: valor, tamanhoDoTexto });
+      movimento,
+      setMovimento: (valor: ModoDeMovimento) => {
+        setMovimento(valor);
+        void guardarPreferencias({ movimento: valor, tamanhoDoTexto });
       },
       tamanhoDoTexto,
       setTamanhoDoTexto: (valor: TamanhoDoTexto) => {
         setTamanhoDoTexto(valor);
-        void guardarPreferencias({ reduzirMovimento, tamanhoDoTexto: valor });
+        void guardarPreferencias({ movimento, tamanhoDoTexto: valor });
       },
     }),
-    [theme, preference, reduzirMovimento, movimentoReduzido, tamanhoDoTexto],
+    [theme, preference, movimento, movimentoReduzido, tamanhoDoTexto],
   );
   const cssVars = useMemo(
     () =>

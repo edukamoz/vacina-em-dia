@@ -4,9 +4,24 @@ import { loginInputSchema, PASSWORD_MIN_LENGTH, registerInputSchema } from '@vac
 export interface FieldErrors {
   readonly email?: string;
   readonly password?: string;
+  readonly confirmation?: string;
 }
 
 const EMAIL_MESSAGE = 'Informe um e-mail válido, por exemplo nome@exemplo.com.br.';
+
+/** Mensagem quando "Repita a senha" não é igual à senha. */
+export const CONFIRMATION_MESSAGE =
+  'As senhas não são iguais. Digite a mesma senha nos dois campos.';
+
+/**
+ * Confere se a senha repetida é igual à primeira (quem digita errado uma vez só descobriria ao
+ * tentar entrar).
+ *
+ * @returns A mensagem de erro, ou `undefined` quando são iguais.
+ */
+export function validatePasswordConfirmation(password: string, confirmation: string) {
+  return password === confirmation ? undefined : CONFIRMATION_MESSAGE;
+}
 
 /**
  * Confere os campos antes de enviar, com mensagens em linguagem simples. A API valida de novo; isto

@@ -10,7 +10,7 @@ import { Texto } from '../../components/texto';
 import { useSession } from '../../session/session-provider';
 import { AuthFrame } from './auth-frame';
 import { CampoSenha } from './campo-senha';
-import { validateCredentials, type FieldErrors } from './validate';
+import { validateCredentials, validatePasswordConfirmation, type FieldErrors } from './validate';
 
 /**
  * Tela "Criar conta" (RF01): e-mail, senha e o aceite dos Termos de uso e da Política de
@@ -22,6 +22,8 @@ export function RegisterScreen() {
   const { register } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const [visivel, setVisivel] = useState(false);
   const [aceitou, setAceitou] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
@@ -34,9 +36,10 @@ export function RegisterScreen() {
       return;
     }
     const { errors: found, values } = validateCredentials('register', email, password);
-    setErrors(found);
+    const mismatch = validatePasswordConfirmation(password, confirmation);
+    setErrors({ ...found, ...(mismatch ? { confirmation: mismatch } : {}) });
     setFailure(null);
-    if (!values) return;
+    if (!values || mismatch) return;
     setPending(true);
     try {
       await register(values);
@@ -72,7 +75,20 @@ export function RegisterScreen() {
         ajuda="Use pelo menos 8 caracteres. Uma frase longa é uma boa senha."
         autoComplete="new-password"
         textContentType="newPassword"
+        returnKeyType="next"
+        visivel={visivel}
+        aoAlternarVisivel={setVisivel}
+      />
+      <CampoSenha
+        rotulo="Repita a senha"
+        value={confirmation}
+        onChangeText={setConfirmation}
+        erro={errors.confirmation}
+        autoComplete="new-password"
+        textContentType="newPassword"
         returnKeyType="go"
+        visivel={visivel}
+        aoAlternarVisivel={setVisivel}
         onSubmitEditing={() => void submit()}
       />
       <View className="gap-xs">

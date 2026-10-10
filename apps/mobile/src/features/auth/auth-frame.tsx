@@ -1,8 +1,11 @@
-import type { ReactNode } from 'react';
+import { Children, type ReactNode } from 'react';
 import { ScrollView, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
+import { Entrada } from '../../components/animacao';
+import { LinkTexto } from '../../components/link-texto';
+import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
 import { useVisual } from '../../theme/theme-provider';
@@ -21,12 +24,27 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
   const expandido = modoDeLayout(useWindowDimensions().width) === 'expandido';
   const { gradienteMarca, altoContraste } = useVisual();
 
+  // Cada bloco do formulário entra um depois do outro, como no protótipo; parado com "Reduzir movimento".
   const formulario = (
     <View className="w-full max-w-form gap-xl">
-      <Texto variante="titulo1" accessibilityRole="header">
-        {titulo}
-      </Texto>
-      {children}
+      {expandido ? (
+        <Entrada>
+          <LinkTexto titulo="Voltar" onPress={() => router.push('/apresentacao')} />
+        </Entrada>
+      ) : null}
+      <Entrada indice={1}>
+        <Texto variante="titulo1" accessibilityRole="header">
+          {titulo}
+        </Texto>
+      </Entrada>
+      {Children.toArray(children).map((filho, indice) => (
+        <Entrada key={indice} indice={indice + 2}>
+          {filho}
+        </Entrada>
+      ))}
+      <Entrada indice={Children.count(children) + 2}>
+        <AtalhoDeMovimento />
+      </Entrada>
     </View>
   );
 

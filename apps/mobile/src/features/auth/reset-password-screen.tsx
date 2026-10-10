@@ -8,7 +8,7 @@ import { useSession } from '../../session/session-provider';
 import { AuthFrame } from './auth-frame';
 import { CampoSenha } from './campo-senha';
 import { clearResetTokenFromUrl, readResetToken } from './reset-token';
-import { validateCredentials } from './validate';
+import { validateCredentials, validatePasswordConfirmation } from './validate';
 
 /**
  * Tela "Criar nova senha", aberta pelo link do e-mail. O token vem do fragmento do endereço e é
@@ -19,7 +19,10 @@ export function ResetPasswordScreen() {
   const { api } = useSession();
   const [token] = useState(() => readResetToken());
   const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const [visivel, setVisivel] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [confirmationError, setConfirmationError] = useState<string | undefined>();
   const [failure, setFailure] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState(false);
@@ -31,9 +34,11 @@ export function ResetPasswordScreen() {
   async function submit() {
     if (pending || !token) return;
     const { errors } = validateCredentials('register', 'nome@exemplo.com.br', password);
+    const mismatch = validatePasswordConfirmation(password, confirmation);
     setError(errors.password);
+    setConfirmationError(mismatch);
     setFailure(null);
-    if (errors.password) return;
+    if (errors.password || mismatch) return;
     setPending(true);
     try {
       await endpoints.resetPassword(api, { token, password });
@@ -81,7 +86,20 @@ export function ResetPasswordScreen() {
         ajuda="Use pelo menos 8 caracteres. Uma frase longa é uma boa senha."
         autoComplete="new-password"
         textContentType="newPassword"
+        returnKeyType="next"
+        visivel={visivel}
+        aoAlternarVisivel={setVisivel}
+      />
+      <CampoSenha
+        rotulo="Repita a nova senha"
+        value={confirmation}
+        onChangeText={setConfirmation}
+        erro={confirmationError}
+        autoComplete="new-password"
+        textContentType="newPassword"
         returnKeyType="go"
+        visivel={visivel}
+        aoAlternarVisivel={setVisivel}
         onSubmitEditing={() => void submit()}
       />
       {failure ? (

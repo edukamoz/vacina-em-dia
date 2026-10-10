@@ -7,6 +7,7 @@ import { Cartao } from '../../components/cartao';
 import { Chave } from '../../components/chave';
 import { Icone, type NomeDoIcone } from '../../components/icone';
 import { LinkTexto } from '../../components/link-texto';
+import { SeletorDeMovimento } from '../../components/seletor-de-movimento';
 import { SeletorDeTamanhoDoTexto } from '../../components/seletor-de-tamanho-do-texto';
 import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
@@ -75,7 +76,7 @@ export function AccountScreen() {
   const pessoas = members.data?.items ?? [];
   const email = account?.email ?? 'Sem e-mail';
   const { altoContraste, gradienteMarca, sombra } = useVisual();
-  const { reduzirMovimento, setReduzirMovimento, movimentoReduzido } = useTheme();
+  const { movimento, movimentoReduzido } = useTheme();
 
   return (
     <Tela reservaBalao titulo="Conta">
@@ -154,15 +155,11 @@ export function AccountScreen() {
           <SeletorDeTamanhoDoTexto />
         </Secao>
         <Secao icone="info" titulo="Movimento" apoio="Animações e efeitos de transição">
-          <Chave
-            rotulo="Reduzir movimento"
-            ligada={reduzirMovimento}
-            aoAlterar={setReduzirMovimento}
-          />
+          <SeletorDeMovimento />
           <Texto variante="apoio" className="text-textoSecundario">
-            {movimentoReduzido && !reduzirMovimento
-              ? 'O movimento já está reduzido pelo aparelho ou pelo tema Alto contraste.'
-              : 'Quando ligado, as telas aparecem prontas, sem animações.'}
+            {movimentoReduzido && movimento !== 'reduzir'
+              ? 'O movimento está parado agora pelo aparelho ou pelo tema Alto contraste.'
+              : 'Em "Reduzir movimento", as telas aparecem prontas, sem animações.'}
           </Texto>
         </Secao>
       </View>

@@ -70,7 +70,7 @@ Disso saem as seis regras do design system: **legível primeiro, nunca só pela 
 
 O movimento tem **função**: mostrar de onde veio algo (entrada dos blocos, janela do assistente), confirmar uma ação (o visto se desenha ao registrar uma aplicação, o botão encolhe ao clicar) e dar vida à apresentação (paralaxe, revelar na rolagem). Duração de 120 a 400 ms, sem nada piscando e sem animação em laço sozinha.
 
-**Nada depende de animação.** Há a chave **Reduzir movimento** na Conta e o app respeita a configuração do sistema e o tema Alto contraste: nesses casos tudo aparece pronto (WCAG 2.3.3 e quem tem sensibilidade a movimento ou vestibulares).
+**Nada depende de animação.** Na Conta, o movimento tem três modos: **Animar sempre** (padrão do projeto, para a apresentação mostrar o desenho completo), **Seguir o aparelho** e **Reduzir movimento**, e há um atalho nas telas de antes do login. O tema Alto contraste sempre deixa tudo parado e quem escolhe "Seguir o aparelho" ou "Reduzir" vê tudo pronto (WCAG 2.3.3 e quem tem sensibilidade a movimento ou vestibulares).
 
 ## 8. Tom de voz
 

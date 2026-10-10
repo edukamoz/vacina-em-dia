@@ -20,9 +20,29 @@ export const ESCALA_DO_TEXTO: Readonly<Record<TamanhoDoTexto, number>> = {
   maior: 1.3,
 };
 
+/**
+ * Como o movimento (animações e efeitos de profundidade) é tratado: `animar` anima sempre, mesmo
+ * que o aparelho peça menos movimento; `reduzir` deixa tudo parado; `sistema` segue o aparelho.
+ * O tema Alto contraste sempre deixa parado, seja qual for a escolha.
+ */
+export type ModoDeMovimento = 'animar' | 'reduzir' | 'sistema';
+
+/** Modos de movimento, na ordem em que a pessoa os escolhe. */
+export const MODOS_DE_MOVIMENTO: readonly ModoDeMovimento[] = ['animar', 'sistema', 'reduzir'];
+
+/** Rótulos dos modos de movimento exibidos na interface. */
+export const ROTULOS_DO_MOVIMENTO: Readonly<Record<ModoDeMovimento, string>> = {
+  animar: 'Animar sempre',
+  sistema: 'Seguir o aparelho',
+  reduzir: 'Reduzir movimento',
+};
+
+/** Modo de movimento de quem ainda não escolheu. */
+export const MOVIMENTO_PADRAO: ModoDeMovimento = 'animar';
+
 /** Preferências de aparência guardadas neste aparelho (não são dados pessoais). */
 export interface Preferencias {
-  readonly reduzirMovimento: boolean;
+  readonly movimento: ModoDeMovimento;
   readonly tamanhoDoTexto: TamanhoDoTexto;
 }
 
@@ -39,9 +59,18 @@ export async function lerPreferencias(): Promise<Partial<Preferencias>> {
     if (!bruto) return {};
     const dado: unknown = JSON.parse(bruto);
     if (typeof dado !== 'object' || dado === null) return {};
-    const { reduzirMovimento, tamanhoDoTexto } = dado as Record<string, unknown>;
+    const { movimento, reduzirMovimento, tamanhoDoTexto } = dado as Record<string, unknown>;
+    // `reduzirMovimento` (booleano) é o formato da primeira versão; vale só se `movimento` faltar.
+    const modo =
+      typeof movimento === 'string' && (MODOS_DE_MOVIMENTO as readonly string[]).includes(movimento)
+        ? (movimento as ModoDeMovimento)
+        : typeof reduzirMovimento === 'boolean'
+          ? reduzirMovimento
+            ? 'reduzir'
+            : 'animar'
+          : undefined;
     return {
-      ...(typeof reduzirMovimento === 'boolean' ? { reduzirMovimento } : {}),
+      ...(modo ? { movimento: modo } : {}),
       ...(typeof tamanhoDoTexto === 'string' &&
       (TAMANHOS_DO_TEXTO as readonly string[]).includes(tamanhoDoTexto)
         ? { tamanhoDoTexto: tamanhoDoTexto as TamanhoDoTexto }
