@@ -63,6 +63,13 @@ Item do Jira: SCRUM-23. A Documentação Técnica exige as versões. Todas foram
 | commitlint (cli e config-conventional) | 21.2.3 | Conventional Commits |
 | TypeDoc | 0.28.20 | `npm run docs` gera `docs/api` (ignorado pelo Git) |
 
+## PDF da carteira (RF11, conferido no npm em 10/10/2026)
+
+| Tecnologia | Versão | Observação |
+|---|---|---|
+| pdfkit (`apps/api`) | 0.20.2 | Gera o PDF com as fontes padrão (Helvetica); ADR-019 |
+| @types/pdfkit (`apps/api`, desenvolvimento) | 0.17.6 | Tipos do PDFKit |
+
 ## Decisões de versão
 
 - **TypeScript 6.0.x em vez da 7:** as ferramentas de lint, documentação e teste ainda não suportam a 7. Revisar quando suportarem.
@@ -111,6 +118,8 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 |---|---|---|
 | expo-secure-store | ~57.0.4 | Token de sessão no celular (Keychain e Keystore), conforme a ADR-009 |
 | expo-audio | ~57.0.5 | Microfone no celular (`AudioStream`, PCM) para a pergunta por voz (RF06) |
+| expo-file-system | ~57.0.7 | Grava o PDF da carteira na pasta temporária do celular (RF11; ADR-019) |
+| expo-sharing | ~57.0.22 | Folha de compartilhar do sistema para entregar o PDF (RF11; ADR-019) |
 | expo-splash-screen | ~57.0.9 | Tela de abertura do app no Android e no iOS, com a marca sobre o verde-saúde |
 | expo-location | ~57.0.20 | Posição atual, só ao tocar em "Usar minha localização" (mapa de postos, RF10; ADR-018) |
 | react-native-webview | 13.16.1 | Mapa Leaflet no celular, sem chave de API (ADR-018) |

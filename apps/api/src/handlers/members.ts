@@ -1,5 +1,6 @@
 import { customDoseInputSchema, memberIdSchema, memberInputSchema } from '@vacina/shared';
 import type { HttpResult } from '../http';
+import type { CarteiraService } from '../services/carteira-service';
 import type { DoseService } from '../services/dose-service';
 import type { Result } from '../services/errors';
 import type { MemberService } from '../services/member-service';
@@ -20,6 +21,8 @@ export interface MemberHandlers {
   remove(ownerId: string, rawId: unknown): Promise<HttpResult>;
   /** `GET /api/members/{id}/doses`. */
   listDoses(ownerId: string, rawId: unknown): Promise<HttpResult>;
+  /** `GET /api/members/{id}/doses/pdf`: a carteira de vacinação em PDF (RF11). */
+  exportDosesPdf(ownerId: string, rawId: unknown): Promise<HttpResult>;
   /** `POST /api/members/{id}/doses`. */
   addCustomDose(ownerId: string, rawId: unknown, rawBody: unknown): Promise<HttpResult>;
 }
@@ -33,8 +36,13 @@ function toResult<T>(result: Result<T>, status = 200): HttpResult {
  *
  * @param members - Casos de uso dos membros.
  * @param doses - Casos de uso de dose (para o calendário do membro).
+ * @param carteira - Exportação da carteira de vacinação em PDF.
  */
-export function createMemberHandlers(members: MemberService, doses: DoseService): MemberHandlers {
+export function createMemberHandlers(
+  members: MemberService,
+  doses: DoseService,
+  carteira: CarteiraService,
+): MemberHandlers {
   return {
     async list(ownerId) {
       return { status: 200, jsonBody: { items: await members.list(ownerId) } };
@@ -71,6 +79,21 @@ export function createMemberHandlers(members: MemberService, doses: DoseService)
       const id = memberIdSchema.safeParse(rawId);
       if (!id.success) return validationErrorResult(['id']);
       return toResult(await doses.listForMember(ownerId, id.data));
+    },
+
+    async exportDosesPdf(ownerId, rawId) {
+      const id = memberIdSchema.safeParse(rawId);
+      if (!id.success) return validationErrorResult(['id']);
+      const result = await carteira.exportPdf(ownerId, id.data);
+      if (!result.ok) return toErrorResult(result.error);
+      return {
+        status: 200,
+        body: result.value.bytes,
+        headers: {
+          'content-type': 'application/pdf',
+          'content-disposition': `attachment; filename="${result.value.filename}"`,
+        },
+      };
     },
 
     async addCustomDose(ownerId, rawId, rawBody) {

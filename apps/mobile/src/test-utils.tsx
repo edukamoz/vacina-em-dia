@@ -50,6 +50,13 @@ export function createFakeFetch(routes: FakeRoutes) {
         if (response.body === undefined) throw new Error('sem corpo');
         return response.body;
       },
+      arrayBuffer: async () => {
+        if (!(response.body instanceof Uint8Array)) throw new Error('sem bytes');
+        return response.body.buffer.slice(
+          response.body.byteOffset,
+          response.body.byteOffset + response.body.byteLength,
+        );
+      },
     } as Response;
   });
   return { fetchFn: fetchFn as unknown as typeof fetch, calls, mock: fetchFn };

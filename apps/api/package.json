@@ -18,10 +18,12 @@
     "@azure/functions": "4.16.5",
     "@vacina/shared": "0.1.0",
     "mssql": "12.7.4",
+    "pdfkit": "0.20.2",
     "zod": "4.6.5"
   },
   "devDependencies": {
     "@types/mssql": "12.3.0",
+    "@types/pdfkit": "0.17.6",
     "azure-functions-core-tools": "4.15.2"
   }
 }

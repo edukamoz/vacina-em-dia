@@ -27,6 +27,7 @@ import { createMssqlExecutor } from '../repositories/sql/mssql-executor';
 import { createSqlRepositories } from '../repositories/sql/sql-repositories';
 import { createAccountService } from '../services/account-service';
 import { createAssistantService } from '../services/assistant-service';
+import { createCarteiraService } from '../services/carteira-service';
 import { createAuthService } from '../services/auth-service';
 import { createConsentService } from '../services/consent-service';
 import { createDoseService } from '../services/dose-service';
@@ -76,6 +77,7 @@ export const memberHandlers = createMemberHandlers(
     calendar,
   }),
   doseService,
+  createCarteiraService({ doses: doseService, clock }),
 );
 export const doseHandlers = createDoseHandlers(doseService);
 export const consentHandlers = createConsentHandlers(
