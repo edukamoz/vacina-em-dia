@@ -252,6 +252,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B10 | SCRUM-20 | Como idoso, quero perguntar por voz sobre vacinas e o calendário, para consultar sem digitar (RF06) | Must | Em análise | Sprint 4 |
 | B11 | SCRUM-21 | Como mãe, quero tirar dúvidas frequentes no chat, com respostas curadas e fonte, para me informar sem orientação médica individual (RF07) | Must | Em análise | Sprint 5 |
 | B12 | novo | Como usuária, quero abrir o assistente em uma janela de conversa sobre a tela em que estou, para perguntar sem perder o lugar | Should | Em análise | Sprint 5 |
+| B50 | novo | Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11 | Should | Em análise | Sprint 1 |
 
 **B10** (PE2, PE1; requisitos: RF06; RNF01, RNF04, RNF09)
 
@@ -277,6 +278,12 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - O assistente não aparece como item do menu lateral.
 - Evidência: PRs #70 e #78; janela-do-assistente.test.tsx
 
+**B50** (autora; requisitos: RF07)
+
+- Página única com acurácia, F1 macro, F1 por intenção, matriz de confusão, curva do limiar e erros.
+- Gerada pelo mesmo comando da avaliação, com as versões fixadas das bibliotecas.
+- Evidência: PR #144; docs/07-testes/painel-pln.html
+
 ## E7 Qualidade e testes (SCRUM-11)
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
@@ -288,6 +295,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B28 | novo | Como equipe, quero a verificação de segurança (OWASP) e uma carga leve, para mostrar que a API aguenta e está protegida | Should | Em análise | Sprint 5 |
 | B39 | novo | Como equipe, quero revisar o dataset do chatbot e o texto do termo de consentimento com outra pessoa, para garantir segurança e clareza | Should | A fazer | Sprint 4 |
 | B40 | novo | Como equipe, quero testar o app em celulares reais (Android e iOS) e com leitor de tela, para achar o que o emulador não mostra | Should | A fazer | Sprint 5 |
+| B49 | novo | Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança | Should | Em análise | Sprint 1 |
 
 **B24** (todas; requisitos: RNF07)
 
@@ -334,12 +342,20 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Defeitos viram itens com prioridade.
 - Atenção: A autora fará o teste nos aparelhos depois.
 
+**B49** (PE1, PE2; requisitos: RF01, RF04, RF07, RF09; RNF04)
+
+- Fluxos de cadastro, consentimento, pessoa, dose, entrar e assistente automatizados no navegador (Playwright).
+- axe-core sem violações graves nas telas de antes do login, nos temas claro e escuro.
+- Roda no CI depois do build e guarda o relatório.
+- Evidência: docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/
+- Atenção: Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).
+
 ## E8 Versão completa (SCRUM-12)
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
 | B13 | SCRUM-38 | Como mãe, quero ver no mapa os postos de saúde perto de mim, para saber onde procurar a vacina (RF10) | Could | Em análise | Sprint 6 |
-| B14 | SCRUM-39 | Como mãe, quero exportar a carteira de vacinação em PDF, para levar à escola ou à consulta (RF11) | Could | A fazer | Sprint 6 |
+| B14 | SCRUM-39 | Como mãe, quero exportar a carteira de vacinação em PDF, para levar à escola ou à consulta (RF11) | Could | Em análise | Sprint 1 |
 | B15 | SCRUM-40 | Como cuidadora, quero compartilhar a carteira de uma pessoa com outro cuidador autorizado, para dividirmos o cuidado (RF12) | Won't (por enquanto) | A fazer | Sprint 6 |
 
 **B13** (PE1, PE3; requisitos: RF10; RNF01, RNF03, RNF04)
@@ -353,9 +369,11 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 **B14** (PE1, PE3; requisitos: RF11; RNF03, RNF10)
 
-- O PDF traz as doses aplicadas, a fonte e a versão do calendário e o aviso de que não substitui a caderneta.
+- O PDF traz a pessoa, o resumo e as doses com situação e data, a fonte e a versão do calendário e o aviso de que não substitui a caderneta, em toda página.
 - Não inclui dados além dos já cadastrados.
-- Atenção: Só se o cronograma permitir (CLAUDE.md §3).
+- Só o dono da conta alcança o PDF de seus membros.
+- Evidência: ADR-019; PR #146; docs/07-testes (CT-PDF-*)
+- Atenção: Falta testar a folha de compartilhar em celular físico (ver B40).
 
 **B15** (PE3; requisitos: RF12; RNF02, RNF03)
 
@@ -372,8 +390,9 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B43 | novo | Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto | Should | Em análise | Sprint 6 |
 | B44 | novo | Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app | Could | Em andamento | Sprint 6 |
 | B45 | novo | Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada | Could | Em análise | Sprint 6 |
-| B46 | novo | Como usuária, quero animações extras (inclinação 3D da apresentação, painel e folha animados), para uma experiência mais viva | Could | Em andamento | Sprint 6 |
+| B46 | novo | Como usuária, quero animações extras (inclinação 3D, pessoas em camadas na apresentação, painel e folha animados), para uma experiência mais viva | Could | Em andamento | Sprint 1 |
 | B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em análise | Sprint 6 |
+| B51 | novo | Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca | Could | Em análise | Sprint 1 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -393,7 +412,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 **B43** (PE2; requisitos: RNF04)
 
 - Tamanho do texto Normal, Grande e Maior na Conta.
-- "Reduzir movimento" na Conta, além da preferência do sistema e do tema Alto contraste.
+- Movimento em três modos na Conta: Animar sempre (padrão), Seguir o aparelho e Reduzir movimento; o tema Alto contraste sempre para.
 - Evidência: PR #75
 
 **B44** (autora; requisitos: RNF04)
@@ -411,7 +430,10 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 **B46** (PE1; requisitos: RNF04)
 
 - Inclinação em até 10 graus, só na apresentação e em Entrar.
-- Tudo parado com "Reduzir movimento".
+- Na apresentação, fotos de pessoas fictícias em camadas que respondem ao mouse.
+- "Animar sempre" é o padrão; tudo para com "Reduzir movimento" e no Alto contraste.
+- Evidência: PRs #138, #140, #141 e #143
+- Atenção: Faltam o painel lateral e a folha animados (opcional).
 
 **B47** (todas; requisitos: -)
 
@@ -419,6 +441,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Tela de abertura (splash) com a marca.
 - Evidência: PR #79
 - Atenção: Falta conferir o ícone e a tela de abertura em aparelho.
+
+**B51** (PE1, PE2; requisitos: RNF04, RNF09)
+
+- Manifesto com nome, ícones (comuns e mascaráveis), tema e atalhos.
+- O Chrome não aponta erro de instalação.
+- Sem service worker: o uso offline segue fora do escopo.
+- Evidência: PR #145; docs/25-app-instalavel.md
+- Atenção: Falta instalar em celular físico e no iOS (ver B40).
 
 ## Não migrados do Jira
 

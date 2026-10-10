@@ -87,3 +87,9 @@ design/
 
 # --- Entrega final (gerada por scripts/empacotar-entrega.ps1) ---
 entrega/
+
+# Testes de ponta a ponta (Playwright)
+apps/mobile/e2e/relatorio/
+apps/mobile/e2e/resultados/
+apps/mobile/test-results/
+apps/mobile/build-e2e.log

@@ -37,7 +37,7 @@ def item(id_, jira, titulo, epico, prio, pessoas, reqs, criterios, estado, sprin
     }
 
 
-CURTOS = {'B01': 'Cadastro e login (RF01)', 'B02': 'Recuperar a senha por e-mail', 'B03': 'Consentimento, privacidade e exclusão de dados (RF09)', 'B04': 'Gerenciar a família (RF02)', 'B05': 'Calendário vacinal por idade (RF03)', 'B06': 'Histórico de doses (RF08)', 'B07': 'Registrar e acompanhar doses (RF04)', 'B08': 'Dose avulsa', 'B09': 'Lembretes e doses atrasadas (RF05)', 'B10': 'Busca por voz (RF06)', 'B11': 'Chatbot de dúvidas (RF07)', 'B12': 'Assistente em janela de chat', 'B13': 'Mapa de postos de saúde (RF10)', 'B14': 'Exportar carteira em PDF (RF11)', 'B15': 'Compartilhar com cuidador (RF12)', 'B16': 'Provisionar recursos na Azure', 'B17': 'Monorepo, ESLint, Prettier e TypeDoc', 'B18': 'Pipeline de CI', 'B19': 'Containerizar com Docker', 'B20': 'Custo na Azure e alertas de orçamento', 'B21': 'Migrações e persistência no Azure SQL', 'B22': 'Aquecer o banco para o primeiro login', 'B23': 'Repositório público e proteção do GitHub', 'B24': 'Plano de teste', 'B25': 'Teste de caixa preta', 'B26': 'UML de estados e casos de teste', 'B27': 'Testes automatizados com Jest', 'B28': 'Segurança (OWASP) e carga leve', 'B29': 'Modelagem UML e DER', 'B30': 'Decisões técnicas em ADRs', 'B31': 'Documentação de Desenvolvimento', 'B32': 'Documentação Técnica', 'B33': 'Documentação do Usuário', 'B34': 'Panfleto A4', 'B35': 'Roteiro e apresentação final', 'B36': 'Empacotar a entrega (PDFs e zip)', 'B38': 'Registrar as decisões sobre licença dos dados, Jest e datas', 'B39': 'Revisar dataset do chatbot e termo de consentimento', 'B40': 'Testar em celulares reais e com leitor de tela', 'B41': 'Design system para mobile e web', 'B42': 'Redesenho visual web e celular', 'B43': 'Tamanho do texto e reduzir movimento', 'B44': 'Atualizar o Figma para a versão 2', 'B45': 'Tela para tablet', 'B46': 'Animações extras (inclinação 3D, painel e folha)', 'B47': 'Ícones do app e da aba', 'B48': 'Confirmar e-mail no cadastro'}
+CURTOS = {'B01': 'Cadastro e login (RF01)', 'B02': 'Recuperar a senha por e-mail', 'B03': 'Consentimento, privacidade e exclusão de dados (RF09)', 'B04': 'Gerenciar a família (RF02)', 'B05': 'Calendário vacinal por idade (RF03)', 'B06': 'Histórico de doses (RF08)', 'B07': 'Registrar e acompanhar doses (RF04)', 'B08': 'Dose avulsa', 'B09': 'Lembretes e doses atrasadas (RF05)', 'B10': 'Busca por voz (RF06)', 'B11': 'Chatbot de dúvidas (RF07)', 'B12': 'Assistente em janela de chat', 'B13': 'Mapa de postos de saúde (RF10)', 'B14': 'Exportar carteira em PDF (RF11)', 'B15': 'Compartilhar com cuidador (RF12)', 'B16': 'Provisionar recursos na Azure', 'B17': 'Monorepo, ESLint, Prettier e TypeDoc', 'B18': 'Pipeline de CI', 'B19': 'Containerizar com Docker', 'B20': 'Custo na Azure e alertas de orçamento', 'B21': 'Migrações e persistência no Azure SQL', 'B22': 'Aquecer o banco para o primeiro login', 'B23': 'Repositório público e proteção do GitHub', 'B24': 'Plano de teste', 'B25': 'Teste de caixa preta', 'B26': 'UML de estados e casos de teste', 'B27': 'Testes automatizados com Jest', 'B28': 'Segurança (OWASP) e carga leve', 'B29': 'Modelagem UML e DER', 'B30': 'Decisões técnicas em ADRs', 'B31': 'Documentação de Desenvolvimento', 'B32': 'Documentação Técnica', 'B33': 'Documentação do Usuário', 'B34': 'Panfleto A4', 'B35': 'Roteiro e apresentação final', 'B36': 'Empacotar a entrega (PDFs e zip)', 'B38': 'Registrar as decisões sobre licença dos dados, Jest e datas', 'B39': 'Revisar dataset do chatbot e termo de consentimento', 'B40': 'Testar em celulares reais e com leitor de tela', 'B41': 'Design system para mobile e web', 'B42': 'Redesenho visual web e celular', 'B43': 'Tamanho do texto e reduzir movimento', 'B44': 'Atualizar o Figma para a versão 2', 'B45': 'Tela para tablet', 'B46': 'Animações extras (inclinação 3D, painel e folha)', 'B47': 'Ícones do app e da aba', 'B48': 'Confirmar e-mail no cadastro', 'B49': 'Testes de ponta a ponta e de acessibilidade', 'B50': 'Painel de métricas do chatbot', 'B51': 'App instalável (PWA)'}
 
 ITENS = [
     # ---------------- E3 Conta e privacidade
@@ -104,8 +104,8 @@ ITENS = [
          'Testar em celular físico e iOS (ver B40); confirmar a licença dos dados (ver B38).'),
     item('B14', 'SCRUM-39', 'Como mãe, quero exportar a carteira de vacinação em PDF, para levar à escola ou à consulta (RF11)',
          'E8', C, 'PE1, PE3', 'RF11; RNF03, RNF10',
-         ['O PDF traz as doses aplicadas, a fonte e a versão do calendário e o aviso de que não substitui a caderneta.', 'Não inclui dados além dos já cadastrados.'],
-         AF, 6, '', 'Só se o cronograma permitir (CLAUDE.md §3).'),
+         ['O PDF traz a pessoa, o resumo e as doses com situação e data, a fonte e a versão do calendário e o aviso de que não substitui a caderneta, em toda página.', 'Não inclui dados além dos já cadastrados.', 'Só o dono da conta alcança o PDF de seus membros.'],
+         AN, 1, 'ADR-019; PR #146; docs/07-testes (CT-PDF-*)', 'Falta testar a folha de compartilhar em celular físico (ver B40).'),
     item('B15', 'SCRUM-40', 'Como cuidadora, quero compartilhar a carteira de uma pessoa com outro cuidador autorizado, para dividirmos o cuidado (RF12)',
          'E8', W, 'PE3', 'RF12; RNF02, RNF03',
          ['O compartilhamento exige autorização explícita e pode ser revogado.', 'A exclusão da conta remove os compartilhamentos.'],
@@ -195,7 +195,7 @@ ITENS = [
          'E9', S, 'PE1, PE3', 'RNF04, RNF09', ['Navegação por barra inferior no celular e lateral no computador.', 'Telas fiéis ao protótipo (Doses, Família, Histórico, Conta, apresentação, Entrar e Criar conta).', 'Efeitos de passar o mouse, clicar e entrada de telas, parados com "Reduzir movimento".'],
          AN, 6, 'PRs #65 a #78'),
     item('B43', None, 'Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto',
-         'E9', S, 'PE2', 'RNF04', ['Tamanho do texto Normal, Grande e Maior na Conta.', '"Reduzir movimento" na Conta, além da preferência do sistema e do tema Alto contraste.'],
+         'E9', S, 'PE2', 'RNF04', ['Tamanho do texto Normal, Grande e Maior na Conta.', 'Movimento em três modos na Conta: Animar sempre (padrão), Seguir o aparelho e Reduzir movimento; o tema Alto contraste sempre para.'],
          AN, 6, 'PR #75'),
     item('B44', None, 'Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app',
          'E9', C, 'autora', 'RNF04', ['Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).', 'Componentes e telas atualizados.'],
@@ -203,12 +203,25 @@ ITENS = [
     item('B45', None, 'Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada',
          'E9', C, 'PE1', 'RNF04, RNF09', ['Barra lateral compacta e grade de duas colunas validadas.', 'Sem texto cortado em 200%.'],
          AN, 6, '', 'Conferido em 820 px (barra lateral compacta, sem rolagem horizontal); falta olhar em tablet real.'),
-    item('B46', None, 'Como usuária, quero animações extras (inclinação 3D da apresentação, painel e folha animados), para uma experiência mais viva',
-         'E9', C, 'PE1', 'RNF04', ['Inclinação em até 10 graus, só na apresentação e em Entrar.', 'Tudo parado com "Reduzir movimento".'],
-         EA, 6),
+    item('B46', None, 'Como usuária, quero animações extras (inclinação 3D, pessoas em camadas na apresentação, painel e folha animados), para uma experiência mais viva',
+         'E9', C, 'PE1', 'RNF04', ['Inclinação em até 10 graus, só na apresentação e em Entrar.', 'Na apresentação, fotos de pessoas fictícias em camadas que respondem ao mouse.', '"Animar sempre" é o padrão; tudo para com "Reduzir movimento" e no Alto contraste.'],
+         EA, 1, 'PRs #138, #140, #141 e #143', 'Faltam o painel lateral e a folha animados (opcional).'),
     item('B47', None, 'Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app',
          'E9', C, 'todas', '', ['Ícone iOS e Android (adaptativo e monocromático) e favicon configurados.', 'Tela de abertura (splash) com a marca.'],
          AN, 6, 'PR #79', 'Falta conferir o ícone e a tela de abertura em aparelho.'),
+    item('B49', None, 'Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança',
+         'E7', S, 'PE1, PE2', 'RF01, RF04, RF07, RF09; RNF04',
+         ['Fluxos de cadastro, consentimento, pessoa, dose, entrar e assistente automatizados no navegador (Playwright).', 'axe-core sem violações graves nas telas de antes do login, nos temas claro e escuro.', 'Roda no CI depois do build e guarda o relatório.'],
+         AN, 1, 'docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/',
+         'Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).'),
+    item('B50', None, 'Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11',
+         'E6', S, 'autora', 'RF07',
+         ['Página única com acurácia, F1 macro, F1 por intenção, matriz de confusão, curva do limiar e erros.', 'Gerada pelo mesmo comando da avaliação, com as versões fixadas das bibliotecas.'],
+         AN, 1, 'PR #144; docs/07-testes/painel-pln.html'),
+    item('B51', None, 'Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca',
+         'E9', C, 'PE1, PE2', 'RNF04, RNF09',
+         ['Manifesto com nome, ícones (comuns e mascaráveis), tema e atalhos.', 'O Chrome não aponta erro de instalação.', 'Sem service worker: o uso offline segue fora do escopo.'],
+         AN, 1, 'PR #145; docs/25-app-instalavel.md', 'Falta instalar em celular físico e no iOS (ver B40).'),
     # ---------------- E3 futuros
     item('B48', None, 'Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço',
          'E3', W, 'PE1', 'RNF02', ['O cadastro só vale depois de clicar no link do e-mail.'],

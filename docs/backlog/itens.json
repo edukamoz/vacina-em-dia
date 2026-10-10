@@ -331,13 +331,14 @@
    "personas": "PE1, PE3",
    "requisitos": "RF11; RNF03, RNF10",
    "criterios": [
-    "O PDF traz as doses aplicadas, a fonte e a versão do calendário e o aviso de que não substitui a caderneta.",
-    "Não inclui dados além dos já cadastrados."
+    "O PDF traz a pessoa, o resumo e as doses com situação e data, a fonte e a versão do calendário e o aviso de que não substitui a caderneta, em toda página.",
+    "Não inclui dados além dos já cadastrados.",
+    "Só o dono da conta alcança o PDF de seus membros."
    ],
-   "estado": "A fazer",
-   "sprint": 6,
-   "evidencia": "",
-   "nota": "Só se o cronograma permitir (CLAUDE.md §3).",
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "ADR-019; PR #146; docs/07-testes (CT-PDF-*)",
+   "nota": "Falta testar a folha de compartilhar em celular físico (ver B40).",
    "curto": "Exportar carteira em PDF (RF11)"
   },
   {
@@ -844,7 +845,7 @@
    "requisitos": "RNF04",
    "criterios": [
     "Tamanho do texto Normal, Grande e Maior na Conta.",
-    "\"Reduzir movimento\" na Conta, além da preferência do sistema e do tema Alto contraste."
+    "Movimento em três modos na Conta: Animar sempre (padrão), Seguir o aparelho e Reduzir movimento; o tema Alto contraste sempre para."
    ],
    "estado": "Em análise",
    "sprint": 6,
@@ -891,19 +892,20 @@
   {
    "id": "B46",
    "jira": null,
-   "titulo": "Como usuária, quero animações extras (inclinação 3D da apresentação, painel e folha animados), para uma experiência mais viva",
+   "titulo": "Como usuária, quero animações extras (inclinação 3D, pessoas em camadas na apresentação, painel e folha animados), para uma experiência mais viva",
    "epico": "E9",
    "prioridade": "Could",
    "personas": "PE1",
    "requisitos": "RNF04",
    "criterios": [
     "Inclinação em até 10 graus, só na apresentação e em Entrar.",
-    "Tudo parado com \"Reduzir movimento\"."
+    "Na apresentação, fotos de pessoas fictícias em camadas que respondem ao mouse.",
+    "\"Animar sempre\" é o padrão; tudo para com \"Reduzir movimento\" e no Alto contraste."
    ],
    "estado": "Em andamento",
-   "sprint": 6,
-   "evidencia": "",
-   "nota": "",
+   "sprint": 1,
+   "evidencia": "PRs #138, #140, #141 e #143",
+   "nota": "Faltam o painel lateral e a folha animados (opcional).",
    "curto": "Animações extras (inclinação 3D, painel e folha)"
   },
   {
@@ -923,6 +925,62 @@
    "evidencia": "PR #79",
    "nota": "Falta conferir o ícone e a tela de abertura em aparelho.",
    "curto": "Ícones do app e da aba"
+  },
+  {
+   "id": "B49",
+   "jira": null,
+   "titulo": "Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "PE1, PE2",
+   "requisitos": "RF01, RF04, RF07, RF09; RNF04",
+   "criterios": [
+    "Fluxos de cadastro, consentimento, pessoa, dose, entrar e assistente automatizados no navegador (Playwright).",
+    "axe-core sem violações graves nas telas de antes do login, nos temas claro e escuro.",
+    "Roda no CI depois do build e guarda o relatório."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/",
+   "nota": "Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).",
+   "curto": "Testes de ponta a ponta e de acessibilidade"
+  },
+  {
+   "id": "B50",
+   "jira": null,
+   "titulo": "Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11",
+   "epico": "E6",
+   "prioridade": "Should",
+   "personas": "autora",
+   "requisitos": "RF07",
+   "criterios": [
+    "Página única com acurácia, F1 macro, F1 por intenção, matriz de confusão, curva do limiar e erros.",
+    "Gerada pelo mesmo comando da avaliação, com as versões fixadas das bibliotecas."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "PR #144; docs/07-testes/painel-pln.html",
+   "nota": "",
+   "curto": "Painel de métricas do chatbot"
+  },
+  {
+   "id": "B51",
+   "jira": null,
+   "titulo": "Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "PE1, PE2",
+   "requisitos": "RNF04, RNF09",
+   "criterios": [
+    "Manifesto com nome, ícones (comuns e mascaráveis), tema e atalhos.",
+    "O Chrome não aponta erro de instalação.",
+    "Sem service worker: o uso offline segue fora do escopo."
+   ],
+   "estado": "Em análise",
+   "sprint": 1,
+   "evidencia": "PR #145; docs/25-app-instalavel.md",
+   "nota": "Falta instalar em celular físico e no iOS (ver B40).",
+   "curto": "App instalável (PWA)"
   },
   {
    "id": "B48",
