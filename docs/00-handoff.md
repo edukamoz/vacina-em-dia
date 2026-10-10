@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 08/10/2026 (**leia a seção 0.11 primeiro**: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 10/10/2026 (**leia a seção 0.12 primeiro**, que atualiza a 0.11; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,26 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.12 Estado em 10/10/2026: backlog no GitHub Projects, documentações e entrega
+
+**Mudanças de gestão (decisões do autor em 10/10/2026):**
+- **O Jira não é mais usado.** O backlog vive no GitHub Projects **"proj-vacina-em-dia"** (projeto #2 de `edukamoz`) e, em texto, em `docs/24-backlog.md`. Fonte: `docs/backlog/dados.py` (gera `itens.json` e o `.md`); `scripts/backlog-github.mjs` importa para o projeto e pode ser repetido (não duplica; cada issue tem o código `[Bnn]` no título). São 47 itens em 9 épicos (E1 a E9), com história de usuário, prioridade MoSCoW, personas, requisitos, critérios de aceite, estado e sprint. **Nenhum item está "Concluído"**: só o autor marca, depois da reunião de encerramento da sprint. As prioridades e estados são proposta a confirmar. Para atualizar um estado: edite `dados.py`, rode `python docs/backlog/dados.py` e depois `node scripts/backlog-github.mjs` (precisa do `gh` com o escopo `project`).
+- **Validação das personas com usuários: abandonada.** Personas e problemas seguem como hipóteses de trabalho (limitação declarada em `docs/23`).
+- **Datas e professor:** sem consulta ao professor; mantidas 12/11, 16/11 e 19/11; Jest mantido no lugar de JUnit (CLAUDE.md §14); a data de Computação em Nuvem II segue em aberto.
+- O autor já fez o backup de `doctos/`, trocou a chave da Brevo e apagou a regra temporária do firewall do SQL; testará em celular depois e preencherá horas e reuniões da Documentação de Desenvolvimento.
+
+**Na `main` desde a 0.11 (PRs #78 a #138):** correção do mapa e da localização na web publicada (CSP com `tile.openstreetmap.org` e `Permissions-Policy` com `geolocation=(self)`); efeitos de passar o mouse e clicar (CSS global em `global.css`, desligado por `data-movimento="reduzido"`); `GET /api/warmup` (aquece o banco ao abrir o app); assistente fora do menu lateral (só o balão); ícone do app e da aba (PNG em `apps/mobile/assets/images/`, `app.json`); tela de abertura (`expo-splash-screen`); inclinação 3D da apresentação e de Entrar (`inclinar.web.tsx`); `docs/22-identidade-visual.md`, `docs/23-do-problema-ao-backlog.md` e `docs/24-backlog.md`; plugin do Figma em `docs/04-design-system/figma-plugin/` (o MCP do Figma bateu no limite do plano Starter).
+
+**Documentações e apresentação (todas em `doctos/`, fora do Git):** `scripts/documentos/` regenera `Documentacao_Tecnica.docx` (versão 1.1), `Documentacao_do_Usuario.docx` (com capturas de tela), `Apresentacao.pptx` (17 slides com notas do apresentador) e `Panfleto.docx`, e `capturas.mjs` tira as capturas (leia `scripts/documentos/LEIA-ME.md`). **Regenerar sobrescreve o arquivo**: se editar o Word à mão, guarde uma cópia. A Documentação de Desenvolvimento (`Documentacao_de_Desenvolvimento.docx`) ainda **não existe** em Word; o rascunho em Markdown é `docs/09-documentacao-de-desenvolvimento.md`; horas e reuniões são do autor.
+
+**Entrega (19/11):** `scripts/empacotar-entrega.ps1` converte os Word em PDF, exporta a apresentação e monta o zip do código com `doctos/` dos PDFs, em `entrega/` (fora do Git). Rode só perto da data, com o Word fechado (um Word já aberto travou o teste da conversão em 10/10/2026).
+
+**Pendências do autor:** rodar o plugin do Figma no app de computador do Figma (componentes e telas do Figma continuam na versão 1); testar em celular físico e iOS (mapa, localização, voz, ícone e abertura); ensaiar a apresentação; revisar o dataset do chatbot e o termo de consentimento; preencher a Documentação de Desenvolvimento; marcar "Concluído" no projeto depois das sprints; conferir as animações a olho (no Windows, "Mostrar animações" desligado faz o app não animar, de propósito).
+
+**Próximos passos do Claude:** a Documentação de Desenvolvimento em Word quando o autor trouxer horas e reuniões; atualizar as documentações a cada mudança de código (rodar os geradores); itens "Could" (painel lateral e folha animados, exportar PDF, compartilhar com cuidador) só com pedido; conferir o CI e o deploy da `main` depois de cada mesclagem.
+
+**Armadilhas novas:** `gh auth refresh -s project` é preciso para mexer no GitHub Projects; criar muitas issues leva cerca de 30 minutos (cada chamada do `gh` demora), rode em segundo plano; o Chrome automatizado reporta "reduzir movimento" se não receber `prefers-reduced-motion: no-preference` (use `page.emulateMediaFeatures`); heredoc do shell com `\` ou aspas quebra: escreva scripts em arquivo.
 
 ### 0.11 Estado em 08/10/2026: redesenho concluído, mapa de postos e repositório público
 
