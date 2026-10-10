@@ -9,7 +9,11 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "lang": "pt-BR",
+      "description": "Carteira de vacinação digital da família, com lembretes e assistente por voz.",
+      "themeColor": "#0B6B52",
+      "backgroundColor": "#0B6B52"
     },
     "plugins": [
       "expo-router",
