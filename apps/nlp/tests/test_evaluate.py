@@ -79,3 +79,35 @@ def test_ct_nlp_127_linha_de_comando_imprime_e_grava_o_relatorio(tmp_path, capsy
     assert "F1 macro" in capsys.readouterr().out
     assert destino.read_text(encoding="utf-8").startswith("# Avaliação do chatbot")
     assert main([]) == 0
+
+
+def test_ct_nlp_126_matriz_de_confusao_tem_uma_linha_por_intencao_e_soma_o_teste(resultado):
+    assert len(resultado.labels) == resultado.intents
+    assert len(resultado.confusion) == resultado.intents
+    assert sum(sum(linha) for linha in resultado.confusion) == resultado.test_size
+    acertos = sum(resultado.confusion[i][i] for i in range(resultado.intents))
+    assert acertos == round(resultado.accuracy * resultado.test_size)
+
+
+def test_ct_nlp_127_painel_html_traz_as_metricas_e_escapa_o_texto(resultado, tmp_path):
+    from dataclasses import replace
+
+    from vacina_nlp.dashboard import render_dashboard
+
+    hostil = replace(resultado, errors=[("<script>alert(1)</script>", "a", "b", 0.5)])
+    pagina = render_dashboard(hostil, date(2026, 10, 10))
+    assert pagina.startswith("<!doctype html>")
+    assert "10/10/2026" in pagina
+    assert "Meta de 0,850 atingida" in pagina
+    assert "<script>alert(1)</script>" not in pagina
+    assert "&lt;script&gt;" in pagina
+    for intencao in resultado.labels:
+        assert intencao in pagina
+    assert pagina.count("<tr>") >= resultado.intents
+
+
+def test_ct_nlp_128_linha_de_comando_grava_o_painel(tmp_path, capsys):
+    destino = tmp_path / "painel.html"
+    assert main(["--write-dashboard", str(destino)]) == 0
+    assert "Painel gravado em" in capsys.readouterr().out
+    assert "Painel de métricas do chatbot" in destino.read_text(encoding="utf-8")
