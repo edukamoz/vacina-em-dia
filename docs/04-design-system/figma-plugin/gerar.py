@@ -55,9 +55,13 @@ def sombra(css):
     if css == 'none':
         return []
     saida = []
-    for parte in re.findall(r'(-?\d+)px (-?\d+)px (\d+)px rgba\((\d+),(\d+),(\d+),([\d.]+)\)', css):
+    # O "px" é opcional: nos tokens o deslocamento zero aparece só como "0" (ex.: "0 1px 2px rgba(...)").
+    for parte in re.findall(r'(-?\d+)(?:px)? (-?\d+)(?:px)? (\d+)(?:px)? rgba\((\d+),(\d+),(\d+),([\d.]+)\)', css):
         x, y, blur, r, g, b, a = parte
         saida.append({'x': int(x), 'y': int(y), 'blur': int(blur), 'r': int(r) / 255, 'g': int(g) / 255, 'b': int(b) / 255, 'a': float(a)})
+    if not saida:
+        # Falhar alto evita publicar estilos de sombra vazios sem ninguém perceber.
+        raise ValueError('Sombra não reconhecida: ' + css)
     return saida
 
 
