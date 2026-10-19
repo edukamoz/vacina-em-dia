@@ -983,6 +983,82 @@
    "curto": "App instalável (PWA)"
   },
   {
+   "id": "B52",
+   "jira": null,
+   "titulo": "Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava",
+   "epico": "E9",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RNF04, RNF09",
+   "criterios": [
+    "Adicionar pessoa, editar pessoa, adicionar dose e detalhe da dose abrem em janela (folha no celular, cartão centralizado na web).",
+    "Fecha pelo botão, tocando no véu e com Esc na web; sem histórico, volta ao início.",
+    "Papel de diálogo e nome igual ao título; a entrada para com \"Reduzir movimento\"."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "apps/mobile/src/components/janela-modal.tsx; CT-APP-MOD*",
+   "nota": "",
+   "curto": "Telas em janela (modal)"
+  },
+  {
+   "id": "B53",
+   "jira": null,
+   "titulo": "Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "PE1",
+   "requisitos": "RNF03",
+   "criterios": [
+    "Tela \"Apoiar o projeto\" com valor sugerido, QR e Pix copia e cola gerados no aparelho (BR Code).",
+    "Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.",
+    "Aviso claro de que a doação é voluntária e não dá acesso a nada."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Decidido em 19/10/2026: Pix copia e cola, custo zero. A chave Pix é do autor (a informar).",
+   "curto": "Apoiar o projeto com Pix"
+  },
+  {
+   "id": "B54",
+   "jira": null,
+   "titulo": "Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "PE1, PE3",
+   "requisitos": "RNF03",
+   "criterios": [
+    "Escolher ou tirar a foto, reduzida no aparelho antes de enviar.",
+    "Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.",
+    "Excluir a conta apaga a foto; o termo de privacidade cita a foto."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Decidido em 19/10/2026: Azure Blob Storage na conta de armazenamento já existente.",
+   "curto": "Foto de perfil (armazenamento de arquivos)"
+  },
+  {
+   "id": "B55",
+   "jira": null,
+   "titulo": "Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar",
+   "epico": "E9",
+   "prioridade": "Could",
+   "personas": "PE1, PE3",
+   "requisitos": "RF04; RNF03",
+   "criterios": [
+    "Só no app (Android e iOS); na web o recurso não aparece.",
+    "O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.",
+    "As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Decidido em 19/10/2026: OCR no aparelho. Exige development build do Expo (não roda no Expo Go).",
+   "curto": "Foto do documento com extração de dados"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",
