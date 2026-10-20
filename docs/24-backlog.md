@@ -398,6 +398,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | Em análise | Sprint 3 |
 | B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | A fazer | - |
 | B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
+| B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Em análise | Sprint 3 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -492,6 +493,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Os cartões da aba Conta têm a mesma altura em cada linha.
 - O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia).
 - Evidência: apps/mobile/src/lib/ambiente.ts; CT-APP-AMB01, CT-APP-L01 a L05; README (rodar no Android)
+
+**B57** (PE1, PE2, PE3; requisitos: RNF08, RNF09)
+
+- Push na main atualiza a pré-release apk-latest; uma tag v* cria uma release fixa.
+- O APK é compilado apontando para a API publicada e o workflow falha se o endereço não estiver dentro do pacote.
+- O arquivo vem com o hash SHA-256 e a página explica como instalar.
+- Evidência: .github/workflows/apk.yml; docs/26-apk-no-github-releases.md
+- Atenção: Assinado com a chave de depuração: instala direto, mas não serve para a Play Store.
 
 ## Não migrados do Jira
 
