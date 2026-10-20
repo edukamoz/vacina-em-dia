@@ -865,10 +865,10 @@
     "Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).",
     "Componentes e telas atualizados."
    ],
-   "estado": "Em andamento",
+   "estado": "Em análise",
    "sprint": 6,
    "evidencia": "docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md",
-   "nota": "Telas v2 feitas no Figma em 20/10/2026 (celular e web, 25 telas); falta a biblioteca de componentes v2 e telas menores (Consentimento, Redefinir senha, Termos e Privacidade). Apague as telas \"v1 ·\" depois de conferir.",
+   "nota": "Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. Falta a autora conferir e apagar as telas e componentes \"v1 ·\"; as telas ainda não usam as instâncias dos componentes.",
    "curto": "Atualizar o Figma para a versão 2"
   },
   {
