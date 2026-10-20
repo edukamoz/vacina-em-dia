@@ -12,6 +12,7 @@ import { SeletorDeTamanhoDoTexto } from '../../components/seletor-de-tamanho-do-
 import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
+import { PIX_DA_DOACAO } from '../../lib/config-pix';
 import { useSession } from '../../session/session-provider';
 import { useTheme, useThemeColors } from '../../theme/theme-provider';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
@@ -174,6 +175,25 @@ export function AccountScreen() {
           aplicativo não substitui a caderneta oficial nem a orientação de profissionais de saúde.
         </Texto>
       </Secao>
+
+      {PIX_DA_DOACAO ? (
+        <Secao
+          icone="coracao"
+          titulo="Apoie o projeto"
+          apoio="Uma doação voluntária por Pix, de qualquer valor"
+        >
+          <Texto className="text-textoSecundario">
+            O aplicativo é gratuito e continuará sendo. A doação não libera nada e é opcional.
+          </Texto>
+          <View className="flex-row">
+            <Botao
+              titulo="Doar com Pix"
+              variante="secundario"
+              onPress={() => router.push('/apoiar')}
+            />
+          </View>
+        </Secao>
+      ) : null}
 
       <View className="flex-row">
         <Botao titulo="Sair" icone="sair" variante="secundario" onPress={() => void logout()} />

@@ -102,6 +102,10 @@ jobs:
         working-directory: apps/mobile/android
         env:
           EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
+          # Pix de doação (variáveis do repositório). Chave aleatória, mostrada no QR: não é segredo.
+          EXPO_PUBLIC_PIX_KEY: ${{ vars.PIX_KEY }}
+          EXPO_PUBLIC_PIX_NAME: ${{ vars.PIX_NAME }}
+          EXPO_PUBLIC_PIX_CITY: ${{ vars.PIX_CITY }}
           NODE_ENV: production
         run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,x86_64
 
