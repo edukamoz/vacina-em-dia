@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
-import { Dimensions } from 'react-native';
+import type { ReactElement } from 'react';
+import { Dimensions, Platform } from 'react-native';
 import { AccountScreen } from '../account/account-screen';
 import {
   ACCEPTED,
@@ -9,6 +10,7 @@ import {
   renderScreen,
 } from '../../test-utils';
 import { LoginScreen } from './login-screen';
+import { LandingWeb } from './landing-web';
 import { RegisterScreen } from './register-screen';
 import { WelcomeScreen } from './welcome-screen';
 
@@ -46,9 +48,9 @@ async function aceitarTermos() {
   );
 }
 
-describe('tela de apresentação', () => {
+describe('apresentação no site (computador)', () => {
   test('CT-APP-L01: mostra a promessa, as vantagens, o aviso e leva a "Criar conta" e "Entrar"', async () => {
-    await renderScreen(<WelcomeScreen />, createFakeFetch({}).fetchFn);
+    await renderScreen(<LandingWeb compacta={false} />, createFakeFetch({}).fetchFn);
     expect(
       screen.getByRole('header', { name: 'As vacinas da sua família, em dia' }),
     ).toBeOnTheScreen();
@@ -67,6 +69,7 @@ describe('tela de apresentação', () => {
     expect(screen.getAllByLabelText(/personagem fict/).length).toBeGreaterThanOrEqual(6);
     expect(screen.getByText('Comece a acompanhar as doses da família.')).toBeOnTheScreen();
     expect(screen.getByText('Para cada fase da vida')).toBeOnTheScreen();
+    expect(screen.queryByText('Leve no celular')).not.toBeOnTheScreen();
 
     const criar = screen.getAllByRole('button', { name: 'Criar conta' });
     expect(criar).toHaveLength(2);
@@ -78,17 +81,65 @@ describe('tela de apresentação', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Entrar' }));
     expect(mockPush).toHaveBeenCalledWith('/entrar');
   });
+});
 
-  test('CT-APP-L02: no computador, as vantagens ficam lado a lado (layout expandido)', async () => {
-    const spy = jest
+describe('apresentação no site (celular)', () => {
+  test('CT-APP-L02: ensina a instalar o app e fixa o botão "Criar conta" no pé da tela', async () => {
+    await renderScreen(<LandingWeb compacta />, createFakeFetch({}).fetchFn);
+    expect(screen.getByText('Leve no celular')).toBeOnTheScreen();
+    expect(screen.getByText(/Instalar app/)).toBeOnTheScreen();
+    // Botão do alto, o fixo no pé e o do cartão final.
+    const criar = screen.getAllByRole('button', { name: 'Criar conta' });
+    expect(criar).toHaveLength(3);
+    await fireEvent.press(criar[1]!);
+    expect(mockPush).toHaveBeenCalledWith('/criar-conta');
+    expect(screen.getByText('Feito para quem cuida de gente')).toBeOnTheScreen();
+  });
+});
+
+describe('primeira tela: um desenho para cada forma de uso', () => {
+  const comWeb = async (largura: number, ui: ReactElement) => {
+    const os = jest.replaceProperty(Platform, 'OS', 'web');
+    const dim = jest
       .spyOn(Dimensions, 'get')
-      .mockReturnValue({ width: 1440, height: 900, scale: 1, fontScale: 1 });
+      .mockReturnValue({ width: largura, height: 900, scale: 1, fontScale: 1 });
     try {
-      await renderScreen(<WelcomeScreen />, createFakeFetch({}).fetchFn);
-      expect(screen.getByText('Fácil de ler')).toBeOnTheScreen();
+      await renderScreen(ui, createFakeFetch({}).fetchFn);
     } finally {
-      spy.mockRestore();
+      os.restore();
+      dim.mockRestore();
     }
+  };
+
+  test('CT-APP-L03: no aplicativo instalado mostra a abertura enxuta, sem a página do site', async () => {
+    await renderScreen(<WelcomeScreen />, createFakeFetch({}).fetchFn);
+    expect(
+      screen.getByRole('header', { name: 'As vacinas da sua família, em dia' }),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText('Fácil de ler')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Leve no celular')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+    expect(mockPush).toHaveBeenCalledWith('/criar-conta');
+    await fireEvent.press(screen.getByRole('button', { name: 'Já tenho conta' }));
+    expect(mockPush).toHaveBeenCalledWith('/entrar');
+    await fireEvent.press(screen.getByRole('link', { name: 'Termos de uso' }));
+    expect(mockPush).toHaveBeenCalledWith('/termos');
+    await fireEvent.press(screen.getByRole('link', { name: 'Política de privacidade' }));
+    expect(mockPush).toHaveBeenCalledWith('/privacidade');
+    expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
+  });
+
+  test('CT-APP-L04: no site, num computador, mostra a página de apresentação completa', async () => {
+    await comWeb(1440, <WelcomeScreen />);
+    expect(screen.getByText('Fácil de ler')).toBeOnTheScreen();
+    expect(screen.queryByText('Leve no celular')).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Já tenho conta' })).not.toBeOnTheScreen();
+  });
+
+  test('CT-APP-L05: no site, no celular, mostra a página compacta com o cartão de instalar', async () => {
+    await comWeb(390, <WelcomeScreen />);
+    expect(screen.getByText('Leve no celular')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Já tenho conta' })).not.toBeOnTheScreen();
   });
 });
 

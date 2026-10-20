@@ -100,6 +100,18 @@ Nenhum texto fica abaixo de 16 dp.
 - A **voz na web** exige HTTPS e permissão do microfone; se negada ou indisponível, o botão leva ao campo de texto.
 - O **push** não existe na web (ver `sequencia-lembrete.md`); lá, o sinal de dose atrasada aparece dentro do app.
 
+### 2.6 Um desenho para cada forma de uso
+
+A primeira tela escolhe o desenho por `lib/ambiente.ts` (`useAmbiente`):
+
+| Ambiente | Quando | Primeira tela |
+|---|---|---|
+| `web-grande` | site com janela de 1024 px ou mais | Página completa: mosaico de peças animadas, fases da vida, personas, vantagens |
+| `web-pequena` | site no celular ou em janela estreita | Página compacta: mosaico de 2 colunas, personas em carrossel, cartão "Leve no celular" e botão Criar conta fixo no pé |
+| `app` | Android, iOS ou site instalado (PWA, `display-mode: standalone`) | Abertura enxuta: marca, pessoas e uma folha com "Criar conta" e "Já tenho conta" |
+
+No mosaico (`hero-modular.web.tsx`), cada peça tem uma animação própria ao passar o mouse, e no celular ao tocar: a pessoa que sobe com corações, o alerta que treme, o calendário que gira, o visto que se desenha com confete, a onda de voz, o balão de fala, o sino que balança e o anel que fecha. Tudo para com "Reduzir movimento".
+
 ## 3. Componentes base
 
 Todos aceitam os três temas, o texto a 200% e uso por teclado, toque e leitor de tela.

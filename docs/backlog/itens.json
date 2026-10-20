@@ -1059,6 +1059,27 @@
    "curto": "Foto do documento com extração de dados"
   },
   {
+   "id": "B56",
+   "jira": null,
+   "titulo": "Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um",
+   "epico": "E9",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RNF04, RNF09",
+   "criterios": [
+    "Site no computador: página completa com o mosaico de peças, cada uma com uma animação própria ao passar o mouse.",
+    "Site no celular: página compacta, com o mosaico em 2 colunas, carrossel de personas, cartão de como instalar e botão Criar conta fixo.",
+    "App instalado (Android, iOS ou site instalado): abertura enxuta com \"Criar conta\" e \"Já tenho conta\".",
+    "Os cartões da aba Conta têm a mesma altura em cada linha.",
+    "O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia)."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "apps/mobile/src/lib/ambiente.ts; CT-APP-AMB01, CT-APP-L01 a L05; README (rodar no Android)",
+   "nota": "",
+   "curto": "Primeira tela por ambiente e app instalado no Android"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",

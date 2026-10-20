@@ -47,9 +47,11 @@
     },
     "icon": "./assets/images/icon.png",
     "ios": {
+      "bundleIdentifier": "br.edu.fatec.vacinaemdia",
       "icon": "./assets/images/icon.png"
     },
     "android": {
+      "package": "br.edu.fatec.vacinaemdia",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon-foreground.png",
         "backgroundColor": "#0B6B52",

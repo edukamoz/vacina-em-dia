@@ -397,6 +397,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | A fazer | - |
 | B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | A fazer | - |
 | B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | A fazer | - |
+| B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -481,6 +482,15 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.
 - As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.
 - Atenção: Decidido em 19/10/2026: OCR no aparelho. Exige development build do Expo (não roda no Expo Go).
+
+**B56** (PE1, PE2, PE3; requisitos: RNF04, RNF09)
+
+- Site no computador: página completa com o mosaico de peças, cada uma com uma animação própria ao passar o mouse.
+- Site no celular: página compacta, com o mosaico em 2 colunas, carrossel de personas, cartão de como instalar e botão Criar conta fixo.
+- App instalado (Android, iOS ou site instalado): abertura enxuta com "Criar conta" e "Já tenho conta".
+- Os cartões da aba Conta têm a mesma altura em cada linha.
+- O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia).
+- Evidência: apps/mobile/src/lib/ambiente.ts; CT-APP-AMB01, CT-APP-L01 a L05; README (rodar no Android)
 
 ## Não migrados do Jira
 

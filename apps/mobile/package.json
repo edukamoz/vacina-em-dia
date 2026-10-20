@@ -8,6 +8,8 @@
   "scripts": {
     "start": "expo start",
     "web": "expo start --web",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "build": "expo export --platform web",
     "typecheck": "tsc --noEmit",
     "test": "jest",
