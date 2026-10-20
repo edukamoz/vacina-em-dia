@@ -396,7 +396,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B52 | novo | Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava | Should | Em análise | Sprint 3 |
 | B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | Em análise | Sprint 3 |
 | B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | Em análise | Sprint 3 |
-| B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | A fazer | - |
+| B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | Em análise | Sprint 3 |
 | B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
 | B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Em análise | Sprint 3 |
 
@@ -484,7 +484,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Só no app (Android e iOS); na web o recurso não aparece.
 - O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.
 - As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.
-- Atenção: Decidido em 19/10/2026: OCR no aparelho. Exige development build do Expo (não roda no Expo Go).
+- Evidência: ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen
+- Atenção: Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.
 
 **B56** (PE1, PE2, PE3; requisitos: RNF04, RNF09)
 

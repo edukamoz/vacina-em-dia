@@ -21,6 +21,8 @@ Legenda de pastas: `api` = `apps/api/src`, `app` = `apps/mobile/src`, `shared` =
 
 A doação por Pix (B53, ADR-021) fica na aba Conta e abre a tela "Apoie o projeto" (`CT-APP-PIX*`: código, CRC16, QR e tela).
 
+A leitura da caderneta por foto (B55, ADR-022) fica na aba Doses, só no app instalado (`CT-APP-OCR*`: leitor do texto, câmera e OCR, tela de conferência).
+
 Além dos requisitos, a foto de perfil (B54, ADR-020) está na aba Conta (`GET`, `PUT` e `DELETE /account/photo`; `CT-FOTO-*` na API e `CT-APP-FOTO*` no app).
 
 O RF10 (mapa de postos) e o RF11 (PDF) foram entregues; o RF12 (compartilhar com cuidador) não foi iniciado, como previsto no escopo.

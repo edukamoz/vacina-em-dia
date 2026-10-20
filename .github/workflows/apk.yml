@@ -6,7 +6,7 @@ name: APK do Android
 #   sempre com o APK mais recente. Dura só uma pré-release; não enche a lista de versões.
 # - Tag `v*` (por exemplo `v0.2.0`): cria uma release fixa dessa versão, com o APK.
 # - Execução manual (Actions > APK do Android > Run workflow): gera e publica como no push.
-# - Pull request que mude este arquivo: só compila e confere o APK (não publica).
+# - Pull request que mude este arquivo ou o package.json do app: só compila e confere o APK (não publica).
 #
 # O app aponta para a API publicada (`EXPO_PUBLIC_API_URL`, embutida no pacote JavaScript na hora do
 # build): sem isso o APK usaria o endereço de desenvolvimento (localhost) e não funcionaria no
@@ -25,10 +25,12 @@ on:
       - 'package-lock.json'
       - '.github/workflows/apk.yml'
     tags: ['v*']
-  # Mudou o próprio workflow? O PR já o roda (compila e confere o APK), mas não publica nada.
+  # Mudou o próprio workflow ou as dependências do app (onde um módulo nativo pode quebrar o build)?
+  # O PR já compila e confere o APK, mas não publica nada.
   pull_request:
     paths:
       - '.github/workflows/apk.yml'
+      - 'apps/mobile/package.json'
   workflow_dispatch:
 
 permissions:

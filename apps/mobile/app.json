@@ -44,8 +44,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "O Vacina em Dia usa a sua galeria só para você escolher a foto de perfil. A foto é reduzida no aparelho e guardada de forma privada.",
-          "cameraPermission": "O Vacina em Dia usa a câmera só para você tirar a foto de perfil. A foto é reduzida no aparelho e guardada de forma privada.",
+          "photosPermission": "O Vacina em Dia usa a sua galeria só para você escolher a foto de perfil ou uma foto da caderneta de vacinação. A foto da caderneta é lida no aparelho e não é enviada.",
+          "cameraPermission": "O Vacina em Dia usa a câmera só para você tirar a foto de perfil ou fotografar a caderneta de vacinação. A foto da caderneta é lida no aparelho e não é enviada.",
           "microphonePermission": false
         }
       ]

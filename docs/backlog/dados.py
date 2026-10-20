@@ -237,7 +237,7 @@ ITENS = [
     item('B55', None, 'Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar',
          'E9', C, 'PE1, PE3', 'RF04; RNF03',
          ['Só no app (Android e iOS); na web o recurso não aparece.', 'O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.', 'As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.'],
-         AF, None, '', 'Decidido em 19/10/2026: OCR no aparelho. Exige development build do Expo (não roda no Expo Go).'),
+         AN, 3, 'ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen', 'Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.'),
     item('B56', None, 'Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um',
          'E9', S, 'PE1, PE2, PE3', 'RNF04, RNF09',
          ['Site no computador: página completa com o mosaico de peças, cada uma com uma animação própria ao passar o mouse.', 'Site no celular: página compacta, com o mosaico em 2 colunas, carrossel de personas, cartão de como instalar e botão Criar conta fixo.', 'App instalado (Android, iOS ou site instalado): abertura enxuta com "Criar conta" e "Já tenho conta".', 'Os cartões da aba Conta têm a mesma altura em cada linha.', 'O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia).'],
