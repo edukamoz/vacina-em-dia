@@ -100,14 +100,15 @@ jobs:
         run: |
           real=$(which node)
           mkdir -p /tmp/shim
-          printf '#!/bin/bash
-echo "ARGS: $*" >> /tmp/node-log.txt
-echo "CWD: $PWD" >> /tmp/node-log.txt
-%s "$@" 2>> /tmp/node-log.txt
-code=$?
-echo "EXIT: $code" >> /tmp/node-log.txt
-exit $code
-' "$real" > /tmp/shim/node
+          {
+            echo '#!/bin/bash'
+            echo 'echo "ARGS: $*" >> /tmp/node-log.txt'
+            echo 'echo "CWD: $PWD" >> /tmp/node-log.txt'
+            echo "$real \"\$@\" 2>> /tmp/node-log.txt"
+            echo 'code=$?'
+            echo 'echo "EXIT: $code" >> /tmp/node-log.txt'
+            echo 'exit $code'
+          } > /tmp/shim/node
           chmod +x /tmp/shim/node
 
       - name: Compilar o APK (release)
