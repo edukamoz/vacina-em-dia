@@ -64,3 +64,339 @@ html:not([data-movimento='reduzido']) textarea {
     transform: translateY(-8px);
   }
 }
+
+/*
+ * Mosaico do alto da apresentação (web, `hero-modular.web.tsx`): cada peça tem uma animação
+ * própria ao passar o mouse (ou ao tocar, no celular). As cores vêm de variáveis `--hm-*` postas
+ * pelo componente, então valem nos três temas. Com "Reduzir movimento" (html[data-movimento=
+ * 'reduzido']) nada se mexe: as peças ficam paradas e já completas.
+ */
+.hm {
+  font-family: 'AtkinsonHyperlegible_400Regular', system-ui, sans-serif;
+  font-size: 17px;
+  display: grid;
+  gap: 14px;
+  width: 100%;
+}
+.hm[data-c='g'] {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 150px);
+  grid-template-areas:
+    'foto foto atras'
+    'foto foto agen'
+    'voz jose aplic'
+    'lemb jose prog';
+}
+.hm[data-c='p'] {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 250px repeat(3, 132px) 210px;
+  grid-template-areas:
+    'foto foto'
+    'atras agen'
+    'voz aplic'
+    'lemb prog'
+    'jose jose';
+}
+.hm-t {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid var(--hm-borda);
+  background: var(--hm-fundo);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--hm-texto);
+  box-shadow: 0 10px 28px rgba(11, 45, 35, 0.1);
+  transition:
+    translate 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    rotate 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.hm-t b,
+.hm-selo,
+.hm-legenda,
+.hm-fala,
+.hm-badge {
+  font-family: 'AtkinsonHyperlegible_700Bold', system-ui, sans-serif;
+  font-weight: 400;
+}
+.hm-t small {
+  display: block;
+  color: var(--hm-apoio);
+  font-size: 0.8em;
+  line-height: 1.25;
+}
+.hm-foto { grid-area: foto; background: linear-gradient(160deg, var(--hm-menta), var(--hm-primariaSuave)); padding: 0; }
+.hm-atras { grid-area: atras; }
+.hm-agen { grid-area: agen; }
+.hm-voz { grid-area: voz; }
+.hm-jose { grid-area: jose; background: linear-gradient(170deg, var(--hm-sol), var(--hm-agenS)); padding: 0; }
+.hm-apli { grid-area: aplic; }
+.hm-lemb { grid-area: lemb; }
+.hm-prog { grid-area: prog; }
+.hm-ico {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 2px solid currentColor;
+}
+.hm-selo {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  font-weight: 700;
+  font-size: 0.8em;
+}
+.hm-atras { color: var(--hm-atras); background: var(--hm-atrasS); }
+.hm-agen { color: var(--hm-agen); background: var(--hm-agenS); }
+.hm-apli { color: var(--hm-apli); background: var(--hm-apliS); }
+.hm-atras b, .hm-agen b, .hm-apli b { color: var(--hm-texto); display: block; }
+
+/* Pessoa que sobe da borda de baixo da peça. */
+.hm-pess {
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  width: 78%;
+  transform: translateX(-50%);
+  transition: transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 18px 20px rgba(11, 45, 35, 0.3));
+}
+.hm-jose .hm-pess { width: 92%; bottom: -10%; }
+.hm[data-c='p'] .hm-jose .hm-pess { width: 40%; left: 70%; bottom: -8%; }
+.hm-legenda {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 2;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--hm-fundo);
+  font-size: 0.8em;
+  font-weight: 700;
+  color: var(--hm-texto);
+}
+.hm-halo {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.75), transparent 68%);
+}
+.hm-cora {
+  position: absolute;
+  bottom: 30%;
+  width: 22px;
+  height: 22px;
+  color: var(--hm-atras);
+  opacity: 0;
+}
+
+/* Balão de fala do Sr. José. */
+.hm-fala {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  max-width: 78%;
+  padding: 8px 12px;
+  border-radius: 16px 16px 16px 4px;
+  background: var(--hm-fundo);
+  color: var(--hm-texto);
+  font-size: 0.78em;
+  font-weight: 700;
+  line-height: 1.2;
+  transform-origin: 0 100%;
+  transform: scale(0.4);
+  opacity: 0;
+  transition:
+    transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 200ms;
+}
+
+/* Microfone e onda. */
+.hm-mic {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--hm-primaria);
+  color: var(--hm-sobre);
+}
+.hm-mic::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--hm-primaria);
+  opacity: 0;
+}
+.hm-onda {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 36px;
+}
+.hm-onda i {
+  display: block;
+  width: 5px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--hm-primaria);
+}
+.hm-onda i:nth-child(2) { height: 18px; }
+.hm-onda i:nth-child(3) { height: 28px; }
+.hm-onda i:nth-child(4) { height: 16px; }
+.hm-onda i:nth-child(5) { height: 22px; }
+
+/* Calendário e barra. */
+.hm-barra { height: 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.12); overflow: hidden; }
+.hm-barra i { display: block; height: 100%; width: 22%; border-radius: 4px; background: currentColor; transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hm-agen .hm-ico { transition: transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* Visto que se desenha e confete. */
+.hm-visto { stroke-dasharray: 34; stroke-dashoffset: 0; }
+.hm-conf { position: absolute; right: 36px; top: 34px; width: 0; height: 0; }
+.hm-conf i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hm-sol);
+  opacity: 0;
+}
+.hm-conf i:nth-child(2n) { background: var(--hm-primaria); border-radius: 2px; }
+
+/* Sino. */
+.hm-sino { transform-origin: 50% 8%; display: inline-block; }
+.hm-badge {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--hm-atras);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8em;
+}
+
+/* Anel de progresso. */
+.hm-anel { width: 64px; height: 64px; transform: rotate(-90deg); }
+.hm-anel circle { fill: none; stroke-width: 9; stroke-linecap: round; }
+.hm-anel .tr { stroke: rgba(0, 0, 0, 0.1); }
+.hm-anel .pg { stroke: var(--hm-primaria); stroke-dasharray: 176; stroke-dashoffset: 88; transition: stroke-dashoffset 1100ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hm-prog .antes, .hm-prog .depois { transition: opacity 300ms, transform 300ms; }
+.hm-prog .depois { position: absolute; opacity: 0; transform: translateY(8px); }
+.hm-prog .num { position: relative; height: 1.3em; }
+
+@keyframes hm-flutua { 50% { transform: translateY(-5px); } }
+@keyframes hm-treme { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-14deg); } 40% { transform: rotate(12deg); } 60% { transform: rotate(-9deg); } 80% { transform: rotate(6deg); } }
+@keyframes hm-pulsa { 0% { box-shadow: 0 0 0 0 currentColor; } 100% { box-shadow: 0 0 0 14px transparent; } }
+@keyframes hm-sobe { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-120px) scale(1.2); opacity: 0; } }
+@keyframes hm-onda { 0%, 100% { transform: scaleY(0.45); } 50% { transform: scaleY(1.5); } }
+@keyframes hm-ondula { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.9); opacity: 0; } }
+@keyframes hm-traca { from { stroke-dashoffset: 34; } to { stroke-dashoffset: 0; } }
+@keyframes hm-estoura { 0% { transform: translate(0, 0) scale(0.4); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(1); opacity: 0; } }
+@keyframes hm-balanca { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(18deg); } 30% { transform: rotate(-16deg); } 45% { transform: rotate(12deg); } 60% { transform: rotate(-8deg); } 75% { transform: rotate(4deg); } }
+@keyframes hm-pula { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.35); } }
+@keyframes hm-halo { 50% { transform: scale(1.12); opacity: 0.8; } }
+
+html:not([data-movimento='reduzido']) .hm-t { animation: hm-flutua 7s ease-in-out infinite; }
+html:not([data-movimento='reduzido']) .hm-t:nth-child(2n) { animation-delay: -2s; }
+html:not([data-movimento='reduzido']) .hm-t:nth-child(3n) { animation-delay: -4s; }
+
+html:not([data-movimento='reduzido']) .hm-t:hover,
+html:not([data-movimento='reduzido']) .hm-t[data-on='1'],
+html:not([data-movimento='reduzido']) .hm-t:focus-visible {
+  animation-play-state: paused;
+  translate: 0 -8px;
+  box-shadow: 0 22px 44px rgba(11, 45, 35, 0.22);
+}
+html:not([data-movimento='reduzido']) .hm-atras:hover { rotate: -2deg; }
+html:not([data-movimento='reduzido']) .hm-agen:hover { rotate: 2deg; }
+html:not([data-movimento='reduzido']) .hm-apli:hover { rotate: -1.5deg; }
+
+/* 1. Mariana: sobe e respira; coraçõezinhos flutuam. */
+html:not([data-movimento='reduzido']) .hm-foto:hover .hm-pess,
+html:not([data-movimento='reduzido']) .hm-foto[data-on='1'] .hm-pess { transform: translateX(-50%) translateY(-6%) scale(1.07); }
+html:not([data-movimento='reduzido']) .hm-foto:hover .hm-halo,
+html:not([data-movimento='reduzido']) .hm-foto[data-on='1'] .hm-halo { animation: hm-halo 1.6s ease-in-out infinite; }
+html:not([data-movimento='reduzido']) .hm-foto:hover .hm-cora,
+html:not([data-movimento='reduzido']) .hm-foto[data-on='1'] .hm-cora { animation: hm-sobe 1.8s ease-out infinite; }
+.hm-cora:nth-of-type(1) { left: 22%; }
+.hm-cora:nth-of-type(2) { left: 48%; color: var(--hm-sol); }
+.hm-cora:nth-of-type(3) { left: 72%; }
+html:not([data-movimento='reduzido']) .hm-foto:hover .hm-cora:nth-of-type(2) { animation-delay: 0.45s; }
+html:not([data-movimento='reduzido']) .hm-foto:hover .hm-cora:nth-of-type(3) { animation-delay: 0.9s; }
+
+/* 2. Atrasada: o alerta treme e o selo pulsa. */
+html:not([data-movimento='reduzido']) .hm-atras:hover .hm-ico svg,
+html:not([data-movimento='reduzido']) .hm-atras[data-on='1'] .hm-ico svg { animation: hm-treme 0.7s ease-in-out infinite; }
+html:not([data-movimento='reduzido']) .hm-atras:hover .hm-selo,
+html:not([data-movimento='reduzido']) .hm-atras[data-on='1'] .hm-selo { animation: hm-pulsa 1s ease-out infinite; }
+
+/* 3. Agendada: o calendário dá uma volta e a barra enche. */
+html:not([data-movimento='reduzido']) .hm-agen:hover .hm-ico,
+html:not([data-movimento='reduzido']) .hm-agen[data-on='1'] .hm-ico { transform: rotateY(360deg); }
+html:not([data-movimento='reduzido']) .hm-agen:hover .hm-barra i,
+html:not([data-movimento='reduzido']) .hm-agen[data-on='1'] .hm-barra i { width: 100%; }
+
+/* 4. Aplicada: o visto se desenha e o confete estoura. */
+html:not([data-movimento='reduzido']) .hm-apli:hover .hm-visto,
+html:not([data-movimento='reduzido']) .hm-apli[data-on='1'] .hm-visto { animation: hm-traca 0.6s ease-out both; }
+html:not([data-movimento='reduzido']) .hm-apli:hover .hm-conf i,
+html:not([data-movimento='reduzido']) .hm-apli[data-on='1'] .hm-conf i { animation: hm-estoura 0.9s ease-out both; }
+.hm-conf i:nth-child(1) { --x: -34px; --y: -30px; }
+.hm-conf i:nth-child(2) { --x: 6px; --y: -44px; }
+.hm-conf i:nth-child(3) { --x: 38px; --y: -26px; }
+.hm-conf i:nth-child(4) { --x: 44px; --y: 8px; }
+.hm-conf i:nth-child(5) { --x: -40px; --y: 6px; }
+.hm-conf i:nth-child(6) { --x: 20px; --y: 30px; }
+
+/* 5. Voz: a onda dança e o microfone emite ondas. */
+html:not([data-movimento='reduzido']) .hm-voz:hover .hm-onda i,
+html:not([data-movimento='reduzido']) .hm-voz[data-on='1'] .hm-onda i { animation: hm-onda 0.8s ease-in-out infinite; }
+.hm-onda i:nth-child(2) { animation-delay: 0.1s !important; }
+.hm-onda i:nth-child(3) { animation-delay: 0.2s !important; }
+.hm-onda i:nth-child(4) { animation-delay: 0.3s !important; }
+.hm-onda i:nth-child(5) { animation-delay: 0.4s !important; }
+html:not([data-movimento='reduzido']) .hm-voz:hover .hm-mic::after,
+html:not([data-movimento='reduzido']) .hm-voz[data-on='1'] .hm-mic::after { animation: hm-ondula 1.1s ease-out infinite; }
+
+/* 6. Sr. José: aproxima e o balão de fala aparece. */
+html:not([data-movimento='reduzido']) .hm-jose:hover .hm-pess,
+html:not([data-movimento='reduzido']) .hm-jose[data-on='1'] .hm-pess { transform: translateX(-50%) translateY(-4%) scale(1.1); }
+html:not([data-movimento='reduzido']) .hm-jose:hover .hm-fala,
+html:not([data-movimento='reduzido']) .hm-jose[data-on='1'] .hm-fala { transform: scale(1); opacity: 1; }
+
+/* 7. Lembrete: o sino balança e a etiqueta pula. */
+html:not([data-movimento='reduzido']) .hm-lemb:hover .hm-sino,
+html:not([data-movimento='reduzido']) .hm-lemb[data-on='1'] .hm-sino { animation: hm-balanca 0.9s ease-in-out infinite; }
+html:not([data-movimento='reduzido']) .hm-lemb:hover .hm-badge,
+html:not([data-movimento='reduzido']) .hm-lemb[data-on='1'] .hm-badge { animation: hm-pula 0.6s ease-in-out infinite; }
+
+/* 8. Progresso: o anel fecha e o texto vira "completo". */
+html:not([data-movimento='reduzido']) .hm-prog:hover .pg,
+html:not([data-movimento='reduzido']) .hm-prog[data-on='1'] .pg { stroke-dashoffset: 0; }
+html:not([data-movimento='reduzido']) .hm-prog:hover .antes,
+html:not([data-movimento='reduzido']) .hm-prog[data-on='1'] .antes { opacity: 0; transform: translateY(-8px); }
+html:not([data-movimento='reduzido']) .hm-prog:hover .depois,
+html:not([data-movimento='reduzido']) .hm-prog[data-on='1'] .depois { opacity: 1; transform: none; }

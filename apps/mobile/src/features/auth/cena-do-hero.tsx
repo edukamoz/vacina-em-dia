@@ -5,7 +5,7 @@ import { FOTOS, FUNDO_DA_CENA } from './fotos';
 /**
  * Cena do alto da apresentação: duas pessoas fictícias recortadas sobre um fundo de vidro, e
  * embaixo os cartões de exemplo. No celular a cena é estática; a versão da web
- * (`cena-do-hero.web.tsx`) move as camadas com o mouse.
+ * é feita para o site pelo `hero-modular.web.tsx`.
  *
  * @param props.cartoes - Cartões de exemplo de dose, mostrados sob as pessoas.
  */

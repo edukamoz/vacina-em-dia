@@ -97,7 +97,7 @@ export function AccountScreen() {
         </View>
       </View>
 
-      <View className="gap-lg expandido:flex-row expandido:items-start">
+      <View className="gap-lg expandido:flex-row expandido:items-stretch">
         <Secao
           icone="familia"
           titulo="Sua família"
@@ -146,7 +146,7 @@ export function AccountScreen() {
         </Secao>
       </View>
 
-      <View className="gap-lg expandido:flex-row expandido:items-start">
+      <View className="gap-lg expandido:flex-row expandido:items-stretch">
         <Secao
           icone="doses"
           titulo="Texto"
@@ -164,7 +164,7 @@ export function AccountScreen() {
         </Secao>
       </View>
 
-      <View className="gap-lg expandido:flex-row expandido:items-start">
+      <View className="gap-lg expandido:flex-row expandido:items-stretch">
         <Secao icone="doses" titulo="Tema" apoio="Como o aplicativo aparece para você">
           <SeletorDeTema />
         </Secao>
