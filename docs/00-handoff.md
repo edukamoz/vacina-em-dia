@@ -118,8 +118,8 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 **Pendências do autor (testes que só em aparelho):**
 1. Reinstalar o app no celular (`npm run dev:android`, ou o APK de `releases/tag/apk-latest`; desinstale antes o app instalado com outra chave) e testar: câmera e galeria da foto de perfil, a leitura da caderneta com uma caderneta de verdade (a qualidade depende da foto; no Android o modelo do Google é baixado no primeiro uso) e o "Doar com Pix" (pague R$ 0,01 para ver se cai na sua conta).
 2. Conferir no celular: instalação como PWA, mapa, localização, voz e iOS (nada disso foi testado em iOS).
-3. No Figma: conferir as telas novas e apagar as "v1 ·".
-4. Apagar `D:\tmp-modal-*.png` (capturas temporárias que a trava de segurança não deixou apagar).
+3. No Figma: conferir as telas novas (as "v1 ·" já foram apagadas pelo autor em 20/10/2026; os `D:\tmp-modal-*.png` também).
+4. Conferir no celular as correções do PR #158 (menu acima da barra do sistema do Android, conteúdo rolando até o menu, mapa arrastável).
 5. Marcar "Concluído" no projeto depois das reuniões de encerramento (só o autor); preencher a Documentação de Desenvolvimento; ensaiar a apresentação; rodar `scripts/empacotar-entrega.ps1` perto de 19/11.
 
 **Armadilhas novas:** (a) no workflow do APK, o `gradle.properties` gerado pelo prebuild não termina com quebra de linha: uma linha acrescentada com `>>` gruda na última e estraga `expo.inlineModules.watchedDirectories` (erro "node finished with non-zero exit value 1"); o passo agora acrescenta uma linha em branco antes; (b) o build de release do Android no Windows estoura o limite de caminho; use o CI (Linux) para o APK; (c) `apps/mobile/.expo/types/router.d.ts` é gerado e fica velho: se o `tsc` reclamar de uma rota nova, apague o arquivo (o CI não o tem); (d) o Bash da ferramenta recusa blocos com muitas aspas aninhadas: grave scripts em arquivo; (e) o Figma MCP do plano gratuito acaba rápido: junte várias telas por chamada; (f) a pré-release `apk-latest` é recriada a cada build (o endereço do arquivo não muda).

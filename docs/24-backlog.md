@@ -426,7 +426,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).
 - Componentes e telas atualizados.
 - Evidência: docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md
-- Atenção: Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. Falta a autora conferir e apagar as telas e componentes "v1 ·"; as telas ainda não usam as instâncias dos componentes.
+- Atenção: Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. As telas e componentes "v1 ·" já foram apagados pela autora; as telas ainda não usam as instâncias dos componentes.
 
 **B45** (PE1; requisitos: RNF04, RNF09)
 

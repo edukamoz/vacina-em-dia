@@ -199,7 +199,7 @@ ITENS = [
          AN, 6, 'PR #75'),
     item('B44', None, 'Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app',
          'E9', C, 'autora', 'RNF04', ['Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).', 'Componentes e telas atualizados.'],
-         AN, 6, 'docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md', 'Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. Falta a autora conferir e apagar as telas e componentes "v1 ·"; as telas ainda não usam as instâncias dos componentes.'),
+         AN, 6, 'docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md', 'Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. As telas e componentes "v1 ·" já foram apagados pela autora; as telas ainda não usam as instâncias dos componentes.'),
     item('B45', None, 'Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada',
          'E9', C, 'PE1', 'RNF04, RNF09', ['Barra lateral compacta e grade de duas colunas validadas.', 'Sem texto cortado em 200%.'],
          AN, 6, '', 'Conferido em 820 px (barra lateral compacta, sem rolagem horizontal); falta olhar em tablet real.'),

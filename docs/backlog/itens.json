@@ -868,7 +868,7 @@
    "estado": "Em análise",
    "sprint": 6,
    "evidencia": "docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md",
-   "nota": "Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. Falta a autora conferir e apagar as telas e componentes \"v1 ·\"; as telas ainda não usam as instâncias dos componentes.",
+   "nota": "Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. As telas e componentes \"v1 ·\" já foram apagados pela autora; as telas ainda não usam as instâncias dos componentes.",
    "curto": "Atualizar o Figma para a versão 2"
   },
   {
