@@ -36,7 +36,7 @@ export interface LimitReachedError {
 export interface RateLimitedError {
   readonly code: 'RATE_LIMITED';
   /** O que foi limitado; muda só a mensagem. Sem valor, é o assistente. */
-  readonly scope?: 'assistant' | 'login' | 'register' | 'reset' | 'units';
+  readonly scope?: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo';
   /** Segundos até a próxima janela livre. */
   readonly retryAfterSeconds: number;
 }
@@ -91,6 +91,21 @@ export interface AuthUnavailableError {
   readonly code: 'AUTH_UNAVAILABLE';
 }
 
+/** A imagem enviada não é um JPEG, PNG ou WebP válido. */
+export interface InvalidImageError {
+  readonly code: 'INVALID_IMAGE';
+}
+
+/** A imagem é maior que o limite aceito. */
+export interface ImageTooLargeError {
+  readonly code: 'IMAGE_TOO_LARGE';
+}
+
+/** O armazenamento de arquivos não respondeu ou não está configurado. */
+export interface StorageUnavailableError {
+  readonly code: 'STORAGE_UNAVAILABLE';
+}
+
 /** Erros de domínio dos casos de uso, mapeados para HTTP em um único ponto. */
 export type ServiceError =
   | NotFoundError
@@ -110,6 +125,9 @@ export type ServiceError =
   | InvalidTokenError
   | InvalidResetTokenError
   | AuthUnavailableError
+  | InvalidImageError
+  | ImageTooLargeError
+  | StorageUnavailableError
   | TransitionError;
 
 /** Resultado de um caso de uso: o valor ou um erro de domínio, nunca uma exceção. */

@@ -16,6 +16,16 @@ import { SessionProvider, useSession } from '../src/session/session-provider';
 import { ThemeProvider, useThemeColors } from '../src/theme/theme-provider';
 
 /**
+ * Telas abertas como janela por cima da anterior (`JanelaModal`): a de trás continua visível sob o
+ * véu. A animação de entrada é da própria janela, então a do navegador fica desligada.
+ */
+const JANELA = {
+  presentation: 'transparentModal',
+  animation: 'none',
+  contentStyle: { backgroundColor: 'transparent' },
+} as const;
+
+/**
  * Rotas conforme o login: sem sessão, só a apresentação, "Entrar", "Criar conta" e os textos legais (Termos e Privacidade, abertos também a quem entrou); com sessão, o
  * app (abas, consentimento, membros e doses). O `Stack.Protected` tira do mapa as rotas que a
  * situação atual não permite, então uma URL de dentro do app nunca abre para quem não entrou.
@@ -42,10 +52,12 @@ function Rotas() {
         <Stack.Protected guard={entrou}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="consentimento" />
-          <Stack.Screen name="dose/nova" />
-          <Stack.Screen name="dose/[id]" />
-          <Stack.Screen name="membro/[id]" />
-          <Stack.Screen name="membro/novo" />
+          <Stack.Screen name="dose/nova" options={JANELA} />
+          <Stack.Screen name="dose/[id]" options={JANELA} />
+          <Stack.Screen name="dose/foto" options={JANELA} />
+          <Stack.Screen name="membro/[id]" options={JANELA} />
+          <Stack.Screen name="membro/novo" options={JANELA} />
+          <Stack.Screen name="apoiar" options={JANELA} />
         </Stack.Protected>
         <Stack.Protected guard={!entrou}>
           <Stack.Screen name="apresentacao" />

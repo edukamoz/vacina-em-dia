@@ -101,9 +101,10 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
     {
       titulo: 'Quais dados guardamos',
       paragrafos: [
-        'Da sua conta: e-mail, senha (guardada de forma embaralhada, sem como ler a senha original), a data e a versão do consentimento que você deu e a sua escolha de receber ou não lembretes por e-mail.',
+        'Da sua conta: e-mail, senha (guardada de forma embaralhada, sem como ler a senha original), a data e a versão do consentimento que você deu e a sua escolha de receber ou não lembretes por e-mail e, se você escolher uma, a foto de perfil (reduzida no seu aparelho e guardada em local privado; você pode apagá-la quando quiser, e ela some com a conta).',
         'De cada pessoa que você cadastra: nome ou apelido, data de nascimento, se está gestante e, se você quiser, o parentesco com você.',
         'Das doses: a vacina, a dose, as datas e a situação (pendente, agendada, atrasada, aplicada ou cancelada). Nas vacinas adicionadas por você, guardamos também o nome da vacina e a dose que você digitou.',
+        'Foto de caderneta ou comprovante: se você usar "Ler caderneta por foto" (só no aplicativo do celular), o texto da foto é lido no próprio aparelho. A foto não é enviada nem guardada por nós, e só as doses que você conferir e confirmar são salvas.',
         'Dados técnicos: o aplicativo registra eventos de funcionamento e erros para manter o serviço estável. Esses registros usam identificadores que não revelam quem você é e não trazem nome, e-mail, data de nascimento nem texto de mensagens.',
       ],
     },

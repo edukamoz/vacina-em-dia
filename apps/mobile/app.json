@@ -40,16 +40,26 @@
           "backgroundColor": "#0B6B52"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Vacina em Dia usa a sua galeria só para você escolher a foto de perfil ou uma foto da caderneta de vacinação. A foto da caderneta é lida no aparelho e não é enviada.",
+          "cameraPermission": "O Vacina em Dia usa a câmera só para você tirar a foto de perfil ou fotografar a caderneta de vacinação. A foto da caderneta é lida no aparelho e não é enviada.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "icon": "./assets/images/icon.png",
     "ios": {
+      "bundleIdentifier": "br.edu.fatec.vacinaemdia",
       "icon": "./assets/images/icon.png"
     },
     "android": {
+      "package": "br.edu.fatec.vacinaemdia",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon-foreground.png",
         "backgroundColor": "#0B6B52",

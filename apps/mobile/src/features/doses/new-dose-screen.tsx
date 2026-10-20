@@ -41,7 +41,7 @@ function CustomDoseForm({ memberId, memberName }: { memberId: string; memberName
     <Tela
       titulo="Adicionar dose"
       subtitulo={`Para ${memberName}. Use para uma vacina que não aparece no calendário oficial.`}
-      voltar
+      modal
     >
       <CampoTexto
         rotulo="Nome da vacina"
@@ -98,14 +98,14 @@ export function NewDoseScreen() {
 
   if (members.isPending) {
     return (
-      <Tela titulo="Adicionar dose" voltar>
+      <Tela titulo="Adicionar dose" modal>
         <EstadoCarregando rotulo="Carregando a família" />
       </Tela>
     );
   }
   if (members.error) {
     return (
-      <Tela titulo="Adicionar dose" voltar>
+      <Tela titulo="Adicionar dose" modal>
         <EstadoErro
           mensagem={members.error.message}
           onTentarDeNovo={() => void members.refetch()}
@@ -115,7 +115,7 @@ export function NewDoseScreen() {
   }
   if (!selected) {
     return (
-      <Tela titulo="Adicionar dose" voltar>
+      <Tela titulo="Adicionar dose" modal>
         <EstadoVazio
           titulo="Nenhuma pessoa cadastrada"
           descricao="Adicione alguém da família antes de cadastrar uma dose."

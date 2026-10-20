@@ -1,0 +1,175 @@
+name: APK do Android
+
+# Gera o APK do aplicativo e o publica nas Releases do GitHub.
+#
+# - Push na `main` que mude o app (ou o pacote compartilhado): atualiza a pré-release "apk-latest",
+#   sempre com o APK mais recente. Dura só uma pré-release; não enche a lista de versões.
+# - Tag `v*` (por exemplo `v0.2.0`): cria uma release fixa dessa versão, com o APK.
+# - Execução manual (Actions > APK do Android > Run workflow): gera e publica como no push.
+# - Pull request que mude este arquivo ou o package.json do app: só compila e confere o APK (não publica).
+#
+# O app aponta para a API publicada (`EXPO_PUBLIC_API_URL`, embutida no pacote JavaScript na hora do
+# build): sem isso o APK usaria o endereço de desenvolvimento (localhost) e não funcionaria no
+# celular. O passo "Conferir o endereço da API" falha o build se o endereço certo não estiver no APK.
+#
+# Assinatura: o APK usa a chave de depuração do projeto Expo, que basta para instalar direto no
+# celular ("fontes desconhecidas"). Para a Play Store seria preciso uma chave própria (não é o caso).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/shared/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/apk.yml'
+    tags: ['v*']
+  # Mudou o próprio workflow ou as dependências do app (onde um módulo nativo pode quebrar o build)?
+  # O PR já compila e confere o APK, mas não publica nada.
+  pull_request:
+    paths:
+      - '.github/workflows/apk.yml'
+      - 'apps/mobile/package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Mesma API do deploy (`deploy.yml`). Mudou o endereço lá? Mude aqui também.
+  API_URL: https://func-vacinaemdia-vedia6398.azurewebsites.net/api
+
+jobs:
+  apk:
+    name: Gerar e publicar o APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar o Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Guardar o cache do Gradle
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('package-lock.json', 'apps/mobile/app.json') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Instalar as dependências
+        run: npm ci
+
+      - name: Conferir que a API publicada responde
+        run: curl -fsS --retry 5 --retry-delay 10 --retry-all-errors "$API_URL/health"
+
+      - name: Gerar o projeto Android (prebuild)
+        working-directory: apps/mobile
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Dar mais memória ao Gradle
+        working-directory: apps/mobile
+        run: |
+          # O padrão estourava o Metaspace da JVM ao empacotar o APK (build da main de 20/10/2026).
+          # O arquivo do prebuild não termina com quebra de linha: sem esta, a linha nova gruda na última.
+          echo "" >> android/gradle.properties
+          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" >> android/gradle.properties
+          echo "org.gradle.daemon=false" >> android/gradle.properties
+
+      - name: Definir o número da versão (versionCode)
+        working-directory: apps/mobile
+        run: |
+          # O Android só instala por cima de uma versão com número maior: usa o número da execução.
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+
+      - name: Compilar o APK (release)
+        working-directory: apps/mobile/android
+        env:
+          EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
+          # Pix de doação (variáveis do repositório). Chave aleatória, mostrada no QR: não é segredo.
+          EXPO_PUBLIC_PIX_KEY: ${{ vars.PIX_KEY }}
+          EXPO_PUBLIC_PIX_NAME: ${{ vars.PIX_NAME }}
+          EXPO_PUBLIC_PIX_CITY: ${{ vars.PIX_CITY }}
+          NODE_ENV: production
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,x86_64
+
+      - name: Conferir o endereço da API dentro do APK
+        run: |
+          apk=$(ls apps/mobile/android/app/build/outputs/apk/release/*.apk | head -n 1)
+          echo "APK: $apk"
+          mkdir -p /tmp/apk && unzip -o -q "$apk" 'assets/index.android.bundle' -d /tmp/apk
+          if ! grep -q "$API_URL" /tmp/apk/assets/index.android.bundle; then
+            echo "::error::O APK não contém o endereço da API ($API_URL). O app não conseguiria falar com o servidor."
+            exit 1
+          fi
+          echo "O APK aponta para $API_URL"
+
+      - name: Nomear o APK e calcular o hash
+        id: arquivo
+        working-directory: apps/mobile
+        run: |
+          versao=$(node -p "require('./app.json').expo.version")
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            nome="vacina-em-dia-${{ github.ref_name }}.apk"
+          else
+            nome="vacina-em-dia.apk"
+          fi
+          cp android/app/build/outputs/apk/release/*.apk "$nome"
+          sha256sum "$nome" | tee "$nome.sha256"
+          echo "nome=$nome" >> "$GITHUB_OUTPUT"
+          echo "versao=$versao" >> "$GITHUB_OUTPUT"
+
+      - name: Guardar o APK como artefato da execução
+        uses: actions/upload-artifact@v7
+        with:
+          name: apk
+          path: |
+            apps/mobile/${{ steps.arquivo.outputs.nome }}
+            apps/mobile/${{ steps.arquivo.outputs.nome }}.sha256
+          retention-days: 14
+
+      - name: Publicar na release de uma tag
+        if: github.ref_type == 'tag' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: apps/mobile
+        run: |
+          notas="APK do Vacina em Dia ${{ steps.arquivo.outputs.versao }} para Android. Aponta para $API_URL. Para instalar, baixe o arquivo no celular e permita a instalação de fontes desconhecidas."
+          if gh release view "${{ github.ref_name }}" >/dev/null 2>&1; then
+            gh release upload "${{ github.ref_name }}" "${{ steps.arquivo.outputs.nome }}" "${{ steps.arquivo.outputs.nome }}.sha256" --clobber
+          else
+            gh release create "${{ github.ref_name }}" "${{ steps.arquivo.outputs.nome }}" "${{ steps.arquivo.outputs.nome }}.sha256" \
+              --title "Vacina em Dia ${{ github.ref_name }}" --notes "$notas" --verify-tag
+          fi
+
+      - name: Atualizar a pré-release "apk-latest"
+        if: github.ref_type != 'tag' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: apps/mobile
+        run: |
+          # Recria a pré-release para o tag acompanhar o commit atual; o endereço de download não muda.
+          gh release delete apk-latest --cleanup-tag --yes 2>/dev/null || true
+          sha=$(sha256sum "${{ steps.arquivo.outputs.nome }}" | cut -d' ' -f1)
+          gh release create apk-latest "${{ steps.arquivo.outputs.nome }}" "${{ steps.arquivo.outputs.nome }}.sha256" \
+            --prerelease --target "${{ github.sha }}" \
+            --title "APK mais recente (build ${{ github.run_number }})" \
+            --notes "APK de teste do Vacina em Dia ${{ steps.arquivo.outputs.versao }} para Android, gerado do commit ${GITHUB_SHA::7} (build ${{ github.run_number }}). Aponta para $API_URL. SHA-256: $sha. Para instalar, baixe o arquivo no celular e permita a instalação de fontes desconhecidas."

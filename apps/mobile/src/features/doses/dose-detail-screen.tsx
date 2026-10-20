@@ -1,11 +1,9 @@
 import type { CivilDate, DoseEventInput, DoseResponse } from '@vacina/shared';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro } from '../../components/estados';
-import { LinkTexto } from '../../components/link-texto';
 import { SeletorDeData } from '../../components/seletor-de-data';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
@@ -156,20 +154,19 @@ function Linha({ rotulo, valor }: { rotulo: string; valor: string }) {
  * @param props.id - Identificador da dose.
  */
 export function DoseDetailScreen({ id }: { id: string }) {
-  const router = useRouter();
   const { data: dose, error, isPending, refetch } = useDose(id);
   const members = useMembers();
 
   if (isPending) {
     return (
-      <Tela titulo="Dose" voltar>
+      <Tela titulo="Dose" modal>
         <EstadoCarregando rotulo="Carregando a dose" />
       </Tela>
     );
   }
   if (error || !dose) {
     return (
-      <Tela titulo="Dose" voltar>
+      <Tela titulo="Dose" modal>
         <EstadoErro
           mensagem={error?.message ?? 'Não encontramos esta dose.'}
           onTentarDeNovo={() => void refetch()}
@@ -182,11 +179,7 @@ export function DoseDetailScreen({ id }: { id: string }) {
   const linhaDeData = doseDateRow(dose);
 
   return (
-    <Tela titulo={`${dose.vaccine}, ${dose.doseLabel}`}>
-      <LinkTexto
-        titulo="Voltar para Doses"
-        onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-      />
+    <Tela titulo={`${dose.vaccine}, ${dose.doseLabel}`} modal>
       <View className="flex-row flex-wrap gap-sm">
         <SeloEstadoDose status={dose.status} />
         <SeloOrigem origem={dose.origin} />

@@ -12,3 +12,4 @@ expo-env.d.ts
 __pycache__
 .pytest_cache
 apps/api/src/data/ubs.json
+scripts/documentos/apresentacao/

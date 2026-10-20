@@ -16,6 +16,7 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "9.1.0",
     "@azure/functions": "4.16.5",
+    "@azure/storage-blob": "12.34.0",
     "@vacina/shared": "0.1.0",
     "mssql": "12.7.4",
     "pdfkit": "0.20.2",

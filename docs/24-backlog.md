@@ -393,6 +393,12 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B46 | novo | Como usuária, quero animações extras (inclinação 3D, pessoas em camadas na apresentação, painel e folha animados), para uma experiência mais viva | Could | Em andamento | Sprint 1 |
 | B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em análise | Sprint 6 |
 | B51 | novo | Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca | Could | Em análise | Sprint 1 |
+| B52 | novo | Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava | Should | Em análise | Sprint 3 |
+| B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | Em análise | Sprint 3 |
+| B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | Em análise | Sprint 3 |
+| B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | Em análise | Sprint 3 |
+| B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
+| B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Em análise | Sprint 3 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -449,6 +455,54 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Sem service worker: o uso offline segue fora do escopo.
 - Evidência: PR #145; docs/25-app-instalavel.md
 - Atenção: Falta instalar em celular físico e no iOS (ver B40).
+
+**B52** (PE1, PE2, PE3; requisitos: RNF04, RNF09)
+
+- Adicionar pessoa, editar pessoa, adicionar dose e detalhe da dose abrem em janela (folha no celular, cartão centralizado na web).
+- Fecha pelo botão, tocando no véu e com Esc na web; sem histórico, volta ao início.
+- Papel de diálogo e nome igual ao título; a entrada para com "Reduzir movimento".
+- Evidência: apps/mobile/src/components/janela-modal.tsx; CT-APP-MOD*
+
+**B53** (PE1; requisitos: RNF03)
+
+- Tela "Apoiar o projeto" com valor sugerido, QR e Pix copia e cola gerados no aparelho (BR Code).
+- Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.
+- Aviso claro de que a doação é voluntária e não dá acesso a nada.
+- Evidência: ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate
+- Atenção: Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).
+
+**B54** (PE1, PE3; requisitos: RNF03)
+
+- Escolher ou tirar a foto, reduzida no aparelho antes de enviar.
+- Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.
+- Excluir a conta apaga a foto; o termo de privacidade cita a foto.
+- Evidência: ADR-020; CT-FOTO-*, CT-APP-FOTO*; GET, PUT e DELETE /account/photo
+- Atenção: Falta testar a câmera e a galeria em celular físico e o Blob Storage real (hoje só o Azurite e o teste com mock).
+
+**B55** (PE1, PE3; requisitos: RF04; RNF03)
+
+- Só no app (Android e iOS); na web o recurso não aparece.
+- O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.
+- As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.
+- Evidência: ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen
+- Atenção: Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.
+
+**B56** (PE1, PE2, PE3; requisitos: RNF04, RNF09)
+
+- Site no computador: página completa com o mosaico de peças, cada uma com uma animação própria ao passar o mouse.
+- Site no celular: página compacta, com o mosaico em 2 colunas, carrossel de personas, cartão de como instalar e botão Criar conta fixo.
+- App instalado (Android, iOS ou site instalado): abertura enxuta com "Criar conta" e "Já tenho conta".
+- Os cartões da aba Conta têm a mesma altura em cada linha.
+- O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia).
+- Evidência: apps/mobile/src/lib/ambiente.ts; CT-APP-AMB01, CT-APP-L01 a L05; README (rodar no Android)
+
+**B57** (PE1, PE2, PE3; requisitos: RNF08, RNF09)
+
+- Push na main atualiza a pré-release apk-latest; uma tag v* cria uma release fixa.
+- O APK é compilado apontando para a API publicada e o workflow falha se o endereço não estiver dentro do pacote.
+- O arquivo vem com o hash SHA-256 e a página explica como instalar.
+- Evidência: .github/workflows/apk.yml; docs/26-apk-no-github-releases.md
+- Atenção: Assinado com a chave de depuração: instala direto, mas não serve para a Play Store.
 
 ## Não migrados do Jira
 

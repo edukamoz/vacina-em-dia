@@ -16,6 +16,7 @@
     "prepare": "husky",
     "build": "npm run build --workspaces --if-present",
     "dev:mobile": "npm run start --workspace apps/mobile",
+    "dev:android": "npm run android --workspace apps/mobile",
     "dev:api": "npm run start --workspace apps/api",
     "dev:api:rede": "npm run start:rede --workspace apps/api",
     "lint": "eslint .",

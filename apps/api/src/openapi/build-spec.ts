@@ -22,6 +22,7 @@ import {
   memberListResponseSchema,
   nearbyUnitsQuerySchema,
   nearbyUnitsResponseSchema,
+  profilePhotoSchema,
   memberResponseSchema,
   refreshInputSchema,
   registerInputSchema,
@@ -427,6 +428,74 @@ export function buildOpenApiDocument(): object {
       204: { description: 'Dados excluídos.' },
       401: unauthorized,
       500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/account/photo',
+    tags: ['Conta e privacidade'],
+    summary: 'Consultar a foto de perfil',
+    description:
+      'Devolve a foto de perfil da conta (JPEG, PNG ou WebP em base64). A foto fica num contêiner privado do Azure Blob Storage e só o dono a lê; a resposta nunca vai para o cache.',
+    security: secured,
+    responses: {
+      200: { description: 'A foto de perfil.', content: jsonContent(profilePhotoSchema) },
+      401: unauthorized,
+      404: errorResponse('`NOT_FOUND`: a conta ainda não tem foto.'),
+      500: internalError,
+      503: errorResponse('`STORAGE_UNAVAILABLE`: o armazenamento não respondeu.'),
+    },
+  });
+
+  registry.registerPath({
+    method: 'put',
+    path: '/account/photo',
+    tags: ['Conta e privacidade'],
+    summary: 'Guardar ou trocar a foto de perfil',
+    description:
+      'Guarda a foto de perfil, substituindo a anterior. Aceita JPEG, PNG ou WebP de até 256 KiB (o app reduz a imagem antes de enviar); a API confere se o conteúdo é mesmo do formato informado. A foto é dado pessoal: some junto com a conta. Limite: 10 trocas por hora.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: profilePhotoSchema,
+            examples: {
+              jpeg: {
+                summary: 'Foto JPEG (resumida)',
+                value: { contentType: 'image/jpeg', data: '/9j/4AAQSkZJRgABAQ...' },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      204: { description: 'Foto guardada.' },
+      400: validationError,
+      401: unauthorized,
+      413: errorResponse('`IMAGE_TOO_LARGE`: a imagem passa de 256 KiB.'),
+      415: errorResponse('`INVALID_IMAGE`: o conteúdo não é um JPEG, PNG ou WebP válido.'),
+      429: errorResponse('`RATE_LIMITED`: muitas trocas de foto; veja o cabeçalho `Retry-After`.'),
+      500: internalError,
+      503: errorResponse('`STORAGE_UNAVAILABLE`: o armazenamento não respondeu.'),
+    },
+  });
+
+  registry.registerPath({
+    method: 'delete',
+    path: '/account/photo',
+    tags: ['Conta e privacidade'],
+    summary: 'Remover a foto de perfil',
+    description: 'Apaga a foto de perfil. Não falha se a conta não tiver foto.',
+    security: secured,
+    responses: {
+      204: { description: 'Foto removida (ou nunca existiu).' },
+      401: unauthorized,
+      500: internalError,
+      503: errorResponse('`STORAGE_UNAVAILABLE`: o armazenamento não respondeu.'),
     },
   });
 

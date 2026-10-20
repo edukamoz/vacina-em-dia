@@ -20,6 +20,11 @@ RUN npm run build -w @vacina/shared
 # para a API, então o navegador não precisa de CORS. Valor público, nunca um segredo.
 ARG EXPO_PUBLIC_API_URL=/api
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
+# Pix de doação (opcional): sem os três valores, a seção "Apoie o projeto" não aparece.
+ARG EXPO_PUBLIC_PIX_KEY=
+ARG EXPO_PUBLIC_PIX_NAME=
+ARG EXPO_PUBLIC_PIX_CITY=
+ENV EXPO_PUBLIC_PIX_KEY=$EXPO_PUBLIC_PIX_KEY \n    EXPO_PUBLIC_PIX_NAME=$EXPO_PUBLIC_PIX_NAME \n    EXPO_PUBLIC_PIX_CITY=$EXPO_PUBLIC_PIX_CITY
 RUN npm run build -w @vacina/mobile
 
 FROM nginx:1.31.6-alpine
