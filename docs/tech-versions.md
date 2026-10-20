@@ -122,6 +122,7 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 | expo-file-system | ~57.0.7 | Grava o PDF da carteira na pasta temporária do celular (RF11; ADR-019) |
 | expo-sharing | ~57.0.22 | Folha de compartilhar do sistema para entregar o PDF (RF11; ADR-019) |
 | expo-image-picker | ~57.0.20 | Escolher ou tirar a foto de perfil (ADR-020) |
+| expo-text-extractor | 2.0.0 | Ler o texto da foto da caderneta no aparelho: ML Kit (Android) e Vision (iOS) (ADR-022) |
 | expo-clipboard | ~57.0.2 | Copiar o código Pix da doação (ADR-021) |
 | qrcode-generator | 2.0.4 | Desenhar o QR Code do Pix no aparelho (ADR-021) |
 | expo-image-manipulator | ~57.0.21 | Recortar e reduzir a foto de perfil no aparelho (ADR-020) |

@@ -20,6 +20,7 @@ Ao mudar um texto, mude `LEGAL_VERSION`.
 |---|---|
 | Não coleta CPF nem Cartão Nacional de Saúde | `CLAUDE.md` §10 |
 | Dados guardados (e-mail, hash da senha, consentimento; nome ou apelido, nascimento, gestante, parentesco; doses, inclusive avulsas; foto de perfil opcional, no Blob Storage) | ADR-014, ADR-016, ADR-020, migrações 003 e 004 |
+| A foto de caderneta ou comprovante é lida no aparelho e não é enviada nem guardada; só as doses confirmadas são salvas | ADR-022 |
 | Texto das perguntas ao assistente não é gravado | `docs/11-assistente-pln.md` |
 | Áudio só em memória, enviado ao Azure AI Speech | `docs/11-assistente-pln.md` |
 | Brevo recebe só e-mail e link | ADR-015 |

@@ -1052,10 +1052,10 @@
     "O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.",
     "As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa."
    ],
-   "estado": "A fazer",
-   "sprint": null,
-   "evidencia": "",
-   "nota": "Decidido em 19/10/2026: OCR no aparelho. Exige development build do Expo (não roda no Expo Go).",
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen",
+   "nota": "Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.",
    "curto": "Foto do documento com extração de dados"
   },
   {

@@ -54,6 +54,7 @@ function Rotas() {
           <Stack.Screen name="consentimento" />
           <Stack.Screen name="dose/nova" options={JANELA} />
           <Stack.Screen name="dose/[id]" options={JANELA} />
+          <Stack.Screen name="dose/foto" options={JANELA} />
           <Stack.Screen name="membro/[id]" options={JANELA} />
           <Stack.Screen name="membro/novo" options={JANELA} />
           <Stack.Screen name="apoiar" options={JANELA} />

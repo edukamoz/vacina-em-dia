@@ -10,6 +10,7 @@ import { Icone } from '../../components/icone';
 import { LinkTexto } from '../../components/link-texto';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
+import { podeLerDocumento } from '../../lib/ler-documento';
 import { todayCivil } from '../../lib/dates';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSelectedMember } from '../calendar/use-selected-member';
@@ -101,7 +102,16 @@ export function DosesScreen() {
       reservaBalao
       titulo={`Doses de ${primeiroNome}`}
       acao={
-        <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
+        <View className="flex-row flex-wrap gap-md">
+          <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
+          {podeLerDocumento ? (
+            <Botao
+              titulo="Ler caderneta por foto"
+              variante="secundario"
+              onPress={() => router.push('/dose/foto')}
+            />
+          ) : null}
+        </View>
       }
     >
       <CarrosselDePessoas pessoas={items} selecionadaId={selected.id} aoEscolher={selectMember} />

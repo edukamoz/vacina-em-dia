@@ -1,5 +1,6 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
+  CivilDate,
   ConsentInput,
   CustomDoseInput,
   DoseEventInput,
@@ -88,6 +89,48 @@ export function useDeleteMember() {
   return useMutation({
     mutationFn: (id: string) => endpoints.deleteMember(api, id),
     onSuccess: () => client.invalidateQueries({ queryKey: ['members'] }),
+  });
+}
+
+/** Uma dose a marcar como aplicada, com a data confirmada pela pessoa. */
+export interface AplicacaoEmLote {
+  readonly id: string;
+  readonly data: CivilDate;
+}
+
+/** Resultado de registrar várias aplicações: quantas deram certo e quais doses falharam. */
+export interface ResultadoDoLote {
+  readonly aplicadas: number;
+  readonly falhas: readonly string[];
+}
+
+/**
+ * Marca várias doses como aplicadas, uma de cada vez (cada uma passa pelas mesmas regras do ciclo
+ * de vida). Uma falha não impede as outras: o resultado diz quantas deram certo e quais não. No
+ * fim, atualiza as telas que mostram doses e lembretes.
+ */
+export function useAplicarDoses() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async (itens: readonly AplicacaoEmLote[]): Promise<ResultadoDoLote> => {
+      let aplicadas = 0;
+      const falhas: string[] = [];
+      for (const item of itens) {
+        try {
+          await endpoints.sendDoseEvent(api, item.id, { type: 'APPLY', date: item.data });
+          aplicadas += 1;
+        } catch {
+          falhas.push(item.id);
+        }
+      }
+      return { aplicadas, falhas };
+    },
+    onSettled: async () => {
+      await client.invalidateQueries({ queryKey: ['member-doses'] });
+      await client.invalidateQueries({ queryKey: ['dose'] });
+      await client.invalidateQueries({ queryKey: ['reminders'] });
+    },
   });
 }
 
