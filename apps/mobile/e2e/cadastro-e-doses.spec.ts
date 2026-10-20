@@ -69,3 +69,39 @@ test.describe('Cadastro até a primeira dose (RF01, RF02, RF03, RF04, RF09)', ()
     expect(api.doses.find((d) => d.ruleId === 'bcg')?.status).toBe('APPLIED');
   });
 });
+
+test.describe('Foto de perfil', () => {
+  test('CT-E2E-05: escolhe uma foto na aba Conta, ela é enviada reduzida e pode ser removida', async ({
+    page,
+    api,
+  }) => {
+    api.consentimentoAceito = true;
+    await page.goto('/entrar');
+    await page.getByLabel('E-mail').fill('mariana@exemplo.com.br');
+    await page.getByLabel('Senha', { exact: true }).fill(SENHA);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await expect(page.getByText('Nenhuma pessoa cadastrada')).toBeVisible();
+
+    await page.goto('/conta');
+    await expect(page.getByRole('heading', { name: 'Seus dados' })).toBeVisible();
+    // Na web só existe a galeria (o seletor de arquivos); a câmera não aparece.
+    await expect(page.getByRole('button', { name: 'Tirar foto' })).toHaveCount(0);
+
+    // PNG de 1 x 1 pixel.
+    const png = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    const seletor = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Escolher foto' }).click();
+    await (await seletor).setFiles({ name: 'foto.png', mimeType: 'image/png', buffer: png });
+
+    await expect(page.getByRole('button', { name: 'Trocar foto' })).toBeVisible();
+    expect(api.foto?.contentType).toBe('image/jpeg');
+    expect(api.chamadas).toContain('PUT /account/photo');
+
+    await page.getByRole('button', { name: 'Remover foto' }).click();
+    await expect(page.getByRole('button', { name: 'Escolher foto' })).toBeVisible();
+    expect(api.foto).toBeNull();
+  });
+});

@@ -1033,10 +1033,10 @@
     "Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.",
     "Excluir a conta apaga a foto; o termo de privacidade cita a foto."
    ],
-   "estado": "A fazer",
-   "sprint": null,
-   "evidencia": "",
-   "nota": "Decidido em 19/10/2026: Azure Blob Storage na conta de armazenamento já existente.",
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "ADR-020; CT-FOTO-*, CT-APP-FOTO*; GET, PUT e DELETE /account/photo",
+   "nota": "Falta testar a câmera e a galeria em celular físico e o Blob Storage real (hoje só o Azurite e o teste com mock).",
    "curto": "Foto de perfil (armazenamento de arquivos)"
   },
   {

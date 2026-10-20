@@ -118,6 +118,9 @@ export const apiErrorSchema = z
       'SPEECH_NOT_RECOGNIZED',
       'UNSUPPORTED_AUDIO',
       'AUDIO_TOO_LARGE',
+      'INVALID_IMAGE',
+      'IMAGE_TOO_LARGE',
+      'STORAGE_UNAVAILABLE',
       'INTERNAL_ERROR',
     ]),
     message: z

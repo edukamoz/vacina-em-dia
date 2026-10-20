@@ -395,7 +395,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B51 | novo | Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca | Could | Em análise | Sprint 1 |
 | B52 | novo | Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava | Should | Em análise | Sprint 3 |
 | B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | A fazer | - |
-| B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | A fazer | - |
+| B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | Em análise | Sprint 3 |
 | B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | A fazer | - |
 | B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
 
@@ -474,7 +474,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Escolher ou tirar a foto, reduzida no aparelho antes de enviar.
 - Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.
 - Excluir a conta apaga a foto; o termo de privacidade cita a foto.
-- Atenção: Decidido em 19/10/2026: Azure Blob Storage na conta de armazenamento já existente.
+- Evidência: ADR-020; CT-FOTO-*, CT-APP-FOTO*; GET, PUT e DELETE /account/photo
+- Atenção: Falta testar a câmera e a galeria em celular físico e o Blob Storage real (hoje só o Azurite e o teste com mock).
 
 **B55** (PE1, PE3; requisitos: RF04; RNF03)
 

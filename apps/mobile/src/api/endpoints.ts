@@ -14,6 +14,8 @@ import {
   memberListResponseSchema,
   memberResponseSchema,
   nearbyUnitsResponseSchema,
+  profilePhotoSchema,
+  type ProfilePhoto,
   type NearbyUnitsQuery,
   type AssistantMessageInput,
   type ConsentInput,
@@ -123,6 +125,19 @@ export const endpoints = {
 
   deleteAccount: (ctx: ApiContext) =>
     apiRequestNoContent(ctx, { path: '/account', method: 'DELETE' }),
+
+  getProfilePhoto: (ctx: ApiContext, signal?: AbortSignal) =>
+    apiRequest(ctx, { path: '/account/photo', ...(signal ? { signal } : {}) }, profilePhotoSchema),
+
+  putProfilePhoto: (ctx: ApiContext, photo: ProfilePhoto) =>
+    apiRequestNoContent(ctx, {
+      path: '/account/photo',
+      method: 'PUT',
+      body: profilePhotoSchema.parse(photo),
+    }),
+
+  deleteProfilePhoto: (ctx: ApiContext) =>
+    apiRequestNoContent(ctx, { path: '/account/photo', method: 'DELETE' }),
 
   listMembers: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(ctx, { path: '/members', ...(signal ? { signal } : {}) }, memberListResponseSchema),

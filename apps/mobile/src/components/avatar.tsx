@@ -1,4 +1,6 @@
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
+import type { ProfilePhoto } from '@vacina/shared';
+import { enderecoDaFoto } from '../lib/escolher-foto';
 import { useThemeColors } from '../theme/theme-provider';
 import { Texto } from './texto';
 
@@ -12,15 +14,18 @@ const CORES = ['avatarA', 'avatarB', 'avatarC', 'avatarD'] as const;
  * @param props.nome - Nome ou apelido; a inicial é a primeira letra, em maiúscula.
  * @param props.indice - Posição na lista, para escolher a cor.
  * @param props.tamanho - Lado em pixels; 56 por padrão.
+ * @param props.foto - Foto de perfil: quando informada, aparece no lugar da inicial.
  */
 export function Avatar({
   nome,
   indice,
   tamanho = 56,
+  foto = null,
 }: {
   nome: string;
   indice: number;
   tamanho?: number;
+  foto?: ProfilePhoto | null;
 }) {
   const cores = useThemeColors();
   const cor = CORES[((indice % CORES.length) + CORES.length) % CORES.length] ?? 'avatarA';
@@ -29,12 +34,21 @@ export function Avatar({
       accessible={false}
       importantForAccessibility="no-hide-descendants"
       aria-hidden
-      className="items-center justify-center rounded-selo border-padrao border-transparent"
+      className="items-center justify-center overflow-hidden rounded-selo border-padrao border-transparent"
       style={{ width: tamanho, height: tamanho, backgroundColor: cores[cor] }}
     >
-      <Texto variante={tamanho >= 56 ? 'titulo3' : 'rotulo'} className="text-sobreAvatar">
-        {nome.trim().charAt(0).toLocaleUpperCase('pt-BR')}
-      </Texto>
+      {foto ? (
+        <Image
+          source={{ uri: enderecoDaFoto(foto) }}
+          accessibilityIgnoresInvertColors
+          resizeMode="cover"
+          style={{ width: tamanho, height: tamanho }}
+        />
+      ) : (
+        <Texto variante={tamanho >= 56 ? 'titulo3' : 'rotulo'} className="text-sobreAvatar">
+          {nome.trim().charAt(0).toLocaleUpperCase('pt-BR')}
+        </Texto>
+      )}
     </View>
   );
 }

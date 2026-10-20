@@ -1,5 +1,12 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { ConsentInput, CustomDoseInput, DoseEventInput, MemberInput } from '@vacina/shared';
+import type {
+  ConsentInput,
+  CustomDoseInput,
+  DoseEventInput,
+  MemberInput,
+  ProfilePhoto,
+} from '@vacina/shared';
+import { ApiRequestError } from '../../api/client';
 import { endpoints } from '../../api/endpoints';
 import { useSession } from '../../session/session-provider';
 
@@ -160,5 +167,43 @@ export function useDeleteAccount() {
       selectMember(null);
       client.clear();
     },
+  });
+}
+
+/** Foto de perfil da conta: a foto, ou `null` quando a conta ainda não tem uma. */
+export function useProfilePhoto() {
+  const { api } = useSession();
+  return useQuery({
+    queryKey: ['profile-photo'],
+    queryFn: async ({ signal }): Promise<ProfilePhoto | null> => {
+      try {
+        return await endpoints.getProfilePhoto(api, signal);
+      } catch (error) {
+        if (error instanceof ApiRequestError && error.status === 404) return null;
+        throw error;
+      }
+    },
+    // A foto é dado pessoal e pesa mais que o resto: não fica guardada além da sessão.
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/** Guarda (ou troca) a foto de perfil e já a mostra, sem nova busca. */
+export function useSaveProfilePhoto() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (photo: ProfilePhoto) => endpoints.putProfilePhoto(api, photo),
+    onSuccess: (_resultado, photo) => client.setQueryData(['profile-photo'], photo),
+  });
+}
+
+/** Remove a foto de perfil. */
+export function useRemoveProfilePhoto() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => endpoints.deleteProfilePhoto(api),
+    onSuccess: () => client.setQueryData(['profile-photo'], null),
   });
 }

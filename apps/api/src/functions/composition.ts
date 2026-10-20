@@ -10,6 +10,7 @@ import { createHttpNlpClient, unavailableNlpClient } from '../clients/nlp-http-c
 import { createHttpSpeechClient, unavailableSpeechClient } from '../clients/speech-http-client';
 import { createAccountHandlers } from '../handlers/account';
 import { createAssistantHandlers } from '../handlers/assistant';
+import { createProfilePhotoHandlers } from '../handlers/profile-photo';
 import { createAuthHandlers, unavailableAuthHandlers } from '../handlers/auth';
 import { createConsentHandlers } from '../handlers/consent';
 import { createDoseHandlers } from '../handlers/doses';
@@ -23,6 +24,9 @@ import { withSecurityHeaders, type HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
 import { createInMemoryStore } from '../repositories/in-memory-store';
+import { createBlobFileStorage } from '../storage/blob-file-storage';
+import { createInMemoryFileStorage } from '../storage/file-storage';
+import { createProfilePhotoService } from '../services/profile-photo-service';
 import { createMssqlExecutor } from '../repositories/sql/mssql-executor';
 import { createSqlRepositories } from '../repositories/sql/sql-repositories';
 import { createAccountService } from '../services/account-service';
@@ -85,8 +89,24 @@ export const consentHandlers = createConsentHandlers(
 );
 const memoryAuth = sql ? undefined : createInMemoryAuthRepository();
 const authRepository = sql?.auth ?? (memoryAuth as ReturnType<typeof createInMemoryAuthRepository>);
+
+/**
+ * Foto de perfil: o arquivo vai para um contêiner privado do Azure Blob Storage, na mesma conta de
+ * armazenamento das Functions (`AzureWebJobsStorage`; em desenvolvimento, o Azurite). Sem essa
+ * variável, fica em memória (testes e desenvolvimento sem armazenamento).
+ */
+const storageConnection = process.env['AzureWebJobsStorage'];
+const fileStorage = storageConnection
+  ? createBlobFileStorage({ connectionString: storageConnection, container: 'fotos-de-perfil' })
+  : createInMemoryFileStorage();
+const profilePhotoService = createProfilePhotoService({
+  storage: fileStorage,
+  limiter: createFixedWindowLimiter(clock),
+  reportError: (kind) => console.error(`Falha no armazenamento de arquivos: ${kind}.`),
+});
+export const profilePhotoHandlers = createProfilePhotoHandlers(profilePhotoService);
 export const accountHandlers = createAccountHandlers(
-  createAccountService(store.accounts, authRepository),
+  createAccountService(store.accounts, authRepository, profilePhotoService),
 );
 
 /**

@@ -83,6 +83,21 @@ export function toErrorResult(error: ServiceError): HttpResult {
         code: 'AUTH_UNAVAILABLE',
         message: 'A entrada na conta não está disponível agora. Tente de novo em instantes.',
       });
+    case 'INVALID_IMAGE':
+      return json(415, {
+        code: 'INVALID_IMAGE',
+        message: 'Esta imagem não pôde ser usada. Escolha uma foto JPEG, PNG ou WebP.',
+      });
+    case 'IMAGE_TOO_LARGE':
+      return json(413, {
+        code: 'IMAGE_TOO_LARGE',
+        message: 'A imagem é grande demais. Escolha outra foto.',
+      });
+    case 'STORAGE_UNAVAILABLE':
+      return json(503, {
+        code: 'STORAGE_UNAVAILABLE',
+        message: 'Não foi possível guardar a foto agora. Tente de novo em instantes.',
+      });
     case 'ASSISTANT_UNAVAILABLE':
       return json(503, {
         code: 'ASSISTANT_UNAVAILABLE',
@@ -108,9 +123,11 @@ export function toErrorResult(error: ServiceError): HttpResult {
 }
 
 function rateLimitedMessage(
-  scope: 'assistant' | 'login' | 'register' | 'reset' | 'units' | undefined,
+  scope: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | undefined,
 ): string {
   switch (scope) {
+    case 'photo':
+      return 'Muitas trocas de foto em pouco tempo. Tente de novo mais tarde.';
     case 'reset':
       return 'Muitos pedidos de nova senha. Tente de novo mais tarde.';
     case 'login':
