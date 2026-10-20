@@ -89,7 +89,7 @@ export function DonateScreen() {
             <Botao
               key={v}
               titulo={`R$ ${v}`}
-              variante="secundario"
+              variante={!digitou && escolhido === v ? 'principal' : 'secundario'}
               selecionado={!digitou && escolhido === v}
               onPress={() => {
                 setOutro('');

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useVisual } from '../theme/theme-provider';
@@ -7,6 +7,7 @@ import { Children } from 'react';
 import { Entrada } from './animacao';
 import { Botao } from './botao';
 import { JanelaModal } from './janela-modal';
+import { RolagemDaTelaContext } from './rolagem-da-tela';
 import { Texto } from './texto';
 
 /**
@@ -45,6 +46,7 @@ export function Tela({
 }) {
   const router = useRouter();
   const { gradienteFundo } = useVisual();
+  const [travada, setTravada] = useState(false);
   if (modal) {
     return (
       <JanelaModal
@@ -58,37 +60,46 @@ export function Tela({
     );
   }
   return (
-    <SafeAreaView className="flex-1 bg-fundo" style={gradienteFundo}>
-      <ScrollView
-        contentContainerClassName={`gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem ${
-          reservaBalao ? 'pb-[96px]' : ''
-        }`}
-      >
-        {voltar ? (
-          <Botao
-            titulo="Voltar"
-            variante="secundario"
-            onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-          />
-        ) : null}
-        <Entrada>
-          <View className="gap-md expandido:flex-row expandido:items-start expandido:justify-between expandido:gap-xl">
-            <View className="expandido:flex-1">
-              <Texto variante="titulo1" accessibilityRole="header">
-                {titulo}
-              </Texto>
-              {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
-              {abaixoDoTitulo}
+    // Nas abas a barra de navegação já cuida da borda de baixo (e da barra do sistema); sem isto o
+    // conteúdo seria cortado antes de chegar ao menu.
+    <SafeAreaView
+      className="flex-1 bg-fundo"
+      style={gradienteFundo}
+      edges={reservaBalao ? ['top', 'left', 'right'] : ['top', 'bottom', 'left', 'right']}
+    >
+      <RolagemDaTelaContext.Provider value={setTravada}>
+        <ScrollView
+          scrollEnabled={!travada}
+          contentContainerClassName={`gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem ${
+            reservaBalao ? 'pb-[96px]' : ''
+          }`}
+        >
+          {voltar ? (
+            <Botao
+              titulo="Voltar"
+              variante="secundario"
+              onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+            />
+          ) : null}
+          <Entrada>
+            <View className="gap-md expandido:flex-row expandido:items-start expandido:justify-between expandido:gap-xl">
+              <View className="expandido:flex-1">
+                <Texto variante="titulo1" accessibilityRole="header">
+                  {titulo}
+                </Texto>
+                {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
+                {abaixoDoTitulo}
+              </View>
+              {acao}
             </View>
-            {acao}
-          </View>
-        </Entrada>
-        {Children.toArray(children).map((filho, indice) => (
-          <Entrada key={indice} indice={indice + 1}>
-            {filho}
           </Entrada>
-        ))}
-      </ScrollView>
+          {Children.toArray(children).map((filho, indice) => (
+            <Entrada key={indice} indice={indice + 1}>
+              {filho}
+            </Entrada>
+          ))}
+        </ScrollView>
+      </RolagemDaTelaContext.Provider>
     </SafeAreaView>
   );
 }

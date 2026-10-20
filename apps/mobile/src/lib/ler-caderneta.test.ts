@@ -74,6 +74,24 @@ describe('lerCaderneta', () => {
     expect(r.encontradas[0]?.trecho).toContain('Pentavalente');
   });
 
+  test('CT-APP-OCR18: o trecho lido não leva linhas de cabeçalho que não são da dose', () => {
+    const r = lerCaderneta(
+      ['CADERNETA DE VACINACAO', 'Hepatite B ao nascer 02/02/2026'],
+      CRIANCA,
+      HOJE,
+    );
+    expect(r.encontradas[0]?.trecho).toBe('Hepatite B ao nascer 02/02/2026');
+  });
+
+  test('CT-APP-OCR19: com a vacina numa linha e a data na seguinte, o trecho junta as duas', () => {
+    const r = lerCaderneta(
+      ['Unidade de saúde', 'Rotavírus humano 1ª dose', '02/02/2026'],
+      CRIANCA,
+      HOJE,
+    );
+    expect(r.encontradas[0]?.trecho).toBe('Rotavírus humano 1ª dose 02/02/2026');
+  });
+
   test.each([
     ['Hepatite B  dose ao nascer 02/02/2026', 'hepb'],
     ['Penta (DTP+Hib+HB) 2a dose 02/02/2026', 'penta2'],

@@ -1,4 +1,5 @@
 import { Pressable, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAssistente } from '../features/assistant/assistente-contexto';
 import { modoDeLayout } from '../lib/layout';
 import { useThemeColors, useVisual } from '../theme/theme-provider';
@@ -17,6 +18,7 @@ export function BalaoAssistente({ largura }: { largura?: number }) {
   const cores = useThemeColors();
   const { altoContraste, gradienteMarca, sombra } = useVisual();
   const janela = useWindowDimensions().width;
+  const { bottom } = useSafeAreaInsets();
   if (aberto) return null;
   const compacto = modoDeLayout(largura ?? janela) === 'compacto';
   return (
@@ -25,7 +27,7 @@ export function BalaoAssistente({ largura }: { largura?: number }) {
       accessibilityLabel="Abrir o assistente"
       accessibilityHint="Pergunte sobre vacinas por texto ou por voz"
       onPress={abrir}
-      style={[gradienteMarca, sombra(3)]}
+      style={[gradienteMarca, sombra(3), compacto ? { marginBottom: bottom } : null]}
       className={`absolute h-[64px] w-[64px] items-center justify-center rounded-selo bg-primaria ${
         compacto ? 'bottom-[88px] right-lg' : 'bottom-xl right-xl'
       } ${altoContraste ? 'border-altoContraste border-borda' : ''}`}

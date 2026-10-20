@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Linking, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
+import { useTravarRolagem } from '../../components/rolagem-da-tela';
 import { useThemeColors } from '../../theme/theme-provider';
 import { buildSetDataScript, MAP_BASE_URL, NATIVE_MAP_HTML } from './native-map-html';
 import type { UnitMapProps } from './unit-map-types';
@@ -15,6 +16,7 @@ export function UnitMap({ units, selectedCnes, position, onSelect }: UnitMapProp
   const cores = useThemeColors();
   const webview = useRef<WebView>(null);
   const [pronto, setPronto] = useState(false);
+  const travarRolagem = useTravarRolagem();
 
   useEffect(() => {
     if (!pronto) return;
@@ -37,12 +39,17 @@ export function UnitMap({ units, selectedCnes, position, onSelect }: UnitMapProp
   function aoReceber(event: WebViewMessageEvent) {
     const mensagem = event.nativeEvent.data;
     if (mensagem === 'pronto') setPronto(true);
+    else if (mensagem === 'liberar') travarRolagem?.(false);
     else onSelect(mensagem);
   }
 
   return (
     <View
       accessibilityLabel="Mapa dos postos de saúde"
+      // Enquanto o dedo está no mapa, a página não rola: o arrasto é do mapa.
+      onTouchStart={() => travarRolagem?.(true)}
+      onTouchEnd={() => travarRolagem?.(false)}
+      onTouchCancel={() => travarRolagem?.(false)}
       className="h-[360px] w-full overflow-hidden rounded-cartao border-fina border-bordaSuave"
     >
       <WebView
@@ -50,6 +57,8 @@ export function UnitMap({ units, selectedCnes, position, onSelect }: UnitMapProp
         originWhitelist={['*']}
         source={{ html: NATIVE_MAP_HTML, baseUrl: MAP_BASE_URL }}
         javaScriptEnabled
+        nestedScrollEnabled
+        overScrollMode="never"
         onMessage={aoReceber}
         onShouldStartLoadWithRequest={(request) => {
           if (request.url.startsWith(MAP_BASE_URL) || request.url.startsWith('about:')) return true;

@@ -1,5 +1,6 @@
 import { Link, usePathname, type Href } from 'expo-router';
 import { Pressable, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Logo } from '../features/auth/logo';
 import { modoDeLayout } from '../lib/layout';
 import { useThemeColors, useVisual } from '../theme/theme-provider';
@@ -85,12 +86,15 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
   const lateral = modo !== 'compacto';
   const expandido = modo === 'expandido';
   const { altoContraste, sombra } = useVisual();
+  // No Android a barra do sistema (botões ou gestos) fica por cima do app; a barra de baixo sobe o
+  // tanto que ela ocupa.
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <View
       role="navigation"
       accessibilityLabel="Menu principal"
-      style={sombra(1)}
+      style={[sombra(1), lateral ? null : { paddingBottom: 8 + bottom }]}
       className={`bg-superficie ${
         lateral
           ? `${altoContraste ? 'border-r-altoContraste border-borda' : 'border-r-fina border-bordaSuave'} ${
