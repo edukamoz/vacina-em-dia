@@ -185,6 +185,10 @@ marcador('**Lembretes:** veja no aplicativo o que vence nos próximos 7 dias ou 
 marcador('**Assistente por texto e por voz:** pergunte, por exemplo, "Para que serve a vacina BCG?", digitando ou falando.')
 marcador('**Histórico:** consulte as doses já aplicadas e canceladas de toda a família.')
 marcador('**Acesso pelo navegador:** use no computador, no tablet ou no celular, pelo endereço ' + ENDERECO + '.')
+marcador('**Aplicativo no celular:** instale no Android pelo arquivo APK ou, no navegador, adicione o Vacina em Dia à tela inicial (seção 3.16).')
+marcador('**Foto de perfil:** coloque uma foto na sua conta, guardada de forma privada.')
+marcador('**Ler a caderneta por foto (só no aplicativo do celular):** fotografe a caderneta e o aplicativo mostra as doses que encontrou, para você conferir antes de salvar.')
+marcador('**Apoiar o projeto:** quem quiser pode contribuir com qualquer valor por Pix. É opcional e não libera nada.')
 
 # 2
 h1('2. O que torna o Vacina em Dia especial?')
@@ -194,7 +198,7 @@ marcador('**Para toda a família:** uma única conta guarda as vacinas de vária
 marcador('**Com fonte oficial:** as vacinas e as respostas do assistente vêm de fontes oficiais, sempre citadas. O assistente **não inventa respostas** nem usa inteligência artificial que cria textos livres.')
 marcador('**Falar em vez de digitar:** quem tem dificuldade para digitar pode fazer a pergunta pela voz.')
 marcador('**Seus dados protegidos:** guardamos só o necessário (nome ou apelido, data de nascimento e as doses). **Não pedimos CPF nem o Cartão Nacional de Saúde.** Você pode apagar a sua conta e todos os dados quando quiser.')
-marcador('**Sem barreiras:** funciona em computador, tablet e celular, direto no navegador, sem instalar nada.')
+marcador('**Sem barreiras:** funciona em computador, tablet e celular, direto no navegador, sem instalar nada; se preferir, também dá para instalar no celular.')
 
 # 3
 h1('3. Como usar o Vacina em Dia: guia rápido')
@@ -232,6 +236,7 @@ passo(3, 'Digite a **"Data de nascimento"** no formato dia, mês e ano (por exem
 passo(4, 'Se a pessoa estiver grávida, marque **"Esta pessoa está grávida (inclui as vacinas da gestação)"**.')
 passo(5, '(Opcional) Em **"Quem é esta pessoa para você?"**, escolha o parentesco (por exemplo, "Mãe", "Filho" ou "Prefiro não informar").')
 passo(6, 'Toque em **"Salvar e ver as vacinas"**. O aplicativo monta o calendário dessa pessoa pela idade.')
+p('Esta e as outras telas de cadastro e de detalhe abrem **em uma janela por cima da tela em que você estava**, para você não perder o lugar. Para fechar sem salvar, toque em **"Fechar"**, toque fora da janela ou, no computador, aperte a tecla Esc.')
 p('Para corrigir um dado, toque na pessoa, depois em **"Editar pessoa"**, e em **"Salvar alterações"**. Para apagar a pessoa, use o botão **"Excluir"** com o nome dela e confirme em **"Sim, excluir"**. Isso apaga as doses dela também.')
 
 h2('3.5. Vendo as vacinas de uma pessoa')
@@ -275,12 +280,13 @@ captura('06-historico', 'Aba Histórico')
 
 h2('3.11. Conta, aparência e privacidade')
 p('Na aba **Conta** você encontra:')
-marcador('**Seus dados:** o e-mail da conta.')
+marcador('**Seus dados:** a foto de perfil (opcional) e o e-mail da conta. Veja a seção 3.13.')
 marcador('**Tema:** escolha **"Seguir o aparelho"**, **"Claro"**, **"Escuro"** ou **"Alto contraste"**. O alto contraste ajuda quem enxerga com dificuldade.')
 marcador('**Texto:** escolha o tamanho das letras do aplicativo: **"Normal"**, **"Grande"** ou **"Maior"**. Isso se soma ao tamanho de letra do seu aparelho.')
 marcador('**Movimento:** ligue **"Reduzir movimento"** para as telas aparecerem prontas, sem animações. O aplicativo também respeita essa configuração do seu aparelho e o tema Alto contraste.')
 marcador('**Lembretes:** ligar ou desligar o e-mail de lembretes.')
 marcador('**Privacidade:** o termo que você aceitou e os links para a **Política de privacidade** e os **Termos de uso**.')
+marcador('**Apoie o projeto:** a doação voluntária por Pix (seção 3.15), quando estiver disponível.')
 marcador('**Sair** da conta neste aparelho.')
 marcador('**Excluir minha conta:** apaga a sua conta, as pessoas cadastradas e todas as doses. Antes de apagar, o aplicativo pede uma confirmação. **Essa ação não pode ser desfeita.**')
 
@@ -295,6 +301,36 @@ passo(4, 'Sem internet, o aplicativo mostra a última lista que recebeu, com a d
 aviso('**Ligue antes de ir:** a lista traz as unidades básicas de saúde do cadastro oficial (CNES) e nem todas têm sala de vacina.')
 captura('08-postos', 'Tela Postos de saúde')
 
+h2('3.13. Foto de perfil')
+p('Na aba **Conta**, no cartão **"Seus dados"**, você pode colocar uma foto na sua conta. Ela é opcional.')
+passo(1, 'Toque em **"Escolher foto"** (para pegar uma da galeria) ou em **"Tirar foto"** (só no celular).')
+passo(2, 'Ajuste o recorte quadrado. O aplicativo reduz a foto no seu aparelho antes de guardá-la, para ocupar pouco espaço.')
+passo(3, 'Para trocar, toque em **"Trocar foto"**. Para tirar, toque em **"Remover foto"**.')
+p('A foto fica guardada de forma **privada**: só você a vê, com a sua conta. Se você excluir a conta, a foto também é apagada. Na primeira vez, o aparelho pede permissão para usar a câmera ou as fotos; toque em permitir.')
+
+h2('3.14. Lendo a caderneta por foto (só no aplicativo do celular)')
+p('Em vez de digitar, você pode fotografar a caderneta de vacinação (ou um comprovante) e deixar o aplicativo procurar as doses. Este recurso **só existe no aplicativo instalado no celular**, não no navegador.')
+passo(1, 'Na aba **Doses**, escolha a pessoa e toque em **"Ler caderneta por foto"**.')
+passo(2, 'Toque em **"Tirar foto"** (ou **"Escolher da galeria"**). Fotografe com **boa luz** e o papel **reto**, com a página inteira na foto.')
+passo(3, 'Aguarde a leitura. O aplicativo lê o texto **no seu próprio celular**: a foto **não é enviada para lugar nenhum**.')
+passo(4, 'Em **"Doses encontradas"**, confira o nome da vacina, a dose e a data de cada uma, e o trecho lido na foto. **Desligue** as que estiverem erradas.')
+passo(5, 'Toque em **"Registrar"**. Só as doses que ficaram ligadas são marcadas como aplicadas, com a data lida.')
+aviso('**Confira sempre:** a leitura pode errar, principalmente com letra manuscrita ou foto escura. O aplicativo só marca doses que a pessoa já tem no calendário. Linhas com data que ele não conseguiu encaixar aparecem numa lista à parte; registre essas à mão na própria dose. Na primeira vez no Android, o celular baixa o modelo de leitura do Google e precisa de internet.')
+
+h2('3.15. Apoiando o projeto com Pix')
+p('O Vacina em Dia é gratuito e continuará sendo. Se ele ajudou a sua família, você pode contribuir com qualquer valor, se quiser. A doação é **voluntária e não libera nada** no aplicativo.')
+passo(1, 'Na aba **Conta**, no cartão **"Apoie o projeto"**, toque em **"Doar com Pix"**.')
+passo(2, 'Escolha um valor (R$ 5, 10, 20 ou 50), digite **"Outro valor"** ou deixe em aberto para digitar no app do seu banco.')
+passo(3, 'Abra o app do seu banco, escolha pagar com Pix e **leia o QR Code**. Ou toque em **"Copiar código Pix"** e use a opção **"Pix copia e cola"** do banco.')
+p('O código é montado no seu aparelho e o pagamento é feito e confirmado só no app do seu banco: o Vacina em Dia **não vê nem guarda** dados de pagamento.')
+
+h2('3.16. Instalando o aplicativo no celular ou no computador')
+p('O Vacina em Dia funciona direto no navegador, mas você também pode instalá-lo:')
+marcador('**No computador ou no Android (Chrome, Edge):** abra o endereço ' + ENDERECO + ' e use **"Instalar app"** (ícone na barra de endereços ou no menu). O app passa a abrir em janela própria, com o ícone da marca.')
+marcador('**No iPhone (Safari):** toque em **Compartilhar** e depois em **"Adicionar à Tela de Início"**.')
+marcador('**Aplicativo Android (APK):** no celular Android, abra https://github.com/edukamoz/vacina-em-dia/releases/tag/apk-latest, baixe o arquivo **vacina-em-dia.apk** e abra-o. O Android pede para permitir a instalação de **"fontes desconhecidas"** para o navegador; permita. Só o aplicativo instalado tem a leitura da caderneta por foto.')
+aviso('**Cuidado com a origem:** instale o APK só pelo endereço oficial acima. Cada versão traz um arquivo de conferência (.sha256).')
+
 # 4
 h1('4. Perguntas Frequentes (FAQ)')
 p('Aqui você encontra respostas para as dúvidas mais comuns sobre o Vacina em Dia.')
@@ -307,7 +343,12 @@ def faq(pergunta, resposta):
 
 faq('Como faço para recuperar minha senha?', 'Na tela "Entrar", toque em "Esqueci minha senha", digite o seu e-mail e toque em "Pedir nova senha". Siga o link que chegar por e-mail. Ele vale por 60 minutos.')
 faq('Não chegou o e-mail de recuperação ou de lembrete. O que fazer?', 'Olhe a caixa de spam ou lixo eletrônico. Confira se o e-mail digitado está certo. O pedido de nova senha pode ser repetido, mas há um limite de pedidos por hora.')
-faq('O sistema funciona no meu celular?', 'Sim. Basta abrir o endereço ' + ENDERECO + ' no navegador do celular. A tela se adapta ao tamanho do aparelho. O aplicativo foi preparado para Android e iPhone, mas ainda não foi publicado nas lojas e não foi testado em iPhone.')
+faq('O sistema funciona no meu celular?', 'Sim. Basta abrir o endereço ' + ENDERECO + ' no navegador do celular. A tela se adapta ao tamanho do aparelho. Você também pode instalar o aplicativo: no Android, pelo arquivo APK das Releases do GitHub; no iPhone, adicionando o site à Tela de Início (veja a seção 3.16). O aplicativo ainda não está nas lojas e não foi testado em iPhone.')
+faq('Como instalo o aplicativo no Android?', 'Baixe o arquivo vacina-em-dia.apk em https://github.com/edukamoz/vacina-em-dia/releases/tag/apk-latest, abra-o e permita a instalação de fontes desconhecidas quando o Android pedir. Instale só por esse endereço.')
+faq('A foto da caderneta é enviada para algum lugar?', 'Não. O texto é lido no próprio celular e a foto não sai dele. Só as doses que você conferir e confirmar são salvas.')
+faq('A leitura da caderneta errou ou não achou nada. E agora?', 'Tente de novo com mais luz e o papel reto, ou registre a aplicação à mão na própria dose. Desligue sempre as doses que o aplicativo trouxe erradas antes de registrar.')
+faq('A doação por Pix é obrigatória? O que eu ganho?', 'Não é obrigatória e não libera nada: serve só para ajudar a manter o projeto. O pagamento é feito no app do seu banco e o Vacina em Dia não guarda nenhum dado dele.')
+faq('Quem vê a minha foto de perfil?', 'Só você. Ela fica guardada de forma privada, você pode removê-la quando quiser, e ela é apagada junto com a conta.')
 faq('Posso usar a mesma conta em mais de um aparelho?', 'Sim. Entre com o mesmo e-mail e a mesma senha, e você verá as mesmas pessoas e doses.')
 faq('O aplicativo substitui a caderneta de vacinação?', 'Não. Guarde a caderneta oficial. O Vacina em Dia ajuda a organizar e a lembrar, mas não substitui a caderneta nem a orientação de profissionais de saúde.')
 faq('De onde vêm as vacinas e as datas?', 'Do Calendário Nacional de Vacinação do Ministério da Saúde (versão 2026). A fonte e a versão aparecem nas telas. Confira sempre com a caderneta e o posto de saúde, pois o calendário pode mudar.')
@@ -322,7 +363,7 @@ faq('Como apago todos os meus dados?', 'Na aba Conta, toque em "Excluir minha co
 faq('Onde posso encontrar ajuda se tiver um problema que não está no FAQ?', 'Você pode escrever para ' + SUPORTE + '. O Vacina em Dia é um projeto acadêmico da Fatec Votorantim e a resposta é dada por e-mail.')
 
 doc.add_paragraph()
-p('Documento elaborado em 07/10/2026. As informações contidas são de responsabilidade da equipe de desenvolvimento do PI-VI.', WD_ALIGN_PARAGRAPH.CENTER).runs[0].font.size = Pt(9)
+p('Documento elaborado em 07/10/2026 e atualizado em 20/10/2026. As informações contidas são de responsabilidade da equipe de desenvolvimento do PI-VI.', WD_ALIGN_PARAGRAPH.CENTER).runs[0].font.size = Pt(9)
 
 doc.save(SAIDA)
 print('ok', SAIDA)

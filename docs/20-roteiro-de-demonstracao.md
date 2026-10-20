@@ -50,11 +50,21 @@ Item do backlog: B35 (e SCRUM-27; critério 5 da banca: funcionalidades por pers
 | 5 | Aba **Doses** de uma pessoa > cartão **Levar a carteira com você** > **Baixar PDF** (RF11) | O PDF traz a pessoa, o resumo, a tabela de doses com a situação e, em **toda página**, a fonte, a versão do calendário e o aviso de que **não substitui a caderneta oficial** |
 | 6 | Aba **Conta** > **Excluir minha conta** (só se for encerrar a demonstração) | Pede confirmação; apaga conta, pessoas e doses (LGPD) |
 
+## Extras (opcional, 2 min)
+
+| Passo | O que fazer | O que mostrar |
+|---|---|---|
+| 1 | **Adicionar pessoa** ou **Adicionar dose** | Abre como **janela** por cima da tela; fecha pelo véu, pelo botão ou com Esc (B52) |
+| 2 | Aba **Conta** > **Escolher foto** | A foto é reduzida no aparelho e guardada em contêiner privado do Blob Storage; some com a conta (B54) |
+| 3 | Aba **Conta** > **Doar com Pix** | QR e Pix copia e cola gerados no aparelho, sem gateway; aviso de doação voluntária (B53) |
+| 4 | **No celular:** aba **Doses** > **Ler caderneta por foto** | O texto é lido no aparelho; as doses encontradas aparecem para conferência e só salvam depois de confirmar (B55) |
+| 5 | Abrir `releases/tag/apk-latest` no celular | O APK mais recente, que já aponta para a API publicada (B57) |
+
 ## Fecho (1 min)
 
-- Rastreabilidade e testes: `docs/19-rastreabilidade.md`; 179 casos de caixa preta aprovados; 42 casos do ciclo da dose; 1.192 testes automatizados; CI com lint, tipos, testes, cobertura, `npm audit` e teste de fumaça do Docker.
+- Rastreabilidade e testes: `docs/19-rastreabilidade.md`; 179 casos de caixa preta aprovados; 42 casos do ciclo da dose; 1.466 testes automatizados (12 ignorados de propósito); CI com lint, tipos, testes, cobertura, `npm audit` e teste de fumaça do Docker.
 - Infraestrutura como código (Bicep), custos estimados e equivalência AWS para Azure: `docs/08`, `docs/16`.
-- Backlog no GitHub Projects ("proj-vacina-em-dia"): 47 itens em 9 épicos, com prioridade e critérios de aceite (`docs/24-backlog.md`).
+- Backlog no GitHub Projects ("proj-vacina-em-dia"): 56 itens em 9 épicos, com prioridade e critérios de aceite (`docs/24-backlog.md`).
 - Limites assumidos: o mapa de postos (RF10) e o PDF da carteira (RF11) foram entregues, mas compartilhar com cuidador (RF12) não foi iniciado; a voz, o mapa e a localização não foram testados em celular físico nem em iOS; as personas não foram validadas com usuários; lembretes por e-mail não têm push no celular.
 
 ## Pontos de atenção antes de apresentar

@@ -13,7 +13,7 @@ Criada em **06/10/2026** com o Azure CLI, na assinatura **Azure for Students**, 
 | Application Insights | `appi-vacinaemdia` | Por uso | Ligado ao workspace `log-vacinaemdia` (retenção de 30 dias, teto diário de 0,1 GB) |
 | Function App (PLN) | `func-nlp-vacinaemdia-vedia6398` | Flex Consumption (Linux, Python 3.13, 512 MB, 1 instância sempre pronta, paralelismo HTTP 8) | Chatbot e busca; `/chat` e `/search` exigem a chave da função |
 | Azure AI Speech | `spch-vacinaemdia-vedia6398` | F0 (gratuito), Brazil South, subdomínio próprio | Reconhecimento de fala pt-BR; 5 horas de áudio por mês na camada gratuita (ADR-003) |
-| Armazenamento | `stvedia6398` | Standard LRS | Exigido pelas Functions; acesso público a blobs desligado |
+| Armazenamento | `stvedia6398` | Standard LRS | Exigido pelas Functions; acesso público a blobs desligado; contêiner privado `fotos-de-perfil` para a foto de perfil (ADR-020) |
 
 ## Provedores registrados
 `Microsoft.Sql`, `Microsoft.CognitiveServices` e `Microsoft.AzureActiveDirectory` (os demais já estavam registrados).

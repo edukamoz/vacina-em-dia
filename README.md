@@ -10,6 +10,14 @@ Projeto Interdisciplinar VI (PI-VI) da Fatec Votorantim, curso de Desenvolviment
 
 Em construção para a entrega de 19/11/2026. Já funcionam: login próprio com recuperação de senha, família, calendário vacinal oficial (PNI 2026), ciclo de vida das doses, consentimento e exclusão de dados, chatbot e busca por voz, deploy na Azure e testes automatizados. O estado detalhado e os próximos passos estão em [`docs/00-handoff.md`](docs/00-handoff.md).
 
+## Recursos extras e instalação
+
+- **Janelas** para adicionar e editar pessoas e doses (B52) e **primeira tela por ambiente**: site grande, site pequeno e app instalado (B56).
+- **Foto de perfil** guardada em contêiner privado do Azure Blob Storage (B54, ADR-020).
+- **Doação por Pix** copia e cola, gerada no aparelho, sem gateway (B53, ADR-021).
+- **Ler a caderneta por foto**, só no app: o texto é lido no aparelho e você confere antes de salvar (B55, ADR-022).
+- **APK do Android** pronto em [Releases > apk-latest](https://github.com/edukamoz/vacina-em-dia/releases/tag/apk-latest), gerado pelo GitHub Actions (B57, `docs/26-apk-no-github-releases.md`). O app web também pode ser instalado como PWA (`docs/25-app-instalavel.md`).
+
 ## Como rodar
 
 Requer Node 22.13 ou mais novo; o projeto usa o Node 24 LTS (veja `.nvmrc`).

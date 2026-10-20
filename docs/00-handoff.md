@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 10/10/2026 (**leia a seção 0.12 primeiro**, que atualiza a 0.11; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 20/10/2026 (**leia a seção 0.13 primeiro**, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,32 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.13 Estado em 20/10/2026: recursos extras, APK nas Releases, Figma completo e documentações atualizadas
+
+**Na `main` desde a 0.12 (PRs #147 a #156; o #150 foi fechado e refeito como #151):**
+- **B52, janelas (#148):** adicionar pessoa, adicionar e abrir dose, editar pessoa abrem como janela por cima da tela (`JanelaModal`, rotas `transparentModal`; folha no celular, cartão central no tablet e no computador; fecha com o véu, o botão e Esc).
+- **B56, primeira tela por ambiente (#151):** `lib/ambiente.ts` escolhe `app`, `web-grande` (a partir de 1024 px) ou `web-pequena`; hero modular com efeito próprio ao passar o mouse; cartões da Conta de mesma altura; ícone, abertura e `applicationId` `br.edu.fatec.vacinaemdia` corrigidos para o Android.
+- **B54, foto de perfil (#152, ADR-020):** `GET/PUT/DELETE /api/account/photo`, contêiner privado `fotos-de-perfil` na conta de armazenamento das Functions, redução no aparelho (256 px), apagada com a conta. Já está em produção.
+- **B57, APK nas Releases (#153 e #154):** `.github/workflows/apk.yml` gera o APK e publica a pré-release `apk-latest` (a cada mudança do app na `main`) e releases fixas por tag `v*`; confere dentro do APK que o endereço da API está embutido (`EXPO_PUBLIC_API_URL`). Ver `docs/26`.
+- **B53, doação por Pix (#155, ADR-021):** tela "Apoie o projeto" (aba Conta), BR Code e QR gerados no aparelho, sem gateway. A chave (aleatória), o nome e a cidade ficam nas **variáveis do repositório** `PIX_KEY`, `PIX_NAME` e `PIX_CITY` (`gh variable list`), lidas pelo deploy web e pelo APK; sem elas a seção some.
+- **B55, caderneta por foto (#156, ADR-022):** botão "Ler caderneta por foto" na aba Doses, só no app; OCR no aparelho (`expo-text-extractor`), encaixe nas doses abertas da pessoa (`lib/ler-caderneta.ts`) e conferência antes de salvar (evento `APPLY`). Exige o app instalado (não roda no Expo Go).
+- **Apresentação animada (#149)** e **Figma (#147):** ver abaixo.
+
+**Figma (arquivo `lZboLAlTDtA2cJQRyKtcdW`, feito pelo Figma MCP em 20/10/2026):** 31 telas v2 (celular em Claro, Escuro e Alto contraste, e web), 16 componentes v2 com variantes e propriedades de texto numa seção da página de componentes (tema Claro) e as telas e componentes antigos renomeados com o prefixo "v1 ·" (apague-os depois de conferir). Os scripts das telas novas não estão no repositório; o arquivo do Figma é o registro (`docs/04-design-system/figma-plugin/LEIA-ME.md`). O limite de chamadas do Figma MCP foi atingido no fim; as capturas da Apresentação em Escuro e Alto contraste não foram conferidas.
+
+**Documentações (regeneradas em 20/10/2026):** `Documentacao_Tecnica.docx` e `Documentacao_do_Usuario.docx` (seções novas 3.13 a 3.16 e FAQ), com cópia dos anteriores em `doctos/_copia-antes-de-20-10/`; `docs/20` (roteiro), `docs/16` (custos), `docs/08`, `docs/19` e o backlog com 56 itens. B52 a B57 estão em **Em análise**; nada está Concluído. A Documentação de Desenvolvimento (horas e reuniões) segue com o autor.
+
+**Pendências do autor (testes que só em aparelho):**
+1. Reinstalar o app no celular (`npm run dev:android`, ou o APK de `releases/tag/apk-latest`; desinstale antes o app instalado com outra chave) e testar: câmera e galeria da foto de perfil, a leitura da caderneta com uma caderneta de verdade (a qualidade depende da foto; no Android o modelo do Google é baixado no primeiro uso) e o "Doar com Pix" (pague R$ 0,01 para ver se cai na sua conta).
+2. Conferir no celular: instalação como PWA, mapa, localização, voz e iOS (nada disso foi testado em iOS).
+3. No Figma: conferir as telas novas e apagar as "v1 ·".
+4. Apagar `D:\tmp-modal-*.png` (capturas temporárias que a trava de segurança não deixou apagar).
+5. Marcar "Concluído" no projeto depois das reuniões de encerramento (só o autor); preencher a Documentação de Desenvolvimento; ensaiar a apresentação; rodar `scripts/empacotar-entrega.ps1` perto de 19/11.
+
+**Armadilhas novas:** (a) no workflow do APK, o `gradle.properties` gerado pelo prebuild não termina com quebra de linha: uma linha acrescentada com `>>` gruda na última e estraga `expo.inlineModules.watchedDirectories` (erro "node finished with non-zero exit value 1"); o passo agora acrescenta uma linha em branco antes; (b) o build de release do Android no Windows estoura o limite de caminho; use o CI (Linux) para o APK; (c) `apps/mobile/.expo/types/router.d.ts` é gerado e fica velho: se o `tsc` reclamar de uma rota nova, apague o arquivo (o CI não o tem); (d) o Bash da ferramenta recusa blocos com muitas aspas aninhadas: grave scripts em arquivo; (e) o Figma MCP do plano gratuito acaba rápido: junte várias telas por chamada; (f) a pré-release `apk-latest` é recriada a cada build (o endereço do arquivo não muda).
+
+**Próximos passos do Claude:** manter as documentações em dia a cada mudança (rodar os geradores de `scripts/documentos`), ajudar a ensaiar a apresentação e a preencher a Documentação de Desenvolvimento quando o autor trouxer horas e reuniões, e atender os itens "Could" que sobraram só com pedido.
 
 ### 0.12 Estado em 10/10/2026: backlog no GitHub Projects, documentações e entrega
 

@@ -9,6 +9,8 @@ O Figma do projeto ([Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQ
   - **Página "Telas: celular":** as 9 do plugin (Entrar, Doses em três temas, Família, Histórico, Conta, Detalhe da dose, Assistente) e 9 novas: Apresentação, Criar conta, Esqueci a senha, Postos de saúde, Conta completa, e as janelas Adicionar dose, Adicionar pessoa, Apoie o projeto (QR de exemplo, com chave fictícia) e Ler caderneta por foto.
   - **Página "Telas: tablet e web":** Doses (Claro, Escuro e Alto contraste), Conta com cartões de mesma altura, a janela Adicionar dose e a Apresentação em web grande e web pequena.
 - As 4 telas antigas (versão 1) foram **renomeadas** com o prefixo "v1 ·", sem apagar. Depois de conferir as novas, apague-as à mão.
+- **Componentes v2:** seção "Componentes v2 (tema Claro)" da página "Fundamentos e componentes", com Botão, Campo de texto, Selo de estado, Cartão de dose, Item de navegação, Cartão de membro, Opção, Interruptor, Avatar, Botão de voz, Cartão de seção, Aviso de fonte e versão, Estado vazio, Estado de erro, Estado carregando e Mensagem do chat; os componentes da versão 1 também ganharam o prefixo "v1 ·".
+- **Telas finais do celular:** além das listadas acima, Consentimento, Redefinir senha, Termos de uso, Política de privacidade e a Apresentação em Escuro e Alto contraste.
 
 ## Plugin 1: sincronizar design system (`manifest.json`, `code.js`)
 
@@ -34,9 +36,9 @@ Não apaga nada: se uma tela com o mesmo nome já existe, ela é pulada; se uma 
 
 ## Limites conhecidos
 
-- O desenho não usa componentes do Figma: as telas são montadas por funções (selo, botão, cartão de dose etc.), o que permite trocar de tema, mas elas não são instâncias dos componentes da página "Fundamentos e componentes", que seguem na versão 1. Reconstruir a biblioteca de componentes v2 é a próxima etapa.
+- O desenho não usa componentes do Figma: as telas são montadas por funções (selo, botão, cartão de dose etc.), o que permite trocar de tema, mas elas não são instâncias dos componentes da página "Fundamentos e componentes", que seguem na versão 1. Em 20/10/2026 foi criada uma biblioteca v2 (16 componentes com variantes, tema Claro) na página de componentes; ligar as telas a ela é uma próxima etapa.
 - O Figma MCP não importa imagens: a Apresentação usa avatares coloridos no lugar das fotos das pessoas fictícias (as fotos existem no app).
 - O QR da janela "Apoie o projeto" é um exemplo gerado com uma chave Pix fictícia; não use no app.
-- Faltam: Consentimento, Redefinir senha, Termos e Privacidade, e a Apresentação em Escuro e Alto contraste.
+- Faltam: a Apresentação web em Escuro e Alto contraste; as capturas das Apresentações em Escuro e Alto contraste do celular não foram conferidas (o limite do MCP acabou).
 - Os scripts das telas novas foram executados pelo Figma MCP e não estão salvos neste repositório; o arquivo do Figma é o registro. Se o app mudar, ajuste as telas no Figma ou refaça-as.
 - Para continuar pelo MCP (com verificação por captura de tela), o plano Education do Figma libera 200 chamadas por dia; a conta gratuita tem créditos limitados, então agrupe várias telas por chamada, como foi feito aqui (4 chamadas de escrita e 2 de ajuste para 25 telas).

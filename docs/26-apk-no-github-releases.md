@@ -25,6 +25,8 @@ O endereço da API é lido de `EXPO_PUBLIC_API_URL` **na hora do build** e fica 
 2. testa `GET /health` da API antes de compilar;
 3. **abre o APK pronto e confere se o endereço está dentro do pacote**; se não estiver, o build falha e nada é publicado.
 
+O mesmo build também recebe `EXPO_PUBLIC_PIX_KEY`, `EXPO_PUBLIC_PIX_NAME` e `EXPO_PUBLIC_PIX_CITY` das **variáveis do repositório** `PIX_KEY`, `PIX_NAME` e `PIX_CITY` (Settings > Secrets and variables > Actions > Variables), para a tela "Apoie o projeto" (ADR-021). A chave Pix é aleatória e pública por natureza (aparece no QR); sem as três variáveis, a seção some do app.
+
 Mudou o endereço da API? Altere `API_URL` em `deploy.yml` **e** em `apk.yml`. A API aceita chamadas do app nativo sem CORS (o CORS vale só para a web).
 
 ## Como é gerado

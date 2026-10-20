@@ -388,7 +388,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B41 | SCRUM-32 | Como equipe, quero o design system (cores, fontes, layout) para mobile e web, para o app ter identidade e ser acessível | Must | Em andamento | Sprint 1 |
 | B42 | novo | Como usuária, quero um visual bonito e dinâmico, com telas próprias para web e celular, para gostar de usar o app | Should | Em análise | Sprint 6 |
 | B43 | novo | Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto | Should | Em análise | Sprint 6 |
-| B44 | novo | Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app | Could | Em andamento | Sprint 6 |
+| B44 | novo | Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app | Could | Em análise | Sprint 6 |
 | B45 | novo | Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada | Could | Em análise | Sprint 6 |
 | B46 | novo | Como usuária, quero animações extras (inclinação 3D, pessoas em camadas na apresentação, painel e folha animados), para uma experiência mais viva | Could | Em andamento | Sprint 1 |
 | B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em análise | Sprint 6 |
@@ -426,7 +426,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).
 - Componentes e telas atualizados.
 - Evidência: docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md
-- Atenção: Telas v2 feitas no Figma em 20/10/2026 (celular e web, 25 telas); falta a biblioteca de componentes v2 e telas menores (Consentimento, Redefinir senha, Termos e Privacidade). Apague as telas "v1 ·" depois de conferir.
+- Atenção: Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. Falta a autora conferir e apagar as telas e componentes "v1 ·"; as telas ainda não usam as instâncias dos componentes.
 
 **B45** (PE1; requisitos: RNF04, RNF09)
 

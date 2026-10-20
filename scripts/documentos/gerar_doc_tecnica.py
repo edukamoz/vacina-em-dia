@@ -15,7 +15,7 @@ REPO = Path(__file__).resolve().parents[2]
 DIAG = REPO / 'docs' / '03-uml'
 SAIDA = REPO / 'doctos' / 'Documentacao_Tecnica.docx'
 VERDE = RGBColor(0x0B, 0x6B, 0x52)
-HOJE = '10/10/2026'
+HOJE = '20/10/2026'
 
 def fonte_do_titulo(estilo, nome='Arial'):
     # O estilo de título vem com fontes do tema (Calibri Light); troca por fonte fixa.
@@ -280,6 +280,7 @@ marcador('**EX1 (para PR1), lembretes:** o cartão "Lembretes" mostra no app as 
 marcador('**EX2 (para PR2), registro digital único:** cada pessoa da família tem seu calendário e seu histórico, com ciclo de vida da dose (pendente, agendada, atrasada, aplicada e cancelada) e vacinas adicionadas à mão. Entregue.')
 marcador('**EX3 (para PR3), calendário oficial e dúvidas:** 100% das vacinas exibidas citam fonte e versão (Calendário Nacional de Vacinação 2026, Ministério da Saúde); o chatbot responde com texto curado e fonte, com F1 macro de 0,932 em 100 frases de teste (meta de 0,85). Entregue.')
 marcador('**EX4 (para PR4), acesso:** pergunta por voz (web e Android; transcrição pelo Azure AI Speech), telas em linguagem simples, três temas (claro, escuro e alto contraste) com contraste calculado pelo WCAG 2.1 AA. Entregue, com ressalvas de teste em aparelho físico e iOS (seção 11).')
+marcador('**Recursos extras, entregues em 20/10/2026 (prioridade Could):** janelas (modais) para adicionar e editar pessoas e doses (B52); doação voluntária por Pix copia e cola, sem gateway (B53, ADR-021); foto de perfil guardada no Azure Blob Storage (B54, ADR-020); leitura da caderneta por foto, feita no aparelho com ML Kit (B55, ADR-022); primeira tela pensada para site grande, site pequeno e app instalado (B56); e APK do Android nas Releases do GitHub (B57).')
 h2('2.3. Público-Alvo')
 p('Os usuários finais são pais e responsáveis por crianças, idosos e cuidadores de familiares. A solução não é voltada a profissionais de saúde. O Quadro 2 apresenta as personas, construídas a partir do problema descrito.')
 cab, linhas = ler_tabelas('docs/01-visao-e-escopo.md', '4 PÚBLICO-ALVO')
@@ -304,12 +305,16 @@ figura(DIAG / 'arq.png', 'Arquitetura do sistema', 24.5, paisagem=True)
 p('**Justificativa:** o modelo serverless cobra por uso e escala a zero, o que cabe no orçamento de um projeto acadêmico; a separação do PLN em Python permite usar scikit-learn sem forçar a API a sair do TypeScript; o pacote compartilhado (`packages/shared`) mantém tipos, esquemas Zod e regras de domínio (máquina de estados da dose, calendário) como fonte única para o app e a API. A API segue camadas: **handlers** (HTTP, finos) → **services** (casos de uso) → **domain** (regras puras) → **repositories** (acesso a dados). Regras de data recebem o "hoje" por parâmetro, para serem testadas sem relógio real.')
 h2('4.2. Componentes Principais')
 tabela('Componentes, tecnologias e versões', ['Componente', 'Tecnologias e versões', 'Responsabilidade'], [
-    ['App (`apps/mobile`)', 'Expo SDK 57.0.27, React Native 0.86.3, React 19.2.3, expo-router 57.0.25, NativeWind 4.2.7, TanStack Query 5.104.1, expo-audio 57.0.5', 'Telas, navegação, sessão (Context API), cache de dados e captura de voz; web, Android e iOS'],
+    ['App (`apps/mobile`)', 'Expo SDK 57.0.27, React Native 0.86.3, React 19.2.3, expo-router 57.0.25, NativeWind 4.2.7, TanStack Query 5.104.1, expo-audio 57.0.5, expo-image-picker 57.0.20, expo-text-extractor 2.0.0, qrcode-generator 2.0.4', 'Telas, navegação, sessão (Context API), cache de dados e captura de voz; web, Android e iOS'],
     ['API (`apps/api`)', 'Azure Functions 4 (`@azure/functions` 4.16.5), Node.js 24.21.0, TypeScript 6.0.3', 'Regras de negócio em camadas, login próprio, rotas REST, rotina diária de lembretes'],
     ['Compartilhado (`packages/shared`)', 'TypeScript 6.0.3, Zod 4.6.5, zod-to-openapi 9.1.0', 'Tipos, esquemas de entrada e saída, máquina de estados da dose, calendário vacinal e regras de lembrete'],
     ['PLN (`apps/nlp`)', 'Azure Functions (Python 3.13), scikit-learn 1.9.1, numpy 2.5.3, scipy 1.18.1', 'Classificador de intenções (TF-IDF + SVM), respostas curadas e busca de vacinas com LSA'],
     ['Banco de dados', 'Azure SQL Database (oferta gratuita, serverless), esquema T-SQL versionado em 5 migrações', 'Contas, tokens, consentimento, pessoas, doses e registro de lembretes'],
     ['Mapa de postos (RF10)', 'Leaflet 1.9.4 com mapas do OpenStreetMap, expo-location 57.0.20, react-native-webview 13.16.1, @react-native-async-storage/async-storage 2.2.0', 'Lista e mapa de unidades básicas de saúde por distância, localização só a pedido, lista guardada no aparelho (offline primeiro); sem chave de API'],
+    ['Armazenamento de arquivos', 'Azure Blob Storage (conta de armazenamento das Functions), @azure/storage-blob 12.34.0, Azurite local', 'Foto de perfil em contêiner privado `fotos-de-perfil`, acessada só pela API (ADR-020); apagada junto com a conta'],
+    ['Doação por Pix', 'BR Code estático (CRC16) e QR gerados no aparelho, qrcode-generator 2.0.4, expo-clipboard 57.0.2', 'Doação voluntária sem gateway: nada passa por servidor nem é guardado (ADR-021)'],
+    ['Leitura da caderneta por foto', 'expo-text-extractor 2.0.0 (ML Kit no Android, Vision no iOS)', 'Reconhece o texto da foto no aparelho e propõe as doses encontradas; só salva o que a pessoa confirmar (ADR-022)'],
+    ['APK do Android', 'GitHub Actions (`apk.yml`), Gradle, Java 21', 'Gera o APK assinado com chave de depuração e o publica na pré-release `apk-latest`, apontando para a API publicada'],
     ['Voz', 'Azure AI Speech (F0), API REST de áudio curto, pt-BR', 'Transcrição da fala; o áudio nunca é gravado'],
     ['E-mail', 'Brevo (API v3, plano gratuito)', 'Recuperação de senha e lembretes por e-mail'],
     ['Entrega e contêineres', 'GitHub Actions, Docker 29.7.2 e Compose 5.4.0, Azurite 3.37.0, nginx 1.31.6', 'CI, deploy por login federado (OIDC) e ambiente local completo'],
@@ -358,7 +363,8 @@ rotas = [
     ['POST', '/api/auth/reset-password', 'Criar nova senha com o token do e-mail', 'não'],
     ['GET', '/api/auth/me', 'Dados da conta', 'sim'],
     ['GET, PUT', '/api/consent', 'Consultar e registrar o consentimento', 'sim'],
-    ['DELETE', '/api/account', 'Excluir a conta e todos os dados', 'sim'],
+    ['DELETE', '/api/account', 'Excluir a conta e todos os dados (inclusive a foto de perfil)', 'sim'],
+    ['GET, PUT, DELETE', '/api/account/photo', 'Consultar, trocar (JPEG, PNG ou WebP até 256 KiB) e remover a foto de perfil', 'sim'],
     ['GET, POST', '/api/members', 'Listar e cadastrar pessoas', 'sim'],
     ['GET, PUT, DELETE', '/api/members/{id}', 'Consultar, editar e excluir uma pessoa', 'sim'],
     ['GET', '/api/members/{id}/doses', 'Calendário e doses da pessoa, com fonte e versão', 'sim'],
@@ -491,6 +497,8 @@ novos = [
     ['R11', 'Partida a frio do serviço de PLN (cerca de 50 s) ao reiniciar.', 'Média / Médio', '1 instância sempre pronta no PLN; fazer uma pergunta de aquecimento antes de apresentar.'],
     ['R12', 'Entrega do e-mail (Brevo) depende de remetente verificado; provedores gratuitos podem cair em spam; limite de 300 e-mails por dia.', 'Média / Médio', 'Verificar o remetente; avisar o usuário para olhar o spam; o aviso dentro do app não depende do e-mail.'],
     ['R13', 'Chaves do login e do Brevo como configuração da aplicação, e não no Key Vault; regra do SQL `AllowAzureServices` ampla.', 'Baixa / Alto', 'Migrar para o Key Vault quando houver o papel de escrita; trocar por regra específica (`docs/21`).'],
+    ['R14', 'A leitura da caderneta por foto (OCR) depende da luz, do papel e do formato; no Android o modelo do Google é baixado no primeiro uso. Não testada com caderneta real nem em iOS.', 'Média / Médio', 'A pessoa confere cada dose antes de salvar; só encaixa em doses que a pessoa já tem; cadastro à mão continua disponível.'],
+    ['R15', 'A doação por Pix não é confirmada pelo app (sem gateway); o QR usa chave aleatória pública do autor.', 'Baixa / Baixo', 'Conferir no extrato do banco; se a chave for abusada, trocar a chave e as variáveis do repositório.'],
 ]
 tabela('Riscos e mitigações', cab, linhas + novos, larguras=[1.1, 5.4, 2.4, 6.9], tamanho=8)
 h2('11.2. Plano de Mitigação')
@@ -498,7 +506,7 @@ p('A mitigação de cada risco está na última coluna do quadro. Os riscos são
 
 # ---------------------------------------------------------------- 12
 h1('12. Itens do Product Backlog (PBI)')
-p('O backlog está organizado em nove épicos e 47 itens, cada um com história de usuário, prioridade (MoSCoW), personas, requisitos, critérios de aceite, estado e sprint. A fonte é `docs/24-backlog.md` e o acompanhamento vivo fica no GitHub Projects ("proj-vacina-em-dia"), que substituiu o Jira em 10/10/2026. O quadro mostra o estado na data deste documento. **O estado segue a convenção do professor (A fazer, Em andamento, Em análise e Concluído): nenhum item foi marcado como Concluído, o que só acontece na reunião de encerramento da sprint.**')
+p('O backlog está organizado em nove épicos e 56 itens, cada um com história de usuário, prioridade (MoSCoW), personas, requisitos, critérios de aceite, estado e sprint. A fonte é `docs/24-backlog.md` e o acompanhamento vivo fica no GitHub Projects ("proj-vacina-em-dia"), que substituiu o Jira em 10/10/2026. O quadro mostra o estado na data deste documento. **O estado segue a convenção do professor (A fazer, Em andamento, Em análise e Concluído): nenhum item foi marcado como Concluído, o que só acontece na reunião de encerramento da sprint.**')
 import json as _json
 _dados = _json.loads((REPO / 'docs' / 'backlog' / 'itens.json').read_text(encoding='utf-8'))
 _epicos = {e[0]: e[1] for e in _dados['epicos']}
@@ -512,6 +520,7 @@ marcador('**Lembretes:** passou de notificação push do Expo para aviso no app 
 marcador('**Limite de uso:** passou de Table Storage para contadores em memória por instância (ADR-010), por simplicidade e custo, com a ressalva de valer por instância.')
 marcador('**Itens acrescentados:** parentesco da pessoa, dose avulsa (ADR-016), Termos de uso e Política de privacidade, cabeçalhos de segurança, checklist OWASP e carga leve, mapa de postos de saúde (RF10, ADR-018), redesenho visual, preferências de texto e de movimento e aquecimento do banco.')
 marcador('**Gestão do backlog:** do Jira para o GitHub Projects (10/10/2026), com prioridades e critérios de aceite por item. A validação das personas com usuários reais foi abandonada por decisão do autor e as personas seguem como hipóteses de trabalho.')
+marcador('**Recursos extras (B52 a B57):** janelas no lugar de páginas inteiras, doação por Pix, foto de perfil no Blob Storage, leitura da caderneta por foto, primeira tela por ambiente e APK nas Releases; todos como prioridade Could, em Em análise, com decisão em ADR (020 a 022).')
 marcador('**Voz no celular:** captura em PCM com `expo-audio` e mesmo WAV da web, em vez de gravar arquivo comprimido, porque o Android não grava WAV em arquivo e a API de áudio curto só lê WAV.')
 
 # ---------------------------------------------------------------- 13
