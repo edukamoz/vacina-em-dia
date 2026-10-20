@@ -394,7 +394,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em análise | Sprint 6 |
 | B51 | novo | Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca | Could | Em análise | Sprint 1 |
 | B52 | novo | Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava | Should | Em análise | Sprint 3 |
-| B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | A fazer | - |
+| B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | Em análise | Sprint 3 |
 | B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | Em análise | Sprint 3 |
 | B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | A fazer | - |
 | B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
@@ -468,7 +468,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Tela "Apoiar o projeto" com valor sugerido, QR e Pix copia e cola gerados no aparelho (BR Code).
 - Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.
 - Aviso claro de que a doação é voluntária e não dá acesso a nada.
-- Atenção: Decidido em 19/10/2026: Pix copia e cola, custo zero. A chave Pix é do autor (a informar).
+- Evidência: ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate
+- Atenção: Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).
 
 **B54** (PE1, PE3; requisitos: RNF03)
 

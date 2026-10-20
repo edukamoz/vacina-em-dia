@@ -19,6 +19,8 @@ Legenda de pastas: `api` = `apps/api/src`, `app` = `apps/mobile/src`, `shared` =
 | RF09 Consentimento e exclusão | Tela de consentimento, aba Conta (exclusão), Termos de uso e Política de privacidade | `GET/PUT /consent`, `DELETE /account` | `CT-APP-C*` tela de consentimento e `CT-APP-X*` aba Conta (`app/features/onboarding-flows.test.tsx`); `CT-FAM-01` e `CT-FAM-03` (sem consentimento não cadastra; menor exige declaração); `CT-APP-L30`, `L31` (`app/features/auth/auth-screens.test.tsx`); `CT-APP-LG*` (`app/features/legal/legal-screen.test.tsx`); caixa preta `CT-CP-K*` |
 | RF11 Exportar PDF | Cartão "Levar a carteira com você" na aba Doses (botão "Baixar PDF") | `GET /members/{id}/doses/pdf` | `CT-PDF-*` (`api/pdf/carteira-pdf.test.ts`, `api/services/carteira-service.test.ts`); `CT-APP-PDF*` e `CT-APP-ARQ*` (`app/features/doses/baixar-carteira.test.tsx`, `app/lib/salvar-arquivo.test.ts`); ADR-019 |
 
+A doação por Pix (B53, ADR-021) fica na aba Conta e abre a tela "Apoie o projeto" (`CT-APP-PIX*`: código, CRC16, QR e tela).
+
 Além dos requisitos, a foto de perfil (B54, ADR-020) está na aba Conta (`GET`, `PUT` e `DELETE /account/photo`; `CT-FOTO-*` na API e `CT-APP-FOTO*` no app).
 
 O RF10 (mapa de postos) e o RF11 (PDF) foram entregues; o RF12 (compartilhar com cuidador) não foi iniciado, como previsto no escopo.

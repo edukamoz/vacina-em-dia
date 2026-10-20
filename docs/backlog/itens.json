@@ -1014,10 +1014,10 @@
     "Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.",
     "Aviso claro de que a doação é voluntária e não dá acesso a nada."
    ],
-   "estado": "A fazer",
-   "sprint": null,
-   "evidencia": "",
-   "nota": "Decidido em 19/10/2026: Pix copia e cola, custo zero. A chave Pix é do autor (a informar).",
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate",
+   "nota": "Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).",
    "curto": "Apoiar o projeto com Pix"
   },
   {

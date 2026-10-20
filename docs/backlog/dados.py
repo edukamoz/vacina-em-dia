@@ -229,7 +229,7 @@ ITENS = [
     item('B53', None, 'Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar',
          'E9', C, 'PE1', 'RNF03',
          ['Tela "Apoiar o projeto" com valor sugerido, QR e Pix copia e cola gerados no aparelho (BR Code).', 'Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.', 'Aviso claro de que a doação é voluntária e não dá acesso a nada.'],
-         AF, None, '', 'Decidido em 19/10/2026: Pix copia e cola, custo zero. A chave Pix é do autor (a informar).'),
+         AN, 3, 'ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate', 'Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).'),
     item('B54', None, 'Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta',
          'E9', C, 'PE1, PE3', 'RNF03',
          ['Escolher ou tirar a foto, reduzida no aparelho antes de enviar.', 'Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.', 'Excluir a conta apaga a foto; o termo de privacidade cita a foto.'],
