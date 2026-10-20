@@ -13,7 +13,8 @@ import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { useSession } from '../../session/session-provider';
-import { useTheme, useThemeColors, useVisual } from '../../theme/theme-provider';
+import { useTheme, useThemeColors } from '../../theme/theme-provider';
+import { CabecalhoDaConta } from './cabecalho-da-conta';
 import {
   useConsent,
   useDeleteAccount,
@@ -75,27 +76,11 @@ export function AccountScreen() {
   const members = useMembers();
   const pessoas = members.data?.items ?? [];
   const email = account?.email ?? 'Sem e-mail';
-  const { altoContraste, gradienteMarca, sombra } = useVisual();
   const { movimento, movimentoReduzido } = useTheme();
 
   return (
     <Tela reservaBalao titulo="Conta">
-      <View
-        style={[gradienteMarca, sombra(2)]}
-        className={`flex-row flex-wrap items-center gap-lg overflow-hidden rounded-folha bg-primaria p-xl ${
-          altoContraste ? 'border-altoContraste border-borda' : ''
-        }`}
-      >
-        <View className="rounded-selo border-[4px] border-sobrePrimaria">
-          <Avatar nome={email} indice={0} tamanho={80} />
-        </View>
-        <View className="min-w-[200px] flex-1">
-          <Texto variante="titulo2" className="text-sobrePrimaria" accessibilityRole="header">
-            Seus dados
-          </Texto>
-          <Texto className="text-sobrePrimaria">{email}</Texto>
-        </View>
-      </View>
+      <CabecalhoDaConta email={email} />
 
       <View className="gap-lg expandido:flex-row expandido:items-stretch">
         <Secao
@@ -175,8 +160,8 @@ export function AccountScreen() {
             <Texto>Você ainda não aceitou o termo de consentimento.</Texto>
           )}
           <Texto className="text-textoSecundario">
-            Guardamos só nome ou apelido, data de nascimento e as doses de cada pessoa. Não pedimos
-            CPF nem Cartão Nacional de Saúde.
+            Guardamos só nome ou apelido, data de nascimento e as doses de cada pessoa, e a foto de
+            perfil, se você escolher uma. Não pedimos CPF nem Cartão Nacional de Saúde.
           </Texto>
           <LinkTexto titulo="Política de privacidade" onPress={() => router.push('/privacidade')} />
           <LinkTexto titulo="Termos de uso" onPress={() => router.push('/termos')} />

@@ -233,7 +233,7 @@ ITENS = [
     item('B54', None, 'Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta',
          'E9', C, 'PE1, PE3', 'RNF03',
          ['Escolher ou tirar a foto, reduzida no aparelho antes de enviar.', 'Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.', 'Excluir a conta apaga a foto; o termo de privacidade cita a foto.'],
-         AF, None, '', 'Decidido em 19/10/2026: Azure Blob Storage na conta de armazenamento já existente.'),
+         AN, 3, 'ADR-020; CT-FOTO-*, CT-APP-FOTO*; GET, PUT e DELETE /account/photo', 'Falta testar a câmera e a galeria em celular físico e o Blob Storage real (hoje só o Azurite e o teste com mock).'),
     item('B55', None, 'Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar',
          'E9', C, 'PE1, PE3', 'RF04; RNF03',
          ['Só no app (Android e iOS); na web o recurso não aparece.', 'O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.', 'As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.'],

@@ -44,6 +44,8 @@ interface Dose {
 /** O que a API falsa guarda e que os testes podem conferir. */
 export interface EstadoDaApi {
   consentimentoAceito: boolean;
+  /** Foto de perfil guardada (ou `null`). */
+  foto: { contentType: string; data: string } | null;
   membros: Membro[];
   doses: Dose[];
   /** Chamadas recebidas, no formato "MÉTODO /caminho". */
@@ -128,6 +130,7 @@ function lerCorpo(texto: string | null): Record<string, unknown> {
 export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
   const estado: EstadoDaApi = {
     consentimentoAceito: false,
+    foto: null,
     membros: [],
     doses: [],
     chamadas: [],
@@ -188,6 +191,20 @@ export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
         acceptedAt: '2026-10-10T12:00:00.000Z',
         guardianDeclaration: corpo.guardianDeclaration === true,
       });
+    }
+
+    if (chave === 'GET /account/photo') {
+      return estado.foto
+        ? json(route, 200, estado.foto)
+        : json(route, 404, { code: 'NOT_FOUND', message: 'Sem foto.' });
+    }
+    if (chave === 'PUT /account/photo') {
+      estado.foto = { contentType: String(corpo.contentType), data: String(corpo.data) };
+      return json(route, 204);
+    }
+    if (chave === 'DELETE /account/photo') {
+      estado.foto = null;
+      return json(route, 204);
     }
 
     if (chave === 'GET /reminders') {

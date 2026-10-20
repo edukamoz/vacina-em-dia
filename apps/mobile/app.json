@@ -40,7 +40,15 @@
           "backgroundColor": "#0B6B52"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Vacina em Dia usa a sua galeria só para você escolher a foto de perfil. A foto é reduzida no aparelho e guardada de forma privada.",
+          "cameraPermission": "O Vacina em Dia usa a câmera só para você tirar a foto de perfil. A foto é reduzida no aparelho e guardada de forma privada.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

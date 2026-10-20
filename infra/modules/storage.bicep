@@ -36,6 +36,13 @@ resource containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2
   }
 ]
 
+@description('Contêiner privado das fotos de perfil (uma imagem por conta, acessada só pela API).')
+resource photoContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: 'fotos-de-perfil'
+  properties: { publicAccess: 'None' }
+}
+
 @description('Nome da conta de armazenamento.')
 output name string = storage.name
 
