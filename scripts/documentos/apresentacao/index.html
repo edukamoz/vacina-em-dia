@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vacina em Dia · Apresentação</title>
+<style>
+@font-face{font-family:"Atkinson";src:url(ativos/atkinson-400Regular.ttf);font-weight:400;font-display:swap}
+@font-face{font-family:"Atkinson";src:url(ativos/atkinson-700Bold.ttf);font-weight:700;font-display:swap}
+:root{
+  --bg:#04201a;--bg2:#073a2f;--g:#0b6b52;--mint:#6fd0aa;--mint2:#bfe9d8;--sun:#f2b84b;--ink:#eafaf4;--mut:#a8c9bd;
+  --glass:rgba(255,255,255,.07);--line:rgba(255,255,255,.16);
+  --red:#ff9d94;--blue:#8fc8ff;--ok:#8be0a4;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Atkinson",system-ui,sans-serif}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+a{color:var(--mint)}
+
+/* ---------- fundo vivo ---------- */
+.bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 20% 0%,var(--bg2),var(--bg) 60%)}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:drift 22s ease-in-out infinite alternate}
+.blob.a{width:60vmax;height:60vmax;left:-15vmax;top:-20vmax;background:#0b6b52}
+.blob.b{width:45vmax;height:45vmax;right:-12vmax;bottom:-18vmax;background:#1c8f6f;animation-duration:28s}
+.blob.c{width:28vmax;height:28vmax;left:45vw;top:55vh;background:#f2b84b;opacity:.16;animation-duration:34s}
+@keyframes drift{to{transform:translate3d(6vmax,4vmax,0) scale(1.15)}}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(70% 70% at 50% 40%,#000,transparent)}
+#part{position:absolute;inset:0;width:100%;height:100%}
+#glow{position:fixed;width:520px;height:520px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(111,208,170,.18),transparent 65%);transform:translate(-50%,-50%);left:50%;top:50%;transition:opacity .4s;z-index:1}
+
+/* ---------- palco 1920x1080 ---------- */
+#stage{position:fixed;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;z-index:2}
+.slide{position:absolute;inset:0;padding:96px 120px 120px;visibility:hidden}
+.slide.active,.slide.leaving{visibility:visible}
+.slide.leaving{z-index:1;animation:leave .6s var(--ease) both}
+.slide.active{z-index:2}
+@keyframes leave{to{opacity:0;transform:scale(.94);filter:blur(10px)}}
+.back.leaving{animation-name:leaveBack}
+@keyframes leaveBack{to{opacity:0;transform:scale(1.06);filter:blur(10px)}}
+.slide.active[data-t=zoom]{animation:inZoom .9s var(--ease) both}
+.slide.active[data-t=slide]{animation:inSlide .9s var(--ease) both}
+.slide.active[data-t=rise]{animation:inRise .9s var(--ease) both}
+.slide.active[data-t=blur]{animation:inBlur .9s var(--ease) both}
+.slide.active[data-t=iris]{animation:inIris 1.1s var(--ease) both}
+.slide.active.back[data-t=slide]{animation-name:inSlideBack}
+@keyframes inZoom{from{opacity:0;transform:scale(1.18)}to{opacity:1;transform:none}}
+@keyframes inSlide{from{opacity:0;transform:translateX(220px)}to{opacity:1;transform:none}}
+@keyframes inSlideBack{from{opacity:0;transform:translateX(-220px)}to{opacity:1;transform:none}}
+@keyframes inRise{from{opacity:0;transform:translateY(160px) rotateX(12deg)}to{opacity:1;transform:none}}
+@keyframes inBlur{from{opacity:0;filter:blur(30px);transform:scale(.96)}to{opacity:1;filter:none;transform:none}}
+@keyframes inIris{from{clip-path:circle(0% at 50% 55%)}to{clip-path:circle(150% at 50% 55%)}}
+
+/* revelações em cascata */
+.slide:not(.active):not(.leaving) [data-r]{opacity:0}
+.slide.leaving [data-r]{opacity:1}
+.slide.active [data-r]{animation:var(--rv,rvUp) .9s var(--ease) both;animation-delay:calc(var(--i,0)*100ms + 380ms)}
+[data-r=left]{--rv:rvLeft}[data-r=right]{--rv:rvRight}[data-r=zoom]{--rv:rvZoom}[data-r=pop]{--rv:rvPop}
+@keyframes rvUp{from{opacity:0;transform:translateY(46px)}to{opacity:1;transform:none}}
+@keyframes rvLeft{from{opacity:0;transform:translateX(-70px)}to{opacity:1;transform:none}}
+@keyframes rvRight{from{opacity:0;transform:translateX(70px)}to{opacity:1;transform:none}}
+@keyframes rvZoom{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+@keyframes rvPop{0%{opacity:0;transform:scale(.4)}70%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:none}}
+.rm .slide [data-r]{opacity:1;animation:none!important}
+.rm .slide.active{animation:none!important}
+.rm .slide.leaving{display:none}
+.rm .blob,.rm *{animation-duration:.001s!important;animation-iteration-count:1!important}
+
+/* ---------- tipografia e peças ---------- */
+.kick{display:inline-flex;align-items:center;gap:12px;font-size:26px;letter-spacing:.18em;text-transform:uppercase;color:var(--mint);font-weight:700}
+.kick::before{content:"";width:46px;height:3px;border-radius:3px;background:var(--sun)}
+h2{font-size:92px;line-height:1.02;font-weight:700;letter-spacing:-.02em;margin:18px 0 0}
+h2 em{font-style:normal;color:var(--mint)}
+.lead{font-size:34px;line-height:1.35;color:var(--mut);max-width:1000px;margin-top:22px}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:30px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 30px 60px -30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12)}
+.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.chip{display:inline-flex;align-items:center;gap:12px;padding:12px 22px;border-radius:999px;background:var(--glass);border:1px solid var(--line);font-size:26px}
+.tilt{transform-style:preserve-3d;transition:transform .25s var(--ease);position:relative;overflow:hidden}
+.tilt::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.16),transparent 55%);opacity:0;transition:opacity .3s}
+.tilt:hover::after{opacity:1}
+
+/* ---------- 1 capa ---------- */
+#s1 .marca{display:flex;align-items:center;gap:26px}
+#s1 .marca svg{width:96px;height:96px}
+#s1 .marca b{font-size:62px;letter-spacing:-.01em}
+#s1 .marca b span{color:var(--mint)}
+#s1 h1{font-size:128px;line-height:1;letter-spacing:-.03em;margin:70px 0 0;max-width:1000px}
+#s1 h1 em{font-style:normal;background:linear-gradient(90deg,var(--mint),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent}
+#s1 .sub{font-size:36px;color:var(--mut);margin-top:30px;max-width:880px;line-height:1.35}
+#s1 .rodape{position:absolute;left:120px;bottom:150px;font-size:26px;color:var(--mut);line-height:1.55}
+#s1 .rodape b{color:var(--ink)}
+.cena{position:absolute;right:40px;top:90px;width:900px;height:900px;perspective:1400px}
+.cena .halo{position:absolute;left:90px;top:120px;width:720px;height:720px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--mint),var(--g) 60%,transparent 72%);opacity:.9;animation:pulse 6s ease-in-out infinite}
+.cena .halo.b{left:360px;top:20px;width:420px;height:420px;background:radial-gradient(circle at 40% 35%,var(--sun),transparent 70%);opacity:.5;animation-delay:-2s}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.cena .p{position:absolute;bottom:60px;height:auto;filter:drop-shadow(0 40px 40px rgba(0,0,0,.45));will-change:transform;transform:translate3d(calc(var(--px,0)*var(--d)*1px),calc(var(--py,0)*var(--d)*.6px),0) rotateY(calc(var(--px,0)*var(--d)*.12deg))}
+.cena .p1{left:20px;width:380px;--d:-14;opacity:.95}
+.cena .p2{left:230px;width:520px;--d:26;z-index:2}
+.cena .p3{right:0;width:420px;--d:-34;z-index:3}
+.pill{position:absolute;display:flex;align-items:center;gap:14px;padding:16px 26px;border-radius:24px;font-size:28px;font-weight:700;background:rgba(255,255,255,.95);color:#12201b;box-shadow:0 24px 50px -16px rgba(0,0,0,.55);z-index:4;animation:bob 5s ease-in-out infinite;transform:translate3d(calc(var(--px,0)*var(--d)*1px),calc(var(--py,0)*var(--d)*1px),0)}
+.pill .ic{font-size:34px}
+.pill.r{color:#b3261e}.pill.b{color:#0b5aa6}.pill.v{color:#1b6b2a}
+.pill small{display:block;font-weight:400;font-size:20px;color:#40524b}
+@keyframes bob{50%{margin-top:-14px}}
+.ecg{position:absolute;left:0;right:0;bottom:0;height:110px;width:100%}
+.ecg path{fill:none;stroke:var(--mint);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:420 2600;animation:ecg 5s linear infinite;filter:drop-shadow(0 0 8px var(--mint))}
+.ecg path.f{stroke:rgba(255,255,255,.1);stroke-dasharray:none;animation:none;filter:none}
+@keyframes ecg{from{stroke-dashoffset:420}to{stroke-dashoffset:-2600}}
+
+/* ---------- 2 problema ---------- */
+.dois{display:grid;grid-template-columns:.85fr 1.15fr;gap:80px;align-items:center;height:100%}
+.cards4{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.card4{padding:40px 40px 44px;min-height:290px}
+.card4 .ic{font-size:64px;color:var(--sun)}
+.card4 h3{font-size:42px;margin:20px 0 10px}
+.card4 p{font-size:28px;line-height:1.35;color:var(--mut)}
+.ods{display:flex;gap:16px;margin-top:44px}
+.ods .chip b{color:var(--sun)}
+
+/* ---------- 3 solução ---------- */
+.feat{display:grid;gap:18px;margin-top:44px;max-width:790px}
+.feat li{list-style:none;display:flex;align-items:center;gap:22px;font-size:34px;padding:18px 26px;border-radius:24px}
+.feat .ic{font-size:44px;color:var(--mint)}
+.feat li small{display:block;font-size:24px;color:var(--mut)}
+.devs{position:absolute;right:70px;top:80px;width:900px;height:880px}
+.laptop{position:absolute;left:0;top:60px;width:760px}
+.laptop .tela{aspect-ratio:1440/900;border-radius:18px 18px 4px 4px;border:12px solid #0c1814;background:#0c1814;overflow:hidden;position:relative;box-shadow:0 50px 80px -30px #000}
+.laptop .base{height:20px;margin:0 -50px;border-radius:0 0 28px 28px;background:linear-gradient(#2b3b35,#101a16)}
+.phone{position:absolute;right:0;top:90px;width:330px;border-radius:52px;border:12px solid #0c1814;background:#0c1814;overflow:hidden;aspect-ratio:390/844;box-shadow:0 50px 80px -20px #000,0 0 0 2px #2e413a;animation:bob 7s ease-in-out infinite}
+.dev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transform:scale(1.04);transition:opacity .6s,transform .9s var(--ease)}
+.dev img.on{opacity:1;transform:none}
+.tabs{display:flex;gap:10px;position:absolute;left:0;right:0;bottom:0;justify-content:center;flex-wrap:wrap}
+.tab{padding:12px 24px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:25px;transition:.25s}
+.tab:hover{border-color:var(--mint)}
+.tab.on{background:var(--mint);color:#04201a;border-color:var(--mint);font-weight:700}
+
+/* ---------- 4 personas ---------- */
+.pers{display:grid;grid-template-columns:repeat(3,1fr);gap:46px;margin-top:50px}
+.flip{display:block;width:100%;perspective:1600px;height:560px;cursor:pointer;background:none;border:0;text-align:left}
+.flip .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .9s var(--ease)}
+.flip.on .in,.flip:hover .in,.flip:focus-visible .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:36px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border:1px solid var(--line)}
+.face.f{background:var(--c)}
+.face.f img{position:absolute;bottom:0;left:50%;height:92%;transform:translateX(-50%);filter:drop-shadow(0 20px 20px rgba(0,0,0,.25))}
+.face.f .nome{position:absolute;left:0;right:0;bottom:0;padding:90px 34px 30px;background:linear-gradient(transparent,rgba(4,32,26,.92));font-size:44px;font-weight:700}
+.face.f .nome small{display:block;font-size:26px;font-weight:400;color:var(--mint2)}
+.face.v{transform:rotateY(180deg);background:linear-gradient(160deg,#0f5a47,#073a2f);padding:48px 44px;display:flex;flex-direction:column;gap:18px}
+.face.v h3{font-size:44px;color:var(--sun)}
+.face.v p{font-size:30px;line-height:1.4}
+.face.v .ic{font-size:60px;color:var(--mint)}
+.dica{position:absolute;left:120px;bottom:100px;font-size:24px;color:var(--mut);display:flex;gap:12px;align-items:center}
+
+/* ---------- 5 requisitos ---------- */
+.rfs{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:46px}
+.rf{display:flex;align-items:center;gap:16px;padding:22px 24px;border-radius:24px;font-size:28px;line-height:1.15}
+.rf b{display:block;font-size:22px;color:var(--mint);letter-spacing:.08em}
+.rf .ic{font-size:36px;color:var(--ok);margin-left:auto}
+.rf.off{border-style:dashed;opacity:.65}.rf.off .ic{color:var(--mut)}
+.rnfs{display:flex;gap:16px;margin-top:34px;flex-wrap:wrap}
+.leg{margin-top:26px;font-size:24px;color:var(--mut)}
+
+/* ---------- 6 demo ---------- */
+.demo{display:grid;grid-template-columns:.9fr 1.1fr;gap:70px;height:100%;align-items:center}
+.who{display:flex;gap:14px;margin:40px 0 30px}
+.who .tab{font-size:30px;padding:14px 30px}
+.steps{display:grid;gap:16px;counter-reset:s}
+.steps li{list-style:none;counter-increment:s;display:flex;align-items:center;gap:22px;font-size:33px;padding:20px 28px;border-radius:24px;opacity:0;transform:translateX(-30px);animation:rvLeft .6s var(--ease) both;animation-delay:calc(var(--k)*110ms)}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--mint);color:#04201a;font-weight:700;font-size:28px;flex:none}
+.rm .steps li{opacity:1;transform:none}
+.live{display:inline-flex;gap:12px;align-items:center;margin-top:34px;padding:16px 30px;border-radius:999px;background:linear-gradient(90deg,var(--g),#139770);font-size:30px;font-weight:700;text-decoration:none;color:#fff;box-shadow:0 18px 40px -14px rgba(19,151,112,.8);transition:transform .25s var(--ease)}
+.live:hover{transform:translateY(-4px) scale(1.03)}
+.live i{width:14px;height:14px;border-radius:50%;background:#ff5f56;box-shadow:0 0 0 0 rgba(255,95,86,.7);animation:ping 1.6s infinite}
+@keyframes ping{to{box-shadow:0 0 0 18px rgba(255,95,86,0)}}
+.demoShow{position:relative;height:860px}
+.demoShow .laptop{left:0;top:30px;width:880px}
+.demoShow .phone{right:10px;top:200px;width:310px}
+
+/* ---------- 7 estados ---------- */
+.est{display:grid;grid-template-columns:1080px 1fr;gap:50px;margin-top:0}
+#svgEst{width:1080px;height:548px;margin-top:10px}
+#svgEst .no{cursor:pointer;transition:opacity .3s}
+#svgEst .no circle{fill:rgba(255,255,255,.08);stroke:var(--c);stroke-width:4;transition:.3s}
+#svgEst .no text{fill:var(--ink);font-size:29px;font-weight:700;text-anchor:middle;pointer-events:none}
+#svgEst .no.sel circle{fill:var(--c);fill-opacity:.35;filter:drop-shadow(0 0 22px var(--c))}
+#svgEst .ar{fill:none;stroke:rgba(255,255,255,.28);stroke-width:3;transition:.3s}
+#svgEst .at{fill:rgba(255,255,255,.28);transition:.3s}
+#svgEst .lb{fill:var(--mut);font-size:27px;text-anchor:middle;transition:.3s}
+#svgEst .ar.hi{stroke:var(--sun);stroke-width:5}
+#svgEst .at.hi{fill:var(--sun)}
+#svgEst .lb.hi{fill:var(--sun);font-weight:700}
+#svgEst.foco .dim{opacity:.18}
+.painelEst{padding:36px 38px;align-self:start;margin-top:30px}
+.painelEst h3{font-size:44px;margin-bottom:12px}
+.painelEst p{font-size:28px;line-height:1.38;color:var(--mut)}
+.painelEst .regra{margin-top:16px;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 30px;border-radius:999px;background:var(--mint);color:#04201a;font-weight:700;font-size:28px;margin-top:24px;transition:transform .25s var(--ease)}
+.btn:hover{transform:translateY(-3px) scale(1.03)}
+#token{fill:var(--sun);filter:drop-shadow(0 0 14px var(--sun))}
+
+/* ---------- 8 arquitetura ---------- */
+#svgArq{width:1500px;height:625px;margin-top:6px}
+.nodo rect{fill:rgba(255,255,255,.08);stroke:var(--line);stroke-width:2;transition:.3s}
+.nodo:hover rect{stroke:var(--mint);fill:rgba(111,208,170,.14)}
+.nodo text{fill:var(--ink);text-anchor:middle}
+.nodo .t{font-size:34px;font-weight:700}.nodo .s{font-size:24px;fill:var(--mut)}
+.fio{fill:none;stroke:var(--mint);stroke-width:3;stroke-dasharray:3 14;stroke-linecap:round;animation:flow 1.2s linear infinite}
+.fio.p{stroke:var(--sun)}.fio.t{stroke:rgba(255,255,255,.4);animation-duration:3s}
+@keyframes flow{to{stroke-dashoffset:-17}}
+
+/* ---------- 9 PLN ---------- */
+.pln{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:30px}
+.chat{padding:30px 32px;height:600px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.chat .top{display:flex;align-items:center;gap:14px;font-weight:700;font-size:30px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.chat .top svg{width:42px;height:42px}
+.bol{max-width:86%;padding:16px 22px;border-radius:24px;font-size:27px;line-height:1.3;animation:rvUp .5s var(--ease) both}
+.bol.u{align-self:flex-end;background:var(--g);border-bottom-right-radius:6px}
+.bol.a{align-self:flex-start;background:rgba(255,255,255,.1);border-bottom-left-radius:6px}
+.bol small{display:block;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);color:var(--mut);font-size:20px}
+.dots{display:inline-flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--mut);animation:dt 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes dt{50%{transform:translateY(-8px);opacity:.4}}
+.met{display:grid;gap:26px}
+.rings{display:flex;gap:30px}
+.ring{position:relative;width:250px;height:250px;text-align:center}
+.ring svg{width:250px;height:250px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:18;stroke-linecap:round}
+.ring .tr{stroke:rgba(255,255,255,.1)}
+.ring .pg{stroke:var(--mint);stroke-dasharray:var(--c) 1000;stroke-dashoffset:var(--c);transition:stroke-dashoffset 1.6s var(--ease) .6s}
+.slide.active .ring .pg{stroke-dashoffset:calc(var(--c)*(1 - var(--v)))}
+.ring div{position:absolute;inset:0;display:grid;place-content:center;font-size:58px;font-weight:700}
+.ring div small{font-size:22px;font-weight:400;color:var(--mut)}
+.bars .l{display:flex;justify-content:space-between;font-size:26px;margin:14px 0 8px}
+.bars .b{height:30px;border-radius:15px;background:rgba(255,255,255,.1);overflow:hidden}
+.bars .b i{display:block;height:100%;width:0;border-radius:15px;background:linear-gradient(90deg,var(--g),var(--mint));transition:width 1.6s var(--ease) .9s}
+.bars .b i.s{background:linear-gradient(90deg,#d99a22,var(--sun))}
+.slide.active .bars .b i{width:var(--w)}
+.fluxo{display:flex;align-items:center;gap:14px;margin-top:30px;flex-wrap:wrap}
+.fluxo .chip{font-size:24px}.fluxo .ic{font-size:30px;color:var(--mint)}.fluxo>.ar{color:var(--sun);font-size:28px}
+
+/* ---------- 10 qualidade ---------- */
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;margin-top:50px}
+.tile{padding:44px 26px;text-align:center}
+.tile .n{font-size:96px;font-weight:700;color:var(--mint);letter-spacing:-.02em;line-height:1}
+.tile .n small{font-size:42px}
+.tile p{font-size:27px;color:var(--mut);margin-top:14px;line-height:1.25}
+.pipe{display:flex;align-items:center;gap:14px;margin-top:64px;flex-wrap:wrap}
+.pipe .chip{opacity:.3;transition:.4s;font-size:28px}
+.pipe .chip.on{opacity:1;border-color:var(--ok);background:rgba(139,224,164,.14)}
+.pipe .chip .ic{color:var(--ok);font-size:28px}
+.pipe>.ar{color:var(--mut);font-size:26px}
+.meta{margin-top:40px;font-size:30px;color:var(--mut)}
+
+/* ---------- 11 nuvem ---------- */
+.nuv{display:grid;grid-template-columns:1.25fr .75fr;gap:60px;margin-top:34px}
+.map{display:grid;gap:12px}
+.mp{display:grid;grid-template-columns:1fr 60px 1fr;align-items:center;padding:10px 26px;font-size:27px;border-radius:22px}
+.mp .ic{font-size:34px;color:var(--sun);justify-self:center}
+.mp span:last-child{color:var(--mint);font-weight:700;text-align:right}
+.mp span:first-child{color:var(--mut)}
+.custo{padding:44px 40px;text-align:center;align-self:start}
+.custo .n{white-space:nowrap;font-size:104px;font-weight:700;color:var(--sun);line-height:1;letter-spacing:-.03em}
+.custo .n small{font-size:42px;color:var(--mut);font-weight:400;letter-spacing:0}
+.custo p{font-size:26px;color:var(--mut);margin-top:16px;line-height:1.35}
+.tags{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;justify-content:center}
+.tags .chip{font-size:23px;padding:10px 18px}
+
+/* ---------- 12 privacidade ---------- */
+.sec{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:44px}
+.sec .t{padding:36px 38px;min-height:260px}
+.sec .ic{font-size:74px;color:var(--mint);transition:transform .5s var(--ease)}
+.sec .t:hover .ic{transform:scale(1.18) rotate(-6deg)}
+.sec h3{font-size:42px;margin:22px 0 10px}
+.sec p{font-size:27px;color:var(--mut);line-height:1.35}
+
+/* ---------- 13 gestão ---------- */
+.kan{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:36px}
+.col{padding:22px;min-height:300px}
+.col h4{font-size:27px;color:var(--mint);margin-bottom:16px;display:flex;justify-content:space-between}
+.col h4 small{color:var(--mut);font-weight:400}
+.cd{padding:16px 18px;border-radius:18px;background:rgba(255,255,255,.1);font-size:25px;margin-bottom:12px;border:1px solid var(--line)}
+.cd b{color:var(--sun);margin-right:8px}
+.cd.mv{animation:rvPop .6s var(--ease) both}
+.lock{display:grid;place-items:center;height:200px;color:var(--mut);font-size:25px;text-align:center;gap:10px;border:2px dashed var(--line);border-radius:18px;padding:20px}
+.lock .ic{font-size:50px}
+.tl{position:relative;margin-top:20px;height:190px}
+.tl .rua{position:absolute;left:0;right:0;top:80px;height:8px;border-radius:8px;background:rgba(255,255,255,.12)}
+.tl .rua i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,var(--g),var(--mint));width:0;transition:width 2.2s var(--ease) .8s}
+.slide.active .tl .rua i{width:100%}
+.tl .m{position:absolute;top:71px;transform:translateX(-50%);text-align:center;font-size:23px;white-space:nowrap}
+.tl .m::before{content:"";display:block;width:26px;height:26px;border-radius:50%;background:var(--sun);margin:0 auto 10px;box-shadow:0 0 0 8px rgba(242,184,75,.25)}
+.tl .m b{display:block;color:var(--sun);font-size:28px}
+.tl .m.fim{transform:translateX(-100%);text-align:right}
+.tl .m.fim::before{margin:0 0 10px auto}
+.tl .sp{position:absolute;top:36px;font-size:20px;color:var(--mut);transform:translateX(-50%)}
+.stats{display:flex;gap:16px}
+
+/* ---------- 14 limites ---------- */
+.lim{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:44px}
+.lim h3{font-size:36px;margin-bottom:20px;color:var(--sun)}
+.lim ul{list-style:none;display:grid;gap:14px}
+.lim li{display:flex;gap:18px;align-items:flex-start;padding:20px 26px;border-radius:22px;font-size:30px;line-height:1.25}
+.lim li .ic{font-size:38px;color:var(--mut);margin-top:2px}
+.lim .ok li .ic{color:var(--ok)}
+
+/* ---------- 15 fim ---------- */
+#s15{display:grid;place-items:center;text-align:center}
+#s15 .qr{width:300px;height:300px;border-radius:30px;background:#fff;padding:16px;box-shadow:0 0 0 12px rgba(111,208,170,.25),0 40px 80px -20px #000;margin:0 auto}
+#s15 .qr img{width:100%;height:100%;display:block}
+#s15 h2{font-size:150px;margin-top:40px}
+#s15 .url{font-size:36px;color:var(--mint);margin-top:12px}
+#s15 .perg{font-size:56px;color:var(--sun);font-weight:700;margin-top:34px}
+.orb{position:absolute;border-radius:50%;filter:blur(2px);animation:bob 6s ease-in-out infinite}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;gap:14px;padding:14px 26px;color:var(--mut);font-size:15px;opacity:.0;transition:opacity .4s;background:linear-gradient(transparent,rgba(4,32,26,.8))}
+body.mostra .hud,.hud:hover{opacity:1}
+.hud .num{min-width:70px;font-variant-numeric:tabular-nums}
+.hud button{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--glass)}
+.hud button:hover{border-color:var(--mint);color:var(--ink)}
+.hud .esp{flex:1}
+.prog{position:fixed;left:0;top:0;height:5px;z-index:21;background:linear-gradient(90deg,var(--mint),var(--sun));width:0;transition:width .6s var(--ease)}
+#notas{position:fixed;left:50%;bottom:64px;transform:translate(-50%,30px);width:min(900px,92vw);z-index:25;padding:20px 26px;border-radius:20px;background:rgba(3,22,18,.94);border:1px solid var(--line);font-size:20px;line-height:1.5;opacity:0;pointer-events:none;transition:.35s var(--ease)}
+#notas.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#notas b{color:var(--sun)}
+#visao{position:fixed;inset:0;z-index:30;background:rgba(3,22,18,.94);backdrop-filter:blur(14px);padding:6vh 6vw;overflow:auto;display:none}
+#visao.on{display:block;animation:inBlur .4s both}
+#visao h2{font-size:40px;margin-bottom:24px}
+#visao .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+#visao button{padding:22px;border-radius:18px;border:1px solid var(--line);background:var(--glass);text-align:left;font-size:20px;line-height:1.25}
+#visao button:hover,#visao button.cur{border-color:var(--mint);background:rgba(111,208,170,.14)}
+#visao button b{display:block;color:var(--mint);font-size:15px;margin-bottom:6px}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+@media print{body{overflow:visible}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob a"></div><div class="blob b"></div><div class="blob c"></div><div class="grid"></div><canvas id="part"></canvas></div>
+<div id="glow"></div>
+<div class="prog" id="prog"></div>
+
+<main id="stage">
+
+<!-- 1 CAPA -->
+<section class="slide" id="s1" data-t="iris" data-title="Capa" data-notes="<b>Abertura.</b> Apresente-se e diga em uma frase: o app ajuda a família a manter as vacinas em dia. As três pessoas da foto são fictícias. Mova o mouse para ver o efeito 3D.">
+  <div class="marca" data-r="left"><svg viewBox="0 0 64 64"><path d="M27 50C36 42 44 31 49 20" fill="none" stroke="#6fd0aa" stroke-width="9" stroke-linecap="round"/><circle cx="52.5" cy="9" r="6.2" fill="#6fd0aa"/><path d="M27 50 17.500 38" fill="none" stroke="#bfe9d8" stroke-width="9" stroke-linecap="round"/><circle cx="12" cy="28" r="5.2" fill="#f2b84b"/></svg><b>Vacina <span>em Dia</span></b></div>
+  <h1 data-r>As vacinas da sua família, <em>em dia.</em></h1>
+  <p class="sub" data-r>Carteira de vacinação digital com lembretes e assistente por voz.</p>
+  <p class="rodape" data-r><b>Projeto Interdisciplinar VI</b> · Fatec Votorantim<br>Eduardo Kamo Iguei · Orientador: Prof. Dr. Cassio R. F. Riedo</p>
+  <div class="cena" data-r="zoom">
+    <div class="halo"></div><div class="halo b"></div>
+    <img class="p p1" src="ativos/carla-cuidadora.webp" alt="">
+    <img class="p p2" src="ativos/mariana-e-bebe.webp" alt="">
+    <img class="p p3" src="ativos/sr-jose.webp" alt="">
+    <div class="pill r" style="left:-10px;top:150px;--d:30"><i data-ic="alert"></i><div>Gripe<small>Atrasada</small></div></div>
+    <div class="pill b" style="right:-20px;top:300px;--d:-40;animation-delay:-1.5s"><i data-ic="calendar"></i><div>Covid-19<small>Agendada</small></div></div>
+    <div class="pill v" style="left:60px;bottom:30px;--d:24;animation-delay:-3s"><i data-ic="check"></i><div>Febre amarela<small>Aplicada</small></div></div>
+  </div>
+  <svg class="ecg" viewBox="0 0 1920 140" preserveAspectRatio="none"><path class="f" d="M0 80H300L330 70L360 80H620L650 20L690 130L730 80H1010L1040 70L1070 80H1330L1360 20L1400 130L1440 80H1920"/><path d="M0 80H300L330 70L360 80H620L650 20L690 130L730 80H1010L1040 70L1070 80H1330L1360 20L1400 130L1440 80H1920"/></svg>
+</section>
+
+<!-- 2 PROBLEMA -->
+<section class="slide" id="s2" data-t="rise" data-title="O problema" data-notes="<b>Proposta do semestre.</b> Quatro problemas levantados na Fase 0, cada um ligado a uma expectativa. São hipóteses de trabalho. Cite os ODS 3 e 10 (o 11 vem pelo mapa de postos).">
+  <div class="dois">
+    <div>
+      <span class="kick" data-r>O problema</span>
+      <h2 data-r>Quatro furos na <em>caderneta.</em></h2>
+      <p class="lead" data-r>Um só app resolve os quatro.</p>
+      <div class="ods" data-r><span class="chip"><b>ODS 3</b> Saúde e bem-estar</span><span class="chip"><b>ODS 10</b> Menos desigualdade</span></div>
+    </div>
+    <div class="cards4">
+      <div data-r="zoom"><div class="glass card4 tilt"><i class="ic" data-ic="bell"></i><h3>Doses esquecidas</h3><p>Sem lembrete, a data passa.</p></div></div>
+      <div data-r="zoom"><div class="glass card4 tilt"><i class="ic" data-ic="book"></i><h3>Caderneta perdida</h3><p>O papel some ou não está na consulta.</p></div></div>
+      <div data-r="zoom"><div class="glass card4 tilt"><i class="ic" data-ic="calendar"></i><h3>Dúvida sobre a idade</h3><p>O que vale para cada pessoa?</p></div></div>
+      <div data-r="zoom"><div class="glass card4 tilt"><i class="ic" data-ic="users"></i><h3>Barreiras de acesso</h3><p>Idosos e quem digita pouco.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 SOLUÇÃO -->
+<section class="slide" id="s3" data-t="slide" data-title="A solução" data-notes="<b>A solução.</b> Um só app (web, Android e iOS) na Azure. Clique nas abas sob os aparelhos para trocar a tela. Novidade desta rodada: PDF da carteira, app instalável e fotos reais na entrada.">
+  <span class="kick" data-r>A solução</span>
+  <h2 data-r style="max-width:780px">Uma carteira, <em>toda a família.</em></h2>
+  <ul class="feat">
+    <li class="glass" data-r="left"><i class="ic" data-ic="calendar"></i><div>Calendário por pessoa e idade<small>Calendário Nacional (PNI 2026), com fonte e versão</small></div></li>
+    <li class="glass" data-r="left"><i class="ic" data-ic="bell"></i><div>Lembretes e doses atrasadas<small>no app e por e-mail, sem expor nomes</small></div></li>
+    <li class="glass" data-r="left"><i class="ic" data-ic="mic"></i><div>Voz e assistente<small>respostas curadas, sem IA generativa</small></div></li>
+    <li class="glass" data-r="left"><i class="ic" data-ic="pin"></i><div>Postos, PDF da carteira e app instalável</div></li>
+  </ul>
+  <div class="devs" data-r="right">
+    <div class="laptop dev"><div class="tela"><img class="on" src="ativos/web-landing.webp" alt=""><img src="ativos/web-cadastro.webp" alt=""><img src="ativos/web-doses.webp" alt=""><img src="ativos/web-dose.webp" alt=""><img src="ativos/web-assistente.webp" alt=""></div><div class="base"></div></div>
+    <div class="phone dev"><img class="on" src="ativos/cel-landing.webp" alt=""><img src="ativos/cel-cadastro.webp" alt=""><img src="ativos/cel-doses.webp" alt=""><img src="ativos/cel-dose.webp" alt=""><img src="ativos/cel-assistente.webp" alt=""></div>
+    <div class="tabs" id="tabs3"><button class="tab on">Início</button><button class="tab">Cadastro</button><button class="tab">Doses</button><button class="tab">Dose</button><button class="tab">Assistente</button></div>
+  </div>
+</section>
+
+<!-- 4 PERSONAS -->
+<section class="slide" id="s4" data-t="zoom" data-title="Para quem" data-notes="<b>Funcionalidades por persona.</b> Passe o mouse (ou clique) em cada cartão para virar. As personas são hipóteses de trabalho; a validação com usuários foi abandonada e isso é uma limitação declarada.">
+  <span class="kick" data-r>Para quem</span>
+  <h2 data-r>Três pessoas, <em>três jeitos de usar.</em></h2>
+  <div class="pers">
+    <div data-r="zoom"><button class="flip" style="--c:linear-gradient(160deg,#bfe9d8,#6fd0aa)"><div class="in"><div class="face f"><img src="ativos/mariana-e-bebe.webp" alt="Mariana com o bebê"><div class="nome">Mariana, 32<small>Mãe de duas crianças</small></div></div><div class="face v"><i class="ic" data-ic="bell"></i><h3>Mariana</h3><p>Pouco tempo, esquece datas.</p><p><b>Precisa:</b> saber quais vacinas e quando, e receber lembretes.</p></div></div></button></div>
+    <div data-r="zoom"><button class="flip" style="--c:linear-gradient(160deg,#fde7b3,#f2b84b)"><div class="in"><div class="face f"><img src="ativos/sr-jose.webp" alt="Sr. José"><div class="nome">Sr. José, 68<small>Aposentado</small></div></div><div class="face v"><i class="ic" data-ic="mic"></i><h3>Sr. José</h3><p>Pouca familiaridade com aplicativos.</p><p><b>Precisa:</b> perguntar por voz, letras grandes e poucos passos.</p></div></div></button></div>
+    <div data-r="zoom"><button class="flip" style="--c:linear-gradient(160deg,#cfe6fb,#8fc8ff)"><div class="in"><div class="face f"><img src="ativos/carla-cuidadora.webp" alt="Carla"><div class="nome">Carla, 45<small>Cuidadora da família</small></div></div><div class="face v"><i class="ic" data-ic="users"></i><h3>Carla</h3><p>Cuida do pai, da mãe e do filho.</p><p><b>Precisa:</b> várias pessoas em uma conta e todas as pendências de uma vez.</p></div></div></button></div>
+  </div>
+  <p class="dica" data-r><i class="ic" data-ic="eye"></i>Personas são hipóteses de trabalho; as fotos são de pessoas fictícias.</p>
+</section>
+
+<!-- 5 REQUISITOS -->
+<section class="slide" id="s5" data-t="slide" data-title="Requisitos" data-notes="<b>Requisitos.</b> 11 dos 12 funcionais entregues. O RF12 (compartilhar com cuidador) ficou de fora por decisão do autor. Os não funcionais mais relevantes: desempenho, acessibilidade, LGPD, multiplataforma. Rastreabilidade completa em docs/19.">
+  <span class="kick" data-r>Requisitos</span>
+  <h2 data-r><em>11 de 12</em> funcionais entregues</h2>
+  <div class="rfs" id="rfs"></div>
+  <div class="rnfs" data-r><span class="chip"><i class="ic" data-ic="zap"></i>90% das respostas em menos de 3 s</span><span class="chip"><i class="ic" data-ic="eye"></i>WCAG 2.1 AA</span><span class="chip"><i class="ic" data-ic="lock"></i>LGPD</span><span class="chip"><i class="ic" data-ic="phone"></i>Android · iOS · Web</span></div>
+</section>
+
+<!-- 6 DEMO -->
+<section class="slide" id="s6" data-t="blur" data-title="Demonstração" data-notes="<b>Demonstração.</b> Roteiro completo em docs/20. Use as abas para cada persona. Aqueça o PLN antes (partida a frio de cerca de 50 s). O botão vermelho abre o app publicado.">
+  <div class="demo">
+    <div>
+      <span class="kick" data-r>Demonstração</span>
+      <h2 data-r>Vamos <em>usar.</em></h2>
+      <div class="who" data-r><button class="tab on">Mariana</button><button class="tab">Sr. José</button><button class="tab">Carla</button></div>
+      <ol class="steps" id="steps"></ol>
+      <a class="live" data-r href="https://blue-rock-0d7abc710.4.azurestaticapps.net" target="_blank" rel="noopener"><i></i>Abrir o app ao vivo</a>
+    </div>
+    <div class="demoShow" data-r="right">
+      <div class="laptop dev" id="dl"><div class="tela"><img class="on" src="ativos/web-doses.webp" alt=""><img src="ativos/web-assistente.webp" alt=""><img src="ativos/web-familia.webp" alt=""></div><div class="base"></div></div>
+      <div class="phone dev" id="dp"><img class="on" src="ativos/cel-doses.webp" alt=""><img src="ativos/cel-assistente.webp" alt=""><img src="ativos/cel-familia.webp" alt=""></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 ESTADOS -->
+<section class="slide" id="s7" data-t="iris" data-title="Ciclo da dose" data-notes="<b>UML de estados (RF04).</b> 5 estados e 12 transições, uma função pura no pacote compartilhado, coberta pelos 42 casos de teste. Clique num estado para ver o que ele permite. <b>Reproduzir exemplo</b> mostra T2, T7, T10 e T6. Atrasar só pela rotina de prazo, nunca pelo cliente.">
+  <span class="kick" data-r>Regra de negócio · UML de estados</span>
+  <h2 data-r style="font-size:76px">O ciclo de vida <em>da dose</em></h2>
+  <div class="est">
+    <svg id="svgEst" viewBox="0 0 1260 640" data-r="zoom"></svg>
+    <div class="glass painelEst" data-r="right"><h3 id="estT">Toque num estado</h3><p id="estP">Veja de onde cada dose pode ir. Atrasar só acontece pela rotina de prazo.</p><p class="regra" id="estR"></p><button class="btn" id="estPlay">▶ Reproduzir exemplo</button></div>
+  </div>
+</section>
+
+<!-- 8 ARQUITETURA -->
+<section class="slide" id="s8" data-t="zoom" data-title="Arquitetura" data-notes="<b>Arquitetura.</b> Cliente-servidor sem servidor: app único, API em Azure Functions (TypeScript), PLN em Python, Azure SQL, Speech, Key Vault e Application Insights. Os pontos amarelos mostram o caminho de uma pergunta por voz. Docker roda tudo localmente.">
+  <span class="kick" data-r>Arquitetura</span>
+  <h2 data-r style="font-size:76px">Tudo na <em>Azure</em>, sem servidor</h2>
+  <svg id="svgArq" viewBox="0 0 1680 700" data-r="zoom"></svg>
+</section>
+
+<!-- 9 PLN -->
+<section class="slide" id="s9" data-t="blur" data-title="PLN" data-notes="<b>PLN (20 pontos).</b> Chatbot: TF-IDF + SVM linear, 490 frases de treino em 20 intenções, 100 de teste separadas, F1 macro 0,93. Busca semântica com LSA: acerto na 1ª posição de 68,3% para 88,9% em 63 consultas. Sem IA generativa; o áudio nunca é gravado. A pergunta de saúde individual é recusada com orientação (SAMU 192).">
+  <span class="kick" data-r>Processamento de linguagem natural</span>
+  <h2 data-r style="font-size:66px">Entende a pergunta. <em>Não inventa a resposta.</em></h2>
+  <div class="pln">
+    <div class="glass chat" data-r="left" id="chat"><div class="top"><svg viewBox="0 0 64 64"><path d="M27 50C36 42 44 31 49 20" fill="none" stroke="#6fd0aa" stroke-width="9" stroke-linecap="round"/><circle cx="52.5" cy="9" r="6.2" fill="#6fd0aa"/><path d="M27 50 17.500 38" fill="none" stroke="#bfe9d8" stroke-width="9" stroke-linecap="round"/><circle cx="12" cy="28" r="5.2" fill="#f2b84b"/></svg>Assistente</div></div>
+    <div class="met" data-r="right">
+      <div class="rings">
+        <div class="ring" style="--c:565;--v:.932"><svg viewBox="0 0 200 200"><circle class="tr" cx="100" cy="100" r="90"/><circle class="pg" cx="100" cy="100" r="90"/></svg><div>0,93<small>F1 macro</small></div></div>
+        <div class="ring" style="--c:565;--v:.94"><svg viewBox="0 0 200 200"><circle class="tr" cx="100" cy="100" r="90"/><circle class="pg" cx="100" cy="100" r="90" style="stroke:var(--sun)"/></svg><div>94%<small>acurácia</small></div></div>
+      </div>
+      <div class="bars"><div class="l"><span>Busca, 1º resultado certo (63 consultas)</span></div>
+        <div class="l"><span>Antes</span><b>68,3%</b></div><div class="b"><i class="s" style="--w:68.3%"></i></div>
+        <div class="l"><span>Com LSA</span><b>88,9%</b></div><div class="b"><i style="--w:88.9%"></i></div></div>
+    </div>
+  </div>
+  <div class="fluxo" data-r><span class="chip"><i class="ic" data-ic="mic"></i>Voz</span><span class="ar">→</span><span class="chip">Azure AI Speech</span><span class="ar">→</span><span class="chip"><i class="ic" data-ic="search"></i>Busca LSA + SVM</span><span class="ar">→</span><span class="chip"><i class="ic" data-ic="book"></i>Resposta curada + fonte</span></div>
+</section>
+
+<!-- 10 QUALIDADE -->
+<section class="slide" id="s10" data-t="rise" data-title="Qualidade e testes" data-notes="<b>Qualidade e testes (12/11).</b> Pirâmide: muitos testes unitários, alguns de integração, poucos de ponta a ponta. 1.250 testes Jest (236 + 585 + 429), pytest no PLN, 179 casos de caixa preta (partição e valor limite), 42 casos de estados, 10 testes ponta a ponta com axe (WCAG). O pipeline falha abaixo de 80% de cobertura. Jest em vez de JUnit é decisão do autor.">
+  <span class="kick" data-r>Qualidade e testes</span>
+  <h2 data-r style="font-size:76px">Cada mudança passa por <em>oito portões</em></h2>
+  <div class="tiles">
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="1250" data-sep="1">0</span></div><p>testes automatizados (Jest)</p></div>
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="95">0</span><small>%</small></div><p>cobertura de linhas do app (mínimo 80%)</p></div>
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="179">0</span></div><p>casos de caixa preta</p></div>
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="42">0</span></div><p>casos do ciclo da dose</p></div>
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="10">0</span></div><p>testes de ponta a ponta + acessibilidade</p></div>
+  </div>
+  <div class="pipe" id="pipe" data-r></div>
+  <p class="meta" data-r>GitHub Actions em todo push e pull request. Falhou, não entra.</p>
+</section>
+
+<!-- 11 NUVEM -->
+<section class="slide" id="s11" data-t="slide" data-title="Nuvem e custo" data-notes="<b>Nuvem, IaC e custo.</b> Equivalência de serviços da AWS para a Azure (clique para alternar). Infraestrutura como código em Bicep; deploy por login federado (OIDC), sem segredo guardado. Custo de cerca de US$ 13 por mês, quase todo das duas instâncias sempre prontas (API e PLN); o SQL fica na oferta gratuita. Detalhes em docs/16.">
+  <span class="kick" data-r>Nuvem · custo · IaC</span>
+  <h2 data-r style="font-size:76px">Da AWS para a <em>Azure</em></h2>
+  <div class="nuv">
+    <div>
+      <div class="map" id="map"></div>
+      <button class="btn" id="mapBtn" data-r>⇄ Alternar AWS / Azure</button>
+    </div>
+    <div class="glass custo" data-r="right">
+      <p>Custo estimado</p>
+      <div class="n">≈ US$ <span class="count" data-to="13">0</span><small>/mês</small></div>
+      <p>quase tudo em duas instâncias sempre prontas (API e PLN). Azure SQL na oferta gratuita.</p>
+      <div class="tags"><span class="chip">Bicep</span><span class="chip">OIDC, sem segredo</span><span class="chip">Docker Compose</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 PRIVACIDADE -->
+<section class="slide" id="s12" data-t="zoom" data-title="Privacidade" data-notes="<b>Segurança e LGPD.</b> Dados de vacinação são sensíveis. Colete o mínimo: sem CPF nem CNS. Checklist OWASP em docs/21. Repositório com varredura de segredos e proteção da branch principal.">
+  <span class="kick" data-r>Segurança e LGPD</span>
+  <h2 data-r>Dado de saúde pede <em>cuidado.</em></h2>
+  <div class="sec">
+    <div data-r="zoom"><div class="glass t tilt"><i class="ic" data-ic="shield"></i><h3>Coleta mínima</h3><p>Sem CPF nem Cartão do SUS.</p></div></div>
+    <div data-r="zoom"><div class="glass t tilt"><i class="ic" data-ic="check"></i><h3>Consentimento</h3><p>Registrado, e excluir a conta apaga tudo.</p></div></div>
+    <div data-r="zoom"><div class="glass t tilt"><i class="ic" data-ic="lock"></i><h3>Senha e sessão</h3><p>Hash scrypt e sessão de 15 minutos.</p></div></div>
+    <div data-r="zoom"><div class="glass t tilt"><i class="ic" data-ic="users"></i><h3>Só o que é seu</h3><p>Posse verificada em todo acesso.</p></div></div>
+    <div data-r="zoom"><div class="glass t tilt"><i class="ic" data-ic="eye"></i><h3>Logs sem dados</h3><p>Nada de nome, e-mail ou mensagem.</p></div></div>
+    <div data-r="zoom"><div class="glass t tilt"><i class="ic" data-ic="cloud"></i><h3>Borda protegida</h3><p>HTTPS, CSP e limite de tentativas.</p></div></div>
+  </div>
+</section>
+
+<!-- 13 GESTÃO -->
+<section class="slide" id="s13" data-t="slide" data-title="Gestão" data-notes="<b>Scrum e backlog.</b> GitHub Projects (proj-vacina-em-dia), que substituiu o Jira: 50 itens em 9 épicos, prioridade MoSCoW e critérios de aceite. A convenção de status é a do professor; Concluído só depois da reunião de encerramento da sprint (por isso o cadeado). Seis sprints semanais, a partir de 06/10, apontando para 12/11, 16/11 e 19/11.">
+  <span class="kick" data-r>Gestão · Scrum</span>
+  <h2 data-r style="font-size:76px">Backlog vivo, <em>seis sprints</em></h2>
+  <div class="kan">
+    <div class="glass col" data-r="zoom"><h4>A fazer <small id="n0"></small></h4><div id="c0"></div></div>
+    <div class="glass col" data-r="zoom"><h4>Em andamento <small id="n1"></small></h4><div id="c1"></div></div>
+    <div class="glass col" data-r="zoom"><h4>Em análise <small id="n2"></small></h4><div id="c2"></div></div>
+    <div class="glass col" data-r="zoom"><h4>Concluído</h4><div class="lock"><i class="ic" data-ic="lock"></i>só depois da reunião de encerramento da sprint</div></div>
+  </div>
+  <div class="tl" id="tl" data-r><div class="rua"><i></i></div></div>
+  <div class="stats" data-r><span class="chip" style="color:var(--sun)">Exemplo do fluxo de um item</span><span class="chip">50 itens</span><span class="chip">9 épicos</span><span class="chip">MoSCoW</span><span class="chip">critérios de aceite</span></div>
+</section>
+
+<!-- 14 LIMITES -->
+<section class="slide" id="s14" data-t="blur" data-title="Limites e próximos passos" data-notes="<b>Limites.</b> Seja honesto(a) com o que ficou de fora. Voz, mapa e localização ainda sem teste em celular físico e iOS. O RF12 (compartilhar com cuidador) fica para uma versão futura.">
+  <span class="kick" data-r>Honestidade</span>
+  <h2 data-r>Limites e <em>próximos passos</em></h2>
+  <div class="lim">
+    <div><h3 data-r>O que ainda falta</h3><ul>
+      <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Não substitui a caderneta nem um profissional de saúde</li>
+      <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Personas sem validação com usuários reais</li>
+      <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Voz, mapa e instalação ainda sem teste em celular físico e iOS</li>
+      <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Compartilhar com cuidador (RF12) fica para depois</li></ul></div>
+    <div class="ok"><h3 data-r>O que acabou de entrar</h3><ul>
+      <li class="glass" data-r="right"><i class="ic" data-ic="check"></i>PDF da carteira, com fonte e aviso em toda página</li>
+      <li class="glass" data-r="right"><i class="ic" data-ic="check"></i>App instalável (PWA) com atalhos</li>
+      <li class="glass" data-r="right"><i class="ic" data-ic="check"></i>Testes de ponta a ponta e de acessibilidade no pipeline</li>
+      <li class="glass" data-r="right"><i class="ic" data-ic="check"></i>Painel de métricas do chatbot</li></ul></div>
+  </div>
+</section>
+
+<!-- 15 FIM -->
+<section class="slide" id="s15" data-t="iris" data-title="Obrigado" data-notes="<b>Encerramento.</b> Agradeça, mostre o QR do app publicado e abra para perguntas.">
+  <div class="orb" style="left:200px;top:160px;width:130px;height:130px;background:var(--sun);opacity:.5"></div>
+  <div class="orb" style="right:220px;top:620px;width:200px;height:200px;background:var(--mint);opacity:.3;animation-delay:-2s"></div>
+  <div>
+    <div class="qr" data-r="pop"><img src="ativos/qr-app.png" alt="QR code do app"></div>
+    <h2 data-r>Obrigado!</h2>
+    <p class="url" data-r>github.com/edukamoz/vacina-em-dia</p>
+    <p class="perg" data-r>Perguntas?</p>
+  </div>
+</section>
+</main>
+
+<div class="hud" id="hud">
+  <button id="bPrev" aria-label="Anterior">←</button><span class="num" id="num">1 / 15</span><button id="bNext" aria-label="Próximo">→</button>
+  <span class="esp"></span>
+  <button id="bVis">Visão geral (G)</button><button id="bNot">Notas (N)</button><button id="bMov">Movimento: ligado (M)</button><button id="bFull">Tela cheia (F)</button>
+</div>
+<div id="notas" role="note"></div>
+<div id="visao"><h2>Visão geral</h2><div class="g" id="vg"></div></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+const sv = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+/* ---------- ícones ---------- */
+const P = {
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  mic: '<rect x="9" y="2" width="6" height="13" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  phone: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+  book: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  zap: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+  eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+};
+function icons(root = document) {
+  $$('[data-ic]', root).forEach((el) => {
+    const s = sv('svg', { viewBox: '0 0 24 24', class: 'ic' });
+    s.innerHTML = P[el.dataset.ic] || '';
+    if (el.tagName === 'I' && !el.classList.contains('ic')) el.classList.add('ic');
+    el.replaceWith(el.tagName === 'I' ? (() => { s.setAttribute('class', 'ic ' + (el.className || '')); if (el.getAttribute('style')) s.setAttribute('style', el.getAttribute('style')); return s; })() : s);
+  });
+}
+icons();
+
+/* ---------- palco, escala e estado ---------- */
+const stage = $('#stage');
+const slides = $$('.slide');
+let cur = -1;
+const fit = () => { const k = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `translate(-50%,-50%) scale(${k})`; };
+addEventListener('resize', fit); fit();
+slides.forEach((s) => $$('[data-r]', s).forEach((el, i) => el.style.setProperty('--i', i)));
+
+let animar = true;
+try { animar = localStorage.getItem('vd-mov') !== 'off'; } catch (e) { /* sem armazenamento */ }
+const aplicarMov = () => { document.documentElement.classList.toggle('rm', !animar); $('#bMov').textContent = `Movimento: ${animar ? 'ligado' : 'reduzido'} (M)`; try { localStorage.setItem('vd-mov', animar ? 'on' : 'off'); } catch (e) { /* ok */ } };
+aplicarMov();
+
+/* ---------- partículas ---------- */
+(() => {
+  const c = $('#part'), g = c.getContext('2d'); let w, h; const ps = [];
+  const size = () => { w = c.width = innerWidth; h = c.height = innerHeight; }; size(); addEventListener('resize', size);
+  for (let i = 0; i < 46; i++) ps.push({ x: Math.random() * 2000, y: Math.random() * 1200, r: 1 + Math.random() * 3, v: .08 + Math.random() * .3, a: .15 + Math.random() * .4, c: Math.random() < .2 ? '242,184,75' : '111,208,170' });
+  const tick = () => { g.clearRect(0, 0, w, h); if (animar) for (const p of ps) { p.y -= p.v; p.x += Math.sin(p.y / 90) * .2; if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; } g.beginPath(); g.fillStyle = `rgba(${p.c},${p.a})`; g.arc(p.x % w, p.y, p.r, 0, 6.3); g.fill(); } requestAnimationFrame(tick); };
+  tick();
+})();
+
+/* ---------- brilho do cursor, parallax e inclinação ---------- */
+const glow = $('#glow'); let idle;
+addEventListener('mousemove', (e) => {
+  glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px';
+  document.body.classList.add('mostra'); clearTimeout(idle); idle = setTimeout(() => document.body.classList.remove('mostra'), 2600);
+  const px = (e.clientX / innerWidth - .5) * 2, py = (e.clientY / innerHeight - .5) * 2;
+  const cena = $('#s1 .cena'); if (cena && animar) { cena.style.setProperty('--px', px.toFixed(3)); cena.style.setProperty('--py', py.toFixed(3)); }
+});
+$$('.tilt').forEach((el) => {
+  el.addEventListener('mousemove', (e) => { if (!animar) return; const r = el.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height; el.style.transform = `perspective(900px) rotateX(${((.5 - y) * 12).toFixed(2)}deg) rotateY(${((x - .5) * 14).toFixed(2)}deg) translateZ(10px)`; el.style.setProperty('--mx', x * 100 + '%'); el.style.setProperty('--my', y * 100 + '%'); });
+  el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+});
+$$('.flip').forEach((f) => f.addEventListener('click', () => f.classList.toggle('on')));
+
+/* ---------- troca de telas em aparelhos ---------- */
+function carrossel(devs, tabs, auto) {
+  let k = 0, timer;
+  const show = (n) => { k = n; devs.forEach((d) => $$('img', d).forEach((im, i) => im.classList.toggle('on', i === n))); tabs.forEach((t, i) => t.classList.toggle('on', i === n)); };
+  tabs.forEach((t, i) => t.addEventListener('click', () => { clearInterval(timer); show(i); }));
+  return { show, start() { if (auto) { clearInterval(timer); timer = setInterval(() => animar && show((k + 1) % tabs.length), 3600); } }, stop() { clearInterval(timer); } };
+}
+const c3 = carrossel($$('#s3 .dev'), $$('#tabs3 .tab'), true);
+
+/* ---------- slide 5: requisitos ---------- */
+const RF = [['RF01', 'Conta e login'], ['RF02', 'Família'], ['RF03', 'Calendário por idade'], ['RF04', 'Ciclo da dose'], ['RF05', 'Lembretes'], ['RF06', 'Busca por voz'], ['RF07', 'Chatbot'], ['RF08', 'Histórico'], ['RF09', 'Consentimento e exclusão'], ['RF10', 'Mapa de postos'], ['RF11', 'PDF da carteira'], ['RF12', 'Compartilhar com cuidador']];
+$('#rfs').innerHTML = RF.map(([c, n], i) => `<div class="glass rf${i === 11 ? ' off' : ''}" data-r="pop"><div><b>${c}</b>${n}</div><i data-ic="${i === 11 ? 'x' : 'check'}"></i></div>`).join('');
+icons($('#rfs')); $$('#rfs [data-r]').forEach((el, i) => el.style.setProperty('--i', i + 1));
+
+/* ---------- slide 6: demo ---------- */
+const DEMO = {
+  0: { passos: ['Criar conta só com e-mail e senha', 'Consentimento em linguagem simples', 'Adicionar a criança e ver o calendário', 'Agendar e registrar a aplicação'], tela: 0 },
+  1: { passos: ['Alto contraste e texto maior', 'Perguntar por voz ou texto', 'Resposta curada, com fonte oficial', 'Saúde individual: recusa e orienta'], tela: 1 },
+  2: { passos: ['Várias pessoas em uma só conta', 'Dose avulsa fora do calendário', 'Histórico de toda a família', 'Baixar o PDF da carteira'], tela: 2 },
+};
+const dl = $('#dl'), dp = $('#dp');
+const quem = $$('#s6 .who .tab');
+function demo(n) {
+  quem.forEach((t, i) => t.classList.toggle('on', i === n));
+  $('#steps').innerHTML = DEMO[n].passos.map((p, i) => `<li class="glass" style="--k:${i + 1}">${p}</li>`).join('');
+  [dl, dp].forEach((d) => $$('img', d).forEach((im, i) => im.classList.toggle('on', i === DEMO[n].tela)));
+}
+quem.forEach((t, i) => t.addEventListener('click', () => demo(i))); demo(0);
+
+/* ---------- slide 7: ciclo da dose ---------- */
+const ESTADOS = {
+  PEND: { x: 130, y: 330, nome: 'Pendente', cor: '#cfd8d4', txt: 'A dose existe e ainda não tem data marcada.', regra: 'Pode agendar, aplicar ou cancelar. O prazo vencido a torna atrasada.' },
+  AGEN: { x: 560, y: 150, nome: 'Agendada', cor: '#8fc8ff', txt: 'Há uma data marcada para tomar.', regra: 'Agendar exige data de hoje em diante. Pode aplicar, reagendar, desagendar ou cancelar.' },
+  ATRA: { x: 560, y: 510, nome: 'Atrasada', cor: '#ff9d94', txt: 'O prazo ou o agendamento venceu.', regra: 'Só a rotina de prazo atrasa uma dose, nunca o cliente. Atrasada só pode ser reagendada, aplicada ou cancelada.' },
+  APLI: { x: 1090, y: 150, nome: 'Aplicada', cor: '#8be0a4', txt: 'Estado final: a dose foi tomada.', regra: 'Aplicar exige data de hoje ou anterior. Daqui não sai mais.' },
+  CANC: { x: 1090, y: 510, nome: 'Cancelada', cor: '#cbb8a6', txt: 'Estado final: a dose foi cancelada.', regra: 'Cancelar exige confirmação. Daqui não sai mais.' },
+};
+const TRANS = [['T2', 'PEND', 'AGEN', 0], ['T8', 'AGEN', 'PEND', 0], ['T3', 'PEND', 'APLI', 0], ['T4', 'PEND', 'ATRA', 0], ['T5', 'PEND', 'CANC', 0], ['T6', 'AGEN', 'APLI', 0], ['T7', 'AGEN', 'ATRA', 1], ['T10', 'ATRA', 'AGEN', 1], ['T9', 'AGEN', 'CANC', 0], ['T11', 'ATRA', 'APLI', 0], ['T12', 'ATRA', 'CANC', 0]];
+const E = $('#svgEst'); const R = 78;
+const defs = sv('defs', {}, E); const mk = sv('marker', { id: 'ah', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 8, markerHeight: 8, orient: 'auto-start-reverse' }, defs); sv('path', { d: 'M0 0 10 5 0 10z', class: 'at', fill: '#a8c9bd' }, mk);
+const arestas = TRANS.map(([id, a, b, par]) => {
+  const A = ESTADOS[a], B = ESTADOS[b]; const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy), ux = dx / d, uy = dy / d;
+  const off = par ? 30 : (a === 'AGEN' && b === 'PEND' ? -34 : (a === 'PEND' && b === 'AGEN' ? 34 : 0));
+  const nx = -uy, ny = ux; const sx = A.x + ux * R + nx * off, sy = A.y + uy * R + ny * off, ex = B.x - ux * (R + 6) + nx * off, ey = B.y - uy * (R + 6) + ny * off;
+  const g = sv('g', { class: 'ed' }, E);
+  const path = sv('path', { d: `M${sx} ${sy} Q${(sx + ex) / 2 + nx * 26} ${(sy + ey) / 2 + ny * 26} ${ex} ${ey}`, class: 'ar', 'marker-end': 'url(#ah)' }, g);
+  const lb = sv('text', { x: (sx + ex) / 2 + nx * (off ? off + 22 : 40), y: (sy + ey) / 2 + ny * (off ? off + 22 : 40) + 6, class: 'lb' }, g); lb.textContent = id;
+  return { id, a, b, g, path, lb };
+});
+const nos = {};
+for (const k in ESTADOS) {
+  const s = ESTADOS[k]; const g = sv('g', { class: 'no', tabindex: 0, role: 'button', 'aria-label': s.nome, style: `--c:${s.cor}` }, E);
+  sv('circle', { cx: s.x, cy: s.y, r: R }, g); const t = sv('text', { x: s.x, y: s.y + 9 }, g); t.textContent = s.nome; nos[k] = g;
+  const ativar = () => selecionar(k); g.addEventListener('click', ativar); g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); ativar(); } });
+}
+const tok = sv('circle', { id: 'token', r: 13, cx: -50, cy: -50 }, E);
+let jogando = 0;
+function selecionar(k) {
+  jogando++; tok.setAttribute('cx', -50);
+  const s = ESTADOS[k];
+  Object.entries(nos).forEach(([n, g]) => g.classList.toggle('sel', n === k));
+  E.classList.add('foco');
+  arestas.forEach((e) => { const hi = e.a === k; e.path.classList.toggle('hi', hi); e.lb.classList.toggle('hi', hi); e.g.classList.toggle('dim', !hi); });
+  Object.entries(nos).forEach(([n, g]) => g.classList.toggle('dim', n !== k && !arestas.some((e) => e.a === k && e.b === n)));
+  const sai = arestas.filter((e) => e.a === k).map((e) => `${e.id} → ${ESTADOS[e.b].nome}`);
+  $('#estT').textContent = s.nome; $('#estP').textContent = s.txt;
+  $('#estR').textContent = s.regra + (sai.length ? ' Sai por: ' + sai.join(', ') + '.' : '');
+}
+function limpar() { E.classList.remove('foco'); $$('.hi', E).forEach((x) => x.classList.remove('hi')); $$('.dim', E).forEach((x) => x.classList.remove('dim')); Object.values(nos).forEach((g) => g.classList.remove('sel')); }
+const ROTEIRO = [['PEND', 'AGEN', 'T2', 'T2: o usuário agenda a dose para uma data de hoje em diante.'], ['AGEN', 'ATRA', 'T7', 'T7: passou a data e nada foi registrado. Quem atrasa é a rotina de prazo, nunca o cliente.'], ['ATRA', 'AGEN', 'T10', 'T10: uma dose atrasada só pode ser reagendada, aplicada ou cancelada.'], ['AGEN', 'APLI', 'T6', 'T6: aplicada em data de hoje ou anterior. Estado final.']];
+async function exemplo() {
+  const id = ++jogando; limpar(); const espera = (ms) => new Promise((r) => setTimeout(r, animar ? ms : 60));
+  const p0 = ESTADOS.PEND; tok.setAttribute('cx', p0.x); tok.setAttribute('cy', p0.y); Object.values(nos).forEach((g) => g.classList.remove('sel')); nos.PEND.classList.add('sel');
+  $('#estT').textContent = 'Exemplo'; $('#estP').textContent = 'Uma dose nasce Pendente.'; $('#estR').textContent = '';
+  await espera(900);
+  for (const [a, b, t, msg] of ROTEIRO) {
+    if (id !== jogando) return;
+    const ar = arestas.find((e) => e.id === t); arestas.forEach((e) => { e.path.classList.toggle('hi', e === ar); e.lb.classList.toggle('hi', e === ar); });
+    const L = ar.path.getTotalLength(); const dur = animar ? 1300 : 1; const t0 = performance.now();
+    await new Promise((res) => { const f = (now) => { if (id !== jogando) return res(); const u = Math.min(1, (now - t0) / dur); const pt = ar.path.getPointAtLength(u * L); tok.setAttribute('cx', pt.x); tok.setAttribute('cy', pt.y); if (u < 1) requestAnimationFrame(f); else res(); }; requestAnimationFrame(f); });
+    Object.entries(nos).forEach(([n, g]) => g.classList.toggle('sel', n === b));
+    $('#estT').textContent = ESTADOS[b].nome; $('#estP').textContent = msg; $('#estR').textContent = '';
+    await espera(1600);
+  }
+  if (id === jogando) { tok.setAttribute('cx', -50); limpar(); }
+}
+$('#estPlay').addEventListener('click', exemplo);
+
+/* ---------- slide 8: arquitetura ---------- */
+const A = $('#svgArq');
+const NODOS = { app: [30, 270, 320, 130, 'App Expo', 'Web · Android · iOS'], api: [520, 270, 340, 130, 'API', 'Azure Functions · TypeScript'], sql: [1020, 40, 320, 120, 'Azure SQL', 'contas e doses'], pln: [1020, 210, 320, 120, 'PLN', 'Python · TF-IDF + SVM · LSA'], voz: [1020, 380, 320, 120, 'AI Speech', 'voz para texto'], mail: [1020, 550, 320, 120, 'E-mail', 'lembretes (só quantidades)'], kv: [520, 520, 340, 110, 'Key Vault', 'segredos'], ai: [520, 80, 340, 110, 'App Insights', 'logs sem dados pessoais'], ci: [30, 520, 320, 110, 'GitHub Actions', 'testes → deploy (OIDC)'] };
+const LIG = [['app', 'api', ''], ['api', 'sql', ''], ['api', 'pln', 'p'], ['api', 'voz', 'p'], ['api', 'mail', ''], ['api', 'kv', 't'], ['api', 'ai', 't'], ['ci', 'api', 't']];
+const ctr = (n) => { const [x, y, w, h] = NODOS[n]; return [x + w / 2, y + h / 2, x, y, w, h]; };
+LIG.forEach(([a, b, c]) => {
+  const [ax, ay, axx, ayy, aw, ah] = ctr(a), [bx, by, bxx, byy, bw, bh] = ctr(b); let sx, sy, ex, ey;
+  if (Math.abs(ay - by) < 30) { sx = ax < bx ? axx + aw : axx; ex = ax < bx ? bxx : bxx + bw; sy = ey = ay; }
+  else if (ax === bx) { sx = ex = ax; sy = ay < by ? ayy + ah : ayy; ey = ay < by ? byy : byy + bh; }
+  else { sx = ax < bx ? axx + aw : axx; sy = ay; ex = ax < bx ? bxx : bxx + bw; ey = by; }
+  const mx = (sx + ex) / 2; sv('path', { d: ax === bx ? `M${sx} ${sy}L${ex} ${ey}` : `M${sx} ${sy}C${mx} ${sy} ${mx} ${ey} ${ex} ${ey}`, class: 'fio ' + c }, A);
+});
+for (const k in NODOS) { const [x, y, w, h, t, s] = NODOS[k]; const g = sv('g', { class: 'nodo' }, A); sv('rect', { x, y, width: w, height: h, rx: 26 }, g); sv('text', { x: x + w / 2, y: y + h / 2 - 2, class: 't' }, g).textContent = t; sv('text', { x: x + w / 2, y: y + h / 2 + 34, class: 's' }, g).textContent = s; }
+
+/* ---------- slide 9: conversa do assistente ---------- */
+const CONV = [['Para que serve a BCG?', 'BCG: protege contra formas graves da tuberculose.', 'Fonte: Calendário Nacional de Vacinação 2026, Ministério da Saúde (PNI)'], ['Estou com febre, que remédio eu tomo?', 'Não posso orientar sobre saúde individual. Procure um profissional ou uma unidade de saúde. Em emergência, ligue 192 (SAMU).', 'O assistente não dá orientação médica.']];
+let chatTimer = 0;
+async function conversa() {
+  const id = ++chatTimer; const chat = $('#chat'); const espera = (ms) => new Promise((r) => setTimeout(r, animar ? ms : 30));
+  const limpa = () => $$('.bol', chat).forEach((b) => b.remove());
+  while (id === chatTimer) {
+    for (const [q, r, f] of CONV) {
+      if (id !== chatTimer) return;
+      limpa();
+      const u = document.createElement('div'); u.className = 'bol u'; u.textContent = ''; chat.appendChild(u);
+      for (const ch of q) { u.textContent += ch; await espera(34); if (id !== chatTimer) return; }
+      await espera(400);
+      const a = document.createElement('div'); a.className = 'bol a'; a.innerHTML = '<span class="dots"><i></i><i></i><i></i></span>'; chat.appendChild(a);
+      await espera(1100); if (id !== chatTimer) return;
+      a.innerHTML = `${r}<small>${f}</small>`;
+      await espera(3600);
+    }
+    await espera(800); limpa();
+  }
+}
+
+/* ---------- slide 10: qualidade ---------- */
+const PORT = ['Lint', 'Tipos', 'Build', 'Jest ≥ 80%', 'Ponta a ponta + axe', 'TypeDoc', 'Auditoria', 'Docker'];
+$('#pipe').innerHTML = PORT.map((p, i) => `${i ? '<span class="ar">→</span>' : ''}<span class="chip"><i data-ic="check"></i>${p}</span>`).join(''); icons($('#pipe'));
+let pipeT = [];
+function pipeIn() { const cs = $$('#pipe .chip'); cs.forEach((c) => c.classList.remove('on')); pipeT.forEach(clearTimeout); pipeT = cs.map((c, i) => setTimeout(() => c.classList.add('on'), (animar ? 1500 + i * 420 : 0))); }
+
+/* ---------- contagem ---------- */
+function contar(slide) {
+  $$('.count', slide).forEach((el) => { const to = +el.dataset.to, sep = el.dataset.sep, t0 = performance.now(), dur = animar ? 1800 : 1; const fmt = (v) => sep ? Math.round(v).toLocaleString('pt-BR') : Math.round(v); const f = (n) => { const u = Math.min(1, (n - t0 - 500) / dur); const v = u <= 0 ? 0 : to * (1 - Math.pow(1 - u, 3)); el.textContent = fmt(v); if (u < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); });
+}
+
+/* ---------- slide 11: AWS ⇄ Azure ---------- */
+const MAPA = [['Lambda', 'Azure Functions'], ['S3 + CloudFront', 'Static Web Apps'], ['RDS', 'Azure SQL Database'], ['Secrets Manager', 'Key Vault'], ['CloudWatch', 'Application Insights'], ['Transcribe', 'Azure AI Speech'], ['CloudFormation', 'Bicep'], ['CodePipeline', 'GitHub Actions']];
+let inv = false;
+function mapa() { $('#map').innerHTML = MAPA.map(([a, z], i) => `<div class="glass mp" data-r="left" style="--i:${i}"><span>${inv ? z : a}</span><i data-ic="zap"></i><span>${inv ? a : z}</span></div>`).join(''); icons($('#map')); }
+mapa();
+$('#mapBtn').addEventListener('click', () => { inv = !inv; $$('#map .mp').forEach((m, i) => { m.style.animation = 'none'; m.offsetHeight; m.style.animation = `rvZoom .5s var(--ease) both`; m.style.animationDelay = i * 50 + 'ms'; }); const q = $$('#map .mp'); q.forEach((m, i) => { const [a, z] = MAPA[i]; const sp = $$('span', m); sp[0].textContent = inv ? z : a; sp[1].textContent = inv ? a : z; }); });
+
+/* ---------- slide 13: kanban + linha do tempo ---------- */
+const CARDS = [['B49', 'Testes de ponta a ponta'], ['B50', 'Painel de métricas do PLN'], ['B51', 'App instalável (PWA)'], ['B14', 'Exportar a carteira em PDF']];
+let kanT = [];
+function kanban() {
+  kanT.forEach(clearTimeout); kanT = [];
+  const col = (n) => $('#c' + n);
+  [0, 1, 2].forEach((n) => { col(n).innerHTML = ''; });
+  const cnt = () => [0, 1, 2].forEach((n) => { $('#n' + n).textContent = col(n).children.length ? col(n).children.length : ''; });
+  const add = (n, i) => { const c = document.createElement('div'); c.className = 'cd mv'; c.id = 'cd' + i; c.innerHTML = `<b>${CARDS[i][0]}</b>${CARDS[i][1]}`; col(n).appendChild(c); cnt(); };
+  const mover = (i, n) => { const c = $('#cd' + i); if (!c) return; c.remove(); add(n, i); };
+  const T = animar ? 1 : 0;
+  CARDS.forEach((_, i) => { kanT.push(setTimeout(() => add(0, i), (animar ? 700 + i * 260 : 0))); });
+  CARDS.forEach((_, i) => { kanT.push(setTimeout(() => mover(i, 1), (animar ? 2400 + i * 340 : 0))); kanT.push(setTimeout(() => mover(i, 2), (animar ? 4300 + i * 340 : 0))); });
+  void T;
+}
+(() => { const tl = $('#tl'); const D0 = Date.UTC(2026, 9, 6), total = (Date.UTC(2026, 10, 19) - D0) / 864e5; const pos = (d) => (d / total * 100) + '%';
+  for (let i = 0; i < 6; i++) { const s = document.createElement('div'); s.className = 'sp'; s.style.left = pos(i * 7 + 3.5); s.textContent = 'Sprint ' + (i + 1); tl.appendChild(s); }
+  [['12/11', 'Qualidade<br>e Testes', Date.UTC(2026, 10, 12)], ['16/11', 'PLN', Date.UTC(2026, 10, 16)], ['19/11', 'Entrega final', Date.UTC(2026, 10, 19)]].forEach(([d, n, u]) => { const m = document.createElement('div'); m.className = 'm'; const p = Math.min((u - D0) / 864e5, total); m.style.left = pos(p); if (p === total) m.classList.add('fim'); m.innerHTML = `<b>${d}</b>${n}`; tl.appendChild(m); });
+  const a = document.createElement('div'); a.className = 'sp'; a.style.left = '0'; a.style.transform = 'none'; a.style.top = '100px'; a.textContent = ''; tl.appendChild(a);
+})();
+
+/* ---------- navegação ---------- */
+const hooks = {
+  1: { in() {}, out() {} },
+  3: { in() { c3.show(0); c3.start(); }, out() { c3.stop(); } },
+  6: { in() { demo(+($$('#s6 .who .tab').findIndex((t) => t.classList.contains('on')))); } },
+  7: { in() { limpar(); $('#estT').textContent = 'Toque num estado'; $('#estP').textContent = 'Veja de onde cada dose pode ir. Atrasar só acontece pela rotina de prazo.'; $('#estR').textContent = ''; tok.setAttribute('cx', -50); jogando++; setTimeout(() => { if (cur === 6) selecionar('PEND'); }, animar ? 2200 : 0); }, out() { jogando++; } },
+  9: { in() { conversa(); }, out() { chatTimer++; $$('#chat .bol').forEach((b) => b.remove()); } },
+  10: { in() { contar(slides[9]); pipeIn(); }, out() { pipeT.forEach(clearTimeout); } },
+  11: { in() { contar(slides[10]); } },
+  13: { in() { kanban(); }, out() { kanT.forEach(clearTimeout); } },
+};
+function go(n, dir) {
+  n = Math.max(0, Math.min(slides.length - 1, n)); if (n === cur) return;
+  const back = dir === undefined ? n < cur : dir < 0;
+  if (cur >= 0) { const o = slides[cur]; hooks[cur + 1]?.out?.(); o.classList.remove('active'); o.classList.toggle('back', back); o.classList.add('leaving'); setTimeout(() => o.classList.remove('leaving'), 650); }
+  const s = slides[n]; s.classList.toggle('back', back);
+  s.classList.remove('active'); void s.offsetWidth; s.classList.add('active'); cur = n;
+  hooks[n + 1]?.in?.();
+  $('#num').textContent = `${n + 1} / ${slides.length}`; $('#prog').style.width = ((n + 1) / slides.length * 100) + '%';
+  $('#notas').innerHTML = s.dataset.notes || ''; try { history.replaceState(null, '', '#' + (n + 1)); } catch (e) { /* ok */ }
+  $$('#vg button').forEach((b, i) => b.classList.toggle('cur', i === n));
+}
+const next = () => go(cur + 1, 1), prev = () => go(cur - 1, -1);
+$('#bNext').addEventListener('click', next); $('#bPrev').addEventListener('click', prev);
+
+$('#vg').innerHTML = slides.map((s, i) => `<button data-i="${i}"><b>${String(i + 1).padStart(2, '0')}</b>${s.dataset.title}</button>`).join('');
+$$('#vg button').forEach((b) => b.addEventListener('click', () => { $('#visao').classList.remove('on'); go(+b.dataset.i); }));
+const toggle = (id) => $(id).classList.toggle('on');
+$('#bVis').addEventListener('click', () => toggle('#visao')); $('#bNot').addEventListener('click', () => toggle('#notas'));
+$('#bMov').addEventListener('click', () => { animar = !animar; aplicarMov(); });
+const full = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); };
+$('#bFull').addEventListener('click', full);
+addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === 'ArrowRight' || k === 'PageDown' || (k === ' ' && !/BUTTON|A/.test(document.activeElement.tagName))) { e.preventDefault(); next(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+  else if (k === 'Home') go(0, -1); else if (k === 'End') go(slides.length - 1, 1);
+  else if (k === 'g' || k === 'G' || k === 'o') toggle('#visao'); else if (k === 'n' || k === 'N') toggle('#notas');
+  else if (k === 'm' || k === 'M') { animar = !animar; aplicarMov(); } else if (k === 'f' || k === 'F') full();
+  else if (k === 'Escape') { $('#visao').classList.remove('on'); $('#notas').classList.remove('on'); }
+});
+let tx = null;
+addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; }, { passive: true });
+addEventListener('touchend', (e) => { if (tx === null) return; const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 60) (d < 0 ? next : prev)(); tx = null; }, { passive: true });
+addEventListener('wheel', (e) => { if ($('#visao').classList.contains('on')) return; if (go.t && performance.now() - go.t < 900) return; if (Math.abs(e.deltaY) < 40) return; go.t = performance.now(); e.deltaY > 0 ? next() : prev(); }, { passive: true });
+
+const ini = Math.max(1, Math.min(slides.length, parseInt(location.hash.slice(1), 10) || 1)) - 1;
+document.fonts?.ready.then(() => go(ini, 1)) ?? go(ini, 1);
+setTimeout(() => { if (cur < 0) go(ini, 1); }, 1500);
+document.body.classList.add('mostra'); setTimeout(() => document.body.classList.remove('mostra'), 3500);
+})();
+</script>
+</body>
+</html>
