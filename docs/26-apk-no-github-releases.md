@@ -29,7 +29,7 @@ Mudou o endereço da API? Altere `API_URL` em `deploy.yml` **e** em `apk.yml`. A
 
 ## Como é gerado
 
-`expo prebuild` cria o projeto Android (a pasta `apps/mobile/android` não é versionada), o número da versão (`versionCode`) é o número da execução do workflow, e `./gradlew assembleRelease` compila só as arquiteturas `arm64-v8a`, `armeabi-v7a` e `x86_64` (celulares e emulador). O JavaScript vai dentro do APK, então o app roda sem o servidor de desenvolvimento (Metro). A compilação leva cerca de 10 a 15 minutos; o cache do Gradle acelera as seguintes.
+`expo prebuild` cria o projeto Android (a pasta `apps/mobile/android` não é versionada), o número da versão (`versionCode`) é o número da execução do workflow, e `./gradlew assembleRelease` compila só as arquiteturas `arm64-v8a` e `x86_64` (celulares atuais e emulador; celulares muito antigos de 32 bits ficam de fora). O JavaScript vai dentro do APK, então o app roda sem o servidor de desenvolvimento (Metro). A compilação leva de 15 a 25 minutos (o Gradle recebe 4 GB de memória; com o padrão ele estourava); o cache do Gradle acelera as seguintes.
 
 ## Para criar uma versão fixa
 

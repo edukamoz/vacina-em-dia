@@ -82,6 +82,15 @@ jobs:
         working-directory: apps/mobile
         run: npx expo prebuild --platform android --no-install
 
+      - name: Dar mais memória ao Gradle
+        working-directory: apps/mobile
+        run: |
+          # O padrão estourava o Metaspace da JVM ao empacotar o APK (build da main de 20/10/2026).
+          # O arquivo do prebuild não termina com quebra de linha: sem esta, a linha nova gruda na última.
+          echo "" >> android/gradle.properties
+          echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" >> android/gradle.properties
+          echo "org.gradle.daemon=false" >> android/gradle.properties
+
       - name: Definir o número da versão (versionCode)
         working-directory: apps/mobile
         run: |
@@ -94,7 +103,7 @@ jobs:
         env:
           EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
           NODE_ENV: production
-        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a,x86_64
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,x86_64
 
       - name: Conferir o endereço da API dentro do APK
         run: |
