@@ -425,7 +425,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 - Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).
 - Componentes e telas atualizados.
-- Atenção: Plugin pronto em docs/04-design-system/figma-plugin; falta a autora rodá-lo no app de computador do Figma.
+- Evidência: docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md
+- Atenção: Telas v2 feitas no Figma em 20/10/2026 (celular e web, 25 telas); falta a biblioteca de componentes v2 e telas menores (Consentimento, Redefinir senha, Termos e Privacidade). Apague as telas "v1 ·" depois de conferir.
 
 **B45** (PE1; requisitos: RNF04, RNF09)
 

@@ -211,24 +211,27 @@ A seção 2.5 está implementada no app (`src/lib/layout.ts`, `src/components/ba
 
 ## 8. Protótipo no Figma
 
-Arquivo: [Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vacina-em-dia) (chave `lZboLAlTDtA2cJQRyKtcdW`). Estado em 06/10/2026:
+Arquivo: [Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vacina-em-dia) (chave `lZboLAlTDtA2cJQRyKtcdW`). Estado em 20/10/2026:
 
 | Parte | Situação |
 |---|---|
-| Variáveis de cor | Feitas: 21 variáveis por tema, nas coleções **Cor (Claro)**, **Cor (Escuro)** e **Cor (Alto contraste)**, espelhando `tokens.json` |
-| Medidas | Feitas: coleção **Medidas** com espaçamento, raios, bordas e alvos de toque (17 variáveis) |
-| Estilos de texto | Feitos: 8 estilos com Atkinson Hyperlegible |
-| Componentes | Feitos (14, ligados às variáveis do tema Claro): Selo de estado, Botão, Campo de texto, Cartão de dose, Botão de voz, Aviso de fonte e versão, Estado vazio, Estado de erro, Estado carregando, Item de navegação, Cartão de membro, Mensagem do chat |
-| Telas de celular (390 px, tema Claro) | Criadas, **ainda não conferidas visualmente**: Entrar, Consentimento, Família e Calendário do membro |
-| Telas restantes de celular | A fazer: Detalhe da dose, Confirmação de cancelamento, Perguntar por voz, Assistente, Histórico, Conta e privacidade |
-| Telas de tablet (768 px) e web (1280 px) | A fazer: Entrar, Família, Calendário com painel de detalhe, Histórico e Assistente |
-| Temas Escuro e Alto contraste nas telas | A fazer: copiar o Calendário do celular e trocar as variáveis para as coleções de cada tema |
+| Variáveis de cor | **Na versão 2** (tokens 2.0.0): 36 variáveis por tema, nas coleções **Cor (Claro)**, **Cor (Escuro)** e **Cor (Alto contraste)**, espelhando `tokens.json` |
+| Medidas | **Na versão 2**: coleção **Medidas** com 21 variáveis (espaçamento, raios, bordas e alvos de toque) |
+| Estilos de texto | **Na versão 2**: 10 estilos com Atkinson Hyperlegible (inclui Exibição e Destaque) |
+| Sombras | **Feitas**: 6 estilos (`Sombra/1`, `2` e `3`, em Claro e Escuro; no Alto contraste não há sombra) |
+| Componentes | **Ainda na versão 1** (cartões de borda colorida): Selo de estado, Botão, Campo de texto, Cartão de dose, Botão de voz, Aviso de fonte e versão, Estado vazio, Estado de erro, Estado carregando, Item de navegação, Cartão de membro e Mensagem do chat. As cores já acompanham os tokens novos porque estão ligadas às variáveis; o desenho (cartão branco com sombra, avatares, anel de progresso) não |
+| Telas do celular (versão 2) | **Feitas** em 20/10/2026 (pelo Figma MCP, com variáveis e estilos ligados): Entrar, Doses (Claro, Escuro e Alto contraste), Família, Histórico, Conta, Detalhe da dose e Assistente; mais Apresentação do app, Criar conta, Esqueci a senha, Postos de saúde, a Conta completa (foto, texto, movimento, tema, privacidade, Pix) e as janelas Adicionar dose, Adicionar pessoa, Apoie o projeto (com QR de exemplo) e Ler caderneta por foto |
+| Telas da web (versão 2) | **Feitas** em 20/10/2026 (página "Telas: tablet e web"): Doses em Claro, Escuro e Alto contraste, Conta com cartões de mesma altura, janela Adicionar dose, e a Apresentação em duas larguras (web grande e web pequena) |
+| Telas antigas (versão 1) | As 4 da página "Telas: celular" foram renomeadas com o prefixo "v1 ·" (Entrar, Consentimento, Família e Calendário do membro); apague depois de conferir as novas |
+| A fazer | Biblioteca de componentes v2 (os componentes seguem na versão 1; as telas v2 são montadas por código, não por instâncias); Consentimento, Redefinir senha, Termos e Privacidade; fotos das pessoas fictícias na Apresentação (o Figma MCP não importa imagens; as telas usam avatares no lugar) |
+
+**Como foi feito e por quê.** Os tokens foram aplicados pelo Figma MCP em 15/10/2026 (uma chamada). Em seguida o limite de chamadas do MCP acabou: no plano Starter, assentos View (e Collab) têm até **20 chamadas por mês**; planos Education têm 200 por dia (documentação do Figma consultada em 15/10/2026). Por isso as telas ficaram em um plugin local, que não tem esse limite.
 
 **Limites do plano Starter do Figma** (encontrados na construção):
 
 - **Um modo por coleção.** Por isso os temas são **coleções separadas** com as mesmas variáveis e os mesmos nomes, em vez de três modos de uma coleção. Se o plano passar a permitir modos, basta juntar as coleções (o `tokens.json` é a fonte).
 - **Três páginas no máximo.** Páginas usadas: "Fundamentos e componentes", "Telas: celular" e "Telas: tablet e web".
-- **Limite de chamadas do Figma MCP.** O limite do plano foi atingido durante a construção; as telas restantes dependem de o limite ser renovado ou de o plano e o assento serem ampliados. O plano de estudante do Figma (Education) costuma liberar o plano Professional sem custo; conferir em figma.com/education.
+- **Limite de chamadas do Figma MCP** (acima). O plano de estudante do Figma (Education) costuma liberar o plano Professional sem custo; conferir em figma.com/education.
 
 Tudo o que foi criado usa variáveis e estilos (nenhuma cor ou medida solta), então a conferência de contraste vale para o arquivo.
 
