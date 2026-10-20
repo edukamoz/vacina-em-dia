@@ -86,6 +86,8 @@ jobs:
         working-directory: apps/mobile
         run: |
           # O padrão estourava o Metaspace da JVM ao empacotar o APK (build da main de 20/10/2026).
+          # O arquivo do prebuild não termina com quebra de linha: sem esta, a linha nova gruda na última.
+          echo "" >> android/gradle.properties
           echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError" >> android/gradle.properties
           echo "org.gradle.daemon=false" >> android/gradle.properties
 
@@ -96,31 +98,12 @@ jobs:
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
           grep -n "versionCode\|versionName" android/app/build.gradle
 
-      - name: Diagnóstico do node (temporário)
-        run: |
-          real=$(which node)
-          mkdir -p /tmp/shim
-          {
-            echo '#!/bin/bash'
-            echo 'echo "ARGS: $*" >> /tmp/node-log.txt'
-            echo 'echo "CWD: $PWD" >> /tmp/node-log.txt'
-            echo "$real \"\$@\" 2>> /tmp/node-log.txt"
-            echo 'code=$?'
-            echo 'echo "EXIT: $code" >> /tmp/node-log.txt'
-            echo 'exit $code'
-          } > /tmp/shim/node
-          chmod +x /tmp/shim/node
-
       - name: Compilar o APK (release)
         working-directory: apps/mobile/android
         env:
           EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
           NODE_ENV: production
-        run: PATH=/tmp/shim:$PATH ./gradlew assembleRelease --no-daemon --stacktrace -PreactNativeArchitectures=arm64-v8a,x86_64
-
-      - name: Mostrar o registro do node (temporário)
-        if: failure()
-        run: tail -c 6000 /tmp/node-log.txt || true
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,x86_64
 
       - name: Conferir o endereço da API dentro do APK
         run: |
