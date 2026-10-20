@@ -149,6 +149,32 @@ def captura(arq, legenda):
     r.font.size = Pt(9)
 
 
+def captura_celular(arquivos, legenda):
+    """Insere uma ou duas capturas do celular lado a lado (telas só do app), com legenda."""
+    from docx.enum.table import WD_TABLE_ALIGNMENT
+    _figuras[0] += 1
+    leg = doc.add_paragraph()
+    leg.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    leg.paragraph_format.keep_with_next = True
+    run = leg.add_run(f'Figura {_figuras[0]} – {legenda}')
+    run.bold = True
+    run.font.size = Pt(10)
+    tab = doc.add_table(rows=1, cols=len(arquivos))
+    tab.alignment = WD_TABLE_ALIGNMENT.CENTER
+    tab.autofit = False
+    largura = Cm(5.2) if len(arquivos) == 1 else Cm(4.8)
+    for i, arq in enumerate(arquivos):
+        celula = tab.rows[0].cells[i]
+        celula.width = largura + Cm(0.4)
+        par = celula.paragraphs[0]
+        par.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        par.add_run().add_picture(f'{CAPTURAS}celular-{arq}.png', width=largura)
+    fonte = doc.add_paragraph()
+    fonte.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = fonte.add_run('Fonte: capturas de tela do aplicativo, com dados fictícios (2026).')
+    r.font.size = Pt(9)
+
+
 rodape()
 
 # Capa
@@ -237,6 +263,7 @@ passo(4, 'Se a pessoa estiver grávida, marque **"Esta pessoa está grávida (in
 passo(5, '(Opcional) Em **"Quem é esta pessoa para você?"**, escolha o parentesco (por exemplo, "Mãe", "Filho" ou "Prefiro não informar").')
 passo(6, 'Toque em **"Salvar e ver as vacinas"**. O aplicativo monta o calendário dessa pessoa pela idade.')
 p('Esta e as outras telas de cadastro e de detalhe abrem **em uma janela por cima da tela em que você estava**, para você não perder o lugar. Para fechar sem salvar, toque em **"Fechar"**, toque fora da janela ou, no computador, aperte a tecla Esc.')
+captura_celular(['12-janela-pessoa', '13-janela-dose'], 'Janelas Adicionar pessoa e Adicionar dose')
 p('Para corrigir um dado, toque na pessoa, depois em **"Editar pessoa"**, e em **"Salvar alterações"**. Para apagar a pessoa, use o botão **"Excluir"** com o nome dela e confirme em **"Sim, excluir"**. Isso apaga as doses dela também.')
 
 h2('3.5. Vendo as vacinas de uma pessoa')
@@ -307,6 +334,7 @@ passo(1, 'Toque em **"Escolher foto"** (para pegar uma da galeria) ou em **"Tira
 passo(2, 'Ajuste o recorte quadrado. O aplicativo reduz a foto no seu aparelho antes de guardá-la, para ocupar pouco espaço.')
 passo(3, 'Para trocar, toque em **"Trocar foto"**. Para tirar, toque em **"Remover foto"**.')
 p('A foto fica guardada de forma **privada**: só você a vê, com a sua conta. Se você excluir a conta, a foto também é apagada. Na primeira vez, o aparelho pede permissão para usar a câmera ou as fotos; toque em permitir.')
+captura_celular(['10-conta-foto'], 'Aba Conta com a foto de perfil')
 
 h2('3.14. Lendo a caderneta por foto (só no aplicativo do celular)')
 p('Em vez de digitar, você pode fotografar a caderneta de vacinação (ou um comprovante) e deixar o aplicativo procurar as doses. Este recurso **só existe no aplicativo instalado no celular**, não no navegador.')
@@ -316,6 +344,7 @@ passo(3, 'Aguarde a leitura. O aplicativo lê o texto **no seu próprio celular*
 passo(4, 'Em **"Doses encontradas"**, confira o nome da vacina, a dose e a data de cada uma, e o trecho lido na foto. **Desligue** as que estiverem erradas.')
 passo(5, 'Toque em **"Registrar"**. Só as doses que ficaram ligadas são marcadas como aplicadas, com a data lida.')
 aviso('**Confira sempre:** a leitura pode errar, principalmente com letra manuscrita ou foto escura. O aplicativo só marca doses que a pessoa já tem no calendário. Linhas com data que ele não conseguiu encaixar aparecem numa lista à parte; registre essas à mão na própria dose. Na primeira vez no Android, o celular baixa o modelo de leitura do Google e precisa de internet.')
+captura_celular(['14-caderneta'], 'Ler caderneta por foto (leitura simulada, com dados fictícios)')
 
 h2('3.15. Apoiando o projeto com Pix')
 p('O Vacina em Dia é gratuito e continuará sendo. Se ele ajudou a sua família, você pode contribuir com qualquer valor, se quiser. A doação é **voluntária e não libera nada** no aplicativo.')
@@ -323,6 +352,7 @@ passo(1, 'Na aba **Conta**, no cartão **"Apoie o projeto"**, toque em **"Doar c
 passo(2, 'Escolha um valor (R$ 5, 10, 20 ou 50), digite **"Outro valor"** ou deixe em aberto para digitar no app do seu banco.')
 passo(3, 'Abra o app do seu banco, escolha pagar com Pix e **leia o QR Code**. Ou toque em **"Copiar código Pix"** e use a opção **"Pix copia e cola"** do banco.')
 p('O código é montado no seu aparelho e o pagamento é feito e confirmado só no app do seu banco: o Vacina em Dia **não vê nem guarda** dados de pagamento.')
+captura_celular(['11-pix'], 'Janela Apoie o projeto, com QR Code de exemplo')
 
 h2('3.16. Instalando o aplicativo no celular ou no computador')
 p('O Vacina em Dia funciona direto no navegador, mas você também pode instalá-lo:')
