@@ -185,7 +185,17 @@ export function lerCaderneta(
       return;
     }
     usadas.add(dose.id);
-    encontradas.push({ dose, data, trecho: janela.reverse().join(' ').trim() });
+    // O trecho vai da linha em que a vacina apareceu até a da data; linhas de cabeçalho acima não entram.
+    const ate = textos.indexOf(textoVacina);
+    encontradas.push({
+      dose,
+      data,
+      trecho: janela
+        .slice(0, ate + 1)
+        .reverse()
+        .join(' ')
+        .trim(),
+    });
   });
 
   return { encontradas, semEncaixe };

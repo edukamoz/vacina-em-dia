@@ -72,6 +72,8 @@ describe('tela Apoie o projeto', () => {
     await abrir();
     await fireEvent.press(await screen.findByRole('button', { name: 'R$ 10' }));
     expect(await screen.findByText('Pix de R$ 10,00')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'R$ 10' })).toBeSelected();
+    expect(screen.getByRole('button', { name: 'R$ 5' })).not.toBeSelected();
     const codigo = codigoNaTela();
     expect(codigo).toContain('540510.00');
     expect(codigo.slice(-4)).toBe(crc16(codigo.slice(0, -4)));
