@@ -96,19 +96,30 @@ jobs:
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
           grep -n "versionCode\|versionName" android/app/build.gradle
 
-      - name: Diagnóstico do autolinking (temporário)
-        working-directory: apps/mobile/android
-        continue-on-error: true
+      - name: Diagnóstico do node (temporário)
         run: |
-          node --version
-          node --no-warnings --eval "require('expo/bin/autolinking')" expo-modules-autolinking mirror-kotlin-inline-modules --kotlin-files-mirror-directory "$PWD/expo/src/main/java/inline/modules/" --inline-modules-list-directory "$PWD/expo/build/inline/modules/" --watched-directories-serialized '[]'; echo "saida=$?"
+          real=$(which node)
+          mkdir -p /tmp/shim
+          printf '#!/bin/bash
+echo "ARGS: $*" >> /tmp/node-log.txt
+echo "CWD: $PWD" >> /tmp/node-log.txt
+%s "$@" 2>> /tmp/node-log.txt
+code=$?
+echo "EXIT: $code" >> /tmp/node-log.txt
+exit $code
+' "$real" > /tmp/shim/node
+          chmod +x /tmp/shim/node
 
       - name: Compilar o APK (release)
         working-directory: apps/mobile/android
         env:
           EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
           NODE_ENV: production
-        run: ./gradlew assembleRelease --no-daemon --stacktrace -PreactNativeArchitectures=arm64-v8a,x86_64
+        run: PATH=/tmp/shim:$PATH ./gradlew assembleRelease --no-daemon --stacktrace -PreactNativeArchitectures=arm64-v8a,x86_64
+
+      - name: Mostrar o registro do node (temporário)
+        if: failure()
+        run: tail -c 6000 /tmp/node-log.txt || true
 
       - name: Conferir o endereço da API dentro do APK
         run: |
