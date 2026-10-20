@@ -1080,6 +1080,25 @@
    "curto": "Primeira tela por ambiente e app instalado no Android"
   },
   {
+   "id": "B57",
+   "jira": null,
+   "titulo": "Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente",
+   "epico": "E9",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RNF08, RNF09",
+   "criterios": [
+    "Push na main atualiza a pré-release apk-latest; uma tag v* cria uma release fixa.",
+    "O APK é compilado apontando para a API publicada e o workflow falha se o endereço não estiver dentro do pacote.",
+    "O arquivo vem com o hash SHA-256 e a página explica como instalar."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": ".github/workflows/apk.yml; docs/26-apk-no-github-releases.md",
+   "nota": "Assinado com a chave de depuração: instala direto, mas não serve para a Play Store.",
+   "curto": "APK do Android nas Releases do GitHub"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",
