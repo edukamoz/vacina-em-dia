@@ -6,6 +6,7 @@ import { useVisual } from '../theme/theme-provider';
 import { Children } from 'react';
 import { Entrada } from './animacao';
 import { Botao } from './botao';
+import { JanelaModal } from './janela-modal';
 import { Texto } from './texto';
 
 /**
@@ -20,6 +21,8 @@ import { Texto } from './texto';
  * @param props.abaixoDoTitulo - Conteúdo colado ao título, como o link "Trocar pessoa".
  * @param props.reservaBalao - Deixa espaço no fim para o balão do assistente não cobrir o conteúdo
  *   (telas das abas).
+ * @param props.modal - Mostra a tela como janela por cima da anterior (`JanelaModal`), em vez de
+ *   página inteira. Use nas telas de formulário e detalhe abertas a partir de outra tela.
  */
 export function Tela({
   titulo,
@@ -28,6 +31,7 @@ export function Tela({
   acao,
   abaixoDoTitulo,
   reservaBalao = false,
+  modal = false,
   children,
 }: {
   titulo: string;
@@ -36,10 +40,23 @@ export function Tela({
   acao?: ReactNode;
   abaixoDoTitulo?: ReactNode;
   reservaBalao?: boolean;
+  modal?: boolean;
   children: ReactNode;
 }) {
   const router = useRouter();
   const { gradienteFundo } = useVisual();
+  if (modal) {
+    return (
+      <JanelaModal
+        titulo={titulo}
+        subtitulo={subtitulo}
+        acao={acao}
+        abaixoDoTitulo={abaixoDoTitulo}
+      >
+        {children}
+      </JanelaModal>
+    );
+  }
   return (
     <SafeAreaView className="flex-1 bg-fundo" style={gradienteFundo}>
       <ScrollView

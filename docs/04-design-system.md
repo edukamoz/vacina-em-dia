@@ -113,6 +113,7 @@ Todos aceitam os três temas, o texto a 200% e uso por teclado, toque e leitor d
 | **Botão de voz** | ouvindo, processando, erro | 56 dp ou mais, com ícone de microfone e texto "Perguntar por voz"; mostra o texto reconhecido e oferece "Digitar" se falhar |
 | **Caixa de confirmação** | cancelar dose, excluir conta | Título claro, consequência descrita em uma frase, botão perigoso e botão "Voltar" com o mesmo peso visual |
 | **Aviso de fonte e versão** | rodapé de conteúdo vacinal | Mostra fonte, versão e a frase de que o app não substitui a caderneta; marca "Calendário de exemplo" quando `is_fictitious` |
+| **Janela (modal)** | folha no celular, cartão centralizado no tablet e na web | Usada por Adicionar pessoa, Editar pessoa, Adicionar dose e detalhe da dose (a tela de trás continua visível sob o véu); papel de diálogo com o título como nome; fecha pelo botão "Fechar", tocando no véu e com Esc na web; sem histórico, volta ao início; a entrada (véu e subida) para com "Reduzir movimento" |
 | **Navegação** | barra inferior, lateral | 4 itens: Doses, Família, Histórico, Conta; item atual com texto em negrito e marca, não só cor |
 | **Estado vazio** | | Ícone, título que convida ("Vamos cadastrar a primeira pessoa") e um botão de ação |
 | **Estado de erro** | | O que aconteceu, o que fazer, botão "Tentar de novo"; nunca mensagem técnica |

@@ -64,7 +64,7 @@ function MemberForm({ membro }: FormProps) {
     <Tela
       titulo={membro ? `Editar ${membro.name}` : 'Adicionar pessoa'}
       subtitulo="Guardamos só o necessário. Pode usar um apelido."
-      voltar
+      modal
     >
       <CampoTexto
         rotulo="Nome ou apelido"
@@ -162,21 +162,21 @@ export function EditMemberScreen({ id }: { id: string }) {
 
   if (isPending) {
     return (
-      <Tela titulo="Editar pessoa" voltar>
+      <Tela titulo="Editar pessoa" modal>
         <EstadoCarregando rotulo="Carregando a pessoa" />
       </Tela>
     );
   }
   if (error) {
     return (
-      <Tela titulo="Editar pessoa" voltar>
+      <Tela titulo="Editar pessoa" modal>
         <EstadoErro mensagem={error.message} onTentarDeNovo={() => void refetch()} />
       </Tela>
     );
   }
   if (!membro) {
     return (
-      <Tela titulo="Editar pessoa" voltar>
+      <Tela titulo="Editar pessoa" modal>
         <EstadoVazio
           titulo="Pessoa não encontrada"
           descricao="Ela pode ter sido excluída. Volte e escolha outra pessoa."

@@ -334,10 +334,11 @@ describe('detalhe da dose (RF04)', () => {
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
   });
 
-  test('CT-APP-D05: o link "Voltar para Doses" volta à tela anterior', async () => {
+  test('CT-APP-D05: o detalhe abre como janela e o botão "Fechar" volta à tela anterior', async () => {
     const fake = detailRoutes(dose());
     await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
-    await fireEvent.press(await screen.findByRole('link', { name: 'Voltar para Doses' }));
+    expect(await screen.findByLabelText(/penta/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar' }));
     expect(mockBack).toHaveBeenCalled();
   });
 
