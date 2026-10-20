@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Linking } from 'react-native';
+import { RolagemDaTelaContext } from '../../components/rolagem-da-tela';
 import { MAP_BASE_URL } from './native-map-html';
 import { UnitMap } from './unit-map';
 
@@ -43,6 +44,45 @@ describe('mapa dos postos no celular (WebView)', () => {
       mockProps['onMessage']?.({ nativeEvent: { data: '0000001' } } as never);
     });
     expect(onSelect).toHaveBeenCalledWith('0000001');
+  });
+
+  test('CT-UNI-APP-53: o dedo no mapa trava a rolagem da página e soltar a libera (o arrasto é do mapa)', async () => {
+    const travar = jest.fn();
+    await render(
+      <RolagemDaTelaContext.Provider value={travar}>
+        <UnitMap units={UNITS} selectedCnes={null} position={null} onSelect={jest.fn()} />
+      </RolagemDaTelaContext.Provider>,
+    );
+    const mapa = screen.getByLabelText('Mapa dos postos de saúde');
+    await fireEvent(mapa, 'touchStart');
+    expect(travar).toHaveBeenLastCalledWith(true);
+    await fireEvent(mapa, 'touchEnd');
+    expect(travar).toHaveBeenLastCalledWith(false);
+    await fireEvent(mapa, 'touchStart');
+    await fireEvent(mapa, 'touchCancel');
+    expect(travar).toHaveBeenLastCalledWith(false);
+  });
+
+  test('CT-UNI-APP-54: a página do mapa pode liberar a rolagem e isso não escolhe unidade nenhuma', async () => {
+    const travar = jest.fn();
+    const onSelect = jest.fn();
+    await render(
+      <RolagemDaTelaContext.Provider value={travar}>
+        <UnitMap units={UNITS} selectedCnes={null} position={null} onSelect={onSelect} />
+      </RolagemDaTelaContext.Provider>,
+    );
+    await act(async () => {
+      mockProps['onMessage']?.({ nativeEvent: { data: 'liberar' } } as never);
+    });
+    expect(travar).toHaveBeenCalledWith(false);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  test('CT-UNI-APP-55: a WebView aceita rolagem aninhada (Android)', async () => {
+    await render(
+      <UnitMap units={UNITS} selectedCnes={null} position={null} onSelect={jest.fn()} />,
+    );
+    expect(mockProps['nestedScrollEnabled']).toBe(true);
   });
 
   test('CT-UNI-APP-52: links de fora abrem no navegador do aparelho, nunca dentro do mapa', async () => {

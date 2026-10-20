@@ -70,6 +70,8 @@ window.setData = function (data) {
   if (points.length === 1) map.setView(points[0], 15);
   else if (points.length > 1) map.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 16 });
 };
+document.getElementById('mapa').addEventListener('touchend', function () { send('liberar'); }, { passive: true });
+document.getElementById('mapa').addEventListener('touchcancel', function () { send('liberar'); }, { passive: true });
 send('pronto');
 </script>
 </body></html>`;
