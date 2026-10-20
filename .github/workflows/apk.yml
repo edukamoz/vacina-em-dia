@@ -96,6 +96,13 @@ jobs:
           sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
           grep -n "versionCode\|versionName" android/app/build.gradle
 
+      - name: Diagnóstico do autolinking (temporário)
+        working-directory: apps/mobile/android
+        continue-on-error: true
+        run: |
+          node --version
+          node --no-warnings --eval "require('expo/bin/autolinking')" expo-modules-autolinking mirror-kotlin-inline-modules --kotlin-files-mirror-directory "$PWD/expo/src/main/java/inline/modules/" --inline-modules-list-directory "$PWD/expo/build/inline/modules/" --watched-directories-serialized '[]'; echo "saida=$?"
+
       - name: Compilar o APK (release)
         working-directory: apps/mobile/android
         env:
