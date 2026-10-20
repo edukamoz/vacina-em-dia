@@ -2,11 +2,13 @@
 
 O Figma do projeto ([Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vacina-em-dia)) foi atualizado para a versão 2 do design system (`tokens.json` 2.0.0) em duas etapas, com dois plugins locais. Eles existem porque o Figma MCP, no plano Starter com assento View, permite só 20 chamadas por mês; plugins locais não têm esse limite.
 
-## Estado em 15/10/2026
+## Estado em 20/10/2026
 
-- **Etapa 1, tokens: feita** (pelo Figma MCP, com o mesmo código de `code.js`). Foram criadas 15 variáveis de cor em cada tema (a versão anterior deste arquivo dizia 14; o Figma contou 15), 4 medidas (`raio/quadro`, `raio/folha`, `borda/fina`, `toque/folga`), 2 estilos de texto (Exibição e Destaque) e as 6 sombras (`Sombra/1`, `2` e `3` em Claro e Escuro, com as camadas de `tokens.json`). Os 21 valores antigos de cada tema foram corrigidos.
-- **Etapa 2, telas: pendente**, por falta de chamadas do MCP. O plugin `telas.js` constrói as telas; **ainda não foi executado no Figma** (foi testado só contra um Figma simulado).
-- Os componentes e as 4 telas antigas (página "Telas: celular") continuam na versão 1. Depois de rodar o plugin de telas e conferir, apague as telas antigas à mão.
+- **Etapa 1, tokens: feita** em 15/10/2026 (pelo Figma MCP, com o mesmo código de `code.js`): 36 variáveis de cor por tema (Claro, Escuro e Alto contraste), 21 medidas, 10 estilos de texto e 6 sombras.
+- **Etapa 2, telas: feita** em 20/10/2026, também pelo Figma MCP, rodando o código de `telas.js` (adaptado: sem `closePlugin`) e mais três scripts para as telas que o plugin não tinha. Como o plano permitiu, o plugin local deixou de ser necessário; ele continua aqui para refazer as telas por conta própria.
+  - **Página "Telas: celular":** as 9 do plugin (Entrar, Doses em três temas, Família, Histórico, Conta, Detalhe da dose, Assistente) e 9 novas: Apresentação, Criar conta, Esqueci a senha, Postos de saúde, Conta completa, e as janelas Adicionar dose, Adicionar pessoa, Apoie o projeto (QR de exemplo, com chave fictícia) e Ler caderneta por foto.
+  - **Página "Telas: tablet e web":** Doses (Claro, Escuro e Alto contraste), Conta com cartões de mesma altura, a janela Adicionar dose e a Apresentação em web grande e web pequena.
+- As 4 telas antigas (versão 1) foram **renomeadas** com o prefixo "v1 ·", sem apagar. Depois de conferir as novas, apague-as à mão.
 
 ## Plugin 1: sincronizar design system (`manifest.json`, `code.js`)
 
@@ -33,5 +35,8 @@ Não apaga nada: se uma tela com o mesmo nome já existe, ela é pulada; se uma 
 ## Limites conhecidos
 
 - O desenho não usa componentes do Figma: as telas são montadas por funções (selo, botão, cartão de dose etc.), o que permite trocar de tema, mas elas não são instâncias dos componentes da página "Fundamentos e componentes", que seguem na versão 1. Reconstruir a biblioteca de componentes v2 é a próxima etapa.
-- Faltam no Figma: Postos (mapa), Apresentação (com as fotos de pessoas fictícias), Criar conta, Esqueci a senha e o tema Alto contraste na versão web.
-- Para continuar pelo MCP (com verificação por captura de tela), o plano Education do Figma libera 200 chamadas por dia.
+- O Figma MCP não importa imagens: a Apresentação usa avatares coloridos no lugar das fotos das pessoas fictícias (as fotos existem no app).
+- O QR da janela "Apoie o projeto" é um exemplo gerado com uma chave Pix fictícia; não use no app.
+- Faltam: Consentimento, Redefinir senha, Termos e Privacidade, e a Apresentação em Escuro e Alto contraste.
+- Os scripts das telas novas foram executados pelo Figma MCP e não estão salvos neste repositório; o arquivo do Figma é o registro. Se o app mudar, ajuste as telas no Figma ou refaça-as.
+- Para continuar pelo MCP (com verificação por captura de tela), o plano Education do Figma libera 200 chamadas por dia; a conta gratuita tem créditos limitados, então agrupe várias telas por chamada, como foi feito aqui (4 chamadas de escrita e 2 de ajuste para 25 telas).

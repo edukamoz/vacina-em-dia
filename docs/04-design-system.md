@@ -211,7 +211,7 @@ A seção 2.5 está implementada no app (`src/lib/layout.ts`, `src/components/ba
 
 ## 8. Protótipo no Figma
 
-Arquivo: [Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vacina-em-dia) (chave `lZboLAlTDtA2cJQRyKtcdW`). Estado em 15/10/2026:
+Arquivo: [Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vacina-em-dia) (chave `lZboLAlTDtA2cJQRyKtcdW`). Estado em 20/10/2026:
 
 | Parte | Situação |
 |---|---|
@@ -220,9 +220,10 @@ Arquivo: [Vacina-em-dia](https://www.figma.com/design/lZboLAlTDtA2cJQRyKtcdW/Vac
 | Estilos de texto | **Na versão 2**: 10 estilos com Atkinson Hyperlegible (inclui Exibição e Destaque) |
 | Sombras | **Feitas**: 6 estilos (`Sombra/1`, `2` e `3`, em Claro e Escuro; no Alto contraste não há sombra) |
 | Componentes | **Ainda na versão 1** (cartões de borda colorida): Selo de estado, Botão, Campo de texto, Cartão de dose, Botão de voz, Aviso de fonte e versão, Estado vazio, Estado de erro, Estado carregando, Item de navegação, Cartão de membro e Mensagem do chat. As cores já acompanham os tokens novos porque estão ligadas às variáveis; o desenho (cartão branco com sombra, avatares, anel de progresso) não |
-| Telas do celular e da web (versão 2) | **Plugin pronto, ainda não executado no Figma**: `figma-plugin/telas.js` (ver `figma-plugin/LEIA-ME.md`) monta Entrar, Doses, Família, Histórico, Conta, Detalhe da dose e Assistente (Claro), Doses em Escuro e Alto contraste, e Doses na web (Claro e Escuro) |
-| Telas antigas (versão 1) | As 4 da página "Telas: celular" (Entrar, Consentimento, Família e Calendário do membro) seguem lá; apague depois de conferir as novas |
-| A fazer | Biblioteca de componentes v2; Postos (mapa), Apresentação, Criar conta e Esqueci a senha; Alto contraste na web |
+| Telas do celular (versão 2) | **Feitas** em 20/10/2026 (pelo Figma MCP, com variáveis e estilos ligados): Entrar, Doses (Claro, Escuro e Alto contraste), Família, Histórico, Conta, Detalhe da dose e Assistente; mais Apresentação do app, Criar conta, Esqueci a senha, Postos de saúde, a Conta completa (foto, texto, movimento, tema, privacidade, Pix) e as janelas Adicionar dose, Adicionar pessoa, Apoie o projeto (com QR de exemplo) e Ler caderneta por foto |
+| Telas da web (versão 2) | **Feitas** em 20/10/2026 (página "Telas: tablet e web"): Doses em Claro, Escuro e Alto contraste, Conta com cartões de mesma altura, janela Adicionar dose, e a Apresentação em duas larguras (web grande e web pequena) |
+| Telas antigas (versão 1) | As 4 da página "Telas: celular" foram renomeadas com o prefixo "v1 ·" (Entrar, Consentimento, Família e Calendário do membro); apague depois de conferir as novas |
+| A fazer | Biblioteca de componentes v2 (os componentes seguem na versão 1; as telas v2 são montadas por código, não por instâncias); Consentimento, Redefinir senha, Termos e Privacidade; fotos das pessoas fictícias na Apresentação (o Figma MCP não importa imagens; as telas usam avatares no lugar) |
 
 **Como foi feito e por quê.** Os tokens foram aplicados pelo Figma MCP em 15/10/2026 (uma chamada). Em seguida o limite de chamadas do MCP acabou: no plano Starter, assentos View (e Collab) têm até **20 chamadas por mês**; planos Education têm 200 por dia (documentação do Figma consultada em 15/10/2026). Por isso as telas ficaram em um plugin local, que não tem esse limite.
 

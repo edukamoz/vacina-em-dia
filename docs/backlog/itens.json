@@ -867,8 +867,8 @@
    ],
    "estado": "Em andamento",
    "sprint": 6,
-   "evidencia": "",
-   "nota": "Plugin pronto em docs/04-design-system/figma-plugin; falta a autora rodá-lo no app de computador do Figma.",
+   "evidencia": "docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md",
+   "nota": "Telas v2 feitas no Figma em 20/10/2026 (celular e web, 25 telas); falta a biblioteca de componentes v2 e telas menores (Consentimento, Redefinir senha, Termos e Privacidade). Apague as telas \"v1 ·\" depois de conferir.",
    "curto": "Atualizar o Figma para a versão 2"
   },
   {
