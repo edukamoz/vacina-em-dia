@@ -3,7 +3,7 @@ import * as Clipboard from 'expo-clipboard';
 import { createFakeFetch, renderScreen } from '../../test-utils';
 import { crc16 } from '../../lib/pix';
 import { desenharQr } from './qr-pix';
-import { DonateScreen, lerValor } from './donate-screen';
+import { DonateScreen, lerValor, somenteNumeros } from './donate-screen';
 
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn() }));
 jest.mock('../../lib/config-pix', () => ({
@@ -26,6 +26,29 @@ const abrir = () => renderScreen(<DonateScreen />, createFakeFetch({}).fetchFn);
 /** Texto do código Pix mostrado na tela. */
 const codigoNaTela = () =>
   screen.getByLabelText('Código Pix copia e cola').props.children as string;
+
+describe('somenteNumeros', () => {
+  test.each([
+    ['abc', ''],
+    ['R$ 15', '15'],
+    ['12,5', '12,5'],
+    ['12,567', '12,56'],
+    ['1,2,3', '1,23'],
+    ['1.234,50', '1234,50'],
+    ['12.5', '12,5'],
+    ['1e5', '15'],
+    ['-10', '10'],
+  ])('CT-APP-PIX30: "%s" fica "%s"', (entrada, esperado) => {
+    expect(somenteNumeros(entrada)).toBe(esperado);
+  });
+
+  test('CT-APP-PIX31: letras digitadas no campo não aparecem', async () => {
+    await abrir();
+    const campo = await screen.findByLabelText('Outro valor (opcional)');
+    await fireEvent.changeText(campo, '1a5');
+    expect(campo.props.value).toBe('15');
+  });
+});
 
 describe('lerValor', () => {
   test.each([
@@ -97,7 +120,7 @@ describe('tela Apoie o projeto', () => {
 
   test('CT-APP-PIX19: valor inválido mostra o erro e esconde o código', async () => {
     await abrir();
-    await fireEvent.changeText(await screen.findByLabelText('Outro valor (opcional)'), 'abc');
+    await fireEvent.changeText(await screen.findByLabelText('Outro valor (opcional)'), '0');
     expect(await screen.findByText('Digite um valor, por exemplo 15,00.')).toBeOnTheScreen();
     expect(screen.queryByLabelText('Código Pix copia e cola')).not.toBeOnTheScreen();
     expect(screen.queryByLabelText('QR Code do Pix')).not.toBeOnTheScreen();

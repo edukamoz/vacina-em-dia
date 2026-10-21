@@ -32,6 +32,21 @@ export function lerValor(texto: string): number | null {
 }
 
 /**
+ * Deixa no campo de valor só números e, no máximo, uma vírgula com até duas casas (centavos).
+ * Letras, símbolos e espaços digitados ou colados são descartados. O ponto de milhar é ignorado
+ * ("1.234,50" vira "1234,50") e um ponto decimal sozinho vira vírgula ("12.5" vira "12,5").
+ *
+ * @param texto - O que a pessoa digitou ou colou.
+ * @returns O texto filtrado, por exemplo `"12,5"`.
+ */
+export function somenteNumeros(texto: string): string {
+  const comPonto = /^\d*\.\d{1,2}$/.test(texto.trim()) ? texto.replace('.', ',') : texto;
+  const [inteiros = '', ...resto] = comPonto.replace(/[^\d,]/g, '').split(',');
+  if (resto.length === 0) return inteiros;
+  return `${inteiros},${resto.join('').slice(0, 2)}`;
+}
+
+/**
  * Tela "Apoie o projeto" (B53): a pessoa escolhe um valor (ou deixa em aberto), vê o QR e copia o
  * Pix copia e cola. O código é montado no aparelho; nada passa por servidor e nenhum dado de
  * pagamento é guardado. A doação é voluntária e não dá acesso a nada.
@@ -103,7 +118,7 @@ export function DonateScreen() {
           rotulo="Outro valor (opcional)"
           value={outro}
           onChangeText={(texto) => {
-            setOutro(texto);
+            setOutro(somenteNumeros(texto));
             setCopiado(null);
           }}
           keyboardType="decimal-pad"
