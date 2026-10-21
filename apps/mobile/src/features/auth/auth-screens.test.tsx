@@ -375,7 +375,13 @@ describe('tela "Criar conta"', () => {
 describe('conta com login', () => {
   const logged = { ...STORED_SESSION, expiresAt: Date.now() + 3_600_000 };
 
+  afterEach(() => jest.restoreAllMocks());
+
   test('CT-APP-L30: mostra o e-mail da conta e "Sair" encerra a sessão', async () => {
+    // No celular o "Sair" fica na própria tela; no tablet e no computador, na barra lateral.
+    jest
+      .spyOn(Dimensions, 'get')
+      .mockReturnValue({ width: 390, height: 844, scale: 1, fontScale: 1 });
     const { store, box } = memorySessionStore(logged);
     const fake = createFakeFetch({
       'GET /consent': { status: 200, body: ACCEPTED },

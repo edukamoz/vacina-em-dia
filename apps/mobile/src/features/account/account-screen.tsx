@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { Avatar } from '../../components/avatar';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
@@ -13,6 +13,7 @@ import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { PIX_DA_DOACAO } from '../../lib/config-pix';
+import { modoDeLayout } from '../../lib/layout';
 import { useSession } from '../../session/session-provider';
 import { useTheme, useThemeColors } from '../../theme/theme-provider';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
@@ -78,10 +79,18 @@ export function AccountScreen() {
   const pessoas = members.data?.items ?? [];
   const email = account?.email ?? 'Sem e-mail';
   const { movimento, movimentoReduzido } = useTheme();
+  // Na barra lateral (tablet e computador) o "Sair" já fica ao lado da aba Conta.
+  const celular = modoDeLayout(useWindowDimensions().width) === 'compacto';
 
   return (
     <Tela reservaBalao titulo="Conta">
       <CabecalhoDaConta email={email} />
+
+      {celular ? (
+        <View className="flex-row">
+          <Botao titulo="Sair" icone="sair" variante="secundario" onPress={() => void logout()} />
+        </View>
+      ) : null}
 
       <View className="gap-lg expandido:flex-row expandido:items-stretch">
         <Secao
@@ -194,10 +203,6 @@ export function AccountScreen() {
           </View>
         </Secao>
       ) : null}
-
-      <View className="flex-row">
-        <Botao titulo="Sair" icone="sair" variante="secundario" onPress={() => void logout()} />
-      </View>
 
       {!confirmando ? (
         <Cartao className="gap-md border-erro expandido:flex-row expandido:items-center expandido:justify-between">
