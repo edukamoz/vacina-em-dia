@@ -26,6 +26,8 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 
 **Painel de métricas:** `docs/07-testes/painel-pln.html` é uma página única (abre direto no navegador, sem internet) com os mesmos números em gráficos: cartões de resumo, F1 por intenção, matriz de confusão, a curva de cobertura e acerto por limiar e a lista de erros. Gere com `python -m vacina_nlp.evaluate --write-dashboard ../../docs/07-testes/painel-pln.html` (dentro de `apps/nlp`) e tire a captura para os documentos com `node scripts/documentos/captura-painel.mjs`.
 
+**Comparação com as técnicas das aulas:** `docs/07-testes/comparacao-pln.md` (gerado por `python -m vacina_nlp.comparacao --write-report ...`) mede, com o mesmo teste separado, Bag-of-Words contra TF-IDF, Naive Bayes, KNN, Regressão Logística e SVM, e o efeito de remover stopwords e de reduzir ao radical (stemming rudimentar, sem biblioteca nova), no chatbot e na busca. Resultado resumido: remover stopwords **piora** o chatbot (perguntas curtas dependem de "como", "quando", "não"); o radical muda pouco; o TF-IDF supera a simples contagem de palavras na busca; no teste de 100 frases o Naive Bayes com TF-IDF superou o SVM, mas na validação cruzada o SVM ficou na frente, e o relatório diz que a diferença não é conclusiva. Nada disso altera o que está em produção.
+
 ## Busca (voz)
 
 `POST /api/search` recebe a transcrição e devolve até 5 vacinas parecidas, com doenças e indicações do calendário. Não é IA generativa. A nota de cada vacina combina duas medidas sobre um documento por vacina (nome, apelidos populares, doenças evitadas, faixas, momentos e observações do calendário):
@@ -66,6 +68,7 @@ Nota mínima de 0,35 (abaixo disso não devolve). Índice montado na partida em 
 | CT-NLP-90 a 93 | Busca por nome, apelido e doença |
 | CT-NLP-130 a 138 | Busca semântica: erro de fala, consulta de grupo, parâmetros, determinismo, documento enriquecido, fora do tema, limiar |
 | CT-NLP-140 a 146 | Avaliação da busca: conjunto de teste (nomes oficiais, respostas de grupo vindas do calendário), métricas, superação do índice original, limiar e relatório |
+| CT-NLP-150 a 159 | Comparação com as aulas: radical e stopwords, seis modelos (a linha de produção bate com a avaliação oficial), pré-processamento, busca com Bag-of-Words, relatório |
 | CT-NLP-100 a 106 | Validação das requisições e erros sem repetir o texto |
 | CT-NLP-110 a 112 | Rotas, chave da função e cabeçalhos |
 | CT-NLP-120 a 127 | Avaliação: F1 acima da meta, sem vazamento, limiar, relatório |

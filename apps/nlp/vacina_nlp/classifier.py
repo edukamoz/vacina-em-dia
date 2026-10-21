@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from collections.abc import Callable
 from functools import lru_cache
 from pathlib import Path
 
@@ -33,21 +34,22 @@ class Prediction:
     scores: dict[str, float]
 
 
-def _build_pipeline() -> Pipeline:
+def _build_pipeline(preprocessor: Callable[[str], str] = normalize) -> Pipeline:
     """TF-IDF de palavras (1 e 2 termos) somado ao de trechos de letras (3 a 5), que tolera erro
-    de digitação, seguido de um SVM linear com probabilidades calibradas (Platt)."""
+    de digitação, seguido de um SVM linear com probabilidades calibradas (Platt). O
+    ``preprocessor`` só muda na avaliação comparativa; em produção é sempre ``normalize``."""
     features = FeatureUnion(
         [
             (
                 "palavras",
                 TfidfVectorizer(
-                    preprocessor=normalize, analyzer="word", ngram_range=(1, 2), sublinear_tf=True
+                    preprocessor=preprocessor, analyzer="word", ngram_range=(1, 2), sublinear_tf=True
                 ),
             ),
             (
                 "letras",
                 TfidfVectorizer(
-                    preprocessor=normalize, analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True
+                    preprocessor=preprocessor, analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True
                 ),
             ),
         ]

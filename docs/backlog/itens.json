@@ -1099,6 +1099,25 @@
    "curto": "APK do Android nas Releases do GitHub"
   },
   {
+   "id": "B58",
+   "jira": null,
+   "titulo": "Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica",
+   "epico": "E6",
+   "prioridade": "Must",
+   "personas": "PE1, PE2",
+   "requisitos": "RF06, RF07",
+   "criterios": [
+    "Relatório com os números das técnicas das aulas sobre o mesmo teste separado, com as limitações.",
+    "Busca com embeddings em português, medida nas mesmas consultas, sem IA generativa e dentro da memória da Function.",
+    "Decisão registrada em ADR e custo conferido."
+   ],
+   "estado": "Em andamento",
+   "sprint": 3,
+   "evidencia": "docs/07-testes/comparacao-pln.md",
+   "nota": "Parte já feita: a comparação. Falta a busca com embeddings (depende de baixar vetores de uma fonte externa, a aprovar).",
+   "curto": "Técnicas das aulas de PLN: comparação e busca com embeddings"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",

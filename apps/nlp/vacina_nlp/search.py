@@ -18,12 +18,13 @@ Não é IA generativa: o resultado são linhas do calendário oficial, e o méto
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 from sklearn.decomposition import TruncatedSVD
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import normalize as l2_normalize
 
@@ -98,8 +99,11 @@ class VaccineSearch:
 
     Args:
         calendar: calendário oficial.
-        analyzer: ``"char"`` (n-gramas de 3 a 5 caracteres, tolera erro de fala) ou ``"word"``
-            (palavras e pares de palavras, o índice original).
+        analyzer: ``"char"`` (n-gramas de 3 a 5 caracteres, tolera erro de fala), ``"word"``
+            (palavras e pares de palavras, o índice original) ou ``"bow"`` (sacola de palavras,
+            só contagem, sem peso TF-IDF; usada na avaliação comparativa).
+        preprocessor: tratamento do texto; em produção é sempre ``normalize`` (as variantes com
+            stopwords e radical só aparecem na avaliação comparativa).
         enriched: inclui faixas, momentos e observações nos documentos.
         lsa_weight: peso da similaridade semântica (LSA) na nota final, de 0 (só TF-IDF, o índice
             original) a 1 (só LSA). A nota é ``(1 - peso) * cosseno_tfidf + peso * cosseno_lsa``.
@@ -114,6 +118,7 @@ class VaccineSearch:
         enriched: bool = True,
         lsa_weight: float = DEFAULT_LSA_WEIGHT,
         components: int = DEFAULT_COMPONENTS,
+        preprocessor: Callable[[str], str] = normalize,
     ) -> None:
         if not 0.0 <= lsa_weight <= 1.0:
             raise ValueError("lsa_weight deve estar entre 0 e 1")
@@ -122,14 +127,16 @@ class VaccineSearch:
         self._names, documentos = build_documents(calendar, enriched=enriched)
         if analyzer == "char":
             self._vectorizer = TfidfVectorizer(
-                preprocessor=normalize, analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True
+                preprocessor=preprocessor, analyzer="char_wb", ngram_range=(3, 5), sublinear_tf=True
             )
         elif analyzer == "word":
             self._vectorizer = TfidfVectorizer(
-                preprocessor=normalize, ngram_range=(1, 2), sublinear_tf=True
+                preprocessor=preprocessor, ngram_range=(1, 2), sublinear_tf=True
             )
+        elif analyzer == "bow":
+            self._vectorizer = CountVectorizer(preprocessor=preprocessor)
         else:
-            raise ValueError("analyzer deve ser 'char' ou 'word'")
+            raise ValueError("analyzer deve ser 'char', 'word' ou 'bow'")
         self._matrix = self._vectorizer.fit_transform(documentos)
         self._svd: TruncatedSVD | None = None
         self._latent: np.ndarray | None = None
