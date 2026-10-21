@@ -403,13 +403,18 @@ html:not([data-movimento='reduzido']) textarea {
     transform 300ms;
 }
 .hm-prog .depois {
-  position: absolute;
   opacity: 0;
   transform: translateY(8px);
 }
+/* Os dois textos dividem a mesma célula da grade: a caixa cresce com a quebra de linha, e um não
+   passa por cima do outro (antes, com altura fixa de uma linha, o texto quebrado vazava do cartão). */
 .hm-prog .num {
-  position: relative;
-  height: 1.3em;
+  display: grid;
+  min-width: 0;
+}
+.hm-prog .num b {
+  grid-area: 1 / 1;
+  overflow-wrap: anywhere;
 }
 
 @keyframes hm-flutua {

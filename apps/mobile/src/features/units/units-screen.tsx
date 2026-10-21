@@ -14,6 +14,10 @@ import { formatDistance, normalizeSearch, routeUrl, telUrl } from './units-forma
 import { UnitMap } from './unit-map';
 import { useUnits } from './use-units';
 
+/** Quantos postos a lista mostra de início (os mais perto) e quantos entram a cada "Mostrar mais". */
+export const POSTOS_INICIAIS = 5;
+export const POSTOS_POR_VEZ = 10;
+
 /** Cartão de uma unidade: nome, endereço, distância, telefone e turno; ao escolher, mostra a rota. */
 function UnitCard({
   unit,
@@ -95,6 +99,7 @@ export function UnitsScreen() {
   const units = useUnits();
   const [selectedCnes, setSelectedCnes] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [mostrados, setMostrados] = useState(POSTOS_INICIAIS);
 
   const visible = useMemo(() => {
     const term = normalizeSearch(search);
@@ -103,6 +108,12 @@ export function UnitsScreen() {
       normalizeSearch(`${unit.name} ${unit.address} ${unit.neighborhood}`).includes(term),
     );
   }, [units.items, search]);
+
+  // A lista é longa (dezenas de postos): mostra os mais perto e deixa pedir mais. Um posto escolhido
+  // no mapa entra na lista mesmo que esteja além do limite.
+  const posicaoEscolhida = visible.findIndex((unit) => unit.cnes === selectedCnes);
+  const limite = Math.max(mostrados, posicaoEscolhida + 1);
+  const listados = visible.slice(0, limite);
 
   const busy = units.phase === 'locating' || units.phase === 'loading';
   const hasList = units.items.length > 0;
@@ -160,7 +171,10 @@ export function UnitsScreen() {
               <CampoTexto
                 rotulo="Buscar por nome ou rua"
                 value={search}
-                onChangeText={setSearch}
+                onChangeText={(texto) => {
+                  setSearch(texto);
+                  setMostrados(POSTOS_INICIAIS);
+                }}
                 autoCorrect={false}
               />
               {!units.position && receivedOn ? (
@@ -169,7 +183,7 @@ export function UnitsScreen() {
                 </Texto>
               ) : null}
               <View role="list" className="gap-md">
-                {visible.map((unit) => (
+                {listados.map((unit) => (
                   <UnitCard
                     key={unit.cnes}
                     unit={unit}
@@ -183,6 +197,33 @@ export function UnitsScreen() {
                   </Texto>
                 ) : null}
               </View>
+              {visible.length > POSTOS_INICIAIS ? (
+                <View className="gap-sm">
+                  <Texto
+                    variante="apoio"
+                    className="text-textoSecundario"
+                    accessibilityLiveRegion="polite"
+                  >
+                    {`Mostrando ${listados.length} de ${visible.length} postos, do mais perto para o mais longe.`}
+                  </Texto>
+                  <View className="flex-row flex-wrap gap-sm">
+                    {listados.length < visible.length ? (
+                      <Botao
+                        titulo={`Mostrar mais ${Math.min(POSTOS_POR_VEZ, visible.length - listados.length)} postos`}
+                        variante="secundario"
+                        onPress={() => setMostrados(limite + POSTOS_POR_VEZ)}
+                      />
+                    ) : null}
+                    {limite > POSTOS_INICIAIS ? (
+                      <Botao
+                        titulo="Mostrar só os mais perto"
+                        variante="secundario"
+                        onPress={() => setMostrados(POSTOS_INICIAIS)}
+                      />
+                    ) : null}
+                  </View>
+                </View>
+              ) : null}
             </>
           ) : !busy && !units.error ? (
             <Cartao className="gap-sm">

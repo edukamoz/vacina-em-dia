@@ -61,11 +61,12 @@ export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () =
   const reduzido = useMovimentoReduzido();
   const { sombra } = useVisual();
   const cartao = (elevado: boolean) => (
-    <Cartao className="flex-row items-start gap-lg" style={elevado ? sombra(2) : undefined}>
+    <Cartao className="grow flex-row items-start gap-lg" style={elevado ? sombra(2) : undefined}>
       <QuadroEstado status={dose.status} />
-      <View className="flex-1 gap-sm">
-        <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
-        <Texto variante="apoio" className="text-textoSecundario">
+      <View className="min-w-0 flex-1 gap-sm">
+        {/* Nomes muito longos (vacinas com várias regras por idade) ficam em até 2 linhas, para o cartão não crescer e entortar a grade; o texto inteiro está no detalhe da dose. */}
+        <Texto variante="titulo3" numberOfLines={2}>{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
+        <Texto variante="apoio" className="text-textoSecundario" numberOfLines={2}>
           {dose.timingLabel}
           {dose.conditional ? ' · depende de condições' : ''}
         </Texto>
@@ -85,6 +86,7 @@ export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () =
       accessibilityRole="button"
       accessibilityLabel={`${dose.vaccine}, ${dose.doseLabel}. Abrir detalhes`}
       onPress={aoAbrir}
+      className="grow"
       // Elevar ao passar (só na web, com mouse): sobe 3 px e ganha a sombra 2; "Reduzir movimento" mantém só a sombra.
       style={(estado) => {
         const passando = Boolean((estado as { hovered?: boolean }).hovered);

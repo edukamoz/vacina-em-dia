@@ -164,4 +164,34 @@ describe('tela de postos de saúde (RF10)', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Usar minha localização' }));
     expect(await screen.findByText('Muitas buscas de postos em pouco tempo.')).toBeOnTheScreen();
   });
+  test('CT-UNI-APP-50: com muitos postos mostra só os mais perto e deixa pedir mais', async () => {
+    const muitos = Array.from({ length: 12 }, (_, i) => ({
+      ...RESPONSE.items[0]!,
+      cnes: `10000${i}`,
+      name: `Unidade Teste ${i + 1}`,
+      distanceMeters: 100 * (i + 1),
+    }));
+    const fake = createFakeFetch({
+      [URL_BUSCA]: { status: 200, body: { ...RESPONSE, items: muitos } },
+    });
+    await renderScreen(<UnitsScreen />, fake.fetchFn);
+    await fireEvent.press(screen.getByRole('button', { name: 'Usar minha localização' }));
+    expect(
+      await screen.findByText('Mostrando 5 de 12 postos, do mais perto para o mais longe.'),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByRole('button', { name: /, a \d/ })).toHaveLength(5);
+    expect(
+      screen.queryByRole('button', { name: 'Mostrar só os mais perto' }),
+    ).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Mostrar mais 7 postos' }));
+    expect(
+      screen.getByText('Mostrando 12 de 12 postos, do mais perto para o mais longe.'),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByRole('button', { name: /, a \d/ })).toHaveLength(12);
+    expect(screen.queryByRole('button', { name: /Mostrar mais/ })).not.toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Mostrar só os mais perto' }));
+    expect(screen.getAllByRole('button', { name: /, a \d/ })).toHaveLength(5);
+  });
 });
