@@ -28,6 +28,8 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 
 **Comparação com as técnicas das aulas:** `docs/07-testes/comparacao-pln.md` (gerado por `python -m vacina_nlp.comparacao --write-report ...`) mede, com o mesmo teste separado, Bag-of-Words contra TF-IDF, Naive Bayes, KNN, Regressão Logística e SVM, e o efeito de remover stopwords e de reduzir ao radical (stemming rudimentar, sem biblioteca nova), no chatbot e na busca. Resultado resumido: remover stopwords **piora** o chatbot (perguntas curtas dependem de "como", "quando", "não"); o radical muda pouco; o TF-IDF supera a simples contagem de palavras na busca; no teste de 100 frases o Naive Bayes com TF-IDF superou o SVM, mas na validação cruzada o SVM ficou na frente, e o relatório diz que a diferença não é conclusiva. Nada disso altera o que está em produção.
 
+**Embeddings (B58, ADR-023):** a busca aceita um terceiro sinal, vetores de palavras em português (GloVe 50d do NILC/USP, CC-BY-4.0, recorte de 3,6 MB em `data/embeddings-pt-50d.npz`, gerado por `scripts/gerar_embeddings.py`). Foi **avaliado e não adotado**: nenhum peso melhorou as 63 consultas (a proximidade dos vetores é por assunto e as 22 vacinas são todas sobre doenças). Fica desligado (`embedding_weight = 0`); os números estão em `docs/07-testes/avaliacao-busca-semantica.md`.
+
 ## Busca (voz)
 
 `POST /api/search` recebe a transcrição e devolve até 5 vacinas parecidas, com doenças e indicações do calendário. Não é IA generativa. A nota de cada vacina combina duas medidas sobre um documento por vacina (nome, apelidos populares, doenças evitadas, faixas, momentos e observações do calendário):
@@ -68,6 +70,7 @@ Nota mínima de 0,35 (abaixo disso não devolve). Índice montado na partida em 
 | CT-NLP-90 a 93 | Busca por nome, apelido e doença |
 | CT-NLP-130 a 138 | Busca semântica: erro de fala, consulta de grupo, parâmetros, determinismo, documento enriquecido, fora do tema, limiar |
 | CT-NLP-140 a 146 | Avaliação da busca: conjunto de teste (nomes oficiais, respostas de grupo vindas do calendário), métricas, superação do índice original, limiar e relatório |
+| CT-NLP-160 a 168 | Embeddings: tabela de vetores, recorte versionado, peso 0 não muda a busca, validação dos pesos, relatório e a guarda de que nenhum peso supera o padrão |
 | CT-NLP-150 a 159 | Comparação com as aulas: radical e stopwords, seis modelos (a linha de produção bate com a avaliação oficial), pré-processamento, busca com Bag-of-Words, relatório |
 | CT-NLP-100 a 106 | Validação das requisições e erros sem repetir o texto |
 | CT-NLP-110 a 112 | Rotas, chave da função e cabeçalhos |

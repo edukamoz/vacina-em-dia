@@ -96,6 +96,7 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 |---|---|---|
 | scikit-learn | 1.9.1 | TF-IDF, SVM e calibração (classificador de intenções e busca) |
 | numpy | 2.5.3 | dependência do scikit-learn |
+| GloVe 50d (NILC/USP) | recorte de 37 mil palavras, 3,6 MB | vetores de palavras em português da busca (recurso desligado, ADR-023). Fonte: huggingface.co/nilc-nlp/glove-50d; licença CC-BY-4.0; Hartmann et al. (2017), Portuguese Word Embeddings: Evaluating on Word Analogies and Natural Language Tasks, STIL |
 | scipy | 1.18.1 | dependência do scikit-learn |
 | joblib | 1.6.0 | dependência do scikit-learn |
 | threadpoolctl | 3.7.0 | dependência do scikit-learn |
