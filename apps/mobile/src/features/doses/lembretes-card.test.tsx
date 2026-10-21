@@ -64,8 +64,10 @@ describe('cartão de lembretes (RF05)', () => {
     });
     await renderScreen(<LembretesCard hoje={HOJE} />, fake.fetchFn);
     expect(await screen.findByText('2 lembretes')).toBeOnTheScreen();
-    expect(screen.getByText('Ana: Gripe, 1ª dose')).toBeOnTheScreen();
-    expect(screen.getByText('atrasada desde 20 de setembro de 2026')).toBeOnTheScreen();
+    expect(screen.getAllByText('Gripe, 1ª dose').length).toBeGreaterThan(0);
+    expect(screen.getByText('Ana · atrasada desde 20 de setembro de 2026')).toBeOnTheScreen();
+    expect(screen.getByText('Atrasada')).toBeOnTheScreen();
+    expect(screen.getByText('Hoje')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('link', { name: /Ana: Gripe, 1ª dose, hoje/ }));
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/dose/[id]', params: { id: 'd2' } });
   });
