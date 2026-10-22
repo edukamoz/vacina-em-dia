@@ -92,9 +92,9 @@ describe('assistente: chat por texto (RF07)', () => {
   test('CT-APP-I03: tocar numa pergunta sugerida a envia', async () => {
     const fake = api();
     await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
-    await fireEvent.press(screen.getByRole('button', { name: 'O que significa dose atrasada?' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Tenho vacina atrasada?' }));
     expect(await screen.findByText(REPLY.text)).toBeOnTheScreen();
-    expect(fake.calls[0]?.body).toEqual({ text: 'O que significa dose atrasada?' });
+    expect(fake.calls[0]?.body).toEqual({ text: 'Tenho vacina atrasada?' });
     await fireEvent.press(screen.getByRole('button', { name: 'Quando toma a vacina BCG?' }));
     await waitFor(() => expect(fake.calls).toHaveLength(2));
   });

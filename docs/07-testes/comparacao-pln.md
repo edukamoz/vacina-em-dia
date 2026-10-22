@@ -3,9 +3,9 @@
 > **Arquivo gerado** por `python -m vacina_nlp.comparacao --write-report ...` (dentro de `apps/nlp`). Não edite à mão.
 
 - **Data:** 2026-10-21
-- **Chatbot:** 490 frases de treino e 100 de teste, separadas (o script recusa vazamento); 20 intenções.
+- **Chatbot:** 1060 frases de treino e 195 de teste, separadas (o script recusa vazamento); 20 intenções.
 - **Busca:** 63 consultas sobre as vacinas do calendário.
-- **Bibliotecas:** scikit-learn 1.7.2, numpy 2.5.3. Semente fixa (42).
+- **Bibliotecas:** scikit-learn 1.9.1, numpy 2.5.3. Semente fixa (42).
 
 Objetivo: mostrar, com números, por que o projeto usa o que usa, relacionando com as aulas de Pré-processamento (tokenização, normalização, stopwords, stemming), Vetorização (Bag-of-Words e TF-IDF) e Classificação (SVM, KNN e Naive Bayes; Regressão Logística no Chatbot II).
 
@@ -15,12 +15,12 @@ Todos usam as mesmas palavras (1 e 2 termos) para isolar o efeito do algoritmo; 
 
 | Configuração | Acurácia (teste) | F1 macro (teste) | Acurácia (validação cruzada) | F1 macro (validação cruzada) |
 |---|---|---|---|---|
-| Bag-of-Words + Naive Bayes | 91.0% | 0.903 | 62.2% | 0.618 |
-| TF-IDF + Naive Bayes | 98.0% | 0.980 | 63.1% | 0.621 |
-| TF-IDF + KNN (k = 3, cosseno) | 86.0% | 0.859 | 52.4% | 0.522 |
-| TF-IDF + Regressão Logística | 90.0% | 0.896 | 64.9% | 0.640 |
-| TF-IDF + SVM linear | 96.0% | 0.960 | 66.3% | 0.660 |
-| Produção: TF-IDF (palavras e letras) + SVM calibrado | 94.0% | 0.932 | 68.8% | 0.670 |
+| Bag-of-Words + Naive Bayes | 85.6% | 0.856 | 62.2% | 0.610 |
+| TF-IDF + Naive Bayes | 93.3% | 0.932 | 64.9% | 0.644 |
+| TF-IDF + KNN (k = 3, cosseno) | 71.3% | 0.696 | 49.0% | 0.489 |
+| TF-IDF + Regressão Logística | 84.1% | 0.844 | 60.8% | 0.617 |
+| TF-IDF + SVM linear | 90.3% | 0.901 | 67.3% | 0.674 |
+| Produção: TF-IDF (palavras e letras) + SVM calibrado | 90.8% | 0.901 | 71.1% | 0.702 |
 
 ## 2. Chatbot: pré-processamento (stopwords e radical)
 
@@ -28,10 +28,10 @@ Mesmo modelo de produção; só muda o tratamento do texto antes da vetorizaçã
 
 | Configuração | Acurácia (teste) | F1 macro (teste) | Acurácia (validação cruzada) | F1 macro (validação cruzada) |
 |---|---|---|---|---|
-| Normalização (o que o projeto usa) | 94.0% | 0.932 | 68.8% | 0.670 |
-| + remover stopwords | 88.0% | 0.876 | 64.1% | 0.619 |
-| + radical (stemming rudimentar) | 95.0% | 0.945 | 68.2% | 0.662 |
-| + stopwords e radical | 85.0% | 0.845 | 63.3% | 0.612 |
+| Normalização (o que o projeto usa) | 90.8% | 0.901 | 71.1% | 0.702 |
+| + remover stopwords | 79.0% | 0.779 | 64.8% | 0.632 |
+| + radical (stemming rudimentar) | 87.7% | 0.864 | 69.8% | 0.680 |
+| + stopwords e radical | 79.5% | 0.777 | 60.7% | 0.582 |
 
 ## 3. Busca: vetorização e pré-processamento
 

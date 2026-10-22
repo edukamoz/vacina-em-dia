@@ -5,7 +5,7 @@
 - **Data:** 2026-10-21
 - **Calendário:** Calendário Nacional de Vacinação 2026 (versão 2026), 21 vacinas indexadas
 - **Consultas de teste:** 63 de vacinas e 12 fora do tema (`vacina_nlp/data/search_test_set.json`)
-- **Bibliotecas:** scikit-learn 1.7.2, numpy 2.5.3
+- **Bibliotecas:** scikit-learn 1.9.1, numpy 2.5.3
 
 ## O que é a busca
 

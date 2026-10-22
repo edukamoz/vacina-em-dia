@@ -23,7 +23,7 @@ def test_ct_nlp_120_f1_macro_no_conjunto_de_teste_separado_atinge_a_meta(resulta
     assert resultado.macro_f1 >= F1_TARGET
     assert resultado.accuracy >= F1_TARGET
     assert resultado.test_size >= 100
-    assert resultado.intents == 20
+    assert resultado.intents == 39
 
 
 def test_ct_nlp_121_toda_intencao_tem_frases_de_teste(resultado):
@@ -56,7 +56,7 @@ def test_ct_nlp_124_validacao_cruzada_roda_so_sobre_o_treino():
 
 def test_ct_nlp_125_ruido_existe_e_alguns_caem_na_resposta_padrao(resultado):
     assert len(load_noise()) == resultado.noise_total >= 10
-    assert resultado.noise_fallback >= 1
+    assert resultado.noise_fallback >= resultado.noise_total - 1
 
 
 def test_ct_nlp_126_relatorio_em_portugues_com_metodo_resultado_e_limitacoes(resultado):

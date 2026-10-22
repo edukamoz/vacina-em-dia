@@ -166,6 +166,7 @@ export function AssistantPanel({
               mensagem={mensagem}
               aoSugerir={send}
               desativado={chat.thinking}
+              aoPasso={(id, passo) => void chat.runStep(id, passo)}
             />
           ))}
           {chat.thinking ? (

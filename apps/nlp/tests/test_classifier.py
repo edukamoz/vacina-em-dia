@@ -14,7 +14,7 @@ def test_ct_nlp_50_dataset_tem_exemplos_suficientes_por_intencao():
     por_intencao: dict[str, int] = {}
     for _, intencao in load_intent_examples():
         por_intencao[intencao] = por_intencao.get(intencao, 0) + 1
-    assert len(por_intencao) == 20
+    assert len(por_intencao) == 39
     assert min(por_intencao.values()) >= 20
 
 

@@ -60,6 +60,6 @@ def test_ct_nlp_106_health_informa_modelo_e_versao_do_calendario(service):
     assert body == {
         "status": "ok",
         "service": "vacina-em-dia-nlp",
-        "intents": 20,
+        "intents": 39,
         "calendarVersion": "2026",
     }

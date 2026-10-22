@@ -29,6 +29,45 @@ export const assistantSourceSchema = z
   })
   .meta({ id: 'AssistantSource' });
 
+/** Telas que o assistente sabe abrir. */
+export const ASSISTANT_SCREENS = [
+  'painel',
+  'postos',
+  'historico',
+  'apoiar',
+  'familia',
+  'conta',
+  'novidades',
+  'doses',
+] as const;
+
+/**
+ * O que o assistente entendeu de um comando ou de uma pergunta sobre a conta (B61): vacinas,
+ * nomes, datas e a tela pedida. Vem das regras do serviço de PLN; o app é quem cruza com os dados
+ * da pessoa logada e confirma com ela antes de qualquer ação. Datas sem ano vêm como `--MM-DD`.
+ */
+export const assistantEntitiesSchema = z
+  .object({
+    vaccines: z
+      .array(z.string())
+      .default([])
+      .meta({ example: ['BCG'] }),
+    names: z
+      .array(z.string())
+      .default([])
+      .meta({ example: ['Maria'] }),
+    dates: z
+      .array(z.string())
+      .default([])
+      .meta({ example: ['2026-02-10'], description: 'AAAA-MM-DD, ou --MM-DD quando sem ano.' }),
+    relativeDay: z
+      .enum(['today', 'yesterday', 'tomorrow', 'day_before_yesterday'])
+      .nullable()
+      .default(null),
+    screen: z.enum(ASSISTANT_SCREENS).nullable().default(null),
+  })
+  .meta({ id: 'AssistantEntities' });
+
 /** Resposta curada do assistente (chatbot por regras e classificação de intenções). */
 export const assistantReplySchema = z
   .object({
@@ -42,6 +81,10 @@ export const assistantReplySchema = z
       .meta({ description: 'Verdadeiro quando o assistente não entendeu (confiança baixa).' }),
     safety: z.boolean().meta({
       description: 'Verdadeiro quando a pergunta foi encaminhada a um profissional de saúde.',
+    }),
+    entities: assistantEntitiesSchema.optional().meta({
+      description:
+        'Só nas intenções da conta e dos comandos (`conta_*` e `acao_*`): o que foi entendido da frase. Vazio nas demais.',
     }),
   })
   .meta({ id: 'AssistantReply' });
@@ -81,6 +124,8 @@ export const nlpSearchResponseSchema = z.object({
 
 /** Pergunta em texto. */
 export type AssistantMessageInput = z.infer<typeof assistantMessageInputSchema>;
+/** O que o assistente entendeu de um comando. */
+export type AssistantEntities = z.infer<typeof assistantEntitiesSchema>;
 /** Resposta curada do assistente. */
 export type AssistantReply = z.infer<typeof assistantReplySchema>;
 /** Vacina encontrada pela busca. */

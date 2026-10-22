@@ -6,10 +6,12 @@ Serviço em `apps/nlp` (Azure Function em Python, ADR-002). **Sem IA generativa*
 
 1. **Texto vazio** ou sem letras: pede para repetir.
 2. **Regras de segurança** (`vacina_nlp/safety.py`): sintoma, reação, remédio, "posso tomar...", emergência. A pergunta **não passa pelo modelo**: o assistente diz que não dá orientação médica, manda procurar um profissional ou a unidade de saúde e cita o SAMU (192). O nome "febre amarela" não dispara a regra de febre.
-3. **Classificador de intenções** (TF-IDF + SVM): 20 intenções. Confiança abaixo do limiar (0,40) devolve a **resposta padrão**, que orienta procurar um profissional ou uma unidade de saúde. Se a pergunta cita uma vacina, o assistente explica a vacina em vez de dizer que não entendeu.
+3. **Classificador de intenções** (TF-IDF + SVM): 39 intenções. Confiança abaixo do limiar (0,30) devolve a **resposta padrão**, que orienta procurar um profissional ou uma unidade de saúde. Se a pergunta cita uma vacina, o assistente explica a vacina em vez de dizer que não entendeu.
 4. **Resposta**: curada. Para "para que serve", "quando toma" e "vacinas do grupo", o texto é montado a partir das linhas do calendário oficial (doenças evitadas, dose e momento) e **sempre cita a fonte e a versão**.
 
 ### Intenções
+
+O assistente também **olha a conta e age** (B61, ADR-025): ver a seção "Assistente com poder sobre a conta" abaixo.
 
 | Grupo | Intenções |
 |---|---|
@@ -18,7 +20,7 @@ Serviço em `apps/nlp` (Azure Function em Python, ADR-002). **Sem IA generativa*
 | Calendário oficial | `vacina_para_que_serve`, `vacina_quando`, `vacinas_do_grupo` |
 | Segurança | `orientacao_medica`, `fora_do_escopo` |
 
-O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`responses.json`) foram **escritos pelo Claude como rascunho e precisam da revisão do autor** antes da apresentação. O conjunto de teste (`test_set.json`) é separado do treino.
+O dataset (`vacina_nlp/data/intents.json`, 1.060 frases) e as respostas (`responses.json`) foram **escritos pelo Claude como rascunho e precisam da revisão do autor** antes da apresentação. O conjunto de teste (`test_set.json`) é separado do treino.
 
 ## Avaliação
 
@@ -26,9 +28,24 @@ O dataset (`vacina_nlp/data/intents.json`, 490 frases) e as respostas (`response
 
 **Painel de métricas:** `docs/07-testes/painel-pln.html` é uma página única (abre direto no navegador, sem internet) com os mesmos números em gráficos: cartões de resumo, F1 por intenção, matriz de confusão, a curva de cobertura e acerto por limiar e a lista de erros. Gere com `python -m vacina_nlp.evaluate --write-dashboard ../../docs/07-testes/painel-pln.html` (dentro de `apps/nlp`) e tire a captura para os documentos com `node scripts/documentos/captura-painel.mjs`.
 
-**Comparação com as técnicas das aulas:** `docs/07-testes/comparacao-pln.md` (gerado por `python -m vacina_nlp.comparacao --write-report ...`) mede, com o mesmo teste separado, Bag-of-Words contra TF-IDF, Naive Bayes, KNN, Regressão Logística e SVM, e o efeito de remover stopwords e de reduzir ao radical (stemming rudimentar, sem biblioteca nova), no chatbot e na busca. Resultado resumido: remover stopwords **piora** o chatbot (perguntas curtas dependem de "como", "quando", "não"); o radical muda pouco; o TF-IDF supera a simples contagem de palavras na busca; no teste de 100 frases o Naive Bayes com TF-IDF superou o SVM, mas na validação cruzada o SVM ficou na frente, e o relatório diz que a diferença não é conclusiva. Nada disso altera o que está em produção.
+**Comparação com as técnicas das aulas:** `docs/07-testes/comparacao-pln.md` (gerado por `python -m vacina_nlp.comparacao --write-report ...`) mede, com o mesmo teste separado, Bag-of-Words contra TF-IDF, Naive Bayes, KNN, Regressão Logística e SVM, e o efeito de remover stopwords e de reduzir ao radical (stemming rudimentar, sem biblioteca nova), no chatbot e na busca. Resultado resumido: remover stopwords **piora** o chatbot (perguntas curtas dependem de "como", "quando", "não"); o radical rudimentar não ajudou (ficou igual ou um pouco pior, conforme o tamanho do dataset); o TF-IDF supera a simples contagem de palavras na busca; no teste de 100 frases o Naive Bayes com TF-IDF superou o SVM, mas na validação cruzada o SVM ficou na frente, e o relatório diz que a diferença não é conclusiva. Nada disso altera o que está em produção.
 
 **Embeddings (B58, ADR-023):** a busca aceita um terceiro sinal, vetores de palavras em português (GloVe 50d do NILC/USP, CC-BY-4.0, recorte de 3,6 MB em `data/embeddings-pt-50d.npz`, gerado por `scripts/gerar_embeddings.py`). Foi **avaliado e não adotado**: nenhum peso melhorou as 63 consultas (a proximidade dos vetores é por assunto e as 22 vacinas são todas sobre doenças). Fica desligado (`embedding_weight = 0`); os números estão em `docs/07-testes/avaliacao-busca-semantica.md`.
+
+## Assistente com poder sobre a conta (B61, ADR-025)
+
+Além de explicar o app e o calendário, o assistente responde com os **dados de quem está logado** e executa **comandos**, sempre com confirmação. O serviço de PLN só entende a frase; **nenhum dado da conta passa por ele**. Quem cruza com os dados e age é o app, pelos mesmos endpoints e regras das telas (`apps/mobile/src/lib/assistente-conta.ts`).
+
+| Tipo | Intenções | O que faz |
+|---|---|---|
+| Consulta à conta | `conta_quem_na_familia`, `conta_doses_atrasadas`, `conta_proxima_dose`, `conta_resumo_vacinacao`, `conta_meus_lembretes`, `conta_email` | Responde com modelos de frase preenchidos com os dados (pessoa citada ou família toda), citando "Seus dados no Vacina em Dia". |
+| Comando com confirmação | `acao_adicionar_pessoa`, `acao_registrar_dose`, `acao_agendar_dose` | Mostra "Posso marcar BCG de Maria como aplicada em 20/10/2026?" com **Confirmar** e **Cancelar**. Só grava ao confirmar; cada gravação passa pela máquina de estados da dose e pelas validações da API. |
+| Navegação | `acao_abrir_tela` | Oferece um botão para abrir Painel de gráficos, Postos, Histórico, Família, Doses, Conta ou Apoio por Pix (não abre sozinho). |
+| Ajuda da plataforma | `como_ver_graficos`, `como_ver_novidades`, `como_apoiar_pix`, `como_ler_caderneta`, `como_trocar_foto`, `como_mudar_aparencia`, `como_instalar_app`, `como_sair_conta`, `como_ver_postos` | Respostas curadas sobre cada recurso. |
+
+**O que o assistente NÃO faz (de propósito):** excluir pessoa, dose ou conta; cancelar dose; trocar e-mail ou senha; dar orientação médica (a regra de segurança vem antes de tudo: "registrar que a Maria tomou a vacina e teve febre" vai para um profissional); gravar sem confirmação; inventar vacina, dose ou data.
+
+**Como o serviço separa "como faço" de "faça":** `Chatbot._command_or_howto`. Pergunta (como, onde, posso...) fica com a explicação; fora disso, o que a frase traz (nome, data, vacina) mostra que é um comando. As entidades (`vaccines`, `names`, `dates` com `--MM-DD` quando sem ano, `relativeDay`, `screen`) saem de regras em `entities.py`. O limiar de confiança caiu de 0,40 para 0,30 porque, com 39 intenções, as probabilidades calibradas se espalham mais (relatório: `avaliacao-chatbot.md`).
 
 ## Busca (voz)
 
@@ -70,6 +87,7 @@ Nota mínima de 0,35 (abaixo disso não devolve). Índice montado na partida em 
 | CT-NLP-90 a 93 | Busca por nome, apelido e doença |
 | CT-NLP-130 a 138 | Busca semântica: erro de fala, consulta de grupo, parâmetros, determinismo, documento enriquecido, fora do tema, limiar |
 | CT-NLP-140 a 146 | Avaliação da busca: conjunto de teste (nomes oficiais, respostas de grupo vindas do calendário), métricas, superação do índice original, limiar e relatório |
+| CT-NLP-170 a 179 | Comandos do assistente: datas (com e sem ano), dia relativo, nomes, tela, "como faço" contra "faça", entidades sem dado da conta, regra de segurança antes do comando |
 | CT-NLP-160 a 168 | Embeddings: tabela de vetores, recorte versionado, peso 0 não muda a busca, validação dos pesos, relatório e a guarda de que nenhum peso supera o padrão |
 | CT-NLP-150 a 159 | Comparação com as aulas: radical e stopwords, seis modelos (a linha de produção bate com a avaliação oficial), pré-processamento, busca com Bag-of-Words, relatório |
 | CT-NLP-100 a 106 | Validação das requisições e erros sem repetir o texto |

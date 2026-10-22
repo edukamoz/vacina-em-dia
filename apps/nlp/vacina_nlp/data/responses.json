@@ -89,6 +89,101 @@
       "origin": "app",
       "text": "Esse assunto está fora do que eu sei responder. Posso ajudar com o uso do aplicativo e com o Calendário Nacional de Vacinação.",
       "suggestions": ["O que você faz?", "Quais vacinas a criança deve tomar?"]
+    },
+    "conta_quem_na_familia": {
+      "origin": "app",
+      "text": "Vou olhar quem está cadastrado na sua conta.",
+      "suggestions": ["Tenho vacina atrasada?", "Como está a vacinação da família?"]
+    },
+    "conta_doses_atrasadas": {
+      "origin": "app",
+      "text": "Vou olhar as doses atrasadas da sua família.",
+      "suggestions": ["Qual a próxima vacina?", "O que significa dose atrasada?"]
+    },
+    "conta_proxima_dose": {
+      "origin": "app",
+      "text": "Vou olhar as próximas doses da sua família.",
+      "suggestions": ["Tenho vacina atrasada?", "Quais são meus lembretes?"]
+    },
+    "conta_resumo_vacinacao": {
+      "origin": "app",
+      "text": "Vou montar o resumo das vacinas da sua família.",
+      "suggestions": ["Abrir o painel de gráficos", "Tenho vacina atrasada?"]
+    },
+    "conta_meus_lembretes": {
+      "origin": "app",
+      "text": "Vou olhar os seus lembretes.",
+      "suggestions": ["Qual a próxima vacina?", "Como funcionam os lembretes?"]
+    },
+    "conta_email": {
+      "origin": "app",
+      "text": "Vou olhar os dados da sua conta.",
+      "suggestions": ["Como troco minha foto de perfil?", "Como saio da conta?"]
+    },
+    "acao_adicionar_pessoa": {
+      "origin": "app",
+      "text": "Para adicionar alguém preciso do nome e da data de nascimento. Por exemplo: adicionar Maria nascida em 10/02/2026.",
+      "suggestions": ["Como adicionar uma pessoa?", "Quem está na minha família?"]
+    },
+    "acao_registrar_dose": {
+      "origin": "app",
+      "text": "Para registrar uma dose diga a pessoa, a vacina e, se quiser, a data. Por exemplo: a Maria tomou a BCG hoje.",
+      "suggestions": ["Como registro que tomei a vacina?", "Tenho vacina atrasada?"]
+    },
+    "acao_agendar_dose": {
+      "origin": "app",
+      "text": "Para agendar uma dose diga a pessoa, a vacina e a data. Por exemplo: agendar a gripe do João para 05/11/2026.",
+      "suggestions": ["Como agendo uma vacina?", "Quais são meus lembretes?"]
+    },
+    "acao_abrir_tela": {
+      "origin": "app",
+      "text": "Posso abrir o painel de gráficos, os postos de saúde, o histórico, a família, as doses, a conta ou o apoio por Pix. Diga qual.",
+      "suggestions": ["Abrir o painel de gráficos", "Mostrar os postos de saúde"]
+    },
+    "como_ver_graficos": {
+      "origin": "app",
+      "text": "O Painel de gráficos fica no topo da aba Histórico. Ele mostra a cobertura (percentual de doses aplicadas), uma rosca de doses por estado, barras por pessoa, as doses aplicadas nos últimos 12 meses e as previstas nos próximos 6. Dá para ver a família toda ou uma pessoa e abrir a tabela com os mesmos números. Os gráficos usam só as doses cadastradas no app.",
+      "suggestions": ["Abrir o painel de gráficos", "Como vejo o histórico?"]
+    },
+    "como_ver_novidades": {
+      "origin": "app",
+      "text": "As Novidades de saúde ficam no fim da aba Doses, num carrossel de cartões. São títulos e links de notícias do portal do Ministério da Saúde, lidos do feed oficial no máximo uma vez por hora. O app não resume nem comenta as notícias: tocar abre a página original. Se o feed não responder, o cartão some.",
+      "suggestions": ["De onde vem o calendário?", "Mostrar o histórico"]
+    },
+    "como_apoiar_pix": {
+      "origin": "app",
+      "text": "O aplicativo é gratuito e continuará sendo. Se quiser ajudar a mantê-lo no ar, abra a aba Conta e toque em \"Doar com Pix\": você escolhe um valor (ou deixa em aberto), vê o QR Code e copia o código Pix copia e cola para pagar no app do seu banco. A doação é opcional, não libera nada, e o app não guarda nem recebe dados de pagamento.",
+      "suggestions": ["Quais dados vocês guardam?", "Como funciona o app?"]
+    },
+    "como_ler_caderneta": {
+      "origin": "app",
+      "text": "Na aba Doses, no app instalado no celular, toque em \"Ler caderneta por foto\", tire a foto (ou escolha da galeria) e confira as doses encontradas antes de registrar. A leitura é feita no próprio aparelho, a foto não vai para a internet, e só marca doses que a pessoa já tem no calendário. Ela pode errar, por isso a conferência é obrigatória. Na web esse botão não aparece.",
+      "suggestions": ["Como registro que tomei a vacina?", "Quais dados vocês guardam?"]
+    },
+    "como_trocar_foto": {
+      "origin": "app",
+      "text": "Abra a aba Conta: no topo você pode escolher uma foto da galeria, tirar uma foto (no celular) ou remover a atual. A foto é opcional, fica guardada de forma privada só para você, aparece no menu e é apagada se você excluir a conta. Sem foto, o app mostra a inicial do seu e-mail.",
+      "suggestions": ["Como saio da conta?", "Como excluo meus dados?"]
+    },
+    "como_mudar_aparencia": {
+      "origin": "app",
+      "text": "Na aba Conta, em Aparência, você escolhe o tema (claro, escuro ou alto contraste), o tamanho do texto e se quer reduzir os movimentos e as animações. As escolhas valem para todas as telas.",
+      "suggestions": ["Como saio da conta?", "O que o assistente faz?"]
+    },
+    "como_instalar_app": {
+      "origin": "app",
+      "text": "No Android você pode baixar o APK na página de Releases do projeto no GitHub (versão apk-latest) e instalar. Em qualquer celular ou computador também dá para usar pelo navegador e, se quiser, instalar como aplicativo (PWA) pela opção \"Instalar\" ou \"Adicionar à tela inicial\" do navegador. Alguns recursos, como ler a caderneta por foto, só existem no app instalado.",
+      "suggestions": ["Como ler a caderneta pela foto?", "Como mudo o tema?"]
+    },
+    "como_sair_conta": {
+      "origin": "app",
+      "text": "No celular, abra a aba Conta: o botão \"Sair\" fica logo abaixo do cabeçalho. No tablet e no computador, o botão \"Sair\" fica na barra lateral, logo acima da aba Conta. Ao sair, a sessão é encerrada neste aparelho.",
+      "suggestions": ["Como excluo meus dados?", "Como troco minha foto?"]
+    },
+    "como_ver_postos": {
+      "origin": "app",
+      "text": "Abra a aba Postos (ou o atalho \"Postos de saúde perto de você\" na aba Doses) e toque em \"Usar minha localização\": o app pede a posição só nesse momento, não a guarda, e mostra as unidades básicas de saúde mais próximas no mapa e numa lista (os 5 mais perto, com \"Mostrar mais\"). Tocar numa unidade mostra a rota e o telefone. A lista não diz quais unidades têm sala de vacina: ligue antes de ir.",
+      "suggestions": ["De onde vem o calendário?", "Mostrar os postos de saúde"]
     }
   },
   "fallback": {

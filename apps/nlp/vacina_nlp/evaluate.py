@@ -141,7 +141,13 @@ def evaluate(
         cobertura = len(aceitas) / len(test)
         acerto = sum(1 for t, p in aceitas if t == p.intent) / len(aceitas) if aceitas else 0.0
         thresholds.append((limiar, cobertura, acerto))
-    noise_fallback = sum(1 for text in noise if classifier.predict(text).confidence < threshold)
+    # Entrada sem sentido é tratada quando cai na resposta padrão (confiança baixa) ou na resposta
+    # de "fora do escopo"; as duas orientam a pessoa sem inventar nada.
+    noise_fallback = sum(
+        1
+        for text in noise
+        if (p := classifier.predict(text)).confidence < threshold or p.intent == "fora_do_escopo"
+    )
     cv_acc, cv_f1 = cross_validate(train) if run_cross_validation else (0.0, 0.0)
 
     return Evaluation(
@@ -237,7 +243,7 @@ def render_report(result: Evaluation, today: date) -> str:
         "",
         f"Com o limiar em uso ({_num(result.threshold_in_use)}), "
         f"{result.noise_fallback} de {result.noise_total} entradas sem sentido (por exemplo "
-        '"asdf" e "????") caem na resposta padrão.',
+        '"asdf" e "????") caem na resposta padrão ou na de "fora do escopo".',
         "",
         "## Limitações",
         "",
