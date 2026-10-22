@@ -1137,6 +1137,25 @@
    "curto": "Novidades de saúde do Ministério da Saúde"
   },
   {
+   "id": "B60",
+   "jira": null,
+   "titulo": "Como usuária, quero ver a situação das vacinas da família em gráficos, para entender num relance o que já foi tomado, o que está atrasado e o que vem pela frente",
+   "epico": "E9",
+   "prioridade": "Should",
+   "personas": "PE1, PE3",
+   "requisitos": "RNF06",
+   "criterios": [
+    "Mostra a cobertura, uma rosca de doses por estado, barras por pessoa, doses aplicadas nos últimos 12 meses e previstas nos próximos 6.",
+    "Dá para ver a família toda ou uma pessoa; cada gráfico tem rótulo de texto para leitor de tela e há uma tabela com os mesmos números.",
+    "Os números vêm das doses cadastradas, calculadas no aparelho, sem biblioteca nova."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "apps/mobile/src/features/charts; apps/mobile/src/lib/estatisticas.ts",
+   "nota": "Gráficos desenhados com react-native-svg e Views (sem biblioteca de gráficos). Atalho no Histórico.",
+   "curto": "Painel de gráficos"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",

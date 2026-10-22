@@ -5,13 +5,14 @@ import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
+import { Icone } from '../../components/icone';
 import { QuadroEstado } from '../../components/quadro-estado';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
-import { useVisual } from '../../theme/theme-provider';
+import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import { useDosesOfMembers, useMembers } from '../data/hooks';
 import { formatCivilDate } from '../doses/format-date';
 
@@ -160,6 +161,7 @@ function TabelaDoHistorico({
 export function HistoryScreen() {
   const router = useRouter();
   const largura = useWindowDimensions().width;
+  const cores = useThemeColors();
   const members = useMembers();
   const pessoas = members.data?.items ?? [];
   const doses = useDosesOfMembers(pessoas.map((pessoa) => pessoa.id));
@@ -206,6 +208,28 @@ export function HistoryScreen() {
 
   return (
     <Tela reservaBalao titulo="Histórico">
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel="Painel de gráficos. Veja a situação das vacinas da família em gráficos."
+        onPress={() => router.push('/painel')}
+        className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
+      >
+        <View
+          aria-hidden
+          className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
+        >
+          <Icone nome="historico" cor={cores.primaria} />
+        </View>
+        <View className="flex-1">
+          <Texto variante="titulo3" importantForAccessibility="no">
+            Painel de gráficos
+          </Texto>
+          <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
+            Veja a situação das vacinas da família em gráficos.
+          </Texto>
+        </View>
+        <Icone nome="seta" cor={cores.textoSecundario} />
+      </Pressable>
       {carregando && <EstadoCarregando rotulo="Carregando o histórico" />}
       {falha?.error && (
         <EstadoErro
