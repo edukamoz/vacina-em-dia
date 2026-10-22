@@ -207,6 +207,32 @@ export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
       return json(route, 204);
     }
 
+    if (chave === 'GET /news') {
+      return json(route, 200, {
+        items: [
+          {
+            title: 'Ministério da Saúde amplia a campanha de vacinação contra a gripe',
+            url: 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms/2026/outubro/campanha-gripe',
+            publishedAt: '2026-10-19',
+            vaccineRelated: true,
+          },
+          {
+            title: 'Carretas de saúde da mulher passam por vistoria técnica',
+            url: 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms/2026/outubro/carretas',
+            publishedAt: '2026-10-17',
+            vaccineRelated: false,
+          },
+        ],
+        source: {
+          name: 'Notícias do Ministério da Saúde',
+          publisher: 'Ministério da Saúde',
+          url: 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms',
+        },
+        updatedAt: '2026-10-21T14:00:00.000Z',
+        notice:
+          'O app só repassa o título e o link das notícias do Ministério da Saúde, sem resumo nem opinião. Não é orientação médica e não substitui a caderneta nem os profissionais de saúde.',
+      });
+    }
     if (chave === 'GET /reminders') {
       return json(route, 200, { leadDays: 7, emailEnabled: true, items: [] });
     }

@@ -1,0 +1,84 @@
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { Linking } from 'react-native';
+import { createFakeFetch, renderScreen } from '../../test-utils';
+import { LIMITE_NOVIDADES, NovidadesCard } from './novidades-card';
+
+const URL_BASE = 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms/2026/outubro';
+const noticia = (n: number, extra = {}) => ({
+  title: `Notícia ${n}`,
+  url: `${URL_BASE}/n${n}`,
+  publishedAt: '2026-10-19',
+  vaccineRelated: false,
+  ...extra,
+});
+const resposta = (items: unknown[], updatedAt: string | null = '2026-10-21T14:00:00.000Z') => ({
+  status: 200,
+  body: {
+    items,
+    source: {
+      name: 'Notícias do Ministério da Saúde',
+      publisher: 'Ministério da Saúde',
+      url: 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms',
+    },
+    updatedAt,
+    notice: 'O app só repassa o título e o link. Não é orientação médica.',
+  },
+});
+
+beforeEach(() => jest.restoreAllMocks());
+
+describe('cartão Novidades de saúde', () => {
+  test('CT-APP-NEW01: mostra título, data, etiqueta de vacinação, fonte e aviso', async () => {
+    const fake = createFakeFetch({
+      'GET /news': resposta([
+        noticia(1, { title: 'Campanha de vacinação', vaccineRelated: true }),
+        noticia(2),
+      ]),
+    });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    expect(await screen.findByRole('header', { name: 'Novidades de saúde' })).toBeOnTheScreen();
+    expect(screen.getByText('Campanha de vacinação')).toBeOnTheScreen();
+    expect(screen.getAllByText('19/10/2026')).toHaveLength(2);
+    expect(screen.getAllByText('Vacinação')).toHaveLength(1);
+    expect(
+      screen.getByText(
+        /Fonte: Notícias do Ministério da Saúde, Ministério da Saúde\. Lido em 21\/10\/2026/,
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.getByText(/Não é orientação médica/)).toBeOnTheScreen();
+  });
+
+  test('CT-APP-NEW02: tocar numa notícia abre a página original no site do Ministério', async () => {
+    const abrir = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    const fake = createFakeFetch({ 'GET /news': resposta([noticia(7)]) });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    await fireEvent.press(await screen.findByRole('link', { name: /Notícia 7, 19\/10\/2026/ }));
+    expect(abrir).toHaveBeenCalledWith(`${URL_BASE}/n7`);
+  });
+
+  test('CT-APP-NEW03: mostra no máximo cinco notícias', async () => {
+    const fake = createFakeFetch({
+      'GET /news': resposta(Array.from({ length: 9 }, (_, i) => noticia(i + 1))),
+    });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    await screen.findByText('Notícia 1');
+    expect(screen.getAllByRole('link')).toHaveLength(LIMITE_NOVIDADES);
+  });
+
+  test('CT-APP-NEW04: sem notícias o cartão some', async () => {
+    const fake = createFakeFetch({ 'GET /news': resposta([], null) });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    await waitFor(() => expect(fake.calls.some((c) => c.key === 'GET /news')).toBe(true));
+    expect(screen.queryByText('Novidades de saúde')).not.toBeOnTheScreen();
+  });
+
+  test('CT-APP-NEW05: se a consulta falha o cartão some, sem mensagem de erro', async () => {
+    const fake = createFakeFetch({
+      'GET /news': { status: 500, body: { code: 'INTERNAL_ERROR', message: 'Erro.' } },
+    });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    await waitFor(() => expect(fake.calls.some((c) => c.key === 'GET /news')).toBe(true));
+    expect(screen.queryByText('Novidades de saúde')).not.toBeOnTheScreen();
+    expect(screen.queryByRole('alert')).not.toBeOnTheScreen();
+  });
+});

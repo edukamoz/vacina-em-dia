@@ -36,7 +36,7 @@ export interface LimitReachedError {
 export interface RateLimitedError {
   readonly code: 'RATE_LIMITED';
   /** O que foi limitado; muda só a mensagem. Sem valor, é o assistente. */
-  readonly scope?: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo';
+  readonly scope?: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | 'news';
   /** Segundos até a próxima janela livre. */
   readonly retryAfterSeconds: number;
 }

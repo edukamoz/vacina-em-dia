@@ -123,7 +123,7 @@ export function toErrorResult(error: ServiceError): HttpResult {
 }
 
 function rateLimitedMessage(
-  scope: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | undefined,
+  scope: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | 'news' | undefined,
 ): string {
   switch (scope) {
     case 'photo':
@@ -136,6 +136,8 @@ function rateLimitedMessage(
       return 'Muitos cadastros em pouco tempo. Tente de novo mais tarde.';
     case 'units':
       return 'Muitas buscas de postos em pouco tempo. Tente de novo mais tarde.';
+    case 'news':
+      return 'Muitas consultas às novidades em pouco tempo. Tente de novo mais tarde.';
     default:
       return 'Você fez muitas perguntas em pouco tempo. Tente de novo mais tarde.';
   }
