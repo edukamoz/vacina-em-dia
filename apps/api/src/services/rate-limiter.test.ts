@@ -70,4 +70,21 @@ describe('limitador de uso (ADR-010)', () => {
     expect(await limiter.consume('novo', [regra])).toEqual({ allowed: true });
     expect(await limiter.consume('dono-0', [regra])).toEqual({ allowed: true });
   });
+
+  test('CT-RL-07: a limpeza mantém os contadores ainda dentro da janela', async () => {
+    const { limiter, avancar } = build();
+    const regra: RateRule = { name: 'r', limit: 1, windowSeconds: 3600 };
+    for (let i = 0; i < 5000; i += 1) await limiter.consume(`dono-${i}`, [regra]);
+    avancar(5);
+    await limiter.consume('novo', [regra]);
+    expect(await limiter.consume('dono-0', [regra])).toEqual({
+      allowed: false,
+      retryAfterSeconds: 3595,
+    });
+  });
+
+  test('CT-RL-08: sem nenhuma regra (laço executado zero vezes) o uso é permitido', async () => {
+    const { limiter } = build();
+    expect(await limiter.consume('a', [])).toEqual({ allowed: true });
+  });
 });

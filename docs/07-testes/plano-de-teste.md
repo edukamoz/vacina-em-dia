@@ -83,7 +83,9 @@ Pirâmide de testes: **muitos testes unitários** (domínio, serviços e valida�
 |---|---|---|
 | Caixa preta: **partição de equivalência e análise de valor limite** | Formulários e entradas da API (cadastro, membros, datas de dose) | 179 casos em `caixa-preta-casos.md` e tabela de execução em `caixa-preta-execucao.md` (SCRUM-28, feitos em 07/10/2026) |
 | Cobertura de estados, de transições e de caminhos | Ciclo de vida da dose | 42 casos já escritos: CT-E (5), CT-T (12), CT-G (9), CT-I (9) e CT-C (7) |
-| Teste de regressão automatizado | Todo o código | Executado em cada push |
+| Teste de regressão (automatizado, seletivo, corretivo, progressivo e manual) | Todo o código | Estratégia na seção 4.5; a suíte inteira roda em cada push e PR |
+| Caixa branca: cobertura de instruções, decisões, condições, caminhos e fluxo de dados | Funções críticas (máquina de estados, limitador de uso, filtro do Pix) | `caixa-branca.md`; cobertura medida pelo Jest com limite de 80% |
+| Teste exploratório com charters e HICCUPPS | Fluxos de dose, assistente, conta e layout | `testes-exploratorios.md`; sessões ao fim de cada sprint (seção 4.5) |
 | Teste de autorização | API | Para todo recurso: usuário A não acessa dado do usuário B |
 | Teste de conteúdo | Calendário e chatbot | Fonte, versão e aviso presentes; resposta padrão quando a confiança é baixa |
 | Teste de desempenho leve | API | Verifica o RNF01 sem ferramenta pesada |
@@ -101,6 +103,60 @@ Pirâmide de testes: **muitos testes unitários** (domínio, serviços e valida�
 ### 4.4 Gestão de defeitos
 
 Defeitos são registrados como itens do tipo Bug no Jira (projeto SCRUM), com passos para reproduzir, resultado esperado e obtido, e severidade (crítica, alta, média ou baixa). Cada correção entra com um teste que a reproduz.
+
+### 4.5 Estratégia de regressão e testes exploratórios
+
+Regressão é reexecutar testes depois de uma mudança para provar que o que funcionava continua funcionando. Os tipos abaixo seguem o material da aula "Testes de regressão e exploratórios":
+
+| Tipo | Como aparece no projeto |
+|---|---|
+| **Automatizada / total** | O CI roda a suíte inteira em todo push e PR: lint, formatação, tipos, build, Jest com cobertura (shared, API e app), pytest do PLN, Playwright com axe-core, TypeDoc e fumaça no Docker. Hoje não há seleção de testes: a suíte inteira roda sempre. |
+| **Parcial / seletiva** | Durante o desenvolvimento, só o pacote ou o arquivo alterado (`npm test --workspace <pacote>` ou `npx jest <arquivo>`); a suíte inteira fica para o CI. |
+| **Incremental** | PRs pequenos, um item por vez (CLAUDE.md §15); cada PR acrescenta os testes do próprio item e roda tudo. |
+| **Unitária com regressão** | Domínio puro (`packages/shared`): a matriz de transições da dose, o calendário e os lembretes têm testes que falham se uma regra mudar. |
+| **Corretiva** | Toda correção de defeito entra com um teste que a reproduz (seção 4.4). |
+| **Progressiva** | Quando uma funcionalidade é reescrita, os testes antigos são substituídos, não remendados. Exemplo: no B61 o assistente passou de 20 para 39 intenções, o conjunto de teste foi refeito e o limiar de confiança mudou de 0,40 para 0,30, com a avaliação registrada em `avaliacao-chatbot.md`. |
+| **Manual** | Aspectos visuais, de acessibilidade com leitor de tela e de aparelho físico, que a automação não cobre bem. Entram nas sessões exploratórias (charter CH-04) e no item B40, ainda pendente. |
+
+**Análise de impacto (o que rodar quando algo muda).** A regra prática, em ordem de alcance:
+
+| Mudou em | Pode afetar | Rodar, no mínimo |
+|---|---|---|
+| `packages/shared` (esquemas, domínio, calendário) | API, app e PLN (contratos) | Tudo (o CI já faz) |
+| `apps/api` | Rotas, serviços, PDF, lembretes | Jest da API; fumaça no Docker |
+| `apps/mobile` | Telas e fluxos | Jest do app; Playwright e axe |
+| `apps/nlp` (intenções, respostas, entidades) | Assistente na API e no app | pytest do PLN; testes do assistente na API e no app (o campo `entities` é contrato do `packages/shared`) |
+| `infra/` (Bicep) | Recursos Azure | Fluxo `infra.yml` |
+| Dados do calendário vacinal | Doses geradas, PDF, painel | `CT-CAL-*`, `CT-G*`, `CT-PDF-*` |
+
+A matriz requisito → tela → rota → teste está em `docs/19-rastreabilidade.md` e serve de apoio a essa análise.
+
+**Pipeline ideal da aula, e onde estamos:**
+
+1. Regressão automatizada a cada PR ou build: **feito** (CI).
+2. Sessões exploratórias ao fim de cada sprint e em pontos críticos: **definidas** em `testes-exploratorios.md`; a execução é do autor.
+3. Monitoramento depois da publicação: Application Insights ligado à Function App; painéis e alertas ainda **pendentes** (RNF05).
+
+### 4.6 Ambientes de teste
+
+Um ambiente de teste é uma configuração controlada de hardware, software, dados e rede onde o sistema é validado antes de chegar ao usuário real. Mapeamento do material da aula para o projeto:
+
+| Ambiente da aula | No projeto | Quem usa | Observação |
+|---|---|---|---|
+| **DEV** | Máquina do autor: `npm run dev:api`, `npm run dev:mobile`, Azurite local | Desenvolvimento | Testes unitários e de integração sem rede e sem Azure real |
+| **QA / Teste** | Máquina virtual limpa do GitHub Actions (Ubuntu) e `docker compose up` (API, PLN, web e Azurite) | CI e o autor | Playwright contra o app web com API falsa; fumaça no Docker contra a API real em contêiner |
+| **Homologação (UAT)** | **Não existe.** Não há ambiente separado da produção | (cliente) | Criar um exigiria recursos Azure adicionais (custo), a aprovar com o autor. A demonstração e as sessões exploratórias fazem esse papel, com contas de teste |
+| **PROD** | Azure: Function App da API e do PLN, Static Web Apps, Azure SQL, em Brazil South | Usuários finais | Só verificação manual dos serviços reais (voz, e-mail, SQL) |
+
+**Boas práticas da aula e situação:**
+
+| Prática | Situação |
+|---|---|
+| Isolar os ambientes | Cada execução do CI usa uma máquina nova; DEV e PROD não compartilham banco |
+| Versionar dados e configurações | `.env.example` sem valores reais, `docs/tech-versions.md`, calendário vacinal versionado com fonte e data, Bicep em `infra/` |
+| Dados de teste anônimos | Só dados fictícios; o conjunto de intenções do chatbot não tem dado pessoal (plano §4.3) |
+| Monitorar logs e métricas | Application Insights; logs sem nome, e-mail ou texto de mensagem; relatórios de cobertura e do Playwright guardados como artefatos no CI |
+| Automatizar a criação de ambientes | Docker Compose para o ambiente local e de CI; Bicep (`infra/`) para a Azure, validado pelo `infra.yml` |
 
 ## 5 Critérios de entrada e saída
 
