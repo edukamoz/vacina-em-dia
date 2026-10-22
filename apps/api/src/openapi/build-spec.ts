@@ -21,6 +21,7 @@ import {
   memberInputSchema,
   memberListResponseSchema,
   nearbyUnitsQuerySchema,
+  newsResponseSchema,
   nearbyUnitsResponseSchema,
   profilePhotoSchema,
   memberResponseSchema,
@@ -323,6 +324,25 @@ export function buildOpenApiDocument(): object {
       400: errorResponse('Parâmetros inválidos (a resposta lista só os nomes dos campos).'),
       401: unauthorized,
       429: errorResponse('`RATE_LIMITED`: mais de 60 buscas em 10 minutos.'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/news',
+    tags: ['Novidades'],
+    summary: 'Últimas notícias de saúde do Ministério da Saúde',
+    description:
+      'Novidades de saúde e vacinação: título, data e link das notícias do portal do Ministério da Saúde (feed RSS oficial), da mais recente para a mais antiga. O app não guarda nem resume o texto das notícias. A API lê o feed no máximo uma vez por hora (cópia na memória); se o feed falhar, devolve a última cópia boa ou uma lista vazia, nunca um erro. Nada do usuário é enviado ao feed. Não é orientação médica.',
+    security: secured,
+    responses: {
+      200: {
+        description: 'Notícias (a lista pode vir vazia se o feed oficial estiver fora do ar).',
+        content: jsonContent(newsResponseSchema),
+      },
+      401: unauthorized,
+      429: errorResponse('`RATE_LIMITED`: mais de 30 consultas em 10 minutos.'),
       500: internalError,
     },
   });

@@ -18,6 +18,7 @@ import { useMemberDoses } from '../data/hooks';
 import { BaixarCarteira } from './baixar-carteira';
 import { DoseCard } from './dose-card';
 import { Festa } from './festa';
+import { NovidadesCard } from '../news/novidades-card';
 import { LembretesCard } from './lembretes-card';
 import { contarDoses, ResumoDoses } from './resumo-doses';
 
@@ -170,6 +171,7 @@ export function DosesScreen() {
         </View>
         <Icone nome="seta" cor={cores.textoSecundario} />
       </Pressable>
+      <NovidadesCard />
       {doses.data && <AvisoFonte fonte={doses.data.source} />}
     </Tela>
   );

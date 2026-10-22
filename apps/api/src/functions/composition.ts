@@ -3,6 +3,10 @@ import type { HttpRequest, HttpResponseInit, InvocationContext } from '@azure/fu
 import { PNI_2026 } from '@vacina/shared';
 import { createBrevoEmailClient, unavailableEmailClient } from '../clients/brevo-email-client';
 import {
+  createOfficialNewsClient,
+  unavailableOfficialNewsClient,
+} from '../clients/official-news-client';
+import {
   createOfficialUnitsClient,
   unavailableOfficialUnitsClient,
 } from '../clients/official-units-client';
@@ -17,6 +21,7 @@ import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
 import { createMemberHandlers } from '../handlers/members';
 import { createReminderHandlers } from '../handlers/reminders';
+import { createNewsHandlers } from '../handlers/news';
 import { createUnitsHandlers } from '../handlers/units';
 import { createWarmupHandler } from '../handlers/warmup';
 import { createWarmupService } from '../services/warmup-service';
@@ -38,6 +43,7 @@ import { createDoseService } from '../services/dose-service';
 import { createMemberService } from '../services/member-service';
 import { createReminderService } from '../services/reminder-service';
 import { loadBundledUnits } from '../services/units-dataset';
+import { createNewsService } from '../services/news-service';
 import { createUnitsService } from '../services/units-service';
 import { createScryptHasher } from '../services/password-hasher';
 import { createFixedWindowLimiter } from '../services/rate-limiter';
@@ -204,6 +210,22 @@ export const unitsHandlers = createUnitsHandlers(
     limiter: createFixedWindowLimiter(clock),
     clock,
     reportError: (kind) => console.error(`Falha na API oficial de unidades: ${kind}.`),
+  }),
+);
+
+/**
+ * Novidades de saúde: títulos e links das notícias do Ministério da Saúde, lidos do feed oficial no
+ * máximo a cada hora. Com `NEWS_FEED=off` nada sai para a internet (testes e desenvolvimento sem rede).
+ */
+export const newsHandlers = createNewsHandlers(
+  createNewsService({
+    client:
+      process.env['NEWS_FEED'] === 'off'
+        ? unavailableOfficialNewsClient
+        : createOfficialNewsClient(),
+    limiter: createFixedWindowLimiter(clock),
+    clock,
+    reportError: (kind) => console.error(`Falha no feed de notícias: ${kind}.`),
   }),
 );
 

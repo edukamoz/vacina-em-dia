@@ -190,6 +190,20 @@ export function useReminders() {
   });
 }
 
+/**
+ * Novidades de saúde: títulos e links das notícias do Ministério da Saúde. A API já guarda uma
+ * cópia por uma hora, então o app só repete a consulta depois de 30 minutos e não insiste se falhar.
+ */
+export function useNews() {
+  const { api } = useSession();
+  return useQuery({
+    queryKey: ['news'],
+    queryFn: ({ signal }) => endpoints.getNews(api, signal),
+    staleTime: 30 * 60 * 1000,
+    retry: false,
+  });
+}
+
 /** Liga ou desliga os lembretes por e-mail e atualiza a lista. */
 export function useSetEmailReminders() {
   const { api } = useSession();
