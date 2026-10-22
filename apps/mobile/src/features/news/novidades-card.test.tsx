@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { Dimensions, Linking } from 'react-native';
 import { createFakeFetch, renderScreen } from '../../test-utils';
-import { LIMITE_NOVIDADES, NovidadesCard } from './novidades-card';
+import { LIMITE_NOVIDADES, NovidadesCard, partesDaData } from './novidades-card';
 
 const URL_BASE = 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms/2026/outubro';
 const noticia = (n: number, extra = {}) => ({
@@ -38,8 +38,13 @@ describe('cartão Novidades de saúde', () => {
     await renderScreen(<NovidadesCard />, fake.fetchFn);
     expect(await screen.findByRole('header', { name: 'Novidades de saúde' })).toBeOnTheScreen();
     expect(screen.getByText('Campanha de vacinação')).toBeOnTheScreen();
-    expect(screen.getAllByText('19/10/2026')).toHaveLength(2);
+    // A data aparece como selo (dia e mês) e completa no rótulo de acessibilidade.
+    expect(screen.getAllByText('OUT', { includeHiddenElements: true })).toHaveLength(2);
+    expect(
+      screen.getByRole('link', { name: /Campanha de vacinação, 19\/10\/2026, sobre vacinação/ }),
+    ).toBeOnTheScreen();
     expect(screen.getAllByText('Vacinação')).toHaveLength(1);
+    expect(screen.getAllByText('Ler no site')).toHaveLength(2);
     expect(
       screen.getByText(
         /Fonte: Notícias do Ministério da Saúde, Ministério da Saúde\. Lido em 21\/10\/2026/,
@@ -56,13 +61,38 @@ describe('cartão Novidades de saúde', () => {
     expect(abrir).toHaveBeenCalledWith(`${URL_BASE}/n7`);
   });
 
-  test('CT-APP-NEW03: mostra no máximo cinco notícias', async () => {
+  test('CT-APP-NEW03: mostra no máximo seis notícias', async () => {
     const fake = createFakeFetch({
       'GET /news': resposta(Array.from({ length: 9 }, (_, i) => noticia(i + 1))),
     });
     await renderScreen(<NovidadesCard />, fake.fetchFn);
     await screen.findByText('Notícia 1');
     expect(screen.getAllByRole('link')).toHaveLength(LIMITE_NOVIDADES);
+    expect(LIMITE_NOVIDADES).toBe(6);
+  });
+
+  test.each([
+    ['2026-10-19', '19', 'OUT'],
+    ['2026-01-05', '5', 'JAN'],
+    ['2026-12-31', '31', 'DEZ'],
+  ])('CT-APP-NEW06: a data %s vira o selo "%s %s"', (civil, dia, mes) => {
+    expect(partesDaData(civil)).toEqual({ dia, mes });
+  });
+
+  test('CT-APP-NEW07: no computador os botões Anterior e Próxima percorrem o carrossel', async () => {
+    jest
+      .spyOn(Dimensions, 'get')
+      .mockReturnValue({ width: 1280, height: 800, scale: 1, fontScale: 1 });
+    const fake = createFakeFetch({
+      'GET /news': resposta(Array.from({ length: 3 }, (_, i) => noticia(i + 1))),
+    });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    const proxima = await screen.findByRole('button', { name: 'Próxima' });
+    expect(screen.getByRole('button', { name: 'Anterior' })).toBeDisabled();
+    await fireEvent.press(proxima);
+    expect(screen.getByRole('button', { name: 'Anterior' })).toBeEnabled();
+    await fireEvent.press(proxima);
+    expect(proxima).toBeDisabled();
   });
 
   test('CT-APP-NEW04: sem notícias o cartão some', async () => {
