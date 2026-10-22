@@ -1175,6 +1175,24 @@
    "curto": "Assistente com poder sobre a conta"
   },
   {
+   "id": "B62",
+   "jira": null,
+   "titulo": "Como equipe, quero um endereço mais bonito para o site, sem pagar nada, para apresentar e divulgar o app com um link fácil de lembrar",
+   "epico": "E2",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RNF08",
+   "criterios": [
+    "Há um domínio gratuito (pacote de estudante ou subdomínio gratuito) apontado para o Static Web Apps, com HTTPS.",
+    "CORS, e-mail de redefinição de senha, mapa, QR e documentos usam o novo endereço; o antigo continua funcionando."
+   ],
+   "estado": "A fazer",
+   "sprint": 3,
+   "evidencia": "docs/27-dominio-proprio.md",
+   "nota": "Pesquisado; falta o autor conseguir o domínio (conta no GitHub Education ou PR no is-a.dev, que pede texto escrito por pessoa).",
+   "curto": "Domínio próprio e gratuito para o site"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",
