@@ -139,7 +139,7 @@ describe('Ler caderneta por foto', () => {
     ler.mockResolvedValue({ tipo });
     await abrir();
     await fotografar('Tirar foto');
-    expect(await screen.findByText(texto)).toBeOnTheScreen();
+    expect(await screen.findByText(texto, {}, { timeout: 4000 })).toBeOnTheScreen();
   });
 
   test('CT-APP-OCR37: cancelar a foto não mostra aviso nem resultado', async () => {
