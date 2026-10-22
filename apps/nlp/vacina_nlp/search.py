@@ -29,6 +29,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import normalize as l2_normalize
 
 from .calendar_data import GROUP_LABELS, Calendar
+from .embeddings import WordVectors, default_word_vectors
 from .entities import VACCINE_ALIASES
 from .preprocess import normalize
 
@@ -108,6 +109,9 @@ class VaccineSearch:
         lsa_weight: peso da similaridade semântica (LSA) na nota final, de 0 (só TF-IDF, o índice
             original) a 1 (só LSA). A nota é ``(1 - peso) * cosseno_tfidf + peso * cosseno_lsa``.
         components: número de temas do LSA (limitado ao número de documentos menos um).
+        embedding_weight: peso da similaridade por vetores de palavras (embeddings) na nota final;
+            a parte lexical fica com ``1 - lsa_weight - embedding_weight``.
+        word_vectors: vetores a usar; por padrão, o recorte do GloVe 50d do NILC.
     """
 
     def __init__(
@@ -119,11 +123,16 @@ class VaccineSearch:
         lsa_weight: float = DEFAULT_LSA_WEIGHT,
         components: int = DEFAULT_COMPONENTS,
         preprocessor: Callable[[str], str] = normalize,
+        embedding_weight: float = 0.0,
+        word_vectors: WordVectors | None = None,
     ) -> None:
         if not 0.0 <= lsa_weight <= 1.0:
             raise ValueError("lsa_weight deve estar entre 0 e 1")
+        if not 0.0 <= embedding_weight <= 1.0 or lsa_weight + embedding_weight > 1.0:
+            raise ValueError("embedding_weight deve estar entre 0 e 1 e somar até 1 com lsa_weight")
         self._calendar = calendar
         self._lsa_weight = lsa_weight
+        self._embedding_weight = embedding_weight
         self._names, documentos = build_documents(calendar, enriched=enriched)
         if analyzer == "char":
             self._vectorizer = TfidfVectorizer(
@@ -138,12 +147,59 @@ class VaccineSearch:
         else:
             raise ValueError("analyzer deve ser 'char', 'word' ou 'bow'")
         self._matrix = self._vectorizer.fit_transform(documentos)
+        self._vectors: WordVectors | None = None
+        self._idf: dict[str, float] = {}
+        self._doc_embeddings: np.ndarray | None = None
+        self._center: np.ndarray | None = None
+        if embedding_weight > 0:
+            self._vectors = word_vectors or default_word_vectors()
+            self._build_embedding_index(documentos)
         self._svd: TruncatedSVD | None = None
         self._latent: np.ndarray | None = None
         if lsa_weight > 0:
             k = max(2, min(components, len(self._names) - 1, self._matrix.shape[1] - 1))
             self._svd = TruncatedSVD(n_components=k, random_state=RANDOM_STATE)
             self._latent = l2_normalize(self._svd.fit_transform(self._matrix))
+
+    def _build_embedding_index(self, documents: list[str]) -> None:
+        """Vetor de cada documento: média das palavras ponderada pelo IDF (palavras raras pesam
+        mais), menos a média de todos os documentos. Sem o centro, todo vetor de texto fica "parecido"
+        com todos os outros e a nota não separa nada."""
+        assert self._vectors is not None
+        tokens = [set(normalize(d).split()) for d in documents]
+        total = len(documents)
+        frequency: dict[str, int] = {}
+        for conjunto in tokens:
+            for palavra in conjunto:
+                frequency[palavra] = frequency.get(palavra, 0) + 1
+        self._idf = {p: float(np.log((1 + total) / (1 + n)) + 1) for p, n in frequency.items()}
+        brutos = [self._vectors.text_vector(d, self._idf) for d in documents]
+        base = np.zeros(self._vectors.dimension, dtype=np.float32)
+        validos = np.array([v for v in brutos if v is not None])
+        self._center = validos.mean(axis=0) if len(validos) else base
+        self._doc_embeddings = np.array(
+            [self._unit(v if v is not None else base, self._center) for v in brutos]
+        )
+
+    @staticmethod
+    def _unit(vector: np.ndarray, center: np.ndarray) -> np.ndarray:
+        centered = vector - center
+        norm = np.linalg.norm(centered)
+        return centered / norm if norm > 0 else centered
+
+    def _semantic_by_words(self, query: str) -> np.ndarray:
+        """Similaridade (0 a 1) entre a pergunta e cada vacina pelos vetores de palavras; zeros se
+        nenhuma palavra da pergunta tem vetor."""
+        assert self._vectors is not None and self._center is not None
+        assert self._doc_embeddings is not None
+        # Palavra que não está em nenhum documento pesa o máximo: costuma ser o assunto da pergunta.
+        maximo = max(self._idf.values(), default=1.0)
+        pesos = {p: self._idf.get(p, maximo) for p in normalize(query).split()}
+        vetor = self._vectors.text_vector(query, pesos)
+        if vetor is None:
+            return np.zeros(len(self._names))
+        similaridade = self._doc_embeddings @ self._unit(vetor, self._center)
+        return np.clip(similaridade, 0.0, 1.0)
 
     @property
     def names(self) -> list[str]:
@@ -156,11 +212,15 @@ class VaccineSearch:
             return np.zeros(len(self._names))
         vector = self._vectorizer.transform([query])
         lexical = cosine_similarity(vector, self._matrix)[0]
-        if self._svd is None or self._latent is None:
-            return lexical
-        latent_query = l2_normalize(self._svd.transform(vector))
-        semantic = np.clip(cosine_similarity(latent_query, self._latent)[0], 0.0, 1.0)
-        return (1.0 - self._lsa_weight) * lexical + self._lsa_weight * semantic
+        peso_lexical = 1.0 - self._lsa_weight - self._embedding_weight
+        nota = peso_lexical * lexical
+        if self._svd is not None and self._latent is not None:
+            latent_query = l2_normalize(self._svd.transform(vector))
+            semantic = np.clip(cosine_similarity(latent_query, self._latent)[0], 0.0, 1.0)
+            nota = nota + self._lsa_weight * semantic
+        if self._embedding_weight > 0:
+            nota = nota + self._embedding_weight * self._semantic_by_words(query)
+        return nota
 
     def search(self, query: str) -> list[SearchHit]:
         """Devolve até cinco vacinas parecidas com a pergunta, da mais para a menos parecida."""

@@ -1111,10 +1111,10 @@
     "Busca com embeddings em português, medida nas mesmas consultas, sem IA generativa e dentro da memória da Function.",
     "Decisão registrada em ADR e custo conferido."
    ],
-   "estado": "Em andamento",
+   "estado": "Em análise",
    "sprint": 3,
-   "evidencia": "docs/07-testes/comparacao-pln.md",
-   "nota": "Parte já feita: a comparação. Falta a busca com embeddings (depende de baixar vetores de uma fonte externa, a aprovar).",
+   "evidencia": "docs/07-testes/comparacao-pln.md; docs/07-testes/avaliacao-busca-semantica.md; docs/05-adrs/ADR-023-embeddings-avaliados-e-nao-adotados-na-busca.md",
+   "nota": "Os embeddings (GloVe 50d do NILC) foram aplicados e medidos, mas não melhoraram a busca; ficam desligados (ADR-023).",
    "curto": "Técnicas das aulas de PLN: comparação e busca com embeddings"
   },
   {

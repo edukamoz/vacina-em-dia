@@ -253,7 +253,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B11 | SCRUM-21 | Como mãe, quero tirar dúvidas frequentes no chat, com respostas curadas e fonte, para me informar sem orientação médica individual (RF07) | Must | Em análise | Sprint 5 |
 | B12 | novo | Como usuária, quero abrir o assistente em uma janela de conversa sobre a tela em que estou, para perguntar sem perder o lugar | Should | Em análise | Sprint 5 |
 | B50 | novo | Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11 | Should | Em análise | Sprint 1 |
-| B58 | novo | Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica | Must | Em andamento | Sprint 3 |
+| B58 | novo | Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica | Must | Em análise | Sprint 3 |
 
 **B10** (PE2, PE1; requisitos: RF06; RNF01, RNF04, RNF09)
 
@@ -290,8 +290,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Relatório com os números das técnicas das aulas sobre o mesmo teste separado, com as limitações.
 - Busca com embeddings em português, medida nas mesmas consultas, sem IA generativa e dentro da memória da Function.
 - Decisão registrada em ADR e custo conferido.
-- Evidência: docs/07-testes/comparacao-pln.md
-- Atenção: Parte já feita: a comparação. Falta a busca com embeddings (depende de baixar vetores de uma fonte externa, a aprovar).
+- Evidência: docs/07-testes/comparacao-pln.md; docs/07-testes/avaliacao-busca-semantica.md; docs/05-adrs/ADR-023-embeddings-avaliados-e-nao-adotados-na-busca.md
+- Atenção: Os embeddings (GloVe 50d do NILC) foram aplicados e medidos, mas não melhoraram a busca; ficam desligados (ADR-023).
 
 ## E7 Qualidade e testes (SCRUM-11)
 
