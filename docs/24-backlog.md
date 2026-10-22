@@ -98,6 +98,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B21 | novo | Como autora, quero manter o banco com migrações versionadas e a persistência no Azure SQL, para os dados sobreviverem a reinícios | Must | Em análise | Sprint 3 |
 | B22 | novo | Como usuária, quero que o primeiro login depois de um tempo sem uso não demore, para não achar que o app travou | Should | Em análise | Sprint 6 |
 | B23 | novo | Como autora, quero o repositório público com proteção ativada, para usar o GitHub Actions sem limite de minutos e sem expor segredos | Should | Em análise | Sprint 6 |
+| B62 | novo | Como equipe, quero um endereço mais bonito para o site, sem pagar nada, para apresentar e divulgar o app com um link fácil de lembrar | Should | A fazer | Sprint 3 |
 
 **B16** (todas; requisitos: RNF02, RNF05, RNF09)
 
@@ -149,6 +150,13 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Varredura do histórico sem segredos; secret scanning e push protection ligados.
 - Branch main protegida e workflows só com permissão de leitura.
 - Evidência: docs/00-handoff.md §0.11
+
+**B62** (PE1, PE2, PE3; requisitos: RNF08)
+
+- Há um domínio gratuito (pacote de estudante ou subdomínio gratuito) apontado para o Static Web Apps, com HTTPS.
+- CORS, e-mail de redefinição de senha, mapa, QR e documentos usam o novo endereço; o antigo continua funcionando.
+- Evidência: docs/27-dominio-proprio.md
+- Atenção: Pesquisado; falta o autor conseguir o domínio (conta no GitHub Education ou PR no is-a.dev, que pede texto escrito por pessoa).
 
 ## E3 Conta e privacidade (SCRUM-7)
 
