@@ -254,6 +254,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B12 | novo | Como usuária, quero abrir o assistente em uma janela de conversa sobre a tela em que estou, para perguntar sem perder o lugar | Should | Em análise | Sprint 5 |
 | B50 | novo | Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11 | Should | Em análise | Sprint 1 |
 | B58 | novo | Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica | Must | Em análise | Sprint 3 |
+| B61 | novo | Como usuária, quero que o assistente consulte a minha conta e execute comandos (adicionar pessoa, registrar e agendar dose, abrir telas) e explique qualquer recurso do app, para resolver tudo conversando, sem perder o controle dos meus dados | Must | Em análise | Sprint 3 |
 
 **B10** (PE2, PE1; requisitos: RF06; RNF01, RNF04, RNF09)
 
@@ -292,6 +293,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Decisão registrada em ADR e custo conferido.
 - Evidência: docs/07-testes/comparacao-pln.md; docs/07-testes/avaliacao-busca-semantica.md; docs/05-adrs/ADR-023-embeddings-avaliados-e-nao-adotados-na-busca.md
 - Atenção: Os embeddings (GloVe 50d do NILC) foram aplicados e medidos, mas não melhoraram a busca; ficam desligados (ADR-023).
+
+**B61** (PE1, PE2, PE3; requisitos: RF06, RF07)
+
+- Responde com os dados de quem está logado: família, doses atrasadas, próxima dose, resumo, lembretes e conta.
+- Adiciona pessoa, registra e agenda dose por comando, sempre com Confirmar e Cancelar; nunca exclui, cancela nem troca e-mail ou senha.
+- Nenhum dado da conta vai ao serviço de PLN; segurança de saúde vem antes de qualquer comando; F1 macro do classificador continua acima de 0,85.
+- Evidência: docs/05-adrs/ADR-025-assistente-com-poder-sobre-a-conta.md; docs/07-testes/avaliacao-chatbot.md
+- Atenção: Dataset de 20 para 39 intenções (1.060 frases); limiar de confiança de 0,40 para 0,30.
 
 ## E7 Qualidade e testes (SCRUM-11)
 

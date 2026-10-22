@@ -128,5 +128,6 @@ def test_ct_nlp_69_resposta_serializa_para_json(service):
         "suggestions",
         "fallback",
         "safety",
+        "entities",
     }
     json.dumps(corpo, ensure_ascii=False)

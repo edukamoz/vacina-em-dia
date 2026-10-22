@@ -413,6 +413,386 @@
     {
       "text": "qual é o melhor time de futebol",
       "intent": "fora_do_escopo"
+    },
+    {
+      "text": "quem são as pessoas da minha conta",
+      "intent": "conta_quem_na_familia"
+    },
+    {
+      "text": "quantos familiares eu cadastrei",
+      "intent": "conta_quem_na_familia"
+    },
+    {
+      "text": "me mostra quem está cadastrado",
+      "intent": "conta_quem_na_familia"
+    },
+    {
+      "text": "quais membros estão no meu aplicativo",
+      "intent": "conta_quem_na_familia"
+    },
+    {
+      "text": "qual o nome das pessoas que acompanho",
+      "intent": "conta_quem_na_familia"
+    },
+    {
+      "text": "quais são as vacinas atrasadas",
+      "intent": "conta_doses_atrasadas"
+    },
+    {
+      "text": "a Ana tem dose atrasada",
+      "intent": "conta_doses_atrasadas"
+    },
+    {
+      "text": "tem alguma coisa em atraso",
+      "intent": "conta_doses_atrasadas"
+    },
+    {
+      "text": "quantas vacinas passaram do prazo",
+      "intent": "conta_doses_atrasadas"
+    },
+    {
+      "text": "me diz as doses vencidas",
+      "intent": "conta_doses_atrasadas"
+    },
+    {
+      "text": "qual vacina o Lucas toma agora",
+      "intent": "conta_proxima_dose"
+    },
+    {
+      "text": "me diz as próximas doses da família",
+      "intent": "conta_proxima_dose"
+    },
+    {
+      "text": "o que está previsto para este mês",
+      "intent": "conta_proxima_dose"
+    },
+    {
+      "text": "quando o Carlos precisa tomar a próxima",
+      "intent": "conta_proxima_dose"
+    },
+    {
+      "text": "qual é a próxima vacina pendente",
+      "intent": "conta_proxima_dose"
+    },
+    {
+      "text": "como estão as vacinas da família",
+      "intent": "conta_resumo_vacinacao"
+    },
+    {
+      "text": "a Beatriz está com as vacinas em dia",
+      "intent": "conta_resumo_vacinacao"
+    },
+    {
+      "text": "qual o resumo da carteira",
+      "intent": "conta_resumo_vacinacao"
+    },
+    {
+      "text": "quantas doses já foram tomadas no total",
+      "intent": "conta_resumo_vacinacao"
+    },
+    {
+      "text": "me diz quanto falta tomar",
+      "intent": "conta_resumo_vacinacao"
+    },
+    {
+      "text": "tenho algum lembrete",
+      "intent": "conta_meus_lembretes"
+    },
+    {
+      "text": "o que está marcado para a semana",
+      "intent": "conta_meus_lembretes"
+    },
+    {
+      "text": "me diz as doses agendadas",
+      "intent": "conta_meus_lembretes"
+    },
+    {
+      "text": "tem vacina para amanhã",
+      "intent": "conta_meus_lembretes"
+    },
+    {
+      "text": "quais lembretes estão ativos",
+      "intent": "conta_meus_lembretes"
+    },
+    {
+      "text": "qual e-mail eu cadastrei",
+      "intent": "conta_email"
+    },
+    {
+      "text": "com que conta estou entrando",
+      "intent": "conta_email"
+    },
+    {
+      "text": "mostra meu perfil",
+      "intent": "conta_email"
+    },
+    {
+      "text": "o e-mail de lembretes está ligado",
+      "intent": "conta_email"
+    },
+    {
+      "text": "que dados tem na minha conta",
+      "intent": "conta_email"
+    },
+    {
+      "text": "adicionar a Lívia nascida em 16/09/2014",
+      "intent": "acao_adicionar_pessoa"
+    },
+    {
+      "text": "cadastra o Otávio que nasceu em 21 de janeiro de 2000",
+      "intent": "acao_adicionar_pessoa"
+    },
+    {
+      "text": "quero incluir minha filha Manuela, nascida em 10/10/2025",
+      "intent": "acao_adicionar_pessoa"
+    },
+    {
+      "text": "adiciona o Theo na família",
+      "intent": "acao_adicionar_pessoa"
+    },
+    {
+      "text": "cadastrar meu avô Joaquim nascido em 06/06/1948",
+      "intent": "acao_adicionar_pessoa"
+    },
+    {
+      "text": "registrar que o Davi tomou a BCG hoje",
+      "intent": "acao_registrar_dose"
+    },
+    {
+      "text": "marca a vacina de varicela da Lívia como aplicada em 15/10/2026",
+      "intent": "acao_registrar_dose"
+    },
+    {
+      "text": "a Manuela tomou a hepatite B ontem",
+      "intent": "acao_registrar_dose"
+    },
+    {
+      "text": "o Otávio tomou a vacina da gripe, pode registrar",
+      "intent": "acao_registrar_dose"
+    },
+    {
+      "text": "tomei a tríplice viral hoje, registra",
+      "intent": "acao_registrar_dose"
+    },
+    {
+      "text": "agendar a vacina de febre amarela do Otávio para 10/12/2026",
+      "intent": "acao_agendar_dose"
+    },
+    {
+      "text": "marca a BCG da Lívia para amanhã",
+      "intent": "acao_agendar_dose"
+    },
+    {
+      "text": "quero agendar a hepatite B do Theo dia 05/11",
+      "intent": "acao_agendar_dose"
+    },
+    {
+      "text": "agenda a dose de gripe da Manuela para 27/11/2026",
+      "intent": "acao_agendar_dose"
+    },
+    {
+      "text": "marcar a vacina da covid do Joaquim em 02/12/2026",
+      "intent": "acao_agendar_dose"
+    },
+    {
+      "text": "abre os gráficos",
+      "intent": "acao_abrir_tela"
+    },
+    {
+      "text": "ir para os postos",
+      "intent": "acao_abrir_tela"
+    },
+    {
+      "text": "me leva para a família",
+      "intent": "acao_abrir_tela"
+    },
+    {
+      "text": "abrir o histórico",
+      "intent": "acao_abrir_tela"
+    },
+    {
+      "text": "mostrar a minha conta",
+      "intent": "acao_abrir_tela"
+    },
+    {
+      "text": "onde ficam os gráficos do app",
+      "intent": "como_ver_graficos"
+    },
+    {
+      "text": "tem estatística das vacinas",
+      "intent": "como_ver_graficos"
+    },
+    {
+      "text": "o que o painel mostra",
+      "intent": "como_ver_graficos"
+    },
+    {
+      "text": "como vejo a cobertura da família em gráfico",
+      "intent": "como_ver_graficos"
+    },
+    {
+      "text": "existe algum gráfico das doses",
+      "intent": "como_ver_graficos"
+    },
+    {
+      "text": "onde aparecem as notícias",
+      "intent": "como_ver_novidades"
+    },
+    {
+      "text": "de onde vêm as novidades de saúde",
+      "intent": "como_ver_novidades"
+    },
+    {
+      "text": "o app resume as notícias",
+      "intent": "como_ver_novidades"
+    },
+    {
+      "text": "como vejo as notícias de vacinação",
+      "intent": "como_ver_novidades"
+    },
+    {
+      "text": "por que as novidades não aparecem",
+      "intent": "como_ver_novidades"
+    },
+    {
+      "text": "como faço uma doação",
+      "intent": "como_apoiar_pix"
+    },
+    {
+      "text": "o aplicativo é pago",
+      "intent": "como_apoiar_pix"
+    },
+    {
+      "text": "como funciona a doação por pix",
+      "intent": "como_apoiar_pix"
+    },
+    {
+      "text": "onde apoio o projeto",
+      "intent": "como_apoiar_pix"
+    },
+    {
+      "text": "tem que pagar para usar o app",
+      "intent": "como_apoiar_pix"
+    },
+    {
+      "text": "como funciona ler a caderneta por foto",
+      "intent": "como_ler_caderneta"
+    },
+    {
+      "text": "dá para fotografar o cartão de vacina",
+      "intent": "como_ler_caderneta"
+    },
+    {
+      "text": "a foto da caderneta sai do meu celular",
+      "intent": "como_ler_caderneta"
+    },
+    {
+      "text": "onde está o botão de ler caderneta",
+      "intent": "como_ler_caderneta"
+    },
+    {
+      "text": "o app consegue ler a caderneta de papel",
+      "intent": "como_ler_caderneta"
+    },
+    {
+      "text": "como mudo a foto do meu perfil",
+      "intent": "como_trocar_foto"
+    },
+    {
+      "text": "onde coloco uma foto minha",
+      "intent": "como_trocar_foto"
+    },
+    {
+      "text": "como removo minha foto",
+      "intent": "como_trocar_foto"
+    },
+    {
+      "text": "a foto de perfil é pública",
+      "intent": "como_trocar_foto"
+    },
+    {
+      "text": "dá para tirar foto na hora para o perfil",
+      "intent": "como_trocar_foto"
+    },
+    {
+      "text": "como ativo o modo escuro",
+      "intent": "como_mudar_aparencia"
+    },
+    {
+      "text": "dá para aumentar a letra",
+      "intent": "como_mudar_aparencia"
+    },
+    {
+      "text": "onde mudo o tema",
+      "intent": "como_mudar_aparencia"
+    },
+    {
+      "text": "tem como reduzir as animações",
+      "intent": "como_mudar_aparencia"
+    },
+    {
+      "text": "o app tem alto contraste",
+      "intent": "como_mudar_aparencia"
+    },
+    {
+      "text": "como instalo o app no meu celular",
+      "intent": "como_instalar_app"
+    },
+    {
+      "text": "tem aplicativo para android",
+      "intent": "como_instalar_app"
+    },
+    {
+      "text": "dá para usar no navegador do computador",
+      "intent": "como_instalar_app"
+    },
+    {
+      "text": "onde baixo o apk",
+      "intent": "como_instalar_app"
+    },
+    {
+      "text": "o app está na play store",
+      "intent": "como_instalar_app"
+    },
+    {
+      "text": "onde eu saio da conta",
+      "intent": "como_sair_conta"
+    },
+    {
+      "text": "como faço para deslogar",
+      "intent": "como_sair_conta"
+    },
+    {
+      "text": "tem como trocar de conta",
+      "intent": "como_sair_conta"
+    },
+    {
+      "text": "onde está o botão de sair",
+      "intent": "como_sair_conta"
+    },
+    {
+      "text": "quero encerrar a sessão",
+      "intent": "como_sair_conta"
+    },
+    {
+      "text": "onde vejo os postos de saúde",
+      "intent": "como_ver_postos"
+    },
+    {
+      "text": "como o app acha o posto mais próximo",
+      "intent": "como_ver_postos"
+    },
+    {
+      "text": "o app guarda onde eu estou",
+      "intent": "como_ver_postos"
+    },
+    {
+      "text": "como faço rota para a unidade",
+      "intent": "como_ver_postos"
+    },
+    {
+      "text": "tem mapa de unidades de saúde",
+      "intent": "como_ver_postos"
     }
   ]
 }

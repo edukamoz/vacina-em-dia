@@ -1156,6 +1156,25 @@
    "curto": "Painel de gráficos"
   },
   {
+   "id": "B61",
+   "jira": null,
+   "titulo": "Como usuária, quero que o assistente consulte a minha conta e execute comandos (adicionar pessoa, registrar e agendar dose, abrir telas) e explique qualquer recurso do app, para resolver tudo conversando, sem perder o controle dos meus dados",
+   "epico": "E6",
+   "prioridade": "Must",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF06, RF07",
+   "criterios": [
+    "Responde com os dados de quem está logado: família, doses atrasadas, próxima dose, resumo, lembretes e conta.",
+    "Adiciona pessoa, registra e agenda dose por comando, sempre com Confirmar e Cancelar; nunca exclui, cancela nem troca e-mail ou senha.",
+    "Nenhum dado da conta vai ao serviço de PLN; segurança de saúde vem antes de qualquer comando; F1 macro do classificador continua acima de 0,85."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "docs/05-adrs/ADR-025-assistente-com-poder-sobre-a-conta.md; docs/07-testes/avaliacao-chatbot.md",
+   "nota": "Dataset de 20 para 39 intenções (1.060 frases); limiar de confiança de 0,40 para 0,30.",
+   "curto": "Assistente com poder sobre a conta"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",

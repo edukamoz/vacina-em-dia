@@ -15,22 +15,47 @@ Sem IA generativa: nenhuma frase é inventada.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
 from typing import Any
 
 from .calendar_data import DATA_DIR, GROUP_LABELS, Calendar, Rule
 from .classifier import IntentClassifier
-from .entities import detect_group, extract_vaccines
+from .entities import (
+    detect_group,
+    detect_screen,
+    extract_dates,
+    extract_names,
+    extract_relative_day,
+    extract_vaccines,
+)
+from .preprocess import normalize
 from .safety import needs_professional
 
 # Abaixo disto, a pergunta é tratada como "não entendi" (definido na avaliação, ver
-# docs/07-testes/avaliacao-chatbot.md).
-CONFIDENCE_THRESHOLD = 0.40
+# docs/07-testes/avaliacao-chatbot.md). Era 0,40 com 20 intenções; com 39 as probabilidades
+# calibradas se espalham mais, e com 0,40 só dois terços das perguntas do teste seriam respondidas.
+CONFIDENCE_THRESHOLD = 0.30
 
 MAX_VACCINES_PER_ANSWER = 3
 MAX_NAMES_IN_GROUP_LIST = 20
 APP_SOURCE_NAME = "Ajuda do Vacina em Dia"
 CLOSING = " Confira sempre a sua caderneta e converse com um profissional de saúde."
+
+# Pares "como faço" (explica) e "faça" (comando). O classificador confunde os dois, porque as
+# frases são parecidas; quem decide é a forma da pergunta e o que ela traz (nome, vacina, data).
+COMMAND_OF_HOWTO = {
+    "como_adicionar_pessoa": "acao_adicionar_pessoa",
+    "como_registrar_dose": "acao_registrar_dose",
+    "como_agendar_dose": "acao_agendar_dose",
+}
+HOWTO_OF_COMMAND = {command: howto for howto, command in COMMAND_OF_HOWTO.items()}
+_NAVIGATION_VERB = re.compile(
+    r"^(abr\w*|ir|vai|va|mostr\w*|me mostra|me leva|lev\w*|quero ir|quero ver|me leve)(?![a-z0-9])"
+)
+_QUESTION_CUE = re.compile(
+    r"(?<![a-z0-9])(como|onde|qual|quais|quando|posso|podem|da para|tem como|por que|porque|o que)(?![a-z0-9])"
+)
 
 
 @dataclass(frozen=True)
@@ -44,6 +69,7 @@ class Reply:
     suggestions: tuple[str, ...] = ()
     fallback: bool = False
     safety: bool = False
+    entities: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         """Formato enviado como JSON."""
@@ -55,6 +81,7 @@ class Reply:
             "suggestions": list(self.suggestions),
             "fallback": self.fallback,
             "safety": self.safety,
+            "entities": self.entities,
         }
 
 
@@ -142,6 +169,9 @@ class Chatbot:
             return self._curated("fallback", "nao_entendi", prediction.confidence, fallback=True)
 
         intent, confidence = prediction.intent, prediction.confidence
+        intent = self._command_or_howto(intent, text)
+        if intent.startswith(("conta_", "acao_")):
+            return self._for_the_app(intent, text, confidence)
         if intent == "vacina_para_que_serve":
             return self._about_vaccine(text, confidence)
         if intent == "vacina_quando":
@@ -149,6 +179,56 @@ class Chatbot:
         if intent == "vacinas_do_grupo":
             return self._group_vaccines(text, confidence)
         return self._curated(intent, intent, confidence, safety=intent == "orientacao_medica")
+
+    # -- comandos e perguntas sobre a conta (o app responde com os dados da pessoa) -----------
+
+    def _command_or_howto(self, intent: str, text: str) -> str:
+        """Separa "como adiciono uma pessoa?" (explica) de "adicionar a Maria nascida em ..."
+        (comando): pergunta (como, onde, posso...) fica com a explicação; fora disso, o que a frase
+        traz (nome, data, vacina) mostra que é um comando."""
+        normalized = normalize(text)
+        if (
+            not _QUESTION_CUE.search(normalized)
+            and _NAVIGATION_VERB.search(normalized)
+            and detect_screen(text)
+            and (intent == "acao_abrir_tela" or intent.startswith("como_ver_"))
+        ):
+            return "acao_abrir_tela"
+        howto = intent if intent in COMMAND_OF_HOWTO else HOWTO_OF_COMMAND.get(intent)
+        if howto is None:
+            return intent
+        command = COMMAND_OF_HOWTO[howto]
+        if _QUESTION_CUE.search(normalized):
+            return howto
+        if intent == command:
+            return command
+        carries = bool(extract_dates(text) or extract_relative_day(text))
+        if command == "acao_adicionar_pessoa":
+            carries = carries or bool(extract_names(text))
+        else:
+            carries = carries or bool(extract_vaccines(text, self._calendar))
+        return command if carries else howto
+
+    def _for_the_app(self, intent: str, text: str, confidence: float) -> Reply:
+        """Resposta de uma intenção da conta: o texto é só o padrão; o app monta a resposta final
+        com os dados da pessoa logada, e as entidades dizem o que ela pediu. Nada da conta passa
+        por aqui."""
+        base = self._curated(intent, intent, confidence)
+        entities: dict[str, Any] = {
+            "vaccines": extract_vaccines(text, self._calendar),
+            "names": extract_names(text),
+            "dates": extract_dates(text),
+            "relativeDay": extract_relative_day(text),
+            "screen": detect_screen(text) if intent == "acao_abrir_tela" else None,
+        }
+        return Reply(
+            intent=base.intent,
+            text=base.text,
+            confidence=base.confidence,
+            source=base.source,
+            suggestions=base.suggestions,
+            entities=entities,
+        )
 
     # -- respostas com dados do calendário oficial -------------------------------------------
 

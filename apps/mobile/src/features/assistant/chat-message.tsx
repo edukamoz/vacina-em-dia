@@ -1,7 +1,9 @@
 import { Pressable, View } from 'react-native';
+import { Botao } from '../../components/botao';
 import { Icone } from '../../components/icone';
 import { Texto } from '../../components/texto';
 import { useThemeColors, useVisual } from '../../theme/theme-provider';
+import type { Passo } from '../../lib/assistente-conta';
 import type { ChatMessage } from './use-assistant-chat';
 
 /**
@@ -12,15 +14,18 @@ import type { ChatMessage } from './use-assistant-chat';
  * @param props.mensagem - Mensagem a exibir.
  * @param props.aoSugerir - Chamada com a pergunta sugerida tocada.
  * @param props.desativado - Desliga as sugestões enquanto o assistente responde.
+ * @param props.aoPasso - Chamada com o botão da resposta (confirmar, escolher, abrir) que foi tocado.
  */
 export function ChatMessageView({
   mensagem,
   aoSugerir,
   desativado,
+  aoPasso,
 }: {
   mensagem: ChatMessage;
   aoSugerir: (pergunta: string) => void;
   desativado: boolean;
+  aoPasso?: (mensagemId: number, passo: Passo) => void;
 }) {
   const cores = useThemeColors();
   const { gradienteMarca, sombra, altoContraste } = useVisual();
@@ -86,6 +91,20 @@ export function ChatMessageView({
           </View>
         ) : null}
       </View>
+
+      {mensagem.passos && mensagem.passos.length > 0 && !mensagem.resolvido ? (
+        <View className="max-w-[92%] flex-row flex-wrap gap-sm">
+          {mensagem.passos.map((passo) => (
+            <Botao
+              key={passo.rotulo}
+              titulo={passo.rotulo}
+              variante={passo.variante ?? 'secundario'}
+              disabled={desativado}
+              onPress={() => aoPasso?.(mensagem.id, passo)}
+            />
+          ))}
+        </View>
+      ) : null}
 
       {mensagem.results && mensagem.results.length > 0 ? (
         <View className="max-w-[92%] gap-xs rounded-[16px] border-fina border-bordaSuave bg-superficieSuave p-md">
