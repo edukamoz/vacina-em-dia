@@ -111,6 +111,43 @@ def threshold_analysis(
     return rows
 
 
+EMBEDDING_WEIGHTS = (0.0, 0.05, 0.1, 0.2, 0.3, 0.5)
+
+
+def embedding_analysis(
+    calendar: Calendar, queries: list[Query], off_topic: list[str]
+) -> tuple[list[tuple[float, Metrics, float]], list[Query], float, float]:
+    """Efeito dos vetores de palavras (GloVe 50d do NILC) como terceiro sinal da busca.
+
+    Returns:
+        Uma linha por peso (peso, métricas, acerto na 1ª posição nas consultas de vocabulário
+        ausente); as consultas de vacina que ficam abaixo do limiar no padrão; o acerto dos
+        embeddings sozinhos nessas consultas; e a nota máxima média deles nas perguntas fora do tema.
+    """
+    linhas = []
+    for peso in EMBEDDING_WEIGHTS:
+        motor = VaccineSearch(
+            calendar,
+            analyzer=DEFAULT_ANALYZER,
+            lsa_weight=DEFAULT_LSA_WEIGHT,
+            components=DEFAULT_COMPONENTS,
+            embedding_weight=peso,
+        )
+        ausentes = [q for q in queries if q.category == "vocabulario_ausente"]
+        linhas.append((peso, evaluate(motor, queries), evaluate(motor, ausentes).hit_at_1))
+    padrao = VaccineSearch(
+        calendar, analyzer=DEFAULT_ANALYZER, lsa_weight=DEFAULT_LSA_WEIGHT, components=DEFAULT_COMPONENTS
+    )
+    so_vetores = VaccineSearch(calendar, analyzer=DEFAULT_ANALYZER, lsa_weight=0, embedding_weight=1.0)
+    abaixo = [q for q in queries if padrao.scores(q.text).max() < MIN_SCORE]
+    certas = sum(
+        1 for q in abaixo if so_vetores.names[int(so_vetores.scores(q.text).argmax())] in q.accepted
+    )
+    acerto_abaixo = certas / len(abaixo) if abaixo else 0.0
+    fora = float(np.mean([so_vetores.scores(texto).max() for texto in off_topic])) if off_topic else 0.0
+    return linhas, abaixo, acerto_abaixo, fora
+
+
 def configurations(calendar: Calendar) -> list[tuple[str, VaccineSearch]]:
     """Configurações comparadas (ablação): do índice original ao padrão atual."""
     return [
@@ -238,7 +275,24 @@ def build_report(calendar: Calendar) -> str:
         f"A escolha de {MIN_SCORE} prioriza **não mostrar vacinas para perguntas sem relação** (uma lista de vacinas depois de \"quero uma pizza\" parece erro). O custo é que as consultas com erro de fala mais forte, como \"cacumba\" por \"caxumba\", podem ficar abaixo do limiar e não devolver a lista; a resposta do chatbot continua aparecendo. É uma escolha de produto, não um resultado único: com limiar menor, mais consultas de vacina acertam e mais perguntas fora do tema recebem vacinas.",
     ]
 
+    linhas_emb, abaixo, acerto_abaixo, fora = embedding_analysis(calendar, queries, off_topic)
     lines += [
+        "",
+        "## Embeddings de palavras (GloVe 50d do NILC): avaliados e não adotados",
+        "",
+        "Foi testado um terceiro sinal na nota: vetores de palavras em português (GloVe 50d do NILC/USP, licença CC-BY-4.0, recorte de cerca de 37 mil palavras e 3,6 MB gerado por `scripts/gerar_embeddings.py`). Cada texto vira a média dos vetores das suas palavras (ponderada pelo IDF), menos a média dos documentos; a nota é o cosseno. O peso é o do embedding na nota final (o LSA fica em 0,3).",
+        "",
+        "| Peso do embedding | Acerto na 1ª | Acerto nas 3 primeiras | MRR | Acerto na 1ª (vocabulário ausente) |",
+        "|---|---|---|---|---|",
+    ]
+    for peso, m, ausente in linhas_emb:
+        marca = " (padrão, sem embedding)" if peso == 0 else ""
+        lines.append(f"| {peso:.2f}{marca} | {_pct(m.hit_at_1)} | {_pct(m.hit_at_3)} | {m.mrr:.3f} | {_pct(ausente)} |")
+    lines += [
+        "",
+        f"Teste como reserva: das {len(queries)} consultas de vacinas, {len(abaixo)} ficam abaixo do limiar no padrão (não devolvem nada). Usando só os embeddings nessas, a vacina certa fica em 1º lugar em **{_pct(acerto_abaixo)}** delas; e a nota máxima média dos embeddings nas perguntas fora do tema é de **{fora:.2f}**, parecida com a das consultas de vacina (o limiar de 0,35 não conseguiria separá-las).",
+        "",
+        "**Resultado:** nenhum peso melhorou a busca neste conjunto; o aumento do peso piora o acerto, inclusive nas consultas de vocabulário ausente, que era o alvo. Os vetores são razoáveis (\"tosse\" fica perto de \"febre\" e \"vômito\"; \"coqueluche\" perto de \"difteria\" e \"tétano\"), mas essa proximidade é **por assunto**, e as 22 vacinas são todas sobre doenças: \"tosse comprida\" fica perto de todas, sem apontar a coqueluche. Por isso o recurso fica **desligado** (`embedding_weight = 0`) e a busca em produção não muda. Outra forma testada em protótipo, comparar cada palavra da pergunta com a palavra mais parecida de cada vacina, também não superou o padrão (melhor MRR de 0,910 contra 0,928; protótipo não versionado). Ver ADR-023.",
         "",
         "## Como interpretar",
         "",
@@ -252,9 +306,9 @@ def build_report(calendar: Calendar) -> str:
         "- Os parâmetros (componentes, peso e limiar) foram **escolhidos olhando este mesmo conjunto** (não há conjunto separado de validação por ser tão pequeno), então os números do padrão são otimistas. O índice em si é feito só com o calendário, nunca com as consultas.",
         "- Não mede a qualidade do reconhecimento de fala: as consultas \"de fala\" simulam erros típicos de transcrição, mas não vêm de áudio real.",
         "",
-        "## Alternativa com embeddings (não adotada)",
+        "## Outras alternativas com embeddings (não adotadas)",
         "",
-        "Modelos de embeddings dão uma semântica bem mais rica (entendem \"tosse comprida\"), mas: um modelo local pequeno (da ordem de 100 MB, com PyTorch) não cabe na instância de 512 MB da Function de PLN; um serviço de embeddings na nuvem tem custo por uso e dependência externa (decisão que o `CLAUDE.md` pede para aprovar). Fica registrada como evolução; o custo deve ser levantado antes (SCRUM-26).",
+        "O teste acima usou vetores pequenos (50 dimensões) e gerais. Modelos de frases, treinados para comparar significado (por exemplo, da família sentence-transformers), tendem a ir melhor, mas: um modelo local pequeno (da ordem de 100 MB, com PyTorch) não cabe na instância de 512 MB da Function de PLN; um serviço de embeddings na nuvem tem custo por uso e dependência externa (decisão que o `CLAUDE.md` pede para aprovar). Fica registrada como evolução; o custo deve ser levantado antes (SCRUM-26).",
         "",
     ]
     return "\n".join(lines)

@@ -248,7 +248,7 @@ ITENS = [
          AN, 3, '.github/workflows/apk.yml; docs/26-apk-no-github-releases.md', 'Assinado com a chave de depuração: instala direto, mas não serve para a Play Store.'),
     item('B58', None, 'Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica',
          'E6', M, 'PE1, PE2', 'RF06, RF07', ['Relatório com os números das técnicas das aulas sobre o mesmo teste separado, com as limitações.', 'Busca com embeddings em português, medida nas mesmas consultas, sem IA generativa e dentro da memória da Function.', 'Decisão registrada em ADR e custo conferido.'],
-         EA, 3, 'docs/07-testes/comparacao-pln.md', 'Parte já feita: a comparação. Falta a busca com embeddings (depende de baixar vetores de uma fonte externa, a aprovar).'),
+         AN, 3, 'docs/07-testes/comparacao-pln.md; docs/07-testes/avaliacao-busca-semantica.md; docs/05-adrs/ADR-023-embeddings-avaliados-e-nao-adotados-na-busca.md', 'Os embeddings (GloVe 50d do NILC) foram aplicados e medidos, mas não melhoraram a busca; ficam desligados (ADR-023).'),
     item('B59', None, 'Como usuária, quero ver as notícias recentes de saúde e vacinação do Ministério da Saúde, para me manter informada sem sair do app',
          'E9', S, 'PE1, PE3', 'RNF06',
          ['Mostra título, data e link das notícias mais recentes do feed oficial, com a etiqueta Vacinação quando o título cita vacina.', 'Não guarda nem resume o texto, cita a fonte e avisa que não é orientação médica.', 'Se o feed falhar, o cartão some e o app segue normal; nada do usuário é enviado ao feed.'],

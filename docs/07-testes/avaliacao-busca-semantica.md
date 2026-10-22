@@ -2,10 +2,10 @@
 
 > **Arquivo gerado** por `python -m vacina_nlp.search_evaluate --write-report ...` (dentro de `apps/nlp`). Não edite à mão.
 
-- **Data:** 2026-10-06
+- **Data:** 2026-10-21
 - **Calendário:** Calendário Nacional de Vacinação 2026 (versão 2026), 21 vacinas indexadas
 - **Consultas de teste:** 63 de vacinas e 12 fora do tema (`vacina_nlp/data/search_test_set.json`)
-- **Bibliotecas:** scikit-learn 1.9.1, numpy 2.5.3
+- **Bibliotecas:** scikit-learn 1.7.2, numpy 2.5.3
 
 ## O que é a busca
 
@@ -67,6 +67,23 @@ Abaixo do limiar a vacina não é devolvida. "Consultas com acerto" é a fraçã
 
 A escolha de 0.35 prioriza **não mostrar vacinas para perguntas sem relação** (uma lista de vacinas depois de "quero uma pizza" parece erro). O custo é que as consultas com erro de fala mais forte, como "cacumba" por "caxumba", podem ficar abaixo do limiar e não devolver a lista; a resposta do chatbot continua aparecendo. É uma escolha de produto, não um resultado único: com limiar menor, mais consultas de vacina acertam e mais perguntas fora do tema recebem vacinas.
 
+## Embeddings de palavras (GloVe 50d do NILC): avaliados e não adotados
+
+Foi testado um terceiro sinal na nota: vetores de palavras em português (GloVe 50d do NILC/USP, licença CC-BY-4.0, recorte de cerca de 37 mil palavras e 3,6 MB gerado por `scripts/gerar_embeddings.py`). Cada texto vira a média dos vetores das suas palavras (ponderada pelo IDF), menos a média dos documentos; a nota é o cosseno. O peso é o do embedding na nota final (o LSA fica em 0,3).
+
+| Peso do embedding | Acerto na 1ª | Acerto nas 3 primeiras | MRR | Acerto na 1ª (vocabulário ausente) |
+|---|---|---|---|---|
+| 0.00 (padrão, sem embedding) | 88.9% | 95.2% | 0.928 | 40.0% |
+| 0.05 | 85.7% | 95.2% | 0.912 | 0.0% |
+| 0.10 | 85.7% | 95.2% | 0.909 | 0.0% |
+| 0.20 | 84.1% | 92.1% | 0.893 | 0.0% |
+| 0.30 | 81.0% | 92.1% | 0.874 | 0.0% |
+| 0.50 | 76.2% | 88.9% | 0.839 | 0.0% |
+
+Teste como reserva: das 63 consultas de vacinas, 8 ficam abaixo do limiar no padrão (não devolvem nada). Usando só os embeddings nessas, a vacina certa fica em 1º lugar em **0.0%** delas; e a nota máxima média dos embeddings nas perguntas fora do tema é de **0.64**, parecida com a das consultas de vacina (o limiar de 0,35 não conseguiria separá-las).
+
+**Resultado:** nenhum peso melhorou a busca neste conjunto; o aumento do peso piora o acerto, inclusive nas consultas de vocabulário ausente, que era o alvo. Os vetores são razoáveis ("tosse" fica perto de "febre" e "vômito"; "coqueluche" perto de "difteria" e "tétano"), mas essa proximidade é **por assunto**, e as 22 vacinas são todas sobre doenças: "tosse comprida" fica perto de todas, sem apontar a coqueluche. Por isso o recurso fica **desligado** (`embedding_weight = 0`) e a busca em produção não muda. Outra forma testada em protótipo, comparar cada palavra da pergunta com a palavra mais parecida de cada vacina, também não superou o padrão (melhor MRR de 0,910 contra 0,928; protótipo não versionado). Ver ADR-023.
+
 ## Como interpretar
 
 - **De onde vem o ganho:** comparando A, B e C, a maior parte da melhoria vem de **enriquecer os documentos** (faixas, momentos e observações: as consultas de grupo, como "vacinas para gestante", passam a funcionar) e de usar **n-gramas de caracteres** (as consultas com erro de fala, que o reconhecimento de voz produz).
@@ -79,6 +96,6 @@ A escolha de 0.35 prioriza **não mostrar vacinas para perguntas sem relação**
 - Os parâmetros (componentes, peso e limiar) foram **escolhidos olhando este mesmo conjunto** (não há conjunto separado de validação por ser tão pequeno), então os números do padrão são otimistas. O índice em si é feito só com o calendário, nunca com as consultas.
 - Não mede a qualidade do reconhecimento de fala: as consultas "de fala" simulam erros típicos de transcrição, mas não vêm de áudio real.
 
-## Alternativa com embeddings (não adotada)
+## Outras alternativas com embeddings (não adotadas)
 
-Modelos de embeddings dão uma semântica bem mais rica (entendem "tosse comprida"), mas: um modelo local pequeno (da ordem de 100 MB, com PyTorch) não cabe na instância de 512 MB da Function de PLN; um serviço de embeddings na nuvem tem custo por uso e dependência externa (decisão que o `CLAUDE.md` pede para aprovar). Fica registrada como evolução; o custo deve ser levantado antes (SCRUM-26).
+O teste acima usou vetores pequenos (50 dimensões) e gerais. Modelos de frases, treinados para comparar significado (por exemplo, da família sentence-transformers), tendem a ir melhor, mas: um modelo local pequeno (da ordem de 100 MB, com PyTorch) não cabe na instância de 512 MB da Function de PLN; um serviço de embeddings na nuvem tem custo por uso e dependência externa (decisão que o `CLAUDE.md` pede para aprovar). Fica registrada como evolução; o custo deve ser levantado antes (SCRUM-26).
