@@ -1193,6 +1193,25 @@
    "curto": "Domínio próprio e gratuito para o site"
   },
   {
+   "id": "B63",
+   "jira": null,
+   "titulo": "Como equipe, quero aplicar ao projeto as estratégias de teste vistas nas aulas, para defender a qualidade na entrega e achar o que os testes automáticos não pegam",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Há projeto de casos de caixa branca (instruções, decisões, condições, caminhos e fluxo de dados) para funções críticas, com a cobertura medida.",
+    "Há charters de teste exploratório com HICCUPPS, prontos para o autor executar.",
+    "O plano de teste descreve a estratégia de regressão, a análise de impacto e os ambientes de teste."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "docs/07-testes/caixa-branca.md; docs/07-testes/testes-exploratorios.md; docs/07-testes/plano-de-teste.md (seções 4.5 e 4.6)",
+   "nota": "Os charters não foram executados (cabe ao autor). Não há ambiente de homologação. Coleção Postman, testes por pares e aleatórios ficaram para depois.",
+   "curto": "Estratégias de teste das aulas: caixa branca, exploratório, regressão e ambientes"
+  },
+  {
    "id": "B48",
    "jira": null,
    "titulo": "Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço",

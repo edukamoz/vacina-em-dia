@@ -322,6 +322,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B39 | novo | Como equipe, quero revisar o dataset do chatbot e o texto do termo de consentimento com outra pessoa, para garantir segurança e clareza | Should | A fazer | Sprint 4 |
 | B40 | novo | Como equipe, quero testar o app em celulares reais (Android e iOS) e com leitor de tela, para achar o que o emulador não mostra | Should | A fazer | Sprint 5 |
 | B49 | novo | Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança | Should | Em análise | Sprint 1 |
+| B63 | novo | Como equipe, quero aplicar ao projeto as estratégias de teste vistas nas aulas, para defender a qualidade na entrega e achar o que os testes automáticos não pegam | Should | Em análise | Sprint 3 |
 
 **B24** (todas; requisitos: RNF07)
 
@@ -375,6 +376,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Roda no CI depois do build e guarda o relatório.
 - Evidência: docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/
 - Atenção: Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).
+
+**B63** (todas; requisitos: RNF07)
+
+- Há projeto de casos de caixa branca (instruções, decisões, condições, caminhos e fluxo de dados) para funções críticas, com a cobertura medida.
+- Há charters de teste exploratório com HICCUPPS, prontos para o autor executar.
+- O plano de teste descreve a estratégia de regressão, a análise de impacto e os ambientes de teste.
+- Evidência: docs/07-testes/caixa-branca.md; docs/07-testes/testes-exploratorios.md; docs/07-testes/plano-de-teste.md (seções 4.5 e 4.6)
+- Atenção: Os charters não foram executados (cabe ao autor). Não há ambiente de homologação. Coleção Postman, testes por pares e aleatórios ficaram para depois.
 
 ## E8 Versão completa (SCRUM-12)
 

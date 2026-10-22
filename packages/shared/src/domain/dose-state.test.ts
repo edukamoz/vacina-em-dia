@@ -229,6 +229,13 @@ describe('guardas das transições (valores limite)', () => {
     expect(error).toMatchObject({ code: 'GUARD_VIOLATION', reason: 'CONFIRMATION_REQUIRED' });
   });
 
+  test('CT-CB-01: dose Agendada sem data de agendamento (dado inconsistente) não é atrasada', () => {
+    const error = expectError(
+      run(dose('SCHEDULED', { scheduledDate: null }), { type: 'MARK_OVERDUE' }, 'SCHEDULER'),
+    );
+    expect(error).toMatchObject({ code: 'GUARD_VIOLATION', reason: 'NOT_OVERDUE' });
+  });
+
   test('agendamento vencido (T7) só vence se a data for anterior a hoje', () => {
     const error = expectError(
       run(dose('SCHEDULED', { scheduledDate: D }), { type: 'MARK_OVERDUE' }, 'SCHEDULER'),
