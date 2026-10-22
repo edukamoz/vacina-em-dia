@@ -408,6 +408,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | Em análise | Sprint 3 |
 | B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
 | B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Em análise | Sprint 3 |
+| B59 | novo | Como usuária, quero ver as notícias recentes de saúde e vacinação do Ministério da Saúde, para me manter informada sem sair do app | Should | Em análise | Sprint 3 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -513,6 +514,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - O arquivo vem com o hash SHA-256 e a página explica como instalar.
 - Evidência: .github/workflows/apk.yml; docs/26-apk-no-github-releases.md
 - Atenção: Assinado com a chave de depuração: instala direto, mas não serve para a Play Store.
+
+**B59** (PE1, PE3; requisitos: RNF06)
+
+- Mostra título, data e link das notícias mais recentes do feed oficial, com a etiqueta Vacinação quando o título cita vacina.
+- Não guarda nem resume o texto, cita a fonte e avisa que não é orientação médica.
+- Se o feed falhar, o cartão some e o app segue normal; nada do usuário é enviado ao feed.
+- Evidência: docs/05-adrs/ADR-024-novidades-de-saude-do-feed-do-ministerio.md; GET /api/news
+- Atenção: Fonte única por enquanto (Ministério da Saúde); Butantan bloqueia leitura automática.
 
 ## Não migrados do Jira
 

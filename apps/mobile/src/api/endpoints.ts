@@ -1,5 +1,6 @@
 import {
   accountInfoSchema,
+  newsResponseSchema,
   reminderListResponseSchema,
   reminderPreferencesInputSchema,
   reminderPreferencesResponseSchema,
@@ -125,6 +126,9 @@ export const endpoints = {
 
   deleteAccount: (ctx: ApiContext) =>
     apiRequestNoContent(ctx, { path: '/account', method: 'DELETE' }),
+
+  getNews: (ctx: ApiContext, signal?: AbortSignal) =>
+    apiRequest(ctx, { path: '/news', ...(signal ? { signal } : {}) }, newsResponseSchema),
 
   getProfilePhoto: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(ctx, { path: '/account/photo', ...(signal ? { signal } : {}) }, profilePhotoSchema),
