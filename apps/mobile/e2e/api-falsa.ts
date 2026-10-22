@@ -217,7 +217,8 @@ export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
             vaccineRelated: true,
           },
           {
-            title: 'Sarampo: Ministério da Saúde reforça a importância de manter a vacinação em dia',
+            title:
+              'Sarampo: Ministério da Saúde reforça a importância de manter a vacinação em dia',
             url: 'https://www.gov.br/saude/pt-br/assuntos/noticias-ms/2026/outubro/sarampo',
             publishedAt: '2026-10-18',
             vaccineRelated: true,
