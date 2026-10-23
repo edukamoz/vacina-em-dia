@@ -1,0 +1,1680 @@
+{
+  "info": {
+    "name": "Vacina em Dia: API",
+    "description": "Testes automatizados da API (PI-VI, Qualidade e Testes de Software).\n\nComo usar: importe esta coleção e um dos ambientes da pasta `postman/`, escolha o ambiente no canto superior direito e rode a coleção inteira (Run). Os testes encadeiam: a pasta 1 cria a conta e guarda o token em `access_token`; as seguintes usam esse token e os ids guardados (`member_id`, `dose_id`).\n\nA pasta 7 apaga a conta de teste. Rode a coleção na ordem, do começo ao fim.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Datas relativas a hoje, usadas nos eventos de dose. A API conta o dia civil em",
+          "// America/Sao_Paulo (UTC-3, sem horário de verão desde 2019); em UTC, depois das 21h",
+          "// o \"hoje\" daqui seria o dia seguinte e aplicar uma dose daria erro de data no futuro.",
+          "const agora = new Date(Date.now() - 3 * 60 * 60 * 1000);",
+          "pm.environment.set('hoje', agora.toISOString().slice(0, 10));",
+          "const amanha = new Date(agora.getTime() + 24 * 60 * 60 * 1000);",
+          "pm.environment.set('amanha', amanha.toISOString().slice(0, 10));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Ambiente",
+      "description": "A API está no ar e responde dentro do limite do RNF01 (3 s).",
+      "item": [
+        {
+          "name": "Saúde da API",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('status \"ok\" e serviço correto', function () {",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.status).to.eql('ok');",
+                  "  pm.expect(corpo.service).to.eql('vacina-em-dia-api');",
+                  "});",
+                  "pm.test('responde em menos de 3 s (RNF01)', function () {",
+                  "  pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Rota pública. Mostra que `base_url` aponta para uma API viva.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Conta e login (RF01)",
+      "description": "Partições de equivalência e valor limite da senha (7 caracteres é inválido; 8, válido), e-mail repetido, credenciais erradas e acesso sem token.",
+      "item": [
+        {
+          "name": "Cadastrar conta (válida)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('email', 'postman.' + Date.now() + '@exemplo.com.br');",
+                  "pm.environment.set('password', 'uma frase longa é melhor');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const corpo = pm.response.json();",
+                  "pm.test('sessão Bearer de 900 s e e-mail da conta', function () {",
+                  "  pm.expect(corpo.tokenType).to.eql('Bearer');",
+                  "  pm.expect(corpo.expiresIn).to.eql(900);",
+                  "  pm.expect(corpo.account.email).to.eql(pm.environment.get('email'));",
+                  "});",
+                  "pm.test('a resposta não devolve a senha nem o hash', function () {",
+                  "  pm.expect(pm.response.text()).to.not.include(pm.environment.get('password'));",
+                  "});",
+                  "pm.environment.set('access_token', corpo.accessToken);",
+                  "pm.environment.set('refresh_token', corpo.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Classe válida. Gera um e-mail novo a cada execução e guarda os tokens no ambiente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Cadastrar com e-mail repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 EMAIL_ALREADY_REGISTERED', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('EMAIL_ALREADY_REGISTERED');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Classe inválida: e-mail já cadastrado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Cadastrar com senha de 7 caracteres (limite)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "  pm.expect(corpo.fields).to.include('body.password');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Valor limite: um abaixo do mínimo de 8 caracteres.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"limite@exemplo.com.br\",\n  \"password\": \"1234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Cadastrar com e-mail em formato inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "  pm.expect(corpo.fields).to.include('body.email');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Classe inválida: e-mail sem domínio.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria@\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Entrar com senha errada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 INVALID_CREDENTIALS', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('INVALID_CREDENTIALS');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "A mensagem não diz se o erro foi no e-mail ou na senha (evita enumerar contas).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"senha totalmente errada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Entrar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const corpo = pm.response.json();",
+                  "pm.test('traz um token novo', function () {",
+                  "  pm.expect(corpo.accessToken).to.be.a('string');",
+                  "});",
+                  "pm.environment.set('access_token', corpo.accessToken);",
+                  "pm.environment.set('refresh_token', corpo.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Quem sou eu (com token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('devolve a conta que entrou', function () {",
+                  "  pm.expect(pm.response.json().email).to.eql(pm.environment.get('email'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Usa o token guardado em `access_token` (autenticação Bearer da coleção)."
+          }
+        },
+        {
+          "name": "Quem sou eu (sem token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 UNAUTHORIZED', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('UNAUTHORIZED');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Autorização: sem token a API recusa.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Consentimento (RF09, LGPD)",
+      "description": "Sem consentimento explícito a API não grava dados da família.",
+      "item": [
+        {
+          "name": "Ver consentimento (ainda não aceito)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('começa como não aceito', function () {",
+                  "  pm.expect(pm.response.json().accepted).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/consent",
+              "host": ["{{base_url}}"],
+              "path": ["consent"]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Criar membro sem consentimento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 CONSENT_REQUIRED', function () {",
+                  "  pm.response.to.have.status(403);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('CONSENT_REQUIRED');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["members"]
+            },
+            "description": "Regra de negócio: antes do aceite, a API barra a gravação.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria\",\n  \"birthDate\": \"2025-08-20\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Aceitar o termo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('fica registrado com a versão do termo', function () {",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.accepted).to.be.true;",
+                  "  pm.expect(corpo.termVersion).to.eql('2026-10-06');",
+                  "  pm.expect(corpo.acceptedAt).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/consent",
+              "host": ["{{base_url}}"],
+              "path": ["consent"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"acceptedTerms\": true,\n  \"termVersion\": \"2026-10-06\",\n  \"guardianDeclaration\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Família (RF02) e calendário (RF03)",
+      "description": "Membro válido, data de nascimento no futuro, nome vazio, isolamento entre usuários e fonte oficial no calendário.",
+      "item": [
+        {
+          "name": "Criar membro (válido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const corpo = pm.response.json();",
+                  "pm.test('devolve id e faixa etária da criança', function () {",
+                  "  pm.expect(corpo.id).to.be.a('string');",
+                  "  pm.expect(corpo.ageGroup).to.eql('CHILD');",
+                  "});",
+                  "pm.environment.set('member_id', corpo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["members"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria\",\n  \"birthDate\": \"2025-08-20\",\n  \"relationship\": \"DAUGHTER\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Criar membro nascido no futuro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 INVALID_BIRTH_DATE', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('INVALID_BIRTH_DATE');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["members"]
+            },
+            "description": "Classe inválida de data: depois de hoje.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Futuro\",\n  \"birthDate\": \"2999-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Criar membro com nome vazio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "  pm.expect(corpo.fields).to.include('body.name');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["members"]
+            },
+            "description": "Valor limite: nome com 0 caracteres.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"birthDate\": \"2025-08-20\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar membros",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('lista só o membro criado', function () {",
+                  "  const itens = pm.response.json().items;",
+                  "  pm.expect(itens).to.have.lengthOf(1);",
+                  "  pm.expect(itens[0].id).to.eql(pm.environment.get('member_id'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/members",
+              "host": ["{{base_url}}"],
+              "path": ["members"]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Calendário da Maria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const corpo = pm.response.json();",
+                  "pm.test('cita a fonte oficial e o aviso (RNF10)', function () {",
+                  "  pm.expect(corpo.source.publisher).to.eql('Ministério da Saúde (PNI)');",
+                  "  pm.expect(corpo.source.notice).to.include('não substitui a caderneta');",
+                  "  pm.expect(corpo.source.isFictitious).to.be.false;",
+                  "});",
+                  "pm.test('há doses e todas começam Pendentes ou Atrasadas', function () {",
+                  "  pm.expect(corpo.items.length).to.be.above(0);",
+                  "  corpo.items.forEach(function (d) { pm.expect(d.status).to.be.oneOf(['PENDING', 'OVERDUE']); });",
+                  "});",
+                  "const pendentes = corpo.items.filter(function (d) { return d.status === 'PENDING'; });",
+                  "pm.environment.set('dose_id', pendentes[0].id);",
+                  "pm.environment.set('dose_id_2', pendentes[1].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/members/{{member_id}}/doses",
+              "host": ["{{base_url}}"],
+              "path": ["members", "{{member_id}}", "doses"]
+            },
+            "description": "Guarda duas doses pendentes para os testes do ciclo de vida."
+          }
+        },
+        {
+          "name": "Calendário de um membro que não existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 NOT_FOUND', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/members/00000000-0000-4000-8000-000000000000/doses",
+              "host": ["{{base_url}}"],
+              "path": ["members", "00000000-0000-4000-8000-000000000000", "doses"]
+            },
+            "description": "Propriedade dos dados: id desconhecido (ou de outra conta) responde 404, nunca 403, para não revelar que existe."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Ciclo de vida da dose (RF04)",
+      "description": "Transições da máquina de estados vistas pela API: guardas de data (422), transição inválida (409) e confirmação de cancelamento.",
+      "item": [
+        {
+          "name": "Aplicar com data futura (guarda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 GUARD_VIOLATION', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('GUARD_VIOLATION');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id}}", "events"]
+            },
+            "description": "Guarda G: aplicar exige data de hoje para trás.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"APPLY\",\n  \"date\": \"2999-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Aplicar hoje (T3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Pendente vira Aplicada, com a data de hoje', function () {",
+                  "  const dose = pm.response.json();",
+                  "  pm.expect(dose.status).to.eql('APPLIED');",
+                  "  pm.expect(dose.appliedDate).to.eql(pm.environment.get('hoje'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id}}", "events"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"APPLY\",\n  \"date\": \"{{hoje}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Aplicar de novo (estado final)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 INVALID_TRANSITION', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('INVALID_TRANSITION');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id}}", "events"]
+            },
+            "description": "Aplicada é estado final: qualquer evento é transição inválida.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"APPLY\",\n  \"date\": \"{{hoje}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Agendar no passado (guarda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 GUARD_VIOLATION', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('GUARD_VIOLATION');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id_2}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id_2}}", "events"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"SCHEDULE\",\n  \"date\": \"2000-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cancelar sem confirmar (guarda)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('422 GUARD_VIOLATION', function () {",
+                  "  pm.response.to.have.status(422);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('GUARD_VIOLATION');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id_2}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id_2}}", "events"]
+            },
+            "description": "Cancelar exige `confirmed: true`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"CANCEL\",\n  \"confirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desagendar uma dose que não está agendada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 INVALID_TRANSITION', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('INVALID_TRANSITION');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id_2}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id_2}}", "events"]
+            },
+            "description": "T8 só existe a partir de Agendada; a partir de Pendente é transição inválida.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"UNSCHEDULE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Agendar para amanhã (T2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Pendente vira Agendada, para amanhã', function () {",
+                  "  const dose = pm.response.json();",
+                  "  pm.expect(dose.status).to.eql('SCHEDULED');",
+                  "  pm.expect(dose.scheduledDate).to.eql(pm.environment.get('amanha'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id_2}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id_2}}", "events"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"SCHEDULE\",\n  \"date\": \"{{amanha}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Desagendar (T8)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Agendada volta a Pendente', function () {",
+                  "  pm.expect(pm.response.json().status).to.eql('PENDING');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id_2}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id_2}}", "events"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"UNSCHEDULE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Tipo de evento desconhecido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "  pm.expect(corpo.fields).to.include('body.type');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/doses/{{dose_id_2}}/events",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "{{dose_id_2}}", "events"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"EXPLODIR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Dose que não existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 NOT_FOUND', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/doses/nao-existe",
+              "host": ["{{base_url}}"],
+              "path": ["doses", "nao-existe"]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Assistente (RF07)",
+      "description": "Pergunta curada com fonte e pergunta de saúde que o chatbot se recusa a responder.",
+      "item": [
+        {
+          "name": "Aquecer o assistente (1/2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200, ou 503 enquanto o PLN acorda', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "O serviço de PLN treina o classificador ao acordar. Na nuvem, depois de um tempo parado, a API espera 15 s por ele e responde 503 (ASSISTANT_UNAVAILABLE); as chamadas seguintes funcionam. Estas duas chamadas absorvem essa partida a frio para os testes abaixo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"oi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Aquecer o assistente (2/2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200, ou 503 enquanto o PLN acorda', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "O serviço de PLN treina o classificador ao acordar. Na nuvem, depois de um tempo parado, a API espera 15 s por ele e responde 503 (ASSISTANT_UNAVAILABLE); as chamadas seguintes funcionam. Estas duas chamadas absorvem essa partida a frio para os testes abaixo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"oi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pergunta sobre uma vacina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const resposta = pm.response.json().reply;",
+                  "pm.test('classifica a intenção e cita a fonte oficial', function () {",
+                  "  pm.expect(resposta.intent).to.eql('vacina_para_que_serve');",
+                  "  pm.expect(resposta.fallback).to.be.false;",
+                  "  pm.expect(resposta.safety).to.be.false;",
+                  "  pm.expect(resposta.source.name).to.include('Ministério da Saúde');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"para que serve a BCG\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pergunta de saúde individual (segurança)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const resposta = pm.response.json().reply;",
+                  "pm.test('recusa e orienta procurar um profissional', function () {",
+                  "  pm.expect(resposta.safety).to.be.true;",
+                  "  pm.expect(resposta.intent).to.eql('orientacao_medica');",
+                  "  pm.expect(resposta.text).to.include('profissional de saúde');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "O chatbot nunca dá orientação médica: a regra de segurança vem antes do classificador.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"meu filho está com febre alta o que eu dou\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Texto vazio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "  pm.expect(corpo.fields).to.include('body.text');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Lembretes, novidades e postos",
+      "description": "Leituras da conta recém-criada e de dados públicos.",
+      "item": [
+        {
+          "name": "Lembretes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('traz a dose atrasada da Maria', function () {",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.items).to.be.a('array');",
+                  "  pm.expect(corpo.items.map(function (i) { return i.kind; })).to.include('OVERDUE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reminders",
+              "host": ["{{base_url}}"],
+              "path": ["reminders"]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Novidades de saúde",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('todas as notícias são do gov.br/saude', function () {",
+                  "  pm.response.json().items.forEach(function (n) {",
+                  "    pm.expect(n.url).to.include('gov.br/saude');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/news",
+              "host": ["{{base_url}}"],
+              "path": ["news"]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Postos perto de uma coordenada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('vêm ordenados do mais perto para o mais longe', function () {",
+                  "  const ds = pm.response.json().items.map(function (u) { return u.distanceMeters; });",
+                  "  pm.expect(ds.length).to.be.above(0);",
+                  "  for (let i = 1; i < ds.length; i++) { pm.expect(ds[i]).to.be.above(ds[i - 1] - 1); }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/units/nearby?lat=-23.5&lon=-47.4",
+              "host": ["{{base_url}}"],
+              "path": ["units", "nearby"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "-23.5"
+                },
+                {
+                  "key": "lon",
+                  "value": "-47.4"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Postos sem a longitude",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('400 VALIDATION_ERROR', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "  pm.expect(corpo.fields).to.include('query.lon');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/units/nearby?lat=-23.5",
+              "host": ["{{base_url}}"],
+              "path": ["units", "nearby"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "-23.5"
+                }
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Limpeza e exclusão de dados (RF09)",
+      "description": "Remove a conta de teste e prova que ela não existe mais.",
+      "item": [
+        {
+          "name": "Excluir a conta e todos os dados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/account",
+              "host": ["{{base_url}}"],
+              "path": ["account"]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Entrar com a conta excluída",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('401 INVALID_CREDENTIALS', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  const corpo = pm.response.json();",
+                  "  pm.expect(corpo.code).to.eql('INVALID_CREDENTIALS');",
+                  "  pm.expect(corpo.message).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Depois da exclusão as credenciais deixam de valer.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
