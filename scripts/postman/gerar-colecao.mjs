@@ -356,6 +356,15 @@ const itens = [
     '5. Assistente (RF07)',
     'Pergunta curada com fonte e pergunta de saúde que o chatbot se recusa a responder.',
     [
+      ...[1, 2].map((n) =>
+        req(`Aquecer o assistente (${n}/2)`, 'POST', '/assistant/message', {
+          desc: 'O serviço de PLN treina o classificador ao acordar. Na nuvem, depois de um tempo parado, a API espera 15 s por ele e responde 503 (ASSISTANT_UNAVAILABLE); as chamadas seguintes funcionam. Estas duas chamadas absorvem essa partida a frio para os testes abaixo.',
+          body: { text: 'oi' },
+          tests: evidencia('200, ou 503 enquanto o PLN acorda', [
+            '  pm.expect(pm.response.code).to.be.oneOf([200, 503]);',
+          ]),
+        }),
+      ),
       req('Pergunta sobre uma vacina', 'POST', '/assistant/message', {
         body: { text: 'para que serve a BCG' },
         tests: [

@@ -1,6 +1,6 @@
 # Vacina em Dia: testes de API com Postman
 
-Material da atividade "Ambientes e ferramentas de teste" (Qualidade e Testes de Software). A coleção testa a API real do projeto: 8 pastas, 37 requisições e 57 testes automáticos. Ela fica em `postman/` e é gerada por `scripts/postman/gerar-colecao.mjs`.
+Material da atividade "Ambientes e ferramentas de teste" (Qualidade e Testes de Software). A coleção testa a API real do projeto: 8 pastas, 39 requisições e 59 testes automáticos. Ela fica em `postman/` e é gerada por `scripts/postman/gerar-colecao.mjs`.
 
 ## 1 O que existe
 
@@ -19,7 +19,11 @@ Material da atividade "Ambientes e ferramentas de teste" (Qualidade e Testes de 
 3. No canto superior direito, selecione o ambiente (**local** ou **nuvem**).
 4. Clique na coleção, depois em **Run**, e rode tudo na ordem. A pasta 1 cria a conta de teste e guarda o token; as seguintes dependem dele; a pasta 7 apaga a conta.
 
-Resultado esperado: 57 testes passando.
+Resultado esperado: 59 testes passando.
+
+> **Ao reimportar:** o Postman guarda uma cópia da coleção. Depois de atualizar o repositório, apague a coleção antiga e importe de novo, senão você roda a versão velha.
+>
+> **Assistente na nuvem:** depois de um tempo parado, o serviço de PLN demora a acordar (treina o classificador) e a API, que espera 15 s por ele, responde 503 `ASSISTANT_UNAVAILABLE`. As duas requisições "Aquecer o assistente" da pasta 5 absorvem isso e aceitam 200 ou 503; se os testes seguintes ainda falharem com 503, rode a pasta 5 de novo.
 
 > Se rodar a coleção várias vezes seguidas, o cadastro da pasta 1 passa a responder **429** (limite de uso, ADR-010) e o resto falha em cascata com 401. Espere a janela do limite passar ou, no ambiente local, reinicie a API (`docker restart vacina-em-dia-api-1`), que zera os contadores.
 >
@@ -48,7 +52,7 @@ docker compose up -d --build azurite api nlp
 
 Sobem só o necessário para a API (o serviço `web` não é preciso para o Postman). Espere a API ficar `healthy` (`docker compose ps`) e confira em `http://localhost:7071/api/health`.
 
-**Dois defeitos conhecidos do Docker local (22/10/2026), que derrubam só a pasta 7:** a exclusão de conta responde 500 porque o cliente de arquivos não alcança o Azurite no Compose (a cadeia `DevelopmentStorageProxyUri` é tratada como proxy HTTP pelo SDK, e o Azurite 3.37.0 recusa a versão de API que o SDK usa). Isso afeta também a foto de perfil no Docker local; na Azure, com a conta de armazenamento real, não se aplica. Enquanto o conserto não entra no repositório, use um `docker-compose.override.yml` local (não versionado) com a cadeia explícita do Azurite e `--skipApiVersionCheck`; com ele a coleção passa por inteiro. Sem ele, o Postman mostra 55 de 57 testes verdes e as duas falhas esperadas na pasta 7. O teste fez o que deveria: achou um defeito real.
+**Dois defeitos conhecidos do Docker local (22/10/2026), que derrubam só a pasta 7:** a exclusão de conta responde 500 porque o cliente de arquivos não alcança o Azurite no Compose (a cadeia `DevelopmentStorageProxyUri` é tratada como proxy HTTP pelo SDK, e o Azurite 3.37.0 recusa a versão de API que o SDK usa). Isso afeta também a foto de perfil no Docker local; na Azure, com a conta de armazenamento real, não se aplica. Enquanto o conserto não entra no repositório, use um `docker-compose.override.yml` local (não versionado) com a cadeia explícita do Azurite e `--skipApiVersionCheck`; com ele a coleção passa por inteiro. Sem ele, o Postman mostra 57 de 59 testes verdes e as duas falhas esperadas na pasta 7. O teste fez o que deveria: achou um defeito real.
 
 ## 5 Rodar sem o Postman
 
@@ -57,15 +61,15 @@ node scripts/postman/executar-colecao.mjs
 node scripts/postman/executar-colecao.mjs --ambiente postman/nuvem.postman_environment.json
 ```
 
-Reproduz o mesmo fluxo no terminal (sem instalar nada) e sai com código 1 se algum teste falhar. **Limite:** implementa só o pedaço de `pm.*` que a coleção usa; não é o motor do Postman. A verificação que vale para a atividade é o Runner do Postman. Estado verificado: a coleção foi executada com este script contra a API local (57 de 57 com a correção local do Azurite; 55 de 57 sem ela). **A importação no aplicativo do Postman não foi testada por mim**: faça um ensaio antes de apresentar.
+Reproduz o mesmo fluxo no terminal (sem instalar nada) e sai com código 1 se algum teste falhar. **Limite:** implementa só o pedaço de `pm.*` que a coleção usa; não é o motor do Postman. A verificação que vale para a atividade é o Runner do Postman. Estado verificado: a coleção foi executada com este script contra a API local (59 de 59 com a correção local do Azurite; 57 de 59 sem ela). **A importação no aplicativo do Postman não foi testada por mim**: faça um ensaio antes de apresentar.
 
 ## 6 Roteiro de 5 minutos
 
 | Tempo | O que mostrar | O que dizer |
 |---|---|---|
-| 0:00 a 0:40 | Ambiente **local** selecionado; variável `base_url`. | Um ambiente de teste é uma configuração controlada para validar o sistema antes dos usuários reais. Com `{{base_url}}`, trocar local por nuvem muda **um** valor, não 37 requisições. |
+| 0:00 a 0:40 | Ambiente **local** selecionado; variável `base_url`. | Um ambiente de teste é uma configuração controlada para validar o sistema antes dos usuários reais. Com `{{base_url}}`, trocar local por nuvem muda **um** valor, não 39 requisições. |
 | 0:40 a 1:40 | Pasta 1, requisição **Cadastrar conta (válida)**: abas Body e Tests. | O script da aba Tests usa `pm.test` (cria o teste), `pm.response` (a resposta do servidor) e `pm.expect` (a asserção). `pm.environment.set('access_token', ...)` guarda o token para as próximas requisições. |
-| 1:40 a 3:20 | **Run** da coleção inteira. | Os testes são encadeados: conta, consentimento, membro, calendário, doses. 57 verdes. É o teste de regressão da API, repetível a qualquer mudança. |
+| 1:40 a 3:20 | **Run** da coleção inteira. | Os testes são encadeados: conta, consentimento, membro, calendário, doses. 59 verdes. É o teste de regressão da API, repetível a qualquer mudança. |
 | 3:20 a 4:20 | Dois testes de erro: **senha de 7 caracteres** (400) e **Aplicar de novo** (409). | Valor limite e classe inválida (caixa preta) e transição inválida da máquina de estados. A API responde sempre no mesmo formato de erro. |
 | 4:20 a 5:00 | Pasta 2 (403 sem consentimento) e pasta 7 (exclusão). | Privacidade (LGPD) testada na API. Limite: a coleção cobre a API, a interface é testada com Playwright; o Postman roda hoje à mão, o CI roda os testes Jest e Playwright. |
 

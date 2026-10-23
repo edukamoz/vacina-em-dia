@@ -1235,6 +1235,86 @@
       "description": "Pergunta curada com fonte e pergunta de saúde que o chatbot se recusa a responder.",
       "item": [
         {
+          "name": "Aquecer o assistente (1/2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200, ou 503 enquanto o PLN acorda', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "O serviço de PLN treina o classificador ao acordar. Na nuvem, depois de um tempo parado, a API espera 15 s por ele e responde 503 (ASSISTANT_UNAVAILABLE); as chamadas seguintes funcionam. Estas duas chamadas absorvem essa partida a frio para os testes abaixo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"oi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Aquecer o assistente (2/2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200, ou 503 enquanto o PLN acorda', function () {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 503]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/assistant/message",
+              "host": ["{{base_url}}"],
+              "path": ["assistant", "message"]
+            },
+            "description": "O serviço de PLN treina o classificador ao acordar. Na nuvem, depois de um tempo parado, a API espera 15 s por ele e responde 503 (ASSISTANT_UNAVAILABLE); as chamadas seguintes funcionam. Estas duas chamadas absorvem essa partida a frio para os testes abaixo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"oi\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Pergunta sobre uma vacina",
           "event": [
             {
