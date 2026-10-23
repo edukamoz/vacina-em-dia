@@ -21,6 +21,10 @@ Material da atividade "Ambientes e ferramentas de teste" (Qualidade e Testes de 
 
 Resultado esperado: 57 testes passando.
 
+> Se rodar a coleção várias vezes seguidas, o cadastro da pasta 1 passa a responder **429** (limite de uso, ADR-010) e o resto falha em cascata com 401. Espere a janela do limite passar ou, no ambiente local, reinicie a API (`docker restart vacina-em-dia-api-1`), que zera os contadores.
+>
+> As datas da coleção (`hoje` e `amanha`) são calculadas no fuso de São Paulo (UTC-3), o mesmo que a API usa para o dia civil. Em UTC, depois das 21h o "hoje" seria o dia seguinte e "Aplicar hoje" daria 422 (corrigido em 22/10/2026, achado ao rodar a coleção às 21h20).
+
 > Cuidado com o ambiente **nuvem**: a coleção cria e depois apaga uma conta de teste de verdade no banco de produção. Se um teste falhar no meio, a conta pode ficar lá. Para ensaios, prefira o local.
 
 ## 3 O que cada pasta cobre

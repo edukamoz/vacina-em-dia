@@ -460,8 +460,10 @@ const colecao = {
   },
   event: [
     evento('prerequest', [
-      '// Datas relativas a hoje, usadas nos eventos de dose.',
-      'const agora = new Date();',
+      '// Datas relativas a hoje, usadas nos eventos de dose. A API conta o dia civil em',
+      '// America/Sao_Paulo (UTC-3, sem horário de verão desde 2019); em UTC, depois das 21h',
+      '// o "hoje" daqui seria o dia seguinte e aplicar uma dose daria erro de data no futuro.',
+      'const agora = new Date(Date.now() - 3 * 60 * 60 * 1000);',
       "pm.environment.set('hoje', agora.toISOString().slice(0, 10));",
       'const amanha = new Date(agora.getTime() + 24 * 60 * 60 * 1000);',
       "pm.environment.set('amanha', amanha.toISOString().slice(0, 10));",
