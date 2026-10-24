@@ -52,6 +52,8 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 
 **Verde da marca e verde de "Aplicada".** Os dois são verdes, mas ficam separados por **matiz** (a primária é um verde-azulado, a "Aplicada" é um verde de folha, cerca de 58° de diferença) e por **função**: a "Aplicada" **sempre** aparece com o ícone de confirmação e o texto "Aplicada" em um selo. O verde da marca nunca aparece sozinho como estado de dose.
 
+**Estados nos gráficos.** As cores dos cinco estados têm quase o mesmo brilho (de 1,0 a 1,4:1 entre si, nos três temas), então só a cor não separa as fatias para quem não distingue cores ou vê em tons de cinza. No painel de gráficos cada estado ganha também uma **textura** (`features/charts/padroes.tsx`): Aplicada lisa, Agendada em listras diagonais, Pendente em pontos e Atrasada em grade. A rosca, a legenda e as barras por pessoa usam a mesma textura. O selo da dose segue usando ícone e texto.
+
 ### 2.2 Tipografia
 
 - **Família:** Atkinson Hyperlegible (fonte livre, desenhada para legibilidade por pessoas com baixa visão). Carregada com `expo-font` (pacote `@expo-google-fonts/atkinson-hyperlegible`, verificado no npm em 06/10/2026). Fonte reserva do sistema enquanto carrega.
@@ -82,7 +84,7 @@ Nenhum texto fica abaixo de 16 dp.
 ### 2.4 Toque, foco e movimento
 
 - **Alvos:** mínimo 48 dp, ações principais 56 dp, folga de 8 dp entre alvos vizinhos. O WCAG 2.5.5 pede 44, nível AAA; a pesquisa com pessoas idosas aponta alvos maiores e folga entre eles.
-- **Foco visível:** anel de 3 px com contraste de no mínimo 3:1 contra o que está ao redor, em todo elemento interativo. Obrigatório na web (teclado).
+- **Foco visível:** anel de 3 px com contraste de no mínimo 3:1 contra o que está ao redor, em todo elemento interativo. Obrigatório na web (teclado). Implementado em `apps/mobile/global.css` (`:focus-visible`): anel na cor `foco`, afastado 2 px, com o vão pintado na cor `fundo`. O vão é o que garante o contraste sobre o botão principal, porque a cor `foco` encostada no verde da marca daria só 1,1:1. Antes disso o app usava o contorno padrão do navegador (1 px, cor e forma variam por navegador).
 - **Movimento:** durações de 120 a 400 ms e curvas `padrao`, `saida` e `mola` (`tokens.json`); nenhuma animação é essencial. A Conta tem três modos de movimento (guardados no aparelho): **"Animar sempre"** (o padrão, vale mesmo que o aparelho peça menos movimento), **"Seguir o aparelho"** e **"Reduzir movimento"**; o tema Alto contraste sempre deixa as telas prontas. A apresentação, Entrar e Criar conta têm o atalho "Reduzir movimento", porque a Conta ainda não está ao alcance. Implementação: `Entrada` (entrada escalonada de cada bloco, em `Tela`), `Botao` (escala 0,97 ao pressionar) e `AnelProgresso` (traço em 900 ms e número em 600 ms), todos em `apps/mobile/src/components/animacao.tsx`. Também animados: visto da dose aplicada (520 ms), brilhos da comemoração (um a um, 500 ms, mola), onda da voz e pontos de "escrevendo" (900 ms por ciclo; os pontos no máximo 3 vezes), cartão de dose que sobe 3 px ao passar o mouse (web), e na apresentação o revelar na rolagem e a paralaxe dos objetos (12 a 26 px). Ficaram de fora a inclinação 3D por mouse e o painel lateral/folha animados.
 - **Tamanho do texto:** Normal, Grande (×1,15) e Maior (×1,3) na Conta, somados ao tamanho de fonte do sistema; `Texto` escala o corpo e a altura da linha.
 
