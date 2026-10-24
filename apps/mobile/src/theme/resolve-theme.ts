@@ -6,17 +6,20 @@ export type ThemePreference = 'system' | ThemeName;
 /**
  * Decide qual tema aplicar.
  *
- * Por padrão segue o sistema (claro ou escuro). Alto contraste só entra por escolha explícita do
- * usuário (`docs/04-design-system.md`, seção 6).
+ * Por padrão segue o sistema: Alto contraste se o sistema pede mais contraste, senão claro ou
+ * escuro. Quem fixou um tema na Conta não é afetado pelo sistema.
  *
  * @param preference - Escolha do usuário.
  * @param systemScheme - Esquema de cores informado pelo sistema, quando houver.
+ * @param systemHighContrast - O sistema pede mais contraste (padrão: não).
  * @returns Tema a aplicar.
  */
 export function resolveTheme(
   preference: ThemePreference,
   systemScheme: string | null | undefined,
+  systemHighContrast = false,
 ): ThemeName {
   if (preference !== 'system') return preference;
+  if (systemHighContrast) return 'highContrast';
   return systemScheme === 'dark' ? 'dark' : 'light';
 }

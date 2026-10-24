@@ -78,6 +78,22 @@ describe('tokens do design system', () => {
     },
   );
 
+  test.each(THEME_NAMES)(
+    'CT-TOK-08: o anel de foco do tema %s tem contraste mínimo de 3:1 com o fundo e a superfície',
+    (tema) => {
+      const c = getThemeColors(tema);
+      expect(contrast(c.foco, c.fundo)).toBeGreaterThanOrEqual(3);
+      expect(contrast(c.foco, c.superficie)).toBeGreaterThanOrEqual(3);
+    },
+  );
+
+  test('CT-TOK-09: o global.css define o anel de foco com a cor `foco` e o vão da cor do fundo', () => {
+    const css = readFileSync(join(__dirname, '../../global.css'), 'utf8');
+    const regra = /:focus-visible\s*\{[^}]*\}/.exec(css)?.[0] ?? '';
+    expect(regra).toContain('outline: 3px solid var(--cor-foco');
+    expect(regra).toContain('var(--cor-fundo');
+  });
+
   test('CT-TOK-10: nenhum componente de controle usa a cor decorativa `bordaSuave`', () => {
     // Botão, campo, opção, interruptor e seletor de data delimitam o controle com `borda` (3:1).
     const controles = [

@@ -93,6 +93,8 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 
 **Verde da marca e verde de "Aplicada".** Os dois são verdes, mas ficam separados por **matiz** (a primária é um verde-azulado, a "Aplicada" é um verde de folha, cerca de 58° de diferença) e por **função**: a "Aplicada" **sempre** aparece com o ícone de confirmação e o texto "Aplicada" em um selo. O verde da marca nunca aparece sozinho como estado de dose.
 
+**Estados nos gráficos.** As cores dos cinco estados têm quase o mesmo brilho (de 1,0 a 1,4:1 entre si, nos três temas), então só a cor não separa as fatias para quem não distingue cores ou vê em tons de cinza. No painel de gráficos cada estado ganha também uma **textura** (`features/charts/padroes.tsx`): Aplicada lisa, Agendada em listras diagonais, Pendente em pontos e Atrasada em grade. A rosca, a legenda e as barras por pessoa usam a mesma textura. O selo da dose segue usando ícone e texto.
+
 ### 2.2 Tipografia
 
 - **Família:** Atkinson Hyperlegible (fonte livre, desenhada para legibilidade por pessoas com baixa visão). Carregada com `expo-font` (pacote `@expo-google-fonts/atkinson-hyperlegible`, verificado no npm em 06/10/2026). Fonte reserva do sistema enquanto carrega.
@@ -134,8 +136,8 @@ Outros tokens (valores completos em `tokens.json`):
 ### 2.4 Toque, foco e movimento
 
 - **Alvos:** mínimo 48 dp, ações principais 56 dp, folga de 8 dp entre alvos vizinhos. O WCAG 2.5.5 pede 44, nível AAA; a pesquisa com pessoas idosas aponta alvos maiores e folga entre eles.
-- **Foco visível:** anel de 3 px com contraste de no mínimo 3:1 contra o que está ao redor, em todo elemento interativo. Obrigatório na web (teclado).
-- **Movimento:** durações de 120 a 400 ms e curvas `padrao`, `saida` e `mola` (`tokens.json`); nenhuma animação é essencial. A Conta tem três modos de movimento (guardados no aparelho): **"Animar sempre"** (o padrão, vale mesmo que o aparelho peça menos movimento), **"Seguir o aparelho"** e **"Reduzir movimento"**; o tema Alto contraste sempre deixa as telas prontas. A apresentação, Entrar e Criar conta têm o atalho "Reduzir movimento", porque a Conta ainda não está ao alcance. Implementação: `Entrada` (entrada escalonada de cada bloco, em `Tela`), `Botao` (escala 0,97 ao pressionar) e `AnelProgresso` (traço em 900 ms e número em 600 ms), todos em `apps/mobile/src/components/animacao.tsx`. Também animados: visto da dose aplicada (520 ms), brilhos da comemoração (um a um, 500 ms, mola), onda da voz e pontos de "escrevendo" (900 ms por ciclo; os pontos no máximo 3 vezes), cartão de dose que sobe 3 px ao passar o mouse (web), e na apresentação o revelar na rolagem e a paralaxe dos objetos (12 a 26 px). Ficaram de fora a inclinação 3D por mouse e o painel lateral/folha animados.
+- **Foco visível:** anel de 3 px com contraste de no mínimo 3:1 contra o que está ao redor, em todo elemento interativo. Obrigatório na web (teclado). Implementado em `apps/mobile/global.css` (`:focus-visible`): anel na cor `foco`, afastado 2 px, com o vão pintado na cor `fundo`. O vão é o que garante o contraste sobre o botão principal, porque a cor `foco` encostada no verde da marca daria só 1,1:1. Antes disso o app usava o contorno padrão do navegador (1 px, cor e forma variam por navegador).
+- **Movimento:** durações de 120 a 400 ms e curvas `padrao`, `saida` e `mola` (`tokens.json`); nenhuma animação é essencial. A Conta tem três modos de movimento (guardados no aparelho): **"Seguir o aparelho"** (o padrão, ADR-026), **"Animar sempre"** (vale mesmo que o aparelho peça menos movimento) e **"Reduzir movimento"**; o tema Alto contraste sempre deixa as telas prontas. A apresentação, Entrar e Criar conta têm o atalho "Reduzir movimento", porque a Conta ainda não está ao alcance. Implementação: `Entrada` (entrada escalonada de cada bloco, em `Tela`), `Botao` (escala 0,97 ao pressionar) e `AnelProgresso` (traço em 900 ms e número em 600 ms), todos em `apps/mobile/src/components/animacao.tsx`. Também animados: visto da dose aplicada (520 ms), brilhos da comemoração (um a um, 500 ms, mola), onda da voz e pontos de "escrevendo" (900 ms por ciclo; os pontos no máximo 3 vezes), cartão de dose que sobe 3 px ao passar o mouse (web), e na apresentação o revelar na rolagem e a paralaxe dos objetos (12 a 26 px). Ficaram de fora a inclinação 3D por mouse e o painel lateral/folha animados.
 - **Tamanho do texto:** Normal, Grande (×1,15) e Maior (×1,3) na Conta, somados ao tamanho de fonte do sistema; `Texto` escala o corpo e a altura da linha.
 
 ### 2.5 Responsividade (celular e web)
@@ -148,7 +150,7 @@ Outros tokens (valores completos em `tokens.json`):
 
 - O **mesmo componente** muda de disposição, não de comportamento.
 - Na web há **estados de passar o mouse e de foco por teclado** que não existem no toque; o estado de pressionado vale para os dois.
-- A **ordem de tabulação** segue a ordem visual; há um link "Pular para o conteúdo" no topo.
+- A **ordem de tabulação** segue a ordem visual; o link "Pular para o conteúdo" é o primeiro item a receber o foco na web (`PularParaOConteudo`, no layout raiz): aparece só nesse momento e, ao ser ativado, leva o foco ao contêiner `#conteudo-principal` da tela (`Tela`, `AuthFrame`, apresentação). Não existe no app nativo.
 - A **voz na web** exige HTTPS e permissão do microfone; se negada ou indisponível, o botão leva ao campo de texto.
 - O **push** não existe na web (ver `sequencia-lembrete.md`); lá, o sinal de dose atrasada aparece dentro do app.
 
@@ -170,7 +172,7 @@ Todos aceitam os três temas, o texto a 200% e uso por teclado, toque e leitor d
 
 | Componente | Variações | Regras principais |
 |---|---|---|
-| **Botão** | principal, secundário, perigo (cancelar e excluir) | Altura mínima de 56 dp em todos os tipos; texto sempre visível, com ícone opcional; **no máximo um botão principal por tela**; estados: normal, passar o mouse, foco, pressionado, desativado (evitar) e carregando |
+| **Botão** | principal, secundário, perigo (cancelar e excluir) | Altura mínima de 56 dp em todos os tipos; texto sempre visível, com ícone opcional; **no máximo um botão principal por tela**; estados: normal, passar o mouse, foco, pressionado, **desativado** (evitar; sem a cor da marca, fundo suave, borda tracejada e texto de apoio, ainda legível) e **carregando** (propriedade `carregando`: indicador no lugar do ícone, toque bloqueado, anunciado como "ocupado", aparência normal); o botão de perigo tem fundo suave de erro, não só a borda |
 | **Campo de texto** | texto, e-mail, senha, data | Rótulo sempre visível **acima** do campo (nunca só o texto de exemplo), dica abaixo, erro abaixo com ícone e texto; altura mínima de 56 dp; senha com botão "Mostrar" |
 | **Cartão** | simples, de dose, de membro | Fio decorativo de 1 px (`bordaSuave`) com `sombra-1`; no Alto contraste, borda de 3 px e sem sombra; cartão de dose tem faixa de 6 px na lateral com a cor do estado; todo o cartão é um alvo de toque quando abre o detalhe |
 | **Selo de estado da dose** | Pendente, Agendada, Atrasada, Aplicada, Cancelada | Ícone + texto + cor; texto no rótulo de acessibilidade ("Dose atrasada") |
@@ -223,14 +225,14 @@ Verificar em toda tela nova, nos três temas e a 200% de texto.
 - [ ] Voz com alternativa de digitação; microfone negado tratado com mensagem clara.
 - [ ] Respeita "reduzir movimento".
 - [ ] Linguagem simples, sem sigla; aviso de fonte e de que não substitui a caderneta.
-- [ ] Testado com leitor de tela (TalkBack, VoiceOver e um leitor na web) nas telas principais.
+- [ ] Testado com leitor de tela (TalkBack, VoiceOver e um leitor na web) nas telas principais. Roteiro e tabelas de resultado em `docs/07-testes/acessibilidade-manual.md` (ainda não executado).
 
 ## 6. Como os tokens entram no código (SCRUM-23)
 
 Implementado em `apps/mobile`:
 
 1. `tokens.json` continua sendo a **fonte única**. O `tailwind.config.js` lê o arquivo e expõe cada cor como variável CSS (`bg-fundo`, `text-texto`, `border-borda`...), além de espaçamento, raios, bordas, alturas de toque (`min-h-toque` 48 dp, `min-h-principal` 56 dp), tamanhos de texto, famílias e breakpoints (`medio:` 600, `expandido:` 1024). Os nomes das classes seguem o vocabulário do design system (em português), 1:1 com as variáveis do Figma.
-2. O `ThemeProvider` (`src/theme/theme-provider.tsx`, Context API, ADR-006) grava as cores do tema ativo como variáveis (`--cor-<token>`). Por padrão segue o sistema (claro ou escuro); **Alto contraste** é escolha do usuário. Seguir a preferência de contraste do navegador na web ficou como melhoria futura, porque o suporte varia.
+2. O `ThemeProvider` (`src/theme/theme-provider.tsx`, Context API, ADR-006) grava as cores do tema ativo como variáveis (`--cor-<token>`). Por padrão segue o sistema (claro ou escuro). **Alto contraste** é escolha do usuário na Conta e também é o tema de quem usa "Seguir o aparelho" e pediu mais contraste ao sistema (`src/theme/contraste-do-sistema.ts`): na web, `prefers-contrast: more` ou o modo de cores forçadas do Windows (`forced-colors: active`); no iOS, "Aumentar contraste"; no Android, "Texto de alto contraste". Quem fixou Claro ou Escuro na Conta não é afetado. Só a leitura na web foi exercitada em teste automatizado; iOS e Android dependem de teste em aparelho.
 3. A fonte Atkinson Hyperlegible é carregada com `expo-font` (pacote `@expo-google-fonts`); **verificado na web** (as duas fontes carregam e o título usa a negrito).
 4. Componentes base já criados: Texto, Botão, Cartão, Selo de estado da dose e Aviso de fonte, mais o cartão de dose. Os testes (Jest + React Native Testing Library) verificam papéis, rótulos, estados, dica de leitura e o aviso de fonte; um teste confere que os três temas têm os mesmos tokens e que os contrastes mínimos (4,5:1; 7:1 no Alto contraste) valem.
 

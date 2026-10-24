@@ -47,18 +47,25 @@ test.describe('Assistente (RF07)', () => {
 });
 
 test.describe('Movimento (RNF04)', () => {
-  test('CT-E2E-04: o padrão anima mesmo com o sistema pedindo menos movimento; a escolha vale na hora', async ({
+  test('CT-E2E-04: o padrão segue o sistema (ADR-026); o atalho escolhe na hora e a escolha vale mais que o sistema', async ({
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/apresentacao');
     const raiz = page.locator('html');
-    await expect(raiz).toHaveAttribute('data-movimento', 'normal');
+    // Sem escolha guardada, o sistema pedindo menos movimento deixa tudo parado.
+    await expect(raiz).toHaveAttribute('data-movimento', 'reduzido');
 
-    // O atalho do rodapé reduz o movimento e volta a animar.
+    // O atalho do rodapé anima mesmo assim ("Animar sempre") e volta a reduzir.
+    await page.getByRole('switch', { name: 'Reduzir movimento' }).click();
+    await expect(raiz).toHaveAttribute('data-movimento', 'normal');
     await page.getByRole('switch', { name: 'Reduzir movimento' }).click();
     await expect(raiz).toHaveAttribute('data-movimento', 'reduzido');
-    await page.getByRole('switch', { name: 'Reduzir movimento' }).click();
-    await expect(raiz).toHaveAttribute('data-movimento', 'normal');
+  });
+
+  test('CT-E2E-04b: sem pedido do sistema, o padrão anima', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/apresentacao');
+    await expect(page.locator('html')).toHaveAttribute('data-movimento', 'normal');
   });
 });

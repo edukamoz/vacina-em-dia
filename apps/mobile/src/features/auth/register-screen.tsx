@@ -116,7 +116,7 @@ export function RegisterScreen() {
       ) : null}
       <Botao
         titulo={pending ? 'Criando a conta...' : 'Criar conta'}
-        disabled={pending}
+        carregando={pending}
         onPress={() => void submit()}
       />
       <LinkTexto titulo="Já tenho conta. Entrar" onPress={() => router.replace('/entrar')} />

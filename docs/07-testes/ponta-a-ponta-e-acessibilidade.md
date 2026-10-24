@@ -21,7 +21,7 @@ A API falsa valida o **contrato** do app (rotas, formatos e mensagens que o app 
 
 ## 3 Resultado de acessibilidade (axe-core)
 
-Em 10/10/2026, nas três telas e nos dois temas, o axe-core encontrou **0 violações** (de 21 a 24 regras cumpridas por tela). Isso cobre o que uma máquina enxerga: contraste de cor, nomes de botões e campos, títulos, idioma da página e áreas clicáveis. **Não substitui** o teste com leitor de tela, com zoom de 200% e no celular, que continuam pendentes. Cada execução guarda o relatório completo (JSON do axe e relatório HTML) como arquivo do pipeline.
+Em 10/10/2026, nas três telas e nos dois temas, o axe-core encontrou **0 violações** (de 21 a 24 regras cumpridas por tela). Isso cobre o que uma máquina enxerga: contraste de cor, nomes de botões e campos, títulos, idioma da página e áreas clicáveis. **Não substitui** o teste com leitor de tela, com zoom de 200% e no celular, que continuam pendentes; o roteiro está em `acessibilidade-manual.md`. Cada execução guarda o relatório completo (JSON do axe e relatório HTML) como arquivo do pipeline.
 
 ## 4 Como rodar
 
