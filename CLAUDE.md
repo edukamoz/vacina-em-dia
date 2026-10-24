@@ -7,7 +7,7 @@ Este arquivo é lido a cada sessão. Siga-o à risca. Quando algo aqui conflitar
 **Vacina em Dia** (título de trabalho: *Carteira de Vacinação Digital com Lembretes e Assistente por Voz*) é um aplicativo multiplataforma (Android, iOS e web) para famílias organizarem o calendário vacinal de seus membros, registrarem doses, receberem lembretes e tirarem dúvidas por **busca por voz** e por um **chatbot** de intenções. Roda inteiramente na **Microsoft Azure**.
 
 - **Contexto acadêmico:** Projeto Interdisciplinar VI (PI-VI), Fatec Votorantim, Curso de Desenvolvimento de Software Multiplataforma. Disciplina-chave: Laboratório de Desenvolvimento Multiplataforma. Satélites: Computação em Nuvem II, Processamento de Linguagem Natural, Qualidade e Testes de Software. Orientador: Prof. Dr. Cassio R. F. Riedo.
-- **Equipe:** uma pessoa (o autor, Eduardo Kamo Iguei). Você atua como par de programação; as decisões são do autor.
+- **Equipe:** cinco integrantes (Eduardo Kamo Iguei, Fernando Ribeiro dos Santos, Gustavo Lopes Ferreira, Iago Yuri Rossan e Lucas Vinicios Consani); o autor deste repositório e quem conduz o trabalho com você é Eduardo Kamo Iguei. Você atua como par de programação; as decisões são do autor. Nomes e RAs completos em `docs/09-documentacao-de-desenvolvimento.md`.
 - **ODS atendidos:** 3 (Saúde e Bem-Estar) e 10 (Redução das Desigualdades); o 11 apenas na versão completa (mapa de unidades de saúde).
 - **Problemas atacados:** doses esquecidas ou atrasadas, caderneta de papel perdida, dúvida sobre o que é indicado por idade e barreiras de acesso (idosos, baixa familiaridade digital).
 - **Personas:** PE1 Mariana (mãe, 32), PE2 Sr. José (idoso, 68, usa voz) e PE3 Carla (cuidadora de vários familiares, 45).
@@ -83,7 +83,7 @@ vacina-em-dia/
     └── shared/              # tipos, esquemas Zod e domínio puro (máquina de estados da dose)
 ```
 
-O `apps/nlp` é Python e **não** é workspace npm; tem ambiente e testes próprios. Tudo em um único repositório porque o autor é uma pessoa só, os tipos são compartilhados, um único pipeline cobre tudo e a entrega final exige uma pasta `doctos/` na raiz e um zip do repositório.
+O `apps/nlp` é Python e **não** é workspace npm; tem ambiente e testes próprios. Tudo em um único repositório porque a equipe é pequena, os tipos são compartilhados, um único pipeline cobre tudo e a entrega final exige uma pasta `doctos/` na raiz e um zip do repositório.
 
 ## 6. Comandos
 

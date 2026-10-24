@@ -192,7 +192,7 @@ par.alignment = WD_ALIGN_PARAGRAPH.CENTER
 runs(par, '**O aplicativo não substitui a caderneta de vacinação oficial nem a orientação de profissionais de saúde.**', 8.5)
 par = doc.add_paragraph()
 par.alignment = WD_ALIGN_PARAGRAPH.CENTER
-runs(par, 'Projeto Interdisciplinar VI (PI-VI), Fatec Votorantim, Centro Paula Souza. Autor: Eduardo Kamo Iguei. Orientador: Prof. Dr. Cassio R. F. Riedo.', 8)
+runs(par, 'Projeto Interdisciplinar VI (PI-VI), Fatec Votorantim, Centro Paula Souza. Equipe: Eduardo Kamo Iguei, Fernando Ribeiro dos Santos, Gustavo Lopes Ferreira, Iago Yuri Rossan e Lucas Vinicios Consani. Orientador: Prof. Dr. Cassio R. F. Riedo.', 8)
 
 doc.save(SAIDA)
 print('ok', SAIDA)

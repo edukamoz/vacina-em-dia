@@ -1,6 +1,6 @@
 # Vacina em Dia: Documento de Visão e Escopo (Fase 0)
 
-> Versão 1.0, 06/10/2026. Autor: Eduardo Kamo Iguei. Projeto Interdisciplinar VI (PI-VI), Fatec Votorantim.
+> Versão 1.0, 06/10/2026. Autores: Eduardo Kamo Iguei, Fernando Ribeiro dos Santos, Gustavo Lopes Ferreira, Iago Yuri Rossan e Lucas Vinicios Consani. Projeto Interdisciplinar VI (PI-VI), Fatec Votorantim.
 > Este arquivo é a versão em Markdown, para consulta no repositório e pelo Claude Code. O documento formal, em ABNT, é `Fase0_Documento_de_Visao_e_Escopo.docx`.
 > Mudanças de escopo ou de decisão devem ser feitas nos dois (ou registradas em ADR).
 
@@ -10,7 +10,7 @@
 
 Este documento apresenta a Fase 0 (Fundação) do projeto desenvolvido no Projeto Interdisciplinar VI (PI-VI) do Curso Superior de Tecnologia em Desenvolvimento de Software Multiplataforma da Fatec Votorantim. O PI-VI tem como objetivo desenvolver uma solução multiplataforma que atenda a demandas reais e contribua com os Objetivos de Desenvolvimento Sustentável (ODS), integrando plataforma web e dispositivos móveis, arquitetura em nuvem, qualidade e testes de software e Processamento de Linguagem Natural (PLN) (FACULDADE DE TECNOLOGIA DE VOTORANTIM, 2026).
 
-O projeto, realizado de forma individual, propõe uma carteira de vacinação digital com lembretes, busca por voz e chatbot de dúvidas, hospedada integralmente na plataforma Microsoft Azure. Antes de qualquer implementação, este documento fixa a visão do produto, a justificativa, o escopo e os requisitos, de modo que as etapas seguintes (Product Backlog, modelagem UML, design system, plano de testes e codificação) partam de decisões registradas.
+O projeto, realizado em equipe, propõe uma carteira de vacinação digital com lembretes, busca por voz e chatbot de dúvidas, hospedada integralmente na plataforma Microsoft Azure. Antes de qualquer implementação, este documento fixa a visão do produto, a justificativa, o escopo e os requisitos, de modo que as etapas seguintes (Product Backlog, modelagem UML, design system, plano de testes e codificação) partam de decisões registradas.
 
 ### 1.2 Organização do documento
 
@@ -59,7 +59,7 @@ Fonte: Elaborado pelo autor (2026).
 
 ### 3.1 Objetivo geral
 
-Desenvolver, de forma individual, uma solução multiplataforma (mobile e web), hospedada na Microsoft Azure, para gestão da carteira de vacinação de famílias, com calendário por faixa etária, lembretes, busca por voz e chatbot de dúvidas, contribuindo para os ODS 3 e 10.
+Desenvolver, em equipe, uma solução multiplataforma (mobile e web), hospedada na Microsoft Azure, para gestão da carteira de vacinação de famílias, com calendário por faixa etária, lembretes, busca por voz e chatbot de dúvidas, contribuindo para os ODS 3 e 10.
 
 ### 3.2 Objetivos específicos
 
@@ -201,7 +201,7 @@ Fonte: Elaborado pelo autor (2026).
 
 1)  prazo de aproximadamente seis semanas até a entrega total;
 
-2)  equipe de uma única pessoa, responsável por todos os papéis do processo;
+2)  equipe de cinco pessoas, com a divisão dos papéis do processo a definir pelo grupo;
 
 3)  custos controlados, priorizando camadas gratuitas ou de baixo custo da Azure;
 
