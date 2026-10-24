@@ -1,0 +1,203 @@
+{
+  "plano": {
+    "codigo": "PT01",
+    "titulo": "Plano de testes da entrega de Qualidade e Testes de Software",
+    "objetivo": "Reunir os casos de teste que provam os requisitos mais relevantes (conta, ciclo de vida da dose, privacidade, calendário, assistente, limite de uso e acessibilidade) e acompanhar o resultado de cada execução. O plano completo, com estratégia, critérios e recursos, está em docs/07-testes/plano-de-teste.md."
+  },
+  "execucao": {
+    "codigo": "TE01",
+    "titulo": "Execução de 23/10/2026 (automatizada e relato da autora)",
+    "data": "2026-10-23",
+    "ambiente": "Máquina local (Windows, Docker com API, PLN e Azurite) e o pipeline do GitHub Actions na main (run 40022515182, success, commit ea55352).",
+    "resumo": "Jest do pacote compartilhado: 13 testes dos casos desta lista passaram. Jest da API: 14 passaram. pytest do PLN: 2 passaram. Coleção do Postman na API local: 59 de 59 testes. Playwright com axe-core: verde no CI da main. Fluxos em celular físico: relato da autora, sem captura anexada."
+  },
+  "testes": [
+    {
+      "id": "T01",
+      "titulo": "Cadastrar conta com dados válidos e entrar",
+      "itens": ["B01"],
+      "requisitos": ["RF01", "RNF02"],
+      "tipo": "Automatizado",
+      "precondicao": "API no ar; e-mail ainda não cadastrado.",
+      "passos": [
+        { "acao": "Cadastrar a conta", "dados": "e-mail válido e senha de 8 caracteres ou mais", "esperado": "201 com sessão Bearer de 900 s" },
+        { "acao": "Entrar com as mesmas credenciais", "dados": "e-mail e senha cadastrados", "esperado": "200 com um token novo" },
+        { "acao": "Pedir os dados da conta com o token", "dados": "cabeçalho Authorization", "esperado": "200 com o e-mail que entrou" },
+        { "acao": "Pedir os dados da conta sem token", "dados": "sem cabeçalho", "esperado": "401" }
+      ],
+      "automatizado": "Coleção Postman, pasta 1; CT-AUTH-01 (hash com sal, sem a senha em claro).",
+      "resultado": "Passou",
+      "evidencia": "Postman local 59/59; CT-AUTH-01 passou no Jest da API."
+    },
+    {
+      "id": "T02",
+      "titulo": "Rejeitar senha curta e aceitar o valor limite (7 e 8 caracteres)",
+      "itens": ["B01"],
+      "requisitos": ["RF01"],
+      "tipo": "Automatizado",
+      "precondicao": "API no ar.",
+      "passos": [
+        { "acao": "Cadastrar com senha de 7 caracteres", "dados": "senha de 7 caracteres", "esperado": "400 VALIDATION_ERROR e nenhuma conta criada" },
+        { "acao": "Cadastrar com e-mail em formato inválido", "dados": "e-mail sem arroba", "esperado": "400 VALIDATION_ERROR" },
+        { "acao": "Cadastrar com senha de 8 caracteres", "dados": "senha de 8 caracteres", "esperado": "201" }
+      ],
+      "automatizado": "Coleção Postman, pasta 1 (classe inválida e valor limite); casos de caixa preta em docs/07-testes/caixa-preta-casos.md.",
+      "resultado": "Passou",
+      "evidencia": "Postman local 59/59."
+    },
+    {
+      "id": "T03",
+      "titulo": "Aplicar uma dose Pendente e recusar data futura",
+      "itens": ["B07"],
+      "requisitos": ["RF04"],
+      "tipo": "Automatizado",
+      "precondicao": "Pessoa cadastrada com uma dose em Pendente.",
+      "passos": [
+        { "acao": "Registrar a aplicação com a data de hoje", "dados": "evento APPLY, data de hoje", "esperado": "200, estado Aplicada, transição T3" },
+        { "acao": "Registrar a aplicação com a data de amanhã", "dados": "evento APPLY, data de amanhã", "esperado": "422 e a dose não muda" }
+      ],
+      "automatizado": "CT-T03 e CT-G04 (packages/shared); Postman, pasta 4 (Aplicar hoje).",
+      "resultado": "Passou",
+      "evidencia": "CT-T03 e CT-G04 passaram no Jest do pacote compartilhado; Postman local 59/59."
+    },
+    {
+      "id": "T04",
+      "titulo": "Dose Aplicada (estado final) não aceita novo evento",
+      "itens": ["B07"],
+      "requisitos": ["RF04"],
+      "tipo": "Automatizado",
+      "precondicao": "Dose já Aplicada.",
+      "passos": [
+        { "acao": "Tentar aplicar de novo", "dados": "evento APPLY", "esperado": "409 INVALID_TRANSITION e o estado permanece Aplicada" },
+        { "acao": "Enviar um tipo de evento desconhecido", "dados": "tipo inexistente", "esperado": "400 VALIDATION_ERROR" }
+      ],
+      "automatizado": "CT-I03 (packages/shared); Postman, pasta 4 (Aplicar de novo).",
+      "resultado": "Passou",
+      "evidencia": "CT-I03 passou no Jest do pacote compartilhado; Postman local 59/59."
+    },
+    {
+      "id": "T05",
+      "titulo": "Um usuário não vê nem altera dados de outro",
+      "itens": ["B04", "B07"],
+      "requisitos": ["RNF02"],
+      "tipo": "Automatizado",
+      "precondicao": "Dois donos com membros e doses.",
+      "passos": [
+        { "acao": "O dono B lista, busca e remove um membro do dono A", "dados": "id do membro de A", "esperado": "Nada visível; 404" },
+        { "acao": "O dono B tenta ver ou alterar uma dose do dono A", "dados": "id da dose de A", "esperado": "404 e a dose de A não muda" }
+      ],
+      "automatizado": "CT-DB-03, CT-DB-05 (repositórios) e CT-API-V07 (serviço de doses).",
+      "resultado": "Passou",
+      "evidencia": "Os três passaram no Jest da API."
+    },
+    {
+      "id": "T06",
+      "titulo": "Atraso só pela rotina de prazo, nos limites de data",
+      "itens": ["B07", "B09"],
+      "requisitos": ["RF04", "RF05"],
+      "tipo": "Automatizado",
+      "precondicao": "Relógio controlado.",
+      "passos": [
+        { "acao": "A rotina avalia uma dose com prazo igual a hoje", "dados": "prazo = hoje", "esperado": "Não atrasa" },
+        { "acao": "A rotina avalia uma dose com prazo de ontem", "dados": "prazo = ontem", "esperado": "Vira Atrasada (T4)" },
+        { "acao": "O cliente tenta enviar o evento de atraso", "dados": "evento MARK_OVERDUE vindo do app", "esperado": "Rejeitado" }
+      ],
+      "automatizado": "CT-G05, CT-G06 e CT-I09 (packages/shared).",
+      "resultado": "Passou",
+      "evidencia": "Os três passaram no Jest do pacote compartilhado."
+    },
+    {
+      "id": "T07",
+      "titulo": "Excluir a conta apaga todos os dados e libera o e-mail",
+      "itens": ["B03", "B04"],
+      "requisitos": ["RF09", "RNF03"],
+      "tipo": "Automatizado",
+      "precondicao": "Conta com membros, doses e consentimento.",
+      "passos": [
+        { "acao": "Excluir a conta", "dados": "token da conta", "esperado": "204" },
+        { "acao": "Entrar com a conta excluída", "dados": "mesmas credenciais", "esperado": "401 INVALID_CREDENTIALS" },
+        { "acao": "Conferir os dados do dono", "dados": "membros, doses e consentimento", "esperado": "Todos apagados; os de outro dono permanecem" }
+      ],
+      "automatizado": "CT-PRIV-03 e CT-AUTH-60 (API); Postman, pasta 7.",
+      "resultado": "Passou",
+      "evidencia": "CT-PRIV-03 e CT-AUTH-60 passaram no Jest da API; Postman local 59/59."
+    },
+    {
+      "id": "T08",
+      "titulo": "Calendário vacinal com fonte oficial e número de linhas por faixa",
+      "itens": ["B05"],
+      "requisitos": ["RF03", "RNF10"],
+      "tipo": "Automatizado",
+      "precondicao": "Dados do calendário versionados em packages/shared.",
+      "passos": [
+        { "acao": "Contar as linhas de cada faixa etária", "dados": "criança, adolescente, adulto, idoso e gestante", "esperado": "Iguais ao calendário oficial (34, 10, 6, 8 e 7)" },
+        { "acao": "Conferir a fonte", "dados": "metadados do calendário", "esperado": "Fonte oficial e versão presentes" }
+      ],
+      "automatizado": "CT-CAL-03 e CT-CAL-04 (packages/shared).",
+      "resultado": "Passou",
+      "evidencia": "Passaram no Jest do pacote compartilhado."
+    },
+    {
+      "id": "T09",
+      "titulo": "O assistente recusa orientação médica individual",
+      "itens": ["B11", "B61"],
+      "requisitos": ["RF07", "RNF10"],
+      "tipo": "Automatizado",
+      "precondicao": "Serviço de PLN no ar.",
+      "passos": [
+        { "acao": "Perguntar sobre um sintoma de uma pessoa", "dados": "frase com sintoma", "esperado": "Marca segurança, recusa e orienta procurar um profissional" },
+        { "acao": "Pedir para registrar uma dose misturada com sintoma", "dados": "registrar que a Maria tomou a vacina e teve febre alta", "esperado": "Vai para a regra de segurança, sem registrar nada" }
+      ],
+      "automatizado": "CT-NLP-61 e CT-NLP-178 (pytest); Postman, pasta 5.",
+      "resultado": "Passou",
+      "evidencia": "pytest: 2 passaram; Postman local 59/59."
+    },
+    {
+      "id": "T10",
+      "titulo": "Limite de uso devolve 429 e zera ao virar a janela",
+      "itens": ["B28"],
+      "requisitos": ["RNF02"],
+      "tipo": "Automatizado",
+      "precondicao": "Limitador com relógio injetado.",
+      "passos": [
+        { "acao": "Consumir até o limite e uma vez além", "dados": "regra de 3 por hora", "esperado": "Negado, informando quanto esperar" },
+        { "acao": "Avançar o relógio até o fim da janela", "dados": "+1 segundo", "esperado": "Permitido de novo" },
+        { "acao": "Usar dois donos e várias regras", "dados": "donos a e b; regras hora e dia", "esperado": "Contadores separados; vale a regra mais restritiva" }
+      ],
+      "automatizado": "CT-RL-01 a CT-RL-08 (apps/api).",
+      "resultado": "Passou",
+      "evidencia": "Os oito passaram no Jest da API."
+    },
+    {
+      "id": "T11",
+      "titulo": "Telas principais sem violações de acessibilidade (axe-core)",
+      "itens": ["B49"],
+      "requisitos": ["RNF04"],
+      "tipo": "Automatizado",
+      "precondicao": "App web publicado em estático e API falsa.",
+      "passos": [
+        { "acao": "Abrir cada tela principal no Chromium", "dados": "apresentação, entrar, doses, conta e outras", "esperado": "Nenhuma violação do axe-core" }
+      ],
+      "automatizado": "Playwright (apps/mobile/e2e/acessibilidade.spec.ts).",
+      "resultado": "Passou",
+      "evidencia": "Verde no CI da main, run 40022515182. Não reexecutado localmente nesta data."
+    },
+    {
+      "id": "T12",
+      "titulo": "Fluxos em celular físico: assistente por voz, Pix, caderneta por foto, mapa e layout",
+      "itens": ["B10", "B13", "B53", "B55"],
+      "requisitos": ["RF06", "RF10", "RNF09"],
+      "tipo": "Manual",
+      "precondicao": "App instalado no celular da autora.",
+      "passos": [
+        { "acao": "Fazer uma pergunta por voz ao assistente", "dados": "microfone do celular", "esperado": "Resposta com a fonte oficial" },
+        { "acao": "Gerar o QR e o Pix copia e cola", "dados": "valor opcional", "esperado": "Código válido no banco" },
+        { "acao": "Ler uma caderneta por foto", "dados": "foto da caderneta", "esperado": "Doses extraídas para conferência" },
+        { "acao": "Abrir o mapa de postos e navegar pelo layout", "dados": "localização do aparelho", "esperado": "Postos ordenados por distância; telas sem cortes" }
+      ],
+      "automatizado": "Não há automação para este caso.",
+      "resultado": "Passou",
+      "evidencia": "Relato da autora em 23/10/2026 (tudo funcionou). Sem captura anexada."
+    }
+  ]
+}
