@@ -52,6 +52,8 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 
 **Verde da marca e verde de "Aplicada".** Os dois são verdes, mas ficam separados por **matiz** (a primária é um verde-azulado, a "Aplicada" é um verde de folha, cerca de 58° de diferença) e por **função**: a "Aplicada" **sempre** aparece com o ícone de confirmação e o texto "Aplicada" em um selo. O verde da marca nunca aparece sozinho como estado de dose.
 
+**Estados nos gráficos.** As cores dos cinco estados têm quase o mesmo brilho (de 1,0 a 1,4:1 entre si, nos três temas), então só a cor não separa as fatias para quem não distingue cores ou vê em tons de cinza. No painel de gráficos cada estado ganha também uma **textura** (`features/charts/padroes.tsx`): Aplicada lisa, Agendada em listras diagonais, Pendente em pontos e Atrasada em grade. A rosca, a legenda e as barras por pessoa usam a mesma textura. O selo da dose segue usando ícone e texto.
+
 ### 2.2 Tipografia
 
 - **Família:** Atkinson Hyperlegible (fonte livre, desenhada para legibilidade por pessoas com baixa visão). Carregada com `expo-font` (pacote `@expo-google-fonts/atkinson-hyperlegible`, verificado no npm em 06/10/2026). Fonte reserva do sistema enquanto carrega.
