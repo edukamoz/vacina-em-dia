@@ -3,6 +3,32 @@
 @tailwind utilities;
 
 /*
+ * Link "Pular para o conteúdo" (WCAG 2.4.1): fora da tela até receber o foco do teclado. O conteúdo
+ * principal recebe o foco por programa (tabindex -1), então não ganha anel: não é um controle.
+ */
+.pular-conteudo {
+  position: fixed;
+  top: -200px;
+  left: 16px;
+  z-index: 10000;
+  padding: 14px 24px;
+  border-radius: 16px;
+  background: var(--cor-primaria, #0b6b52);
+  color: var(--cor-sobrePrimaria, #ffffff);
+  font-family: AtkinsonHyperlegible_700Bold, sans-serif;
+  font-size: 18px;
+  line-height: 24px;
+  text-decoration: none;
+}
+.pular-conteudo:focus {
+  top: 16px;
+}
+[id='conteudo-principal']:focus-visible {
+  outline: none;
+  box-shadow: none !important;
+}
+
+/*
  * Movimento da web (design system, "Movimento"): tudo que se clica reage ao passar o mouse e ao
  * apertar. O ThemeProvider marca <html data-movimento="reduzido"> com "Reduzir movimento", com a
  * preferência do sistema ou no Alto contraste; nesses casos nada disto se aplica.

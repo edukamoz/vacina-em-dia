@@ -8,6 +8,7 @@ import { DefaultTheme, Stack, ThemeProvider as NavigationTheme } from 'expo-rout
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { EstadoCarregando } from '../src/components/estados';
+import { PularParaOConteudo } from '../src/components/pular-para-o-conteudo';
 import { Tela } from '../src/components/tela';
 import '../global.css';
 import { createQueryClient } from '../src/api/query-client';
@@ -95,6 +96,7 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
         <ThemeProvider>
+          <PularParaOConteudo />
           <StatusBar style="auto" />
           <Rotas />
         </ThemeProvider>
