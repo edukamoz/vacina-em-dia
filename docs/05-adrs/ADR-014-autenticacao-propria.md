@@ -39,7 +39,7 @@ A ADR-005 escolheu o Microsoft Entra External ID. Em 07/10/2026 o portal do Entr
 - **Exclusão de conta:** remove a conta, os tokens de renovação e os dados dos membros, sem chamada a serviço externo.
 - **Custo:** zero adicional (nenhum serviço novo).
 - **Testes de segurança:** casos para hash e comparação, política de senha, enumeração de contas, bloqueio por tentativas, expiração e rotação do token de renovação, adulteração do JWT e acesso a dados de outra conta.
-- O `docs/12-guia-tenant-entra.md` fica como **histórico** e não deve ser seguido.
+- O guia do tenant do Entra (`docs/12-guia-tenant-entra.md`) era **histórico** e foi removido em 23/10/2026; o caminho do Entra não deve ser seguido.
 
 ## Verificações e fontes
 

@@ -73,7 +73,7 @@ Ordem pelo ganho de pontos e pelas dependências. Itens com **(autor)** só o au
 
 O erro 401 "Insufficient privileges" ao abrir o Entra indica que o diretório da faculdade (Centro Paula Souza) não dá ao aluno permissão para criar tenants. Opções, na ordem que recomendo:
 
-1. Criar o tenant externo com uma **conta Microsoft pessoal** (fora do diretório da faculdade), pelo fluxo de teste gratuito do Entra External ID (`docs/12-guia-tenant-entra.md`); o tenant não precisa ficar ligado à assinatura da faculdade para funcionar.
+1. Criar o tenant externo com uma **conta Microsoft pessoal** (fora do diretório da faculdade), pelo fluxo de teste gratuito do Entra External ID (caminho descartado pela ADR-014); o tenant não precisa ficar ligado à assinatura da faculdade para funcionar.
 2. Se também não for possível, **adiar o login** e apresentar com a sessão de demonstração (ADR-013) já implementada, dizendo claramente que o login real é a próxima sprint. O login não aparece como critério da banca.
 
 A decisão é do autor. Não depende de nada que eu possa fazer pelo código.
