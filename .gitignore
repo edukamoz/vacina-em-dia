@@ -93,3 +93,6 @@ apps/mobile/e2e/relatorio/
 apps/mobile/e2e/resultados/
 apps/mobile/test-results/
 apps/mobile/build-e2e.log
+
+# Grafo de conhecimento do projeto (graphify), gerado localmente
+graphify-out/
