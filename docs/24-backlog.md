@@ -2,7 +2,7 @@
 
 Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, requisitos e personas de cada item. Gerado de `docs/backlog/dados.py` (rode `python docs/backlog/dados.py` depois de editar). A versão viva fica no projeto "proj-vacina-em-dia" do GitHub Projects, que substitui o Jira; a ligação problema, requisito e item está em `docs/23-do-problema-ao-backlog.md`.
 
-**Convenção de estados (professor):** A fazer, Em andamento, Em análise (terminou dentro da data da sprint) e Concluído (só depois de analisado na reunião de encerramento da sprint). Nenhum item aqui está como Concluído; quem decide é a autora. **Prioridade (MoSCoW):** Must (deve), Should (deveria), Could (poderia) e Won't (não agora). As prioridades são uma proposta a ser confirmada pela autora.
+**Convenção de estados (professor):** A fazer, Em andamento, Em análise (terminou dentro da data da sprint) e Concluído (só depois de analisado na reunião de encerramento da sprint). Os itens Concluídos foram marcados por decisão da autora em 23/10/2026, só os que têm prova (PR mesclado com o CI verde e, onde cabia, teste dela em celular); os demais seguem em Em análise ou antes. **Prioridade (MoSCoW):** Must (deve), Should (deveria), Could (poderia) e Won't (não agora). As prioridades são uma proposta a ser confirmada pela autora.
 
 | Sprint | Período |
 |---|---|
@@ -17,15 +17,16 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
-| B29 | SCRUM-31 | Como equipe, quero a modelagem UML (casos de uso, classes, sequência) e o DER, para documentar o sistema | Must | Em análise | Sprint 1 |
-| B30 | SCRUM-33 | Como equipe, quero as decisões técnicas registradas em ADRs, para defender as escolhas na apresentação | Must | Em análise | Sprint 1 |
+| B29 | SCRUM-31 | Como equipe, quero a modelagem UML (casos de uso, classes, sequência) e o DER, para documentar o sistema | Must | Concluído | Sprint 1 |
+| B30 | SCRUM-33 | Como equipe, quero as decisões técnicas registradas em ADRs, para defender as escolhas na apresentação | Must | Concluído | Sprint 1 |
 | B31 | SCRUM-35 | Como autora, quero a Documentação de Desenvolvimento (horas, atividades, reuniões, aprendizados e Scrum) mantida ao longo do projeto, para entregá-la em PDF no fim | Must | Em andamento | Sprint 1 |
 | B32 | SCRUM-34 | Como autora, quero a Documentação Técnica conforme o modelo da disciplina, para a entrega final | Must | Em andamento | Sprint 5 |
 | B33 | SCRUM-36 | Como autora, quero a Documentação do Usuário em linguagem simples (passo a passo e perguntas frequentes), para quem vai usar o app | Must | Em análise | Sprint 6 |
 | B34 | SCRUM-37 | Como autora, quero o panfleto A4 do projeto para a mostra, para apresentar o app ao público | Should | Em andamento | Sprint 6 |
 | B35 | novo | Como autora, quero o roteiro de demonstração e a apresentação final, para defender o projeto em 19/11 | Must | Em análise | Sprint 6 |
 | B36 | novo | Como autora, quero empacotar a entrega (PDFs das três documentações, panfleto e zip do repositório), para entregar em 19/11 | Must | Em andamento | Sprint 6 |
-| B38 | novo | Como autora, quero registrar as decisões sobre a licença dos dados dos postos, o uso de Jest no lugar de JUnit e as datas de entrega, para defender as escolhas na apresentação | Should | Em análise | Sprint 3 |
+| B38 | novo | Como autora, quero registrar as decisões sobre a licença dos dados dos postos, o uso de Jest no lugar de JUnit e as datas de entrega, para defender as escolhas na apresentação | Should | Concluído | Sprint 3 |
+| B66 | novo | Como equipe, quero cada item do backlog com responsável, data de finalização, peso e tempo, e o repositório sem arquivos obsoletos, para prestar contas da sprint | Should | Em análise | Sprint 3 |
 
 **B29** (todas; requisitos: RNF06)
 
@@ -86,16 +87,23 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Evidência: CLAUDE.md §14; ADR-018
 - Atenção: A autora decidiu não consultar o professor sobre esses pontos.
 
+**B66** (todas; requisitos: RNF07)
+
+- Os itens do projeto têm responsável, data e hora da última entrega, peso, tempo e PRs, calculados dos PRs mesclados.
+- Documentos e arquivos obsoletos ou temporários foram removidos.
+- Evidência: scripts/backlog-metricas.mjs; docs/backlog/metricas.json; scripts/backlog-github.mjs
+- Atenção: O tempo é uma estimativa de trabalho em sessão (autor e agente), não as horas da Documentação de Desenvolvimento, que são da autora.
+
 ## E2 Infraestrutura, Azure e DevOps (SCRUM-6)
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
-| B16 | SCRUM-22 | Como equipe, quero a API, o banco, o cofre de segredos e o monitoramento na Azure, para o app rodar na nuvem | Must | Em análise | Sprint 2 |
-| B17 | SCRUM-23 | Como desenvolvedora, quero o monorepo com TypeScript estrito, ESLint, Prettier e TypeDoc, para manter a qualidade do código | Must | Em análise | Sprint 2 |
-| B18 | SCRUM-24 | Como desenvolvedora, quero um pipeline de CI que rode lint, tipos, build, testes com cobertura, TypeDoc e auditoria, para barrar regressões | Must | Em análise | Sprint 2 |
-| B19 | SCRUM-25 | Como equipe, quero o projeto em contêineres Docker, para rodar em qualquer máquina com um comando | Must | Em análise | Sprint 5 |
+| B16 | SCRUM-22 | Como equipe, quero a API, o banco, o cofre de segredos e o monitoramento na Azure, para o app rodar na nuvem | Must | Concluído | Sprint 2 |
+| B17 | SCRUM-23 | Como desenvolvedora, quero o monorepo com TypeScript estrito, ESLint, Prettier e TypeDoc, para manter a qualidade do código | Must | Concluído | Sprint 2 |
+| B18 | SCRUM-24 | Como desenvolvedora, quero um pipeline de CI que rode lint, tipos, build, testes com cobertura, TypeDoc e auditoria, para barrar regressões | Must | Concluído | Sprint 2 |
+| B19 | SCRUM-25 | Como equipe, quero o projeto em contêineres Docker, para rodar em qualquer máquina com um comando | Must | Concluído | Sprint 5 |
 | B20 | SCRUM-26 | Como autora, quero estimar o custo mensal na Azure e ter alertas de orçamento, para não gastar além do crédito | Should | Em andamento | Sprint 5 |
-| B21 | novo | Como autora, quero manter o banco com migrações versionadas e a persistência no Azure SQL, para os dados sobreviverem a reinícios | Must | Em análise | Sprint 3 |
+| B21 | novo | Como autora, quero manter o banco com migrações versionadas e a persistência no Azure SQL, para os dados sobreviverem a reinícios | Must | Concluído | Sprint 3 |
 | B22 | novo | Como usuária, quero que o primeiro login depois de um tempo sem uso não demore, para não achar que o app travou | Should | Em análise | Sprint 6 |
 | B23 | novo | Como autora, quero o repositório público com proteção ativada, para usar o GitHub Actions sem limite de minutos e sem expor segredos | Should | Em análise | Sprint 6 |
 | B62 | novo | Como equipe, quero um endereço mais bonito para o site, sem pagar nada, para apresentar e divulgar o app com um link fácil de lembrar | Should | A fazer | Sprint 3 |
@@ -162,7 +170,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
-| B01 | SCRUM-13 | Como responsável por uma família, quero criar uma conta e entrar com e-mail e senha, para ter minha carteira em qualquer aparelho (RF01) | Must | Em análise | Sprint 2 |
+| B01 | SCRUM-13 | Como responsável por uma família, quero criar uma conta e entrar com e-mail e senha, para ter minha carteira em qualquer aparelho (RF01) | Must | Concluído | Sprint 2 |
 | B02 | novo | Como usuária que esqueceu a senha, quero recebê-la por e-mail para redefinir, para voltar a usar o app sem perder meus dados | Should | Em análise | Sprint 2 |
 | B03 | SCRUM-14 | Como responsável, quero aceitar um termo de consentimento claro e poder excluir minha conta e todos os dados, para ter controle sobre meus dados de saúde (RF09) | Must | Em análise | Sprint 4 |
 | B48 | novo | Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço | Won't (por enquanto) | A fazer | - |
@@ -200,9 +208,9 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
-| B04 | SCRUM-15 | Como cuidadora, quero cadastrar as pessoas da minha família (com parentesco), para acompanhar a vacinação de todas em uma só conta (RF02) | Must | Em análise | Sprint 3 |
+| B04 | SCRUM-15 | Como cuidadora, quero cadastrar as pessoas da minha família (com parentesco), para acompanhar a vacinação de todas em uma só conta (RF02) | Must | Concluído | Sprint 3 |
 | B05 | SCRUM-16 | Como mãe, quero ver o calendário vacinal de cada pessoa conforme a idade, com fonte e versão, para saber o que é indicado e quando (RF03) | Must | Em análise | Sprint 3 |
-| B06 | SCRUM-17 | Como cuidadora, quero consultar o histórico de doses de cada pessoa, para ter a caderneta digital à mão (RF08) | Must | Em análise | Sprint 4 |
+| B06 | SCRUM-17 | Como cuidadora, quero consultar o histórico de doses de cada pessoa, para ter a caderneta digital à mão (RF08) | Must | Concluído | Sprint 4 |
 
 **B04** (PE1, PE3; requisitos: RF02; RNF03, RNF04)
 
@@ -229,8 +237,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
-| B07 | SCRUM-18 | Como responsável, quero agendar, registrar como aplicada, reagendar ou cancelar uma dose, para manter o registro certo (RF04) | Must | Em análise | Sprint 3 |
-| B08 | novo | Como cuidadora, quero cadastrar uma dose que não está no calendário (dose avulsa), para registrar tudo que a pessoa tomou | Should | Em análise | Sprint 3 |
+| B07 | SCRUM-18 | Como responsável, quero agendar, registrar como aplicada, reagendar ou cancelar uma dose, para manter o registro certo (RF04) | Must | Concluído | Sprint 3 |
+| B08 | novo | Como cuidadora, quero cadastrar uma dose que não está no calendário (dose avulsa), para registrar tudo que a pessoa tomou | Should | Concluído | Sprint 3 |
 | B09 | SCRUM-19 | Como mãe, quero receber lembretes antes da data de cada dose e ver as atrasadas em destaque, para não esquecer (RF05) | Must | Em análise | Sprint 4 |
 
 **B07** (PE1, PE3; requisitos: RF04; RNF01, RNF07, RNF10)
@@ -259,10 +267,10 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 |---|---|---|---|---|---|
 | B10 | SCRUM-20 | Como idoso, quero perguntar por voz sobre vacinas e o calendário, para consultar sem digitar (RF06) | Must | Em análise | Sprint 4 |
 | B11 | SCRUM-21 | Como mãe, quero tirar dúvidas frequentes no chat, com respostas curadas e fonte, para me informar sem orientação médica individual (RF07) | Must | Em análise | Sprint 5 |
-| B12 | novo | Como usuária, quero abrir o assistente em uma janela de conversa sobre a tela em que estou, para perguntar sem perder o lugar | Should | Em análise | Sprint 5 |
-| B50 | novo | Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11 | Should | Em análise | Sprint 1 |
-| B58 | novo | Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica | Must | Em análise | Sprint 3 |
-| B61 | novo | Como usuária, quero que o assistente consulte a minha conta e execute comandos (adicionar pessoa, registrar e agendar dose, abrir telas) e explique qualquer recurso do app, para resolver tudo conversando, sem perder o controle dos meus dados | Must | Em análise | Sprint 3 |
+| B12 | novo | Como usuária, quero abrir o assistente em uma janela de conversa sobre a tela em que estou, para perguntar sem perder o lugar | Should | Concluído | Sprint 5 |
+| B50 | novo | Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11 | Should | Concluído | Sprint 1 |
+| B58 | novo | Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica | Must | Concluído | Sprint 3 |
+| B61 | novo | Como usuária, quero que o assistente consulte a minha conta e execute comandos (adicionar pessoa, registrar e agendar dose, abrir telas) e explique qualquer recurso do app, para resolver tudo conversando, sem perder o controle dos meus dados | Must | Concluído | Sprint 3 |
 
 **B10** (PE2, PE1; requisitos: RF06; RNF01, RNF04, RNF09)
 
@@ -314,15 +322,17 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
-| B24 | SCRUM-27 | Como equipe, quero o plano de teste com requisitos relevantes e papéis do processo, para a entrega de Qualidade e Testes de 12/11 | Must | Em análise | Sprint 1 |
+| B24 | SCRUM-27 | Como equipe, quero o plano de teste com requisitos relevantes e papéis do processo, para a entrega de Qualidade e Testes de 12/11 | Must | Concluído | Sprint 1 |
 | B25 | SCRUM-28 | Como equipe, quero casos de caixa preta com tabela de execução, para provar o comportamento por fora | Must | Em análise | Sprint 3 |
-| B26 | SCRUM-29 | Como equipe, quero o diagrama UML de estados da dose e os casos de teste de estados e transições, para a entrega de 12/11 | Must | Em análise | Sprint 1 |
-| B27 | SCRUM-30 | Como equipe, quero os testes automatizados em Jest 100% aprovados e com cobertura de 90%, para a entrega de 12/11 | Must | Em análise | Sprint 4 |
-| B28 | novo | Como equipe, quero a verificação de segurança (OWASP) e uma carga leve, para mostrar que a API aguenta e está protegida | Should | Em análise | Sprint 5 |
+| B26 | SCRUM-29 | Como equipe, quero o diagrama UML de estados da dose e os casos de teste de estados e transições, para a entrega de 12/11 | Must | Concluído | Sprint 1 |
+| B27 | SCRUM-30 | Como equipe, quero os testes automatizados em Jest 100% aprovados e com cobertura de 90%, para a entrega de 12/11 | Must | Concluído | Sprint 4 |
+| B28 | novo | Como equipe, quero a verificação de segurança (OWASP) e uma carga leve, para mostrar que a API aguenta e está protegida | Should | Concluído | Sprint 5 |
 | B39 | novo | Como equipe, quero revisar o dataset do chatbot e o texto do termo de consentimento com outra pessoa, para garantir segurança e clareza | Should | A fazer | Sprint 4 |
 | B40 | novo | Como equipe, quero testar o app em celulares reais (Android e iOS) e com leitor de tela, para achar o que o emulador não mostra | Should | A fazer | Sprint 5 |
-| B49 | novo | Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança | Should | Em análise | Sprint 1 |
+| B49 | novo | Como equipe, quero testes de ponta a ponta e a verificação automática de acessibilidade rodando no pipeline, para provar que os fluxos críticos e o WCAG 2.1 AA continuam valendo a cada mudança | Should | Concluído | Sprint 1 |
 | B63 | novo | Como equipe, quero aplicar ao projeto as estratégias de teste vistas nas aulas, para defender a qualidade na entrega e achar o que os testes automáticos não pegam | Should | Em análise | Sprint 3 |
+| B64 | novo | Como equipe, quero uma coleção de testes de API no Postman e testes por combinação de pares e aleatórios, para demonstrar a automação de testes de API e a robustez do projeto | Should | Concluído | Sprint 3 |
+| B65 | novo | Como equipe, quero casos de teste, plano e execução registrados no GitHub Projects, ligados aos itens do backlog, para ter a rastreabilidade que o Jira com Xray dava | Should | Em análise | Sprint 3 |
 
 **B24** (todas; requisitos: RNF07)
 
@@ -385,6 +395,20 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Evidência: docs/07-testes/caixa-branca.md; docs/07-testes/testes-exploratorios.md; docs/07-testes/plano-de-teste.md (seções 4.5 e 4.6)
 - Atenção: Os charters não foram executados (cabe ao autor). Não há ambiente de homologação. Coleção Postman, testes por pares e aleatórios ficaram para depois.
 
+**B64** (todas; requisitos: RNF07)
+
+- A coleção cobre conta, família, doses, assistente, lembretes e exclusão de conta, com testes pm.test e ambientes local e nuvem.
+- Testes por pares e aleatórios (semente fixa) passam no CI.
+- Evidência: postman/; docs/07-testes/api-postman.md; docs/07-testes/pares-e-aleatorios.md
+- Atenção: Apresentada em aula. No Docker local, a exclusão de conta e a foto de perfil falham por causa do Azurite; ainda não há item para o conserto definitivo.
+
+**B65** (todas; requisitos: RNF07)
+
+- Há ao menos 5 casos de teste (com passos, dados e resultado esperado), um plano de testes e uma execução com resultado, como issues ligadas aos itens do backlog.
+- Há um relatório de cobertura de requisitos por testes.
+- Evidência: docs/07-testes/gestao-de-testes-github.md
+- Atenção: Equivale ao Jira com Xray da aula. A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).
+
 ## E8 Versão completa (SCRUM-12)
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
@@ -421,21 +445,21 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | ID | Jira | Item | Prioridade | Estado | Sprint |
 |---|---|---|---|---|---|
 | B41 | SCRUM-32 | Como equipe, quero o design system (cores, fontes, layout) para mobile e web, para o app ter identidade e ser acessível | Must | Em andamento | Sprint 1 |
-| B42 | novo | Como usuária, quero um visual bonito e dinâmico, com telas próprias para web e celular, para gostar de usar o app | Should | Em análise | Sprint 6 |
-| B43 | novo | Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto | Should | Em análise | Sprint 6 |
+| B42 | novo | Como usuária, quero um visual bonito e dinâmico, com telas próprias para web e celular, para gostar de usar o app | Should | Concluído | Sprint 6 |
+| B43 | novo | Como usuária, quero aumentar o tamanho do texto e reduzir o movimento, para usar o app com conforto | Should | Concluído | Sprint 6 |
 | B44 | novo | Como equipe, quero o arquivo do Figma atualizado para o design system v2, para ter o protótipo igual ao app | Could | Em análise | Sprint 6 |
 | B45 | novo | Como usuária de tablet, quero uma tela pensada para 600 a 1023 px, para não usar a versão do celular esticada | Could | Em análise | Sprint 6 |
 | B46 | novo | Como usuária, quero animações extras (inclinação 3D, pessoas em camadas na apresentação, painel e folha animados), para uma experiência mais viva | Could | Em andamento | Sprint 1 |
 | B47 | novo | Como usuária, quero o ícone do app e o da aba do navegador com a marca, para reconhecer o app | Could | Em análise | Sprint 6 |
 | B51 | novo | Como usuária, quero instalar o app web no computador e no celular, para abrir com um toque e ter o ícone da marca | Could | Em análise | Sprint 1 |
-| B52 | novo | Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava | Should | Em análise | Sprint 3 |
-| B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | Em análise | Sprint 3 |
+| B52 | novo | Como usuária, quero que adicionar pessoa, adicionar dose, editar e abrir uma dose apareçam em uma janela por cima da tela, para não perder o lugar onde eu estava | Should | Concluído | Sprint 3 |
+| B53 | novo | Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar | Could | Concluído | Sprint 3 |
 | B54 | novo | Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta | Could | Em análise | Sprint 3 |
-| B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | Em análise | Sprint 3 |
-| B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Em análise | Sprint 3 |
-| B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Em análise | Sprint 3 |
-| B59 | novo | Como usuária, quero ver as notícias recentes de saúde e vacinação do Ministério da Saúde, para me manter informada sem sair do app | Should | Em análise | Sprint 3 |
-| B60 | novo | Como usuária, quero ver a situação das vacinas da família em gráficos, para entender num relance o que já foi tomado, o que está atrasado e o que vem pela frente | Should | Em análise | Sprint 3 |
+| B55 | novo | Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar | Could | Concluído | Sprint 3 |
+| B56 | novo | Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um | Should | Concluído | Sprint 3 |
+| B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Concluído | Sprint 3 |
+| B59 | novo | Como usuária, quero ver as notícias recentes de saúde e vacinação do Ministério da Saúde, para me manter informada sem sair do app | Should | Concluído | Sprint 3 |
+| B60 | novo | Como usuária, quero ver a situação das vacinas da família em gráficos, para entender num relance o que já foi tomado, o que está atrasado e o que vem pela frente | Should | Concluído | Sprint 3 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -507,7 +531,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.
 - Aviso claro de que a doação é voluntária e não dá acesso a nada.
 - Evidência: ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate
-- Atenção: Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).
+- Atenção: Testado em celular pela autora em 23/10/2026 (relato: tudo funcionou). Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).
 
 **B54** (PE1, PE3; requisitos: RNF03)
 
@@ -523,7 +547,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.
 - As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.
 - Evidência: ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen
-- Atenção: Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.
+- Atenção: Testado em celular pela autora em 23/10/2026 (relato: tudo funcionou). Exige o app instalado (development build); não roda no Expo Go.
 
 **B56** (PE1, PE2, PE3; requisitos: RNF04, RNF09)
 

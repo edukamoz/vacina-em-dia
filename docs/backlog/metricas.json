@@ -1,0 +1,655 @@
+{
+  "geradoPor": "scripts/backlog-metricas.mjs",
+  "fuso": "America/Sao_Paulo",
+  "regras": {
+    "tempo": "git-hours: lacunas de até 120 min entre commits contam inteiras; lacuna maior abre bloco novo com 30 min. Estimativa de trabalho em sessão (autor e agente), não as horas registradas da Documentação de Desenvolvimento.",
+    "peso": "Fibonacci pelo total de linhas alteradas nos PRs (sem lockfile, imagens, documentos Word e arquivos gerados do backlog): até 50 = 1, 200 = 2, 500 = 3, 1.500 = 5, 4.000 = 8, acima = 13.",
+    "finalizadoEm": "Data e hora do merge do último PR do item.",
+    "janela": "Minutos do primeiro commit ao merge do último PR; inclui esperas (CI, noite), por isso é um teto.",
+    "tempoSessao": "Tempo ativo no chat do agente: do primeiro registro da sessão que cita a branch do PR até o merge, somando só as lacunas de até 15 min entre mensagens e ferramentas (pausas maiores não contam). Janelas de PRs do mesmo item são unidas. Mede o trabalho em sessão (autor e agente), não as horas registradas da Documentação de Desenvolvimento. Itens sem PR na sessão ficam sem este valor."
+  },
+  "itens": {
+    "B01": {
+      "prs": [
+        27,
+        29,
+        31,
+        32,
+        37,
+        49,
+        52,
+        53
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 16:15",
+      "linhasAlteradas": 6766,
+      "peso": 13,
+      "tempoEstimadoMin": 405,
+      "janelaMin": 1163,
+      "commits": 13,
+      "tempoSessaoMin": 74
+    },
+    "B04": {
+      "prs": [
+        22,
+        28,
+        40
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 12:30",
+      "linhasAlteradas": 7398,
+      "peso": 13,
+      "tempoEstimadoMin": 90,
+      "janelaMin": 1034,
+      "commits": 5,
+      "tempoSessaoMin": 6
+    },
+    "B05": {
+      "prs": [
+        21
+      ],
+      "finalizadoEm": "2026-10-06",
+      "finalizadoEmTexto": "06/10/2026 19:23",
+      "linhasAlteradas": 781,
+      "peso": 5,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 29,
+      "commits": 1
+    },
+    "B07": {
+      "prs": [
+        14,
+        15,
+        44,
+        45
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 14:39",
+      "linhasAlteradas": 2980,
+      "peso": 8,
+      "tempoEstimadoMin": 101,
+      "janelaMin": 1333,
+      "commits": 11,
+      "tempoSessaoMin": 39
+    },
+    "B09": {
+      "prs": [
+        54
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 17:08",
+      "linhasAlteradas": 1277,
+      "peso": 5,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 45,
+      "commits": 1,
+      "tempoSessaoMin": 28
+    },
+    "B10": {
+      "prs": [
+        26,
+        55
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 17:47",
+      "linhasAlteradas": 2955,
+      "peso": 8,
+      "tempoEstimadoMin": 91,
+      "janelaMin": 1283,
+      "commits": 8,
+      "tempoSessaoMin": 19
+    },
+    "B11": {
+      "prs": [
+        25,
+        34,
+        35
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 00:38",
+      "linhasAlteradas": 5237,
+      "peso": 13,
+      "tempoEstimadoMin": 110,
+      "janelaMin": 282,
+      "commits": 7,
+      "tempoSessaoMin": 1
+    },
+    "B14": {
+      "prs": [
+        146
+      ],
+      "finalizadoEm": "2026-10-10",
+      "finalizadoEmTexto": "10/10/2026 08:14",
+      "linhasAlteradas": 1064,
+      "peso": 5,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 116,
+      "commits": 1,
+      "tempoSessaoMin": 19
+    },
+    "B16": {
+      "prs": [
+        18,
+        19,
+        20
+      ],
+      "finalizadoEm": "2026-10-06",
+      "finalizadoEmTexto": "06/10/2026 19:23",
+      "linhasAlteradas": 159,
+      "peso": 2,
+      "tempoEstimadoMin": 65,
+      "janelaMin": 75,
+      "commits": 3
+    },
+    "B17": {
+      "prs": [
+        8,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "finalizadoEm": "2026-10-06",
+      "finalizadoEmTexto": "06/10/2026 16:30",
+      "linhasAlteradas": 3548,
+      "peso": 8,
+      "tempoEstimadoMin": 88,
+      "janelaMin": 61,
+      "commits": 16
+    },
+    "B18": {
+      "prs": [
+        9,
+        58,
+        60,
+        68
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 22:39",
+      "linhasAlteradas": 129,
+      "peso": 2,
+      "tempoEstimadoMin": 153,
+      "janelaMin": 1869,
+      "commits": 4,
+      "tempoSessaoMin": 22
+    },
+    "B19": {
+      "prs": [
+        16,
+        23,
+        36,
+        43
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 13:02",
+      "linhasAlteradas": 673,
+      "peso": 5,
+      "tempoEstimadoMin": 137,
+      "janelaMin": 1199,
+      "commits": 7,
+      "tempoSessaoMin": 86
+    },
+    "B20": {
+      "prs": [
+        30
+      ],
+      "finalizadoEm": "2026-10-06",
+      "finalizadoEmTexto": "06/10/2026 22:03",
+      "linhasAlteradas": 59,
+      "peso": 2,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 12,
+      "commits": 1
+    },
+    "B21": {
+      "prs": [
+        142
+      ],
+      "finalizadoEm": "2026-10-10",
+      "finalizadoEmTexto": "10/10/2026 08:12",
+      "linhasAlteradas": 630,
+      "peso": 5,
+      "tempoEstimadoMin": 62,
+      "janelaMin": 145,
+      "commits": 3,
+      "tempoSessaoMin": 41
+    },
+    "B24": {
+      "prs": [
+        2,
+        56
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 18:16",
+      "linhasAlteradas": 311,
+      "peso": 3,
+      "tempoEstimadoMin": 60,
+      "janelaMin": 1708,
+      "commits": 2,
+      "tempoSessaoMin": 27
+    },
+    "B25": {
+      "prs": [
+        33,
+        51
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 15:47",
+      "linhasAlteradas": 2945,
+      "peso": 8,
+      "tempoEstimadoMin": 61,
+      "janelaMin": 1021,
+      "commits": 3,
+      "tempoSessaoMin": 12
+    },
+    "B27": {
+      "prs": [
+        57,
+        59
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 19:28",
+      "linhasAlteradas": 312,
+      "peso": 3,
+      "tempoEstimadoMin": 76,
+      "janelaMin": 70,
+      "commits": 2,
+      "tempoSessaoMin": 38
+    },
+    "B29": {
+      "prs": [
+        4
+      ],
+      "finalizadoEm": "2026-10-06",
+      "finalizadoEmTexto": "06/10/2026 14:44",
+      "linhasAlteradas": 841,
+      "peso": 5,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 18,
+      "commits": 3
+    },
+    "B30": {
+      "prs": [
+        3
+      ],
+      "finalizadoEm": "2026-10-06",
+      "finalizadoEmTexto": "06/10/2026 14:12",
+      "linhasAlteradas": 467,
+      "peso": 3,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 8,
+      "commits": 3
+    },
+    "B31": {
+      "prs": [
+        7,
+        42,
+        48,
+        80,
+        157
+      ],
+      "finalizadoEm": "2026-10-20",
+      "finalizadoEmTexto": "20/10/2026 19:29",
+      "linhasAlteradas": 461,
+      "peso": 3,
+      "tempoEstimadoMin": 211,
+      "janelaMin": 20421,
+      "commits": 9,
+      "tempoSessaoMin": 75
+    },
+    "B32": {
+      "prs": [
+        62,
+        63,
+        157
+      ],
+      "finalizadoEm": "2026-10-20",
+      "finalizadoEmTexto": "20/10/2026 19:29",
+      "linhasAlteradas": 140,
+      "peso": 2,
+      "tempoEstimadoMin": 60,
+      "janelaMin": 18683,
+      "commits": 2,
+      "tempoSessaoMin": 28
+    },
+    "B33": {
+      "prs": [
+        61,
+        157,
+        161
+      ],
+      "finalizadoEm": "2026-10-20",
+      "finalizadoEmTexto": "20/10/2026 19:55",
+      "linhasAlteradas": 316,
+      "peso": 3,
+      "tempoEstimadoMin": 85,
+      "janelaMin": 18731,
+      "commits": 4,
+      "tempoSessaoMin": 115
+    },
+    "B34": {
+      "prs": [
+        64
+      ],
+      "finalizadoEm": "2026-10-07",
+      "finalizadoEmTexto": "07/10/2026 20:34",
+      "linhasAlteradas": 2,
+      "peso": 1,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 6,
+      "commits": 1,
+      "tempoSessaoMin": 6
+    },
+    "B35": {
+      "prs": [
+        139,
+        149
+      ],
+      "finalizadoEm": "2026-10-19",
+      "finalizadoEmTexto": "19/10/2026 22:05",
+      "linhasAlteradas": 991,
+      "peso": 5,
+      "tempoEstimadoMin": 100,
+      "janelaMin": 74,
+      "commits": 2,
+      "tempoSessaoMin": 24
+    },
+    "B41": {
+      "prs": [
+        5,
+        6,
+        24,
+        38,
+        39,
+        41,
+        46,
+        47,
+        50,
+        65,
+        66,
+        67,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        147
+      ],
+      "finalizadoEm": "2026-10-20",
+      "finalizadoEmTexto": "20/10/2026 19:19",
+      "linhasAlteradas": 6807,
+      "peso": 13,
+      "tempoEstimadoMin": 493,
+      "janelaMin": 20437,
+      "commits": 25,
+      "tempoSessaoMin": 413
+    },
+    "B44": {
+      "prs": [
+        157,
+        161
+      ],
+      "finalizadoEm": "2026-10-20",
+      "finalizadoEmTexto": "20/10/2026 19:55",
+      "linhasAlteradas": 312,
+      "peso": 3,
+      "tempoEstimadoMin": 55,
+      "janelaMin": 29,
+      "commits": 3,
+      "tempoSessaoMin": 10
+    },
+    "B46": {
+      "prs": [
+        138,
+        140,
+        141,
+        143
+      ],
+      "finalizadoEm": "2026-10-10",
+      "finalizadoEmTexto": "10/10/2026 08:12",
+      "linhasAlteradas": 1168,
+      "peso": 5,
+      "tempoEstimadoMin": 63,
+      "janelaMin": 172,
+      "commits": 4,
+      "tempoSessaoMin": 70
+    },
+    "B47": {
+      "prs": [
+        137
+      ],
+      "finalizadoEm": "2026-10-09",
+      "finalizadoEmTexto": "09/10/2026 23:07",
+      "linhasAlteradas": 0,
+      "peso": 1,
+      "tempoEstimadoMin": 0,
+      "janelaMin": 0,
+      "commits": 0,
+      "tempoSessaoMin": 15
+    },
+    "B49": {
+      "prs": [
+        142
+      ],
+      "finalizadoEm": "2026-10-10",
+      "finalizadoEmTexto": "10/10/2026 08:12",
+      "linhasAlteradas": 630,
+      "peso": 5,
+      "tempoEstimadoMin": 62,
+      "janelaMin": 145,
+      "commits": 3,
+      "tempoSessaoMin": 41
+    },
+    "B50": {
+      "prs": [
+        144
+      ],
+      "finalizadoEm": "2026-10-10",
+      "finalizadoEmTexto": "10/10/2026 08:13",
+      "linhasAlteradas": 477,
+      "peso": 3,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 134,
+      "commits": 1,
+      "tempoSessaoMin": 28
+    },
+    "B51": {
+      "prs": [
+        145
+      ],
+      "finalizadoEm": "2026-10-10",
+      "finalizadoEmTexto": "10/10/2026 08:14",
+      "linhasAlteradas": 226,
+      "peso": 3,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 131,
+      "commits": 1,
+      "tempoSessaoMin": 22
+    },
+    "B52": {
+      "prs": [
+        148
+      ],
+      "finalizadoEm": "2026-10-19",
+      "finalizadoEmTexto": "19/10/2026 22:02",
+      "linhasAlteradas": 293,
+      "peso": 3,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 71,
+      "commits": 1,
+      "tempoSessaoMin": 25
+    },
+    "B53": {
+      "prs": [
+        155,
+        169
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 20:26",
+      "linhasAlteradas": 1030,
+      "peso": 5,
+      "tempoEstimadoMin": 60,
+      "janelaMin": 1540,
+      "commits": 2,
+      "tempoSessaoMin": 34
+    },
+    "B54": {
+      "prs": [
+        152
+      ],
+      "finalizadoEm": "2026-10-19",
+      "finalizadoEmTexto": "19/10/2026 22:29",
+      "linhasAlteradas": 1477,
+      "peso": 5,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 12,
+      "commits": 1,
+      "tempoSessaoMin": 22
+    },
+    "B55": {
+      "prs": [
+        156,
+        174
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 21:24",
+      "linhasAlteradas": 1063,
+      "peso": 5,
+      "tempoEstimadoMin": 67,
+      "janelaMin": 1582,
+      "commits": 3,
+      "tempoSessaoMin": 28
+    },
+    "B56": {
+      "prs": [
+        151,
+        158,
+        169,
+        170
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 20:40",
+      "linhasAlteradas": 2993,
+      "peso": 8,
+      "tempoEstimadoMin": 139,
+      "janelaMin": 2824,
+      "commits": 7,
+      "tempoSessaoMin": 40
+    },
+    "B57": {
+      "prs": [
+        153,
+        154
+      ],
+      "finalizadoEm": "2026-10-20",
+      "finalizadoEmTexto": "20/10/2026 18:11",
+      "linhasAlteradas": 228,
+      "peso": 3,
+      "tempoEstimadoMin": 128,
+      "janelaMin": 1181,
+      "commits": 8,
+      "tempoSessaoMin": 67
+    },
+    "B58": {
+      "prs": [
+        171,
+        172
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 21:03",
+      "linhasAlteradas": 972,
+      "peso": 5,
+      "tempoEstimadoMin": 45,
+      "janelaMin": 19,
+      "commits": 2,
+      "tempoSessaoMin": 14
+    },
+    "B59": {
+      "prs": [
+        173,
+        177
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 21:57",
+      "linhasAlteradas": 1050,
+      "peso": 5,
+      "tempoEstimadoMin": 76,
+      "janelaMin": 50,
+      "commits": 4,
+      "tempoSessaoMin": 31
+    },
+    "B60": {
+      "prs": [
+        178
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 22:06",
+      "linhasAlteradas": 1085,
+      "peso": 5,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 4,
+      "commits": 1,
+      "tempoSessaoMin": 8
+    },
+    "B61": {
+      "prs": [
+        179
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 23:11",
+      "linhasAlteradas": 3150,
+      "peso": 8,
+      "tempoEstimadoMin": 39,
+      "janelaMin": 16,
+      "commits": 2,
+      "tempoSessaoMin": 67
+    },
+    "B62": {
+      "prs": [
+        180
+      ],
+      "finalizadoEm": "2026-10-21",
+      "finalizadoEmTexto": "21/10/2026 23:20",
+      "linhasAlteradas": 46,
+      "peso": 1,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 9,
+      "commits": 1,
+      "tempoSessaoMin": 1
+    },
+    "B63": {
+      "prs": [
+        184
+      ],
+      "finalizadoEm": "2026-10-22",
+      "finalizadoEmTexto": "22/10/2026 20:48",
+      "linhasAlteradas": 285,
+      "peso": 3,
+      "tempoEstimadoMin": 30,
+      "janelaMin": 11,
+      "commits": 1,
+      "tempoSessaoMin": 17
+    },
+    "B64": {
+      "prs": [
+        186,
+        187
+      ],
+      "finalizadoEm": "2026-10-23",
+      "finalizadoEmTexto": "23/10/2026 17:52",
+      "linhasAlteradas": 3293,
+      "peso": 8,
+      "tempoEstimadoMin": 48,
+      "janelaMin": 1241,
+      "commits": 5,
+      "tempoSessaoMin": 30
+    }
+  }
+}

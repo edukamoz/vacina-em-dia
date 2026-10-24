@@ -1,6 +1,6 @@
 # Vacina em Dia: Plano de Teste
 
-> Item do Jira: SCRUM-27. Primeira entrega de Qualidade e Testes de Software (12/11/2026).
+> Item do backlog: B24 (antes SCRUM-27 no Jira). Primeira entrega de Qualidade e Testes de Software (12/11/2026).
 > Versão 0.1 (rascunho), 06/10/2026. Autor: Eduardo Kamo Iguei.
 > Este arquivo é a fonte em Markdown. Na entrega, o conteúdo vai para Word (ABNT) e depois PDF.
 > Documentos relacionados: `docs/02-requisitos.md`, `docs/03-uml/estados-dose.md`, `docs/07-testes/casos-teste-estados-dose.md`.
@@ -102,7 +102,7 @@ Pirâmide de testes: **muitos testes unitários** (domínio, serviços e valida�
 
 ### 4.4 Gestão de defeitos
 
-Defeitos são registrados como itens do tipo Bug no Jira (projeto SCRUM), com passos para reproduzir, resultado esperado e obtido, e severidade (crítica, alta, média ou baixa). Cada correção entra com um teste que a reproduz.
+Defeitos são registrados como issues do tipo "Defeito" no GitHub Projects (projeto proj-vacina-em-dia, que substituiu o Jira em 10/10/2026), ligadas ao teste que os achou, com passos para reproduzir, resultado esperado e obtido, e severidade (crítica, alta, média ou baixa). Cada correção entra com um teste que a reproduz.
 
 ### 4.5 Estratégia de regressão e testes exploratórios
 
@@ -162,7 +162,7 @@ Um ambiente de teste é uma configuração controlada de hardware, software, dad
 
 ### 5.1 Entrada (para começar a testar um item)
 
-- Requisito e critérios de aceite do item no Jira definidos.
+- Requisito e critérios de aceite do item no backlog (GitHub Projects) definidos.
 - Casos de teste escritos (ou, no caso de domínio com regra clara, testes escritos antes do código).
 - Código do item em uma branch, compilando, com `lint` e `typecheck` limpos.
 - Ambiente de teste disponível (local ou contêiner) e dados fictícios prontos.
@@ -189,12 +189,12 @@ Os testes de um item são suspensos se o ambiente cair, se o pipeline estiver qu
 | Ambientes | Máquina local; contêineres Docker com Azurite; pipeline no GitHub Actions; Azure só para verificação manual dos serviços reais |
 | Dados | Calendário de exemplo `FICTITIOUS` e conjunto de intenções criado e revisado manualmente, sem dados pessoais |
 | Dispositivos | Navegador, emulador Android e simulador iOS (RNF09) |
-| Rastreamento | Jira (projeto SCRUM) e este repositório |
+| Rastreamento | GitHub Projects (casos de teste, plano e execuções como issues; ver `gestao-de-testes-github.md`) e este repositório |
 | Pessoas | Uma pessoa (o autor), acumulando todos os papéis (ver seção 8) |
 
 ## 7 Cronograma estimado
 
-As horas abaixo são **estimativas de planejamento**, não registros de horas trabalhadas. Os registros reais ficam no Jira e na Documentação de Desenvolvimento.
+As horas abaixo são **estimativas de planejamento**, não registros de horas trabalhadas. Os registros reais ficam na Documentação de Desenvolvimento (o Jira não é mais usado).
 
 | Sprint | Período | Item | Atividade de teste | Estimativa |
 |---|---|---|---|---|

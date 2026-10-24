@@ -2,8 +2,8 @@
 
 Rode `python docs/backlog/dados.py` depois de editar. O `itens.json` alimenta a importação para o
 GitHub Projects (`scripts/backlog-github.mjs`). Os estados seguem a convenção do professor:
-A fazer, Em andamento, Em análise e Concluído; este arquivo nunca usa "Concluído" (só o autor
-marca, depois da reunião de encerramento da sprint).
+A fazer, Em andamento, Em análise e Concluído. "Concluído" só entra pela lista CONCLUIDOS abaixo, por
+decisão do autor e só para o que tem prova (PR mesclado, CI verde e, quando cabe, teste do autor em aparelho).
 """
 import json
 import os
@@ -25,11 +25,18 @@ SPRINTS = {
     4: ('Sprint 4', '27/10 a 02/11'), 5: ('Sprint 5', '03/11 a 09/11'), 6: ('Sprint 6', '10/11 a 19/11'),
 }
 
-AF, EA, AN = 'A fazer', 'Em andamento', 'Em análise'
+AF, EA, AN, CO = 'A fazer', 'Em andamento', 'Em análise', 'Concluído'
+
+# Itens dados como Concluídos pelo autor em 23/10/2026. Critério: PR mesclado com o CI verde, sem nota
+# de verificação pendente e, onde havia pendência de aparelho (Pix, caderneta por foto, assistente), o
+# teste do autor em celular. Para reabrir um item, tire o código da lista.
+CONCLUIDOS = {'B01', 'B04', 'B06', 'B07', 'B08', 'B12', 'B16', 'B17', 'B18', 'B19', 'B21', 'B24', 'B26', 'B27', 'B28', 'B29', 'B30', 'B38', 'B42', 'B43', 'B49', 'B50', 'B52', 'B53', 'B55', 'B56', 'B57', 'B58', 'B59', 'B60', 'B61', 'B64'}
 M, S, C, W = 'Must', 'Should', 'Could', "Won't (por enquanto)"
 
 
 def item(id_, jira, titulo, epico, prio, pessoas, reqs, criterios, estado, sprint, evidencia='', nota=''):
+    if id_ in CONCLUIDOS:
+        estado = CO
     return {
         'id': id_, 'jira': jira, 'titulo': titulo, 'epico': epico, 'prioridade': prio, 'personas': pessoas,
         'requisitos': reqs, 'criterios': criterios, 'estado': estado, 'sprint': sprint,
@@ -37,7 +44,7 @@ def item(id_, jira, titulo, epico, prio, pessoas, reqs, criterios, estado, sprin
     }
 
 
-CURTOS = {'B01': 'Cadastro e login (RF01)', 'B02': 'Recuperar a senha por e-mail', 'B03': 'Consentimento, privacidade e exclusão de dados (RF09)', 'B04': 'Gerenciar a família (RF02)', 'B05': 'Calendário vacinal por idade (RF03)', 'B06': 'Histórico de doses (RF08)', 'B07': 'Registrar e acompanhar doses (RF04)', 'B08': 'Dose avulsa', 'B09': 'Lembretes e doses atrasadas (RF05)', 'B10': 'Busca por voz (RF06)', 'B11': 'Chatbot de dúvidas (RF07)', 'B12': 'Assistente em janela de chat', 'B13': 'Mapa de postos de saúde (RF10)', 'B14': 'Exportar carteira em PDF (RF11)', 'B15': 'Compartilhar com cuidador (RF12)', 'B16': 'Provisionar recursos na Azure', 'B17': 'Monorepo, ESLint, Prettier e TypeDoc', 'B18': 'Pipeline de CI', 'B19': 'Containerizar com Docker', 'B20': 'Custo na Azure e alertas de orçamento', 'B21': 'Migrações e persistência no Azure SQL', 'B22': 'Aquecer o banco para o primeiro login', 'B23': 'Repositório público e proteção do GitHub', 'B24': 'Plano de teste', 'B25': 'Teste de caixa preta', 'B26': 'UML de estados e casos de teste', 'B27': 'Testes automatizados com Jest', 'B28': 'Segurança (OWASP) e carga leve', 'B29': 'Modelagem UML e DER', 'B30': 'Decisões técnicas em ADRs', 'B31': 'Documentação de Desenvolvimento', 'B32': 'Documentação Técnica', 'B33': 'Documentação do Usuário', 'B34': 'Panfleto A4', 'B35': 'Roteiro e apresentação final', 'B36': 'Empacotar a entrega (PDFs e zip)', 'B38': 'Registrar as decisões sobre licença dos dados, Jest e datas', 'B39': 'Revisar dataset do chatbot e termo de consentimento', 'B40': 'Testar em celulares reais e com leitor de tela', 'B41': 'Design system para mobile e web', 'B42': 'Redesenho visual web e celular', 'B43': 'Tamanho do texto e reduzir movimento', 'B44': 'Atualizar o Figma para a versão 2', 'B45': 'Tela para tablet', 'B46': 'Animações extras (inclinação 3D, painel e folha)', 'B47': 'Ícones do app e da aba', 'B48': 'Confirmar e-mail no cadastro', 'B49': 'Testes de ponta a ponta e de acessibilidade', 'B50': 'Painel de métricas do chatbot', 'B51': 'App instalável (PWA)', 'B52': 'Telas em janela (modal)', 'B53': 'Apoiar o projeto com Pix', 'B54': 'Foto de perfil (armazenamento de arquivos)', 'B55': 'Foto do documento com extração de dados', 'B56': 'Primeira tela por ambiente e app instalado no Android', 'B57': 'APK do Android nas Releases do GitHub', 'B58': 'Técnicas das aulas de PLN: comparação e busca com embeddings', 'B59': 'Novidades de saúde do Ministério da Saúde', 'B60': 'Painel de gráficos', 'B61': 'Assistente com poder sobre a conta', 'B62': 'Domínio próprio e gratuito para o site', 'B63': 'Estratégias de teste das aulas: caixa branca, exploratório, regressão e ambientes'}
+CURTOS = {'B01': 'Cadastro e login (RF01)', 'B02': 'Recuperar a senha por e-mail', 'B03': 'Consentimento, privacidade e exclusão de dados (RF09)', 'B04': 'Gerenciar a família (RF02)', 'B05': 'Calendário vacinal por idade (RF03)', 'B06': 'Histórico de doses (RF08)', 'B07': 'Registrar e acompanhar doses (RF04)', 'B08': 'Dose avulsa', 'B09': 'Lembretes e doses atrasadas (RF05)', 'B10': 'Busca por voz (RF06)', 'B11': 'Chatbot de dúvidas (RF07)', 'B12': 'Assistente em janela de chat', 'B13': 'Mapa de postos de saúde (RF10)', 'B14': 'Exportar carteira em PDF (RF11)', 'B15': 'Compartilhar com cuidador (RF12)', 'B16': 'Provisionar recursos na Azure', 'B17': 'Monorepo, ESLint, Prettier e TypeDoc', 'B18': 'Pipeline de CI', 'B19': 'Containerizar com Docker', 'B20': 'Custo na Azure e alertas de orçamento', 'B21': 'Migrações e persistência no Azure SQL', 'B22': 'Aquecer o banco para o primeiro login', 'B23': 'Repositório público e proteção do GitHub', 'B24': 'Plano de teste', 'B25': 'Teste de caixa preta', 'B26': 'UML de estados e casos de teste', 'B27': 'Testes automatizados com Jest', 'B28': 'Segurança (OWASP) e carga leve', 'B29': 'Modelagem UML e DER', 'B30': 'Decisões técnicas em ADRs', 'B31': 'Documentação de Desenvolvimento', 'B32': 'Documentação Técnica', 'B33': 'Documentação do Usuário', 'B34': 'Panfleto A4', 'B35': 'Roteiro e apresentação final', 'B36': 'Empacotar a entrega (PDFs e zip)', 'B38': 'Registrar as decisões sobre licença dos dados, Jest e datas', 'B39': 'Revisar dataset do chatbot e termo de consentimento', 'B40': 'Testar em celulares reais e com leitor de tela', 'B41': 'Design system para mobile e web', 'B42': 'Redesenho visual web e celular', 'B43': 'Tamanho do texto e reduzir movimento', 'B44': 'Atualizar o Figma para a versão 2', 'B45': 'Tela para tablet', 'B46': 'Animações extras (inclinação 3D, painel e folha)', 'B47': 'Ícones do app e da aba', 'B48': 'Confirmar e-mail no cadastro', 'B49': 'Testes de ponta a ponta e de acessibilidade', 'B50': 'Painel de métricas do chatbot', 'B51': 'App instalável (PWA)', 'B52': 'Telas em janela (modal)', 'B53': 'Apoiar o projeto com Pix', 'B54': 'Foto de perfil (armazenamento de arquivos)', 'B55': 'Foto do documento com extração de dados', 'B56': 'Primeira tela por ambiente e app instalado no Android', 'B57': 'APK do Android nas Releases do GitHub', 'B58': 'Técnicas das aulas de PLN: comparação e busca com embeddings', 'B59': 'Novidades de saúde do Ministério da Saúde', 'B60': 'Painel de gráficos', 'B61': 'Assistente com poder sobre a conta', 'B62': 'Domínio próprio e gratuito para o site', 'B63': 'Estratégias de teste das aulas: caixa branca, exploratório, regressão e ambientes', 'B64': 'Postman e testes por pares e aleatórios', 'B65': 'Gestão de testes no GitHub Projects (equivalente ao Xray)', 'B66': 'Backlog com responsável, datas, peso e tempo; limpeza do repositório'}
 
 ITENS = [
     # ---------------- E3 Conta e privacidade
@@ -229,7 +236,7 @@ ITENS = [
     item('B53', None, 'Como usuária que gostou do app, quero apoiar o projeto com uma doação por Pix, para ajudar a mantê-lo no ar',
          'E9', C, 'PE1', 'RNF03',
          ['Tela "Apoiar o projeto" com valor sugerido, QR e Pix copia e cola gerados no aparelho (BR Code).', 'Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.', 'Aviso claro de que a doação é voluntária e não dá acesso a nada.'],
-         AN, 3, 'ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate', 'Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).'),
+         AN, 3, 'ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate', 'Testado em celular pela autora em 23/10/2026 (relato: tudo funcionou). Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).'),
     item('B54', None, 'Como usuária, quero ter uma foto de perfil, para reconhecer rápido a minha conta',
          'E9', C, 'PE1, PE3', 'RNF03',
          ['Escolher ou tirar a foto, reduzida no aparelho antes de enviar.', 'Guardada em contêiner privado do Azure Blob Storage, com acesso por endereço temporário.', 'Excluir a conta apaga a foto; o termo de privacidade cita a foto.'],
@@ -237,7 +244,7 @@ ITENS = [
     item('B55', None, 'Como usuária do app no celular, quero fotografar a caderneta ou um comprovante e ver as doses lidas, para cadastrar sem digitar',
          'E9', C, 'PE1, PE3', 'RF04; RNF03',
          ['Só no app (Android e iOS); na web o recurso não aparece.', 'O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.', 'As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa.'],
-         AN, 3, 'ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen', 'Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.'),
+         AN, 3, 'ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen', 'Testado em celular pela autora em 23/10/2026 (relato: tudo funcionou). Exige o app instalado (development build); não roda no Expo Go.'),
     item('B56', None, 'Como usuária, quero que a primeira tela seja pensada para onde eu abro o app (site no computador, site no celular ou app instalado), para ter a melhor experiência em cada um',
          'E9', S, 'PE1, PE2, PE3', 'RNF04, RNF09',
          ['Site no computador: página completa com o mosaico de peças, cada uma com uma animação própria ao passar o mouse.', 'Site no celular: página compacta, com o mosaico em 2 colunas, carrossel de personas, cartão de como instalar e botão Criar conta fixo.', 'App instalado (Android, iOS ou site instalado): abertura enxuta com "Criar conta" e "Já tenho conta".', 'Os cartões da aba Conta têm a mesma altura em cada linha.', 'O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia).'],
@@ -267,6 +274,15 @@ ITENS = [
          'E7', S, 'todas', 'RNF07',
          ['Há projeto de casos de caixa branca (instruções, decisões, condições, caminhos e fluxo de dados) para funções críticas, com a cobertura medida.', 'Há charters de teste exploratório com HICCUPPS, prontos para o autor executar.', 'O plano de teste descreve a estratégia de regressão, a análise de impacto e os ambientes de teste.'],
          AN, 3, 'docs/07-testes/caixa-branca.md; docs/07-testes/testes-exploratorios.md; docs/07-testes/plano-de-teste.md (seções 4.5 e 4.6)', 'Os charters não foram executados (cabe ao autor). Não há ambiente de homologação. Coleção Postman, testes por pares e aleatórios ficaram para depois.'),
+    item('B64', None, 'Como equipe, quero uma coleção de testes de API no Postman e testes por combinação de pares e aleatórios, para demonstrar a automação de testes de API e a robustez do projeto',
+         'E7', S, 'todas', 'RNF07', ['A coleção cobre conta, família, doses, assistente, lembretes e exclusão de conta, com testes pm.test e ambientes local e nuvem.', 'Testes por pares e aleatórios (semente fixa) passam no CI.'],
+         AN, 3, 'postman/; docs/07-testes/api-postman.md; docs/07-testes/pares-e-aleatorios.md', 'Apresentada em aula. No Docker local, a exclusão de conta e a foto de perfil falham por causa do Azurite; ainda não há item para o conserto definitivo.'),
+    item('B65', None, 'Como equipe, quero casos de teste, plano e execução registrados no GitHub Projects, ligados aos itens do backlog, para ter a rastreabilidade que o Jira com Xray dava',
+         'E7', S, 'todas', 'RNF07', ['Há ao menos 5 casos de teste (com passos, dados e resultado esperado), um plano de testes e uma execução com resultado, como issues ligadas aos itens do backlog.', 'Há um relatório de cobertura de requisitos por testes.'],
+         AN, 3, 'docs/07-testes/gestao-de-testes-github.md', 'Equivale ao Jira com Xray da aula. A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).'),
+    item('B66', None, 'Como equipe, quero cada item do backlog com responsável, data de finalização, peso e tempo, e o repositório sem arquivos obsoletos, para prestar contas da sprint',
+         'E1', S, 'todas', 'RNF07', ['Os itens do projeto têm responsável, data e hora da última entrega, peso, tempo e PRs, calculados dos PRs mesclados.', 'Documentos e arquivos obsoletos ou temporários foram removidos.'],
+         AN, 3, 'scripts/backlog-metricas.mjs; docs/backlog/metricas.json; scripts/backlog-github.mjs', 'O tempo é uma estimativa de trabalho em sessão (autor e agente), não as horas da Documentação de Desenvolvimento, que são da autora.'),
     # ---------------- E3 futuros
     item('B48', None, 'Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço',
          'E3', W, 'PE1', 'RNF02', ['O cadastro só vale depois de clicar no link do e-mail.'],
@@ -292,7 +308,7 @@ def main():
         '',
         'Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, requisitos e personas de cada item. Gerado de `docs/backlog/dados.py` (rode `python docs/backlog/dados.py` depois de editar). A versão viva fica no projeto "proj-vacina-em-dia" do GitHub Projects, que substitui o Jira; a ligação problema, requisito e item está em `docs/23-do-problema-ao-backlog.md`.',
         '',
-        '**Convenção de estados (professor):** A fazer, Em andamento, Em análise (terminou dentro da data da sprint) e Concluído (só depois de analisado na reunião de encerramento da sprint). Nenhum item aqui está como Concluído; quem decide é a autora. **Prioridade (MoSCoW):** Must (deve), Should (deveria), Could (poderia) e Won\'t (não agora). As prioridades são uma proposta a ser confirmada pela autora.',
+        '**Convenção de estados (professor):** A fazer, Em andamento, Em análise (terminou dentro da data da sprint) e Concluído (só depois de analisado na reunião de encerramento da sprint). Os itens Concluídos foram marcados por decisão da autora em 23/10/2026, só os que têm prova (PR mesclado com o CI verde e, onde cabia, teste dela em celular); os demais seguem em Em análise ou antes. **Prioridade (MoSCoW):** Must (deve), Should (deveria), Could (poderia) e Won\'t (não agora). As prioridades são uma proposta a ser confirmada pela autora.',
         '',
         '| Sprint | Período |', '|---|---|',
     ]
