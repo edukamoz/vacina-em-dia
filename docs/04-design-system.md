@@ -171,7 +171,7 @@ Verificar em toda tela nova, nos três temas e a 200% de texto.
 - [ ] Voz com alternativa de digitação; microfone negado tratado com mensagem clara.
 - [ ] Respeita "reduzir movimento".
 - [ ] Linguagem simples, sem sigla; aviso de fonte e de que não substitui a caderneta.
-- [ ] Testado com leitor de tela (TalkBack, VoiceOver e um leitor na web) nas telas principais.
+- [ ] Testado com leitor de tela (TalkBack, VoiceOver e um leitor na web) nas telas principais. Roteiro e tabelas de resultado em `docs/07-testes/acessibilidade-manual.md` (ainda não executado).
 
 ## 6. Como os tokens entram no código (SCRUM-23)
 
