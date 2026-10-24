@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import tokensJson from '../../../../docs/04-design-system/tokens.json';
 import {
   THEME_NAMES,
@@ -75,6 +77,48 @@ describe('tokens do design system', () => {
       }
     },
   );
+
+  test('CT-TOK-10: nenhum componente de controle usa a cor decorativa `bordaSuave`', () => {
+    // Botão, campo, opção, interruptor e seletor de data delimitam o controle com `borda` (3:1).
+    const controles = [
+      'botao',
+      'campo-texto',
+      'chave',
+      'alternar',
+      'grupo-de-radios',
+      'selecao',
+      'seletor-de-data',
+    ];
+    for (const nome of controles) {
+      const codigo = readFileSync(join(__dirname, `../components/${nome}.tsx`), 'utf8');
+      expect({ nome, usa: codigo.includes('bordaSuave') }).toEqual({ nome, usa: false });
+    }
+  });
+
+  test('CT-TOK-11: a tabela de cores do docs/04-design-system.md bate com o tokens.json nos três temas', () => {
+    const doc = readFileSync(join(__dirname, '../../../../docs/04-design-system.md'), 'utf8');
+    const linhas = [
+      ...doc.matchAll(
+        /^\| `(\w+)` \| `(#[0-9a-fA-F]{6})` \| `(#[0-9a-fA-F]{6})` \| `(#[0-9a-fA-F]{6})` \|/gm,
+      ),
+    ];
+    const temas = tokensJson.temas as Record<string, Record<string, string>>;
+    expect(linhas.map((l) => l[1]).sort()).toEqual(Object.keys(temas.claro!).sort());
+    for (const [, token, claro, escuro, alto] of linhas) {
+      expect({ token, claro: claro!.toLowerCase() }).toEqual({
+        token,
+        claro: temas.claro![token!],
+      });
+      expect({ token, escuro: escuro!.toLowerCase() }).toEqual({
+        token,
+        escuro: temas.escuro![token!],
+      });
+      expect({ token, alto: alto!.toLowerCase() }).toEqual({
+        token,
+        alto: temas.altoContraste![token!],
+      });
+    }
+  });
 
   test('CT-TOK-07: sombras e gradientes existem nos temas Claro e Escuro e somem no Alto contraste', () => {
     for (const nivel of ['1', '2', '3'] as const) {

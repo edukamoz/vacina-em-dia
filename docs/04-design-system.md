@@ -1,6 +1,6 @@
 # Vacina em Dia: Design System
 
-Item do Jira: SCRUM-32 (requisitos RNF04 e RNF09). Versão 0.1 (rascunho), 06/10/2026. Fonte dos valores: [`04-design-system/tokens.json`](04-design-system/tokens.json). Decisão relacionada: ADR-011.
+Item do Jira: SCRUM-32 (requisitos RNF04 e RNF09). Versão dos tokens 2.0.0, documento atualizado em 24/10/2026. Fonte dos valores: [`04-design-system/tokens.json`](04-design-system/tokens.json). Decisão relacionada: ADR-011.
 
 O app é **um só código para Android, iOS e web** (RNF09). Por isso o design system é **responsivo desde o início**: o mesmo conjunto de tokens e componentes serve ao celular (pessoa tocando) e à web em computador (mouse e teclado). O público inclui idosos (Sr. José, 68 anos) e pessoas com pouca familiaridade digital, então a acessibilidade é a regra principal, não um acabamento.
 
@@ -32,23 +32,64 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 | `foco` | Anel de foco do teclado |
 | `erro`, `erroSuave` | Mensagens de erro |
 
-**Valores do tema Claro** (os dos outros temas estão em `tokens.json`):
+**Valores dos três temas** (fonte: `tokens.json`, versão 2.0.0; um teste confere esta tabela com o arquivo):
 
-| Token | Valor | Contraste mais crítico |
-|---|---|---|
-| `fundo` | `#FFFFFF` | |
-| `superficie` | `#F2F7F5` | |
-| `texto` | `#12201B` | 16,8:1 sobre o fundo |
-| `textoSecundario` | `#40524B` | 8,3:1 sobre o fundo |
-| `borda` | `#6B7D75` | 4,4:1 sobre o fundo (mínimo para componente: 3:1) |
-| `primaria` | `#0B6B52` | 6,5:1 com texto branco |
-| `pendente` / `pendenteSuave` | `#44525F` / `#ECEFF3` | 7,0:1 |
-| `agendada` / `agendadaSuave` | `#0A5C9E` / `#E3EFF9` | 5,9:1 |
-| `atrasada` / `atrasadaSuave` | `#B3261E` / `#FCE8E6` | 5,6:1 |
-| `aplicada` / `aplicadaSuave` | `#2F6A1D` / `#E4F2DC` | 5,6:1 |
-| `cancelada` / `canceladaSuave` | `#5B6670` / `#EEEEEE` | 5,1:1 |
+| Token | Claro | Escuro | Alto contraste | Uso |
+|---|---|---|---|---|
+| `fundo` | `#f6faf8` | `#0b1512` | `#ffffff` | Fundo da tela |
+| `superficie` | `#ffffff` | `#15231e` | `#ffffff` | Fundo dos cartões, campos e janelas |
+| `texto` | `#12201b` | `#ecf4f0` | `#000000` | Texto principal |
+| `textoSecundario` | `#40524b` | `#b3c4bc` | `#1f2a25` | Texto de apoio (datas, dicas, rótulos secundários) |
+| `borda` | `#6b7d75` | `#7f928a` | `#000000` | Contorno de campo, botão secundário e controle (componente: mínimo 3:1) |
+| `primaria` | `#0b6b52` | `#6fd0aa` | `#00432f` | Botão principal, links e destaque da marca |
+| `sobrePrimaria` | `#ffffff` | `#06231a` | `#ffffff` | Texto e ícone sobre a cor primária |
+| `primariaSuave` | `#e1f2ec` | `#16372d` | `#ffffff` | Fundo suave da marca (selos e blocos de destaque) |
+| `pendente` | `#44525f` | `#b4c0cc` | `#26323b` | Estado Pendente (texto, ícone e traço) |
+| `pendenteSuave` | `#eceff3` | `#25303c` | `#ffffff` | Fundo do selo Pendente |
+| `agendada` | `#0a5c9e` | `#8cc4f2` | `#064477` | Estado Agendada |
+| `agendadaSuave` | `#e3eff9` | `#14304a` | `#ffffff` | Fundo do selo Agendada |
+| `atrasada` | `#b3261e` | `#ffb4ab` | `#8c1007` | Estado Atrasada |
+| `atrasadaSuave` | `#fce8e6` | `#4a1f1b` | `#ffffff` | Fundo do selo Atrasada |
+| `aplicada` | `#2f6a1d` | `#a5d98f` | `#1b4d0e` | Estado Aplicada |
+| `aplicadaSuave` | `#e4f2dc` | `#203a16` | `#ffffff` | Fundo do selo Aplicada |
+| `cancelada` | `#5b6670` | `#a5b0bb` | `#3a444d` | Estado Cancelada |
+| `canceladaSuave` | `#eeeeee` | `#2a323a` | `#ffffff` | Fundo do selo Cancelada |
+| `foco` | `#0a5c9e` | `#8cc4f2` | `#000000` | Anel de foco do teclado (veja 2.4) |
+| `erro` | `#b3261e` | `#ffb4ab` | `#8c1007` | Mensagem de erro e botão de perigo |
+| `erroSuave` | `#fce8e6` | `#4a1f1b` | `#ffffff` | Fundo da mensagem de erro e do botão de perigo |
+| `fundoProfundo` | `#e7f3ee` | `#0f1d18` | `#ffffff` | Ponto final do degradê do fundo da tela |
+| `superficieSuave` | `#eef6f2` | `#1c2d27` | `#ffffff` | Fundo de avisos, balões e linhas em destaque |
+| `bordaSuave` | `#d5e2dc` | `#2a3d35` | `#000000` | Fio decorativo de cartão, janela e divisória (**não** delimita controle; veja "Cores só decorativas") |
+| `primariaProfunda` | `#084c46` | `#4db991` | `#00432f` | Ponto final do degradê do botão principal |
+| `decorMenta` | `#bfe9d8` | `#1f4a3c` | `#ffffff` | Manchas decorativas (apresentação) |
+| `decorSol` | `#f2b84b` | `#f2b84b` | `#ffffff` | Manchas decorativas (apresentação) |
+| `avatarA` | `#bfe9d8` | `#bfe9d8` | `#ffffff` | Fundo de avatar (rodízio) |
+| `avatarB` | `#f6dfa6` | `#f6dfa6` | `#ffffff` | Fundo de avatar (rodízio) |
+| `avatarC` | `#cfe4f7` | `#cfe4f7` | `#ffffff` | Fundo de avatar (rodízio) |
+| `avatarD` | `#f4d3d0` | `#f4d3d0` | `#ffffff` | Fundo de avatar (rodízio) |
+| `sobreAvatar` | `#12201b` | `#12201b` | `#000000` | Inicial sobre o fundo de avatar |
+| `marcaCrianca` | `#37a882` | `#bfe9d8` | `#00432f` | Logo: figura da criança (ilustração) |
+| `marcaPonto` | `#eba92a` | `#f2b84b` | `#00432f` | Logo: ponto de destaque (ilustração) |
+| `marcaInvCrianca` | `#bfe9d8` | `#0f4a39` | `#ffffff` | Logo sobre fundo escuro: figura |
+| `marcaInvPonto` | `#f2b84b` | `#06231a` | `#ffffff` | Logo sobre fundo escuro: ponto |
+
+**Pares principais e contraste** (fórmula do WCAG 2.1; o teste `tokens.test.ts` garante os mínimos):
+
+| Par | Claro | Escuro | Alto contraste |
+|---|---|---|---|
+| `texto` sobre `fundo` | 16,0:1 | 16,6:1 | 21,0:1 |
+| `textoSecundario` sobre `fundo` | 7,9:1 | 10,2:1 | 14,8:1 |
+| `textoSecundario` sobre `superficieSuave` | 7,6:1 | 7,9:1 | 14,8:1 |
+| `borda` sobre `fundo` (componente, mínimo 3:1) | 4,1:1 | 5,6:1 | 21,0:1 |
+| `sobrePrimaria` sobre `primaria` | 6,5:1 | 8,9:1 | 11,4:1 |
+| `sobrePrimaria` sobre `primariaProfunda` | 9,8:1 | 6,9:1 | 11,4:1 |
+| `foco` sobre `fundo` (mínimo 3:1) | 6,6:1 | 10,0:1 | 21,0:1 |
+| `erro` sobre `erroSuave` | 5,5:1 | 8,2:1 | 9,6:1 |
+| Cada estado sobre o seu `...Suave` (selo) | 5,1 a 7,0:1 | 5,9 a 8,2:1 | 9,6 a 13,1:1 |
 
 **Metas e resultado:** texto normal exige 4,5:1 e componente de interface exige 3:1 (WCAG 1.4.3 e 1.4.11, nível AA). O texto principal está acima de 7:1 (nível AAA). O ponto mais baixo de texto é a `cancelada` no tema Claro, com 5,1:1. No Escuro, o menor contraste de texto é 5,9:1. No Alto contraste, o menor é 9,6:1 (todos acima de 7:1).
+
+**Cores só decorativas.** Três grupos de tokens ficam abaixo de 3:1 contra o fundo de propósito e **nunca** carregam informação nem delimitam um controle: `bordaSuave` (1,3:1 no Claro e 1,6:1 no Escuro; fio de cartão, janela e divisória, sempre junto de sombra ou de fundo diferente), `marcaCrianca` e `marcaPonto` (2,8:1 e 2,0:1 no Claro; só no logo) e `decorMenta`, `decorSol` e `avatarA` a `avatarD` (manchas e fundos de avatar). Quem delimita botão, campo, opção ou interruptor usa `borda` (3:1 ou mais). No Alto contraste os fios decorativos viram `borda`, de 3 px. Os cartões de dose, que se tocam para abrir o detalhe, também usam o fio suave: o que os identifica como alvo é o conteúdo e a sombra, e no Alto contraste a borda forte. Se um dia um desses tokens passar a carregar informação, troque por `borda` ou pelo token do estado. O teste `CT-TOK-10` impede `bordaSuave` nos componentes de controle.
 
 **Verde da marca e verde de "Aplicada".** Os dois são verdes, mas ficam separados por **matiz** (a primária é um verde-azulado, a "Aplicada" é um verde de folha, cerca de 58° de diferença) e por **função**: a "Aplicada" **sempre** aparece com o ícone de confirmação e o texto "Aplicada" em um selo. O verde da marca nunca aparece sozinho como estado de dose.
 
@@ -68,6 +109,8 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 | `rotulo` | 16 / 24 | 700 | Rótulo de campo e selo |
 | `apoio` | 16 / 24 | 400 | Dica, data, aviso |
 | `botao` | 18 / 24 | 700 | Texto de botão |
+| `exibicao` | 56 / 60 | 700 | Título da apresentação (espaçamento de letras −0,02) |
+| `destaque` | 22 / 30 | 400 | Frase de apoio em destaque |
 
 Nenhum texto fica abaixo de 16 dp.
 
@@ -76,8 +119,17 @@ Nenhum texto fica abaixo de 16 dp.
 | Grupo | Valores (dp) |
 |---|---|
 | Espaçamento | 4, 8, 12, 16, 24, 32, 48 |
-| Raios | campo 8, cartão 12, botão 14, selo totalmente arredondado |
-| Bordas | padrão 2, faixa de estado 6, alto contraste 3, anel de foco 3 |
+| Raios | campo 12, botão 16, quadro 18, cartão 20, folha 28, selo totalmente arredondado |
+| Bordas | fina 1 (fio decorativo), padrão 2, faixa de estado 6, alto contraste 3, anel de foco 3 |
+
+Outros tokens (valores completos em `tokens.json`):
+
+| Grupo | Valores |
+|---|---|
+| Sombras | `sombra-1`, `sombra-2` e `sombra-3`, em Claro e Escuro; no Alto contraste não há sombra |
+| Durações (ms) | rápida 120, padrão 200, enfática 320, lenta 400, intervalo entre itens 55 |
+| Curvas | `padrao`, `saida` e `mola` |
+| Layout (dp) | conteúdo até 960, página até 1184, formulário 440, lateral de Entrar 560; margens 16, 24 e 32 |
 
 ### 2.4 Toque, foco e movimento
 
@@ -118,9 +170,9 @@ Todos aceitam os três temas, o texto a 200% e uso por teclado, toque e leitor d
 
 | Componente | Variações | Regras principais |
 |---|---|---|
-| **Botão** | principal, secundário, perigo (cancelar e excluir) | Altura de 56 dp no principal e 48 dp nos demais; texto sempre visível, com ícone opcional; **no máximo um botão principal por tela**; estados: normal, passar o mouse, foco, pressionado, desativado (evitar) e carregando |
+| **Botão** | principal, secundário, perigo (cancelar e excluir) | Altura mínima de 56 dp em todos os tipos; texto sempre visível, com ícone opcional; **no máximo um botão principal por tela**; estados: normal, passar o mouse, foco, pressionado, desativado (evitar) e carregando |
 | **Campo de texto** | texto, e-mail, senha, data | Rótulo sempre visível **acima** do campo (nunca só o texto de exemplo), dica abaixo, erro abaixo com ícone e texto; altura mínima de 56 dp; senha com botão "Mostrar" |
-| **Cartão** | simples, de dose, de membro | Borda de 2 px; cartão de dose tem faixa de 6 px na lateral com a cor do estado; todo o cartão é um alvo de toque quando abre o detalhe |
+| **Cartão** | simples, de dose, de membro | Fio decorativo de 1 px (`bordaSuave`) com `sombra-1`; no Alto contraste, borda de 3 px e sem sombra; cartão de dose tem faixa de 6 px na lateral com a cor do estado; todo o cartão é um alvo de toque quando abre o detalhe |
 | **Selo de estado da dose** | Pendente, Agendada, Atrasada, Aplicada, Cancelada | Ícone + texto + cor; texto no rótulo de acessibilidade ("Dose atrasada") |
 | **Botão de voz** | ouvindo, processando, erro | 56 dp ou mais, com ícone de microfone e texto "Perguntar por voz"; mostra o texto reconhecido e oferece "Digitar" se falhar |
 | **Caixa de confirmação** | cancelar dose, excluir conta | Título claro, consequência descrita em uma frase, botão perigoso e botão "Voltar" com o mesmo peso visual |
