@@ -69,7 +69,7 @@ export function BaixarCarteira({ memberId, nome }: { memberId: string; nome: str
         <Botao
           titulo={baixar.isPending ? 'Preparando o PDF...' : 'Baixar PDF'}
           variante="secundario"
-          disabled={baixar.isPending}
+          carregando={baixar.isPending}
           onPress={() => void aoPressionar()}
         />
       </View>

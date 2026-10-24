@@ -235,7 +235,7 @@ export function AccountScreen() {
           <Botao
             titulo="Sim, excluir tudo"
             variante="perigo"
-            disabled={remove.isPending}
+            carregando={remove.isPending}
             onPress={() =>
               remove.mutate(undefined, {
                 onSuccess: () => void endSession(),

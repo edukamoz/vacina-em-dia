@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { DoseCard, doseHint } from '../features/doses/dose-card';
 import { ThemeProvider, useTheme } from '../theme/theme-provider';
 import { AvisoFonte } from './aviso-fonte';
-import { Botao } from './botao';
+import { Botao, classesDoBotao } from './botao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from './estados';
 import { SeletorDeTema } from './seletor-de-tema';
 import { SELO_POR_ESTADO, SeloEstadoDose } from './selo-estado-dose';
@@ -24,6 +24,32 @@ describe('Botao', () => {
     await fireEvent.press(botao);
     expect(botao).toBeDisabled();
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  test('CT-UI-02b: botão desativado mantém o texto e usa a aparência tracejada, não a da marca', async () => {
+    await render(<Botao titulo="Salvar" disabled />);
+    expect(screen.getByText('Salvar')).toBeOnTheScreen();
+    const { caixa } = classesDoBotao('principal', true);
+    expect(caixa).toContain('border-dashed');
+    expect(caixa).not.toContain('bg-primaria');
+  });
+
+  test('CT-UI-02c: botão carregando fica ocupado, bloqueia o toque e mantém a aparência normal', async () => {
+    const onPress = jest.fn();
+    await render(<Botao titulo="Entrar" carregando onPress={onPress} />);
+    const botao = screen.getByRole('button', { name: 'Entrar' });
+    await fireEvent.press(botao);
+    expect(botao).toBeDisabled();
+    expect(botao).toBeBusy();
+    expect(onPress).not.toHaveBeenCalled();
+    expect(classesDoBotao('principal', false).caixa).not.toContain('border-dashed');
+  });
+
+  test('CT-UI-02d: o botão de perigo tem fundo próprio e não parece o secundário', () => {
+    expect(classesDoBotao('perigo', false).caixa).toContain('bg-erroSuave');
+    expect(classesDoBotao('perigo', false).caixa).not.toBe(
+      classesDoBotao('secundario', false).caixa,
+    );
   });
 });
 

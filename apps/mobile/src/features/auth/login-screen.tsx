@@ -71,7 +71,7 @@ export function LoginScreen() {
       ) : null}
       <Botao
         titulo={pending ? 'Entrando...' : 'Entrar'}
-        disabled={pending}
+        carregando={pending}
         onPress={() => void submit()}
       />
       <View>

@@ -120,7 +120,7 @@ Todos aceitam os três temas, o texto a 200% e uso por teclado, toque e leitor d
 
 | Componente | Variações | Regras principais |
 |---|---|---|
-| **Botão** | principal, secundário, perigo (cancelar e excluir) | Altura de 56 dp no principal e 48 dp nos demais; texto sempre visível, com ícone opcional; **no máximo um botão principal por tela**; estados: normal, passar o mouse, foco, pressionado, desativado (evitar) e carregando |
+| **Botão** | principal, secundário, perigo (cancelar e excluir) | Altura de 56 dp no principal e 48 dp nos demais; texto sempre visível, com ícone opcional; **no máximo um botão principal por tela**; estados: normal, passar o mouse, foco, pressionado, **desativado** (evitar; sem a cor da marca, fundo suave, borda tracejada e texto de apoio, ainda legível) e **carregando** (propriedade `carregando`: indicador no lugar do ícone, toque bloqueado, anunciado como "ocupado", aparência normal); o botão de perigo tem fundo suave de erro, não só a borda |
 | **Campo de texto** | texto, e-mail, senha, data | Rótulo sempre visível **acima** do campo (nunca só o texto de exemplo), dica abaixo, erro abaixo com ícone e texto; altura mínima de 56 dp; senha com botão "Mostrar" |
 | **Cartão** | simples, de dose, de membro | Borda de 2 px; cartão de dose tem faixa de 6 px na lateral com a cor do estado; todo o cartão é um alvo de toque quando abre o detalhe |
 | **Selo de estado da dose** | Pendente, Agendada, Atrasada, Aplicada, Cancelada | Ícone + texto + cor; texto no rótulo de acessibilidade ("Dose atrasada") |

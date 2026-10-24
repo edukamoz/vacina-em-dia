@@ -51,7 +51,8 @@ export function ConsentScreen() {
 
       <Botao
         titulo="Aceitar e continuar"
-        disabled={!aceitou || accept.isPending}
+        disabled={!aceitou}
+        carregando={accept.isPending}
         onPress={() =>
           accept.mutate(
             { acceptedTerms: true, termVersion: TERMS_VERSION, guardianDeclaration: responsavel },
