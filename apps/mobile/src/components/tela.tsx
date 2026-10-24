@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ID_DO_CONTEUDO } from '../lib/pular-conteudo';
 import { useVisual } from '../theme/theme-provider';
 import { Children } from 'react';
 import { Entrada } from './animacao';
@@ -69,6 +70,8 @@ export function Tela({
     >
       <RolagemDaTelaContext.Provider value={setTravada}>
         <ScrollView
+          nativeID={ID_DO_CONTEUDO}
+          tabIndex={-1}
           scrollEnabled={!travada}
           contentContainerClassName={`gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem ${
             reservaBalao ? 'pb-[96px]' : ''

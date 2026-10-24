@@ -98,7 +98,7 @@ Nenhum texto fica abaixo de 16 dp.
 
 - O **mesmo componente** muda de disposição, não de comportamento.
 - Na web há **estados de passar o mouse e de foco por teclado** que não existem no toque; o estado de pressionado vale para os dois.
-- A **ordem de tabulação** segue a ordem visual; há um link "Pular para o conteúdo" no topo.
+- A **ordem de tabulação** segue a ordem visual; o link "Pular para o conteúdo" é o primeiro item a receber o foco na web (`PularParaOConteudo`, no layout raiz): aparece só nesse momento e, ao ser ativado, leva o foco ao contêiner `#conteudo-principal` da tela (`Tela`, `AuthFrame`, apresentação). Não existe no app nativo.
 - A **voz na web** exige HTTPS e permissão do microfone; se negada ou indisponível, o botão leva ao campo de texto.
 - O **push** não existe na web (ver `sequencia-lembrete.md`); lá, o sinal de dose atrasada aparece dentro do app.
 
