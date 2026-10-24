@@ -49,7 +49,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
  * preferência de movimento do sistema.
  *
  * @param props.initialPreference - Escolha inicial; por padrão segue o sistema.
- * @param props.initialReduceMotion - `true` começa em "Reduzir movimento" (os testes ligam para não animar); senão começa em "Animar sempre".
+ * @param props.initialReduceMotion - `true` começa em "Reduzir movimento" (os testes ligam para não animar); senão começa em "Seguir o aparelho".
  * @param props.initialTextSize - Tamanho do texto inicial.
  */
 export function ThemeProvider({
