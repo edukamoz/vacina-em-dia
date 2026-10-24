@@ -9,6 +9,7 @@ import {
   type ModoDeMovimento,
   type TamanhoDoTexto,
 } from './preferencias';
+import { useAltoContrasteDoSistema } from './contraste-do-sistema';
 import { resolveTheme, type ThemePreference } from './resolve-theme';
 import {
   getBackgroundGradient,
@@ -70,7 +71,8 @@ export function ThemeProvider({
   const [tamanhoDoTexto, setTamanhoDoTexto] = useState<TamanhoDoTexto>(initialTextSize);
   const [movimentoDoSistema, setMovimentoDoSistema] = useState(false);
   const systemScheme = useColorScheme();
-  const theme = resolveTheme(preference, systemScheme);
+  const contrasteDoSistema = useAltoContrasteDoSistema();
+  const theme = resolveTheme(preference, systemScheme, contrasteDoSistema);
 
   useEffect(() => {
     let ativo = true;
