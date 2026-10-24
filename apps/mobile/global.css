@@ -3,6 +3,19 @@
 @tailwind utilities;
 
 /*
+ * Foco por teclado (design system, "Toque, foco e movimento"): anel de 3 px na cor `foco`, afastado
+ * 2 px do elemento. O vão é pintado com a cor do fundo do tema, então o anel mantém 3:1 mesmo sobre
+ * o botão principal (a cor `foco` sozinha, encostada no verde, não passa de 1,1:1). `!important`
+ * porque a sombra do botão e do cartão vem em estilo inline. Só aparece com teclado (`:focus-visible`),
+ * exceto em campos de texto, onde o navegador também o mostra ao clicar.
+ */
+:focus-visible {
+  outline: 3px solid var(--cor-foco, #0a5c9e);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--cor-fundo, #ffffff) !important;
+}
+
+/*
  * Movimento da web (design system, "Movimento"): tudo que se clica reage ao passar o mouse e ao
  * apertar. O ThemeProvider marca <html data-movimento="reduzido"> com "Reduzir movimento", com a
  * preferência do sistema ou no Alto contraste; nesses casos nada disto se aplica.
