@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 20/10/2026 (**leia a seção 0.13 primeiro**, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 24/10/2026 (**leia a seção 0.14 primeiro**, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,34 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.14 Estado em 24/10/2026: acessibilidade do design system
+
+**Levantamento e plano.** Em 24/10/2026 o design system foi auditado (contraste das três paletas pela fórmula do WCAG, foco, rótulos, movimento, gráficos, botões e a doc contra o `tokens.json` v2) e o plano de correções P1 a P10 foi feito e **mesclado na `main`** (PRs #208 a #215, merge commit, branches apagadas). O **P9** (token de aviso separado de erro) ficou de fora de propósito: só vale se alguma tela precisar.
+
+| Item | PR | O que mudou |
+|---|---|---|
+| P1 foco | #208 | `:focus-visible` global em `global.css`: anel de 3 px na cor `foco`, afastado 2 px, com o vão na cor do fundo (a cor `foco` encostada no botão verde dava 1,1:1). Antes o app usava o contorno do navegador. CT-TOK-08 e 09 |
+| P2 pular conteúdo | #209 | `PularParaOConteudo` (`.web.tsx`), `src/lib/pular-conteudo.ts`, id `conteudo-principal` em `Tela`, `AuthFrame`, landing e abertura. A doc dizia que existia e não existia. CT-A11Y-01 a 05 |
+| P3 movimento | #210 | Padrão de movimento passa de "Animar sempre" para "Seguir o aparelho" (**ADR-026, ainda Proposto**). CT-PREF ajustados; `CT-E2E-04` reescrito e `CT-E2E-04b` novo |
+| P4 contraste do sistema | #211 | `src/theme/contraste-do-sistema.ts`: "Seguir o aparelho" abre em Alto contraste quando o sistema pede (web: `prefers-contrast` e `forced-colors`; iOS e Android só por teste automatizado). CT-TEMA-02 a 08 |
+| P5 gráficos | #212 | Texturas por estado (lisa, listras, pontos, grade) em `features/charts/padroes.tsx`. CT-A11Y-06 a 08 |
+| P7 botão | #213 | `Botao` com `carregando`, aparência de desativado (tracejado, texto legível) e perigo com `bg-erroSuave`; 10 telas usam `carregando`. CT-UI-02b a 02d |
+| P6 e P8 doc | #214 | `docs/04-design-system.md` alinhada ao `tokens.json` 2.0.0 (36 tokens nos 3 temas), "cores só decorativas"; CT-TOK-10 (controles não usam `bordaSuave`) e CT-TOK-11 (a tabela da doc bate com o JSON) |
+| P10 roteiro | #215 | `docs/07-testes/acessibilidade-manual.md`: 8 sessões, **nenhuma executada** |
+
+**Pendências do autor**
+1. **ADR-026:** confirmar e trocar para "Aceita" (muda uma decisão sua: o padrão era "Animar sempre" para a apresentação).
+2. **Antes de 19/11:** num computador com as animações do sistema desligadas o app abre parado; escolher "Animar sempre" na Conta (ou ligar as animações do sistema).
+3. **Executar o roteiro de acessibilidade** nos aparelhos (leitor de tela, TalkBack, VoiceOver, 200% de texto, contraste, daltonismo) e preencher as tabelas. Marcar o checklist da seção 5 do design system com data. Nada do projeto foi testado em iOS.
+4. Atribuir os códigos `Bnn` aos itens no GitHub Projects (os PRs ficaram sem código) e decidir o destino da branch antiga `fix/B66-metricas-e-tipo-dos-testes`, que não faz parte desta série e não foi mesclada.
+5. Opcional: ligar "Allow auto-merge" em Settings, General, do repositório; e pôr `graphify-out/` (grafo gerado no estudo do projeto, não versionado) no `.gitignore`.
+
+**Limites conhecidos:** os cartões de dose (alvo de toque) usam o fio suave `bordaSuave` (1,3:1 no Claro); o que os identifica é o conteúdo e a sombra, e no Alto contraste a borda forte. Os temas Claro e Alto contraste dos itens P1, P5 e P7 não foram vistos no navegador (só o Escuro).
+
+**Armadilhas novas:** (a) `gh pr merge --auto` **mescla na hora** se o repositório não permite merge automático e quem chama é administrador sem exigência de checks; o #212 foi assim para a `main` antes de o CI terminar (acabou verde). Confira o CI antes de qualquer `gh pr merge`; (b) o CI roda também os testes de ponta a ponta (Playwright): uma mudança de comportamento do app pode quebrá-los sem quebrar o Jest; localmente `E2E_CANAL=chrome npx playwright test` em `apps/mobile` (ou `npm run e2e`, que exporta a web antes); (c) no Windows o `npm run format:check` acusa centenas de arquivos por fim de linha (CRLF); use `prettier --check --end-of-line auto` nos arquivos alterados e **não** rode `prettier --write` em pastas inteiras (deixa dezenas de arquivos "modificados" só por LF e CRLF); (d) `git diff --ignore-space-at-eol --stat` mostra o que mudou de verdade; (e) o Metro demora vários minutos no primeiro empacotamento e uma rota nova só aparece depois de recarregar a página; (f) as tabelas de `docs/04-design-system.md` são conferidas por teste: ao mudar um token, atualize a tabela de cores da doc (CT-TOK-11).
+
+**Próximos passos do Claude:** manter o design system e a doc em dia; ajudar a preencher o roteiro de acessibilidade quando o autor trouxer os resultados; abrir o P9 só com pedido.
 
 ### 0.13 Estado em 20/10/2026: recursos extras, APK nas Releases, Figma completo e documentações atualizadas
 
