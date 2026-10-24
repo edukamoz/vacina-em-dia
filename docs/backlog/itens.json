@@ -87,7 +87,7 @@
     "Excesso de tentativas de login é bloqueado por um tempo.",
     "Mensagens de erro em linguagem simples, sem revelar se o e-mail existe."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 2,
    "evidencia": "ADR-014; CT-AUTH-*; docs/14-login-proprio.md",
    "nota": "",
@@ -145,7 +145,7 @@
     "Cada pessoa mostra o resumo de doses (aplicadas, pendentes e atrasadas).",
     "Só o dono da conta enxerga e altera seus membros."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "CT-FAM-*; telas Família e Nova pessoa",
    "nota": "",
@@ -182,7 +182,7 @@
     "O histórico lista aplicadas e canceladas com data, em até 3 toques da tela inicial.",
     "Doses avulsas aparecem com a etiqueta \"Adicionada por você\"."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 4,
    "evidencia": "CT-APP-H*",
    "nota": "",
@@ -201,7 +201,7 @@
     "Atrasar só acontece pela rotina de prazo, nunca pelo app.",
     "Cancelar pede confirmação; datas respeitam as regras (agendar e reagendar de hoje em diante; aplicar até hoje)."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "docs/03-uml/estados-dose.md; CT-T*, CT-E*, 42 casos de estados",
    "nota": "",
@@ -219,7 +219,7 @@
     "A dose avulsa tem nome e dose em texto livre e segue o mesmo ciclo de estados.",
     "Aparece com a etiqueta \"Adicionada por você\", distinta das doses oficiais."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "ADR-016; caixa preta de dose avulsa",
    "nota": "",
@@ -296,7 +296,7 @@
     "Fechar a janela cancela uma gravação em andamento.",
     "O assistente não aparece como item do menu lateral."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 5,
    "evidencia": "PRs #70 e #78; janela-do-assistente.test.tsx",
    "nota": "",
@@ -372,7 +372,7 @@
     "Infraestrutura descrita como código (Bicep).",
     "Banco acessado por identidade gerenciada, sem senha de SQL."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 2,
    "evidencia": "infra/; docs/08-infraestrutura-azure.md",
    "nota": "",
@@ -390,7 +390,7 @@
     "Scripts padrão (lint, typecheck, test, docs) funcionam em todos os pacotes.",
     "Hooks do Git e commitlint ativos."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 2,
    "evidencia": "CLAUDE.md §6",
    "nota": "",
@@ -408,7 +408,7 @@
     "O pipeline falha se algum teste falhar ou a cobertura ficar abaixo de 80%.",
     "Roda em todo push e o job de Docker só na main."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 2,
    "evidencia": ".github/workflows/ci.yml",
    "nota": "",
@@ -426,7 +426,7 @@
     "`docker compose up --build` sobe a API, o app web, o PLN e o Azurite.",
     "Há guia de manutenção do Docker."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 5,
    "evidencia": "docker-compose.yml; docs/17-docker-manutencao.md",
    "nota": "",
@@ -462,7 +462,7 @@
     "Migrações aplicadas por script antes do deploy.",
     "Contrato do repositório testado em memória e no SQL real."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "ADR-004; docs/15-persistencia-sql.md; scripts/db-migrate.mjs",
    "nota": "",
@@ -516,7 +516,7 @@
     "Plano segue o modelo da disciplina.",
     "Cada requisito relevante liga-se a casos de teste."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 1,
    "evidencia": "docs/07-testes/",
    "nota": "",
@@ -553,7 +553,7 @@
     "As 12 transições e as guardas estão cobertas por teste.",
     "Transições inválidas respondem erro e preservam o estado."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 1,
    "evidencia": "docs/03-uml/estados-dose.md; docs/07-testes/casos-teste-estados-dose.md",
    "nota": "",
@@ -572,7 +572,7 @@
     "Cobertura acima de 80% (exigida) e meta própria de 90%.",
     "O nome do teste traz o ID do caso (CT-...)."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 4,
    "evidencia": "app 404 e API 552 testes; cobertura do app 95%",
    "nota": "",
@@ -590,7 +590,7 @@
     "Checklist OWASP Top 10 revisada.",
     "Carga leve com 99% das requisições abaixo de 3 s."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 5,
    "evidencia": "docs/21-seguranca-owasp-e-carga.md",
    "nota": "",
@@ -608,7 +608,7 @@
     "Diagramas versionados em docs/03-uml.",
     "DER coerente com as migrações do banco."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 1,
    "evidencia": "docs/03-uml/",
    "nota": "",
@@ -626,7 +626,7 @@
     "Toda decisão relevante tem um ADR com contexto, decisão e consequências.",
     "Índice de ADRs atualizado."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 1,
    "evidencia": "docs/05-adrs/ (18 ADRs)",
    "nota": "",
@@ -754,7 +754,7 @@
     "Licença dos dados dos postos (CC BY-SemDerivações 3.0) e a limpeza de nomes registradas como premissa no ADR-018.",
     "Entregas de 12/11, 16/11 e 19/11 mantidas como estão; a data de Computação em Nuvem II segue em aberto."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "CLAUDE.md §14; ADR-018",
    "nota": "A autora decidiu não consultar o professor sobre esses pontos.",
@@ -829,7 +829,7 @@
     "Telas fiéis ao protótipo (Doses, Família, Histórico, Conta, apresentação, Entrar e Criar conta).",
     "Efeitos de passar o mouse, clicar e entrada de telas, parados com \"Reduzir movimento\"."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 6,
    "evidencia": "PRs #65 a #78",
    "nota": "",
@@ -847,7 +847,7 @@
     "Tamanho do texto Normal, Grande e Maior na Conta.",
     "Movimento em três modos na Conta: Animar sempre (padrão), Seguir o aparelho e Reduzir movimento; o tema Alto contraste sempre para."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 6,
    "evidencia": "PR #75",
    "nota": "",
@@ -939,7 +939,7 @@
     "axe-core sem violações graves nas telas de antes do login, nos temas claro e escuro.",
     "Roda no CI depois do build e guarda o relatório."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 1,
    "evidencia": "docs/07-testes/ponta-a-ponta-e-acessibilidade.md; apps/mobile/e2e/",
    "nota": "Roda só na web e com API falsa; celular e leitor de tela seguem manuais (ver B40).",
@@ -957,7 +957,7 @@
     "Página única com acurácia, F1 macro, F1 por intenção, matriz de confusão, curva do limiar e erros.",
     "Gerada pelo mesmo comando da avaliação, com as versões fixadas das bibliotecas."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 1,
    "evidencia": "PR #144; docs/07-testes/painel-pln.html",
    "nota": "",
@@ -995,7 +995,7 @@
     "Fecha pelo botão, tocando no véu e com Esc na web; sem histórico, volta ao início.",
     "Papel de diálogo e nome igual ao título; a entrada para com \"Reduzir movimento\"."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "apps/mobile/src/components/janela-modal.tsx; CT-APP-MOD*",
    "nota": "",
@@ -1014,10 +1014,10 @@
     "Nenhum dado de pagamento passa pelo app nem pela API; sem gateway.",
     "Aviso claro de que a doação é voluntária e não dá acesso a nada."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "ADR-021; CT-APP-PIX*; lib/pix.ts, features/donate",
-   "nota": "Falta pagar um Pix real de R$ 0,01 para conferir no banco, e abrir o QR em celular físico. Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).",
+   "nota": "Testado em celular pela autora em 23/10/2026 (relato: tudo funcionou). Chave Pix em variáveis do repositório (PIX_KEY, PIX_NAME, PIX_CITY).",
    "curto": "Apoiar o projeto com Pix"
   },
   {
@@ -1052,10 +1052,10 @@
     "O texto é lido no aparelho (OCR com ML Kit) e a foto não sai do celular.",
     "As doses encontradas aparecem para conferência e só são salvas depois da confirmação da pessoa."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "ADR-022; CT-APP-OCR*; lib/ler-caderneta.ts, lib/ler-documento.ts, doses/foto-documento-screen",
-   "nota": "Falta testar com uma caderneta de verdade em celular físico (a leitura depende da foto) e o primeiro uso no Android, que baixa o modelo do Google. Exige o app instalado (development build); não roda no Expo Go.",
+   "nota": "Testado em celular pela autora em 23/10/2026 (relato: tudo funcionou). Exige o app instalado (development build); não roda no Expo Go.",
    "curto": "Foto do documento com extração de dados"
   },
   {
@@ -1073,7 +1073,7 @@
     "Os cartões da aba Conta têm a mesma altura em cada linha.",
     "O app instala no Android com o ícone, a splash e o nome do projeto (pacote br.edu.fatec.vacinaemdia)."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "apps/mobile/src/lib/ambiente.ts; CT-APP-AMB01, CT-APP-L01 a L05; README (rodar no Android)",
    "nota": "",
@@ -1092,7 +1092,7 @@
     "O APK é compilado apontando para a API publicada e o workflow falha se o endereço não estiver dentro do pacote.",
     "O arquivo vem com o hash SHA-256 e a página explica como instalar."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": ".github/workflows/apk.yml; docs/26-apk-no-github-releases.md",
    "nota": "Assinado com a chave de depuração: instala direto, mas não serve para a Play Store.",
@@ -1111,7 +1111,7 @@
     "Busca com embeddings em português, medida nas mesmas consultas, sem IA generativa e dentro da memória da Function.",
     "Decisão registrada em ADR e custo conferido."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "docs/07-testes/comparacao-pln.md; docs/07-testes/avaliacao-busca-semantica.md; docs/05-adrs/ADR-023-embeddings-avaliados-e-nao-adotados-na-busca.md",
    "nota": "Os embeddings (GloVe 50d do NILC) foram aplicados e medidos, mas não melhoraram a busca; ficam desligados (ADR-023).",
@@ -1130,7 +1130,7 @@
     "Não guarda nem resume o texto, cita a fonte e avisa que não é orientação médica.",
     "Se o feed falhar, o cartão some e o app segue normal; nada do usuário é enviado ao feed."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "docs/05-adrs/ADR-024-novidades-de-saude-do-feed-do-ministerio.md; GET /api/news",
    "nota": "Fonte única por enquanto (Ministério da Saúde); Butantan bloqueia leitura automática.",
@@ -1149,7 +1149,7 @@
     "Dá para ver a família toda ou uma pessoa; cada gráfico tem rótulo de texto para leitor de tela e há uma tabela com os mesmos números.",
     "Os números vêm das doses cadastradas, calculadas no aparelho, sem biblioteca nova."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "apps/mobile/src/features/charts; apps/mobile/src/lib/estatisticas.ts",
    "nota": "Gráficos desenhados com react-native-svg e Views (sem biblioteca de gráficos). Atalho no Histórico.",
@@ -1168,7 +1168,7 @@
     "Adiciona pessoa, registra e agenda dose por comando, sempre com Confirmar e Cancelar; nunca exclui, cancela nem troca e-mail ou senha.",
     "Nenhum dado da conta vai ao serviço de PLN; segurança de saúde vem antes de qualquer comando; F1 macro do classificador continua acima de 0,85."
    ],
-   "estado": "Em análise",
+   "estado": "Concluído",
    "sprint": 3,
    "evidencia": "docs/05-adrs/ADR-025-assistente-com-poder-sobre-a-conta.md; docs/07-testes/avaliacao-chatbot.md",
    "nota": "Dataset de 20 para 39 intenções (1.060 frases); limiar de confiança de 0,40 para 0,30.",
@@ -1210,6 +1210,60 @@
    "evidencia": "docs/07-testes/caixa-branca.md; docs/07-testes/testes-exploratorios.md; docs/07-testes/plano-de-teste.md (seções 4.5 e 4.6)",
    "nota": "Os charters não foram executados (cabe ao autor). Não há ambiente de homologação. Coleção Postman, testes por pares e aleatórios ficaram para depois.",
    "curto": "Estratégias de teste das aulas: caixa branca, exploratório, regressão e ambientes"
+  },
+  {
+   "id": "B64",
+   "jira": null,
+   "titulo": "Como equipe, quero uma coleção de testes de API no Postman e testes por combinação de pares e aleatórios, para demonstrar a automação de testes de API e a robustez do projeto",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "A coleção cobre conta, família, doses, assistente, lembretes e exclusão de conta, com testes pm.test e ambientes local e nuvem.",
+    "Testes por pares e aleatórios (semente fixa) passam no CI."
+   ],
+   "estado": "Concluído",
+   "sprint": 3,
+   "evidencia": "postman/; docs/07-testes/api-postman.md; docs/07-testes/pares-e-aleatorios.md",
+   "nota": "Apresentada em aula. No Docker local, a exclusão de conta e a foto de perfil falham por causa do Azurite; ainda não há item para o conserto definitivo.",
+   "curto": "Postman e testes por pares e aleatórios"
+  },
+  {
+   "id": "B65",
+   "jira": null,
+   "titulo": "Como equipe, quero casos de teste, plano e execução registrados no GitHub Projects, ligados aos itens do backlog, para ter a rastreabilidade que o Jira com Xray dava",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Há ao menos 5 casos de teste (com passos, dados e resultado esperado), um plano de testes e uma execução com resultado, como issues ligadas aos itens do backlog.",
+    "Há um relatório de cobertura de requisitos por testes."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "docs/07-testes/gestao-de-testes-github.md",
+   "nota": "Equivale ao Jira com Xray da aula. A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).",
+   "curto": "Gestão de testes no GitHub Projects (equivalente ao Xray)"
+  },
+  {
+   "id": "B66",
+   "jira": null,
+   "titulo": "Como equipe, quero cada item do backlog com responsável, data de finalização, peso e tempo, e o repositório sem arquivos obsoletos, para prestar contas da sprint",
+   "epico": "E1",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Os itens do projeto têm responsável, data e hora da última entrega, peso, tempo e PRs, calculados dos PRs mesclados.",
+    "Documentos e arquivos obsoletos ou temporários foram removidos."
+   ],
+   "estado": "Em análise",
+   "sprint": 3,
+   "evidencia": "scripts/backlog-metricas.mjs; docs/backlog/metricas.json; scripts/backlog-github.mjs",
+   "nota": "O tempo é uma estimativa de trabalho em sessão (autor e agente), não as horas da Documentação de Desenvolvimento, que são da autora.",
+   "curto": "Backlog com responsável, datas, peso e tempo; limpeza do repositório"
   },
   {
    "id": "B48",

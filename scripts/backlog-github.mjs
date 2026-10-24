@@ -7,10 +7,13 @@
  * Uso: node scripts/backlog-github.mjs --owner edukamoz --project proj-vacina-em-dia --repo edukamoz/vacina-em-dia [--dry-run]
  *
  * Campos criados no projeto: Status (A fazer, Em andamento, Em análise, Concluído), Épico,
- * Prioridade, Sprint, Requisitos, Personas e Jira. Nenhum item é marcado como Concluído.
+ * Prioridade, Sprint, Requisitos, Personas, Jira, Tipo, Peso, Finalizado em, Hora da finalização,
+ * Tempo na sessão (min), Tempo estimado por commits (min) e PRs. Os cinco últimos vêm de
+ * `docs/backlog/metricas.json` (gerado por `scripts/backlog-metricas.mjs`). O responsável de cada
+ * item é a dona do repositório (assignee da issue). Itens Concluídos têm a issue fechada.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
@@ -28,6 +31,10 @@ const DRY = args.includes('--dry-run');
 const dados = JSON.parse(
   readFileSync(fileURLToPath(new URL('../docs/backlog/itens.json', import.meta.url)), 'utf8'),
 );
+const metricasArquivo = fileURLToPath(new URL('../docs/backlog/metricas.json', import.meta.url));
+const metricas = existsSync(metricasArquivo)
+  ? JSON.parse(readFileSync(metricasArquivo, 'utf8')).itens
+  : {};
 const tmp = mkdtempSync(join(tmpdir(), 'backlog-'));
 
 function gh(...a) {
@@ -49,6 +56,7 @@ const opcoes = (nomes, cores) =>
 const STATUS = ['A fazer', 'Em andamento', 'Em análise', 'Concluído'];
 const PRIORIDADES = ['Must', 'Should', 'Could', "Won't (por enquanto)"];
 const SPRINTS = Object.values(dados.sprints).map(([nome, periodo]) => `${nome} (${periodo})`);
+const TIPOS = ['História', 'Épico', 'Teste', 'Plano de testes', 'Execução de testes', 'Defeito'];
 const EPICOS = dados.epicos.map(([id, nome]) => `${id} ${nome}`);
 
 // ---------- projeto
@@ -111,6 +119,13 @@ garantirCampo('Sprint', 'SINGLE_SELECT', SPRINTS);
 garantirCampo('Requisitos', 'TEXT');
 garantirCampo('Personas', 'TEXT');
 garantirCampo('Jira', 'TEXT');
+garantirCampo('Tipo', 'SINGLE_SELECT', TIPOS);
+garantirCampo('Peso', 'NUMBER');
+garantirCampo('Finalizado em', 'DATE');
+garantirCampo('Hora da finalização', 'TEXT');
+garantirCampo('Tempo na sessão (min)', 'NUMBER');
+garantirCampo('Tempo estimado por commits (min)', 'NUMBER');
+garantirCampo('PRs', 'TEXT');
 fs = campos();
 const campo = (nome) => fs.find((f) => f.name === nome);
 const opcaoId = (nomeCampo, nomeOpcao) => {
@@ -144,7 +159,7 @@ for (const issue of JSON.parse(
     '-L',
     '300',
     '--json',
-    'number,title,id,url',
+    'number,title,id,url,state',
   ),
 )) {
   const m = /^\[(B\d+|E\d+)\]/.exec(issue.title);
@@ -207,13 +222,19 @@ function garantirIssue(codigo, titulo, corpo, rotulos) {
   return { issue, item };
 }
 
-function definir(item, nomeCampo, valor) {
+function definir(item, nomeCampo, valor, tipo = 'text') {
   if (valor === undefined || valor === null || valor === '') return;
   const f = campo(nomeCampo);
-  const value =
-    f.type === 'ProjectV2SingleSelectField'
-      ? { singleSelectOptionId: opcaoId(nomeCampo, valor) }
-      : { text: String(valor) };
+  let value;
+  if (f.type === 'ProjectV2SingleSelectField') {
+    value = { singleSelectOptionId: opcaoId(nomeCampo, valor) };
+  } else if (tipo === 'number') {
+    value = { number: Number(valor) };
+  } else if (tipo === 'date') {
+    value = { date: String(valor) };
+  } else {
+    value = { text: String(valor) };
+  }
   gql(
     `mutation($p: ID!, $i: ID!, $f: ID!, $v: ProjectV2FieldValue!) { updateProjectV2ItemFieldValue(input: {projectId: $p, itemId: $i, fieldId: $f, value: $v}) { projectV2Item { id } } }`,
     { p: projeto.id, i: item, f: f.id, v: value },
@@ -227,8 +248,37 @@ for (const [id, nome, jira] of dados.epicos) {
   const { issue, item } = garantirIssue(id, nome, corpo, ['backlog', 'epic']);
   definir(item, 'Épico', `${id} ${nome}`);
   definir(item, 'Jira', jira);
+  definir(item, 'Tipo', 'Épico');
   epicoIssue.set(id, issue);
   console.log(`Épico ${id} -> #${issue.number}`);
+}
+
+function formatarMin(min) {
+  if (!min) return '-';
+  const h = Math.floor(min / 60);
+  return h ? `${h} h ${String(min % 60).padStart(2, '0')} min` : `${min} min`;
+}
+
+function entrega(id) {
+  const m = metricas[id];
+  if (!m) {
+    return [
+      '',
+      '### Entrega',
+      '- Sem PR identificado para este item; data, peso e tempo não calculados.',
+    ];
+  }
+  return [
+    '',
+    '### Entrega',
+    `- **Responsável:** ${OWNER}`,
+    `- **Finalizado em:** ${m.finalizadoEmTexto} (horário de Brasília, merge do último PR)`,
+    `- **PRs:** ${m.prs.map((n) => `#${n}`).join(', ')}`,
+    `- **Peso:** ${m.peso} (pelas ${m.linhasAlteradas} linhas alteradas nos PRs)`,
+    `- **Tempo na sessão:** ${m.tempoSessaoMin ? formatarMin(m.tempoSessaoMin) : 'sem registro de sessão'}`,
+    `- **Tempo estimado pelos commits:** ${formatarMin(m.tempoEstimadoMin)}`,
+    '- _Os tempos medem o trabalho em sessão (autora e agente) e não substituem as horas registradas na Documentação de Desenvolvimento. Cálculo em `docs/backlog/metricas.json`._',
+  ];
 }
 
 // ---------- itens
@@ -250,7 +300,9 @@ for (const it of dados.itens) {
     it.evidencia ? `\n**Evidência:** ${it.evidencia}` : '',
     it.nota ? `\n**Atenção:** ${it.nota}` : '',
     '',
-    '_Estados seguem a convenção do professor; só a autora marca "Concluído"._',
+    ...entrega(it.id),
+    '',
+    '_Estados seguem a convenção do professor. "Concluído" só para o que tem prova (PR mesclado com o CI verde e, onde cabia, teste da autora)._',
   ].join('\n');
   const { issue, item } = garantirIssue(it.id, it.curto, corpo, ['backlog']);
   definir(item, 'Status', it.estado);
@@ -260,6 +312,27 @@ for (const it of dados.itens) {
   definir(item, 'Requisitos', it.requisitos);
   definir(item, 'Personas', it.personas);
   definir(item, 'Jira', it.jira);
+  definir(item, 'Tipo', 'História');
+  const m = metricas[it.id];
+  if (m) {
+    definir(item, 'Peso', m.peso, 'number');
+    definir(item, 'Finalizado em', m.finalizadoEm, 'date');
+    definir(item, 'Hora da finalização', m.finalizadoEmTexto);
+    definir(item, 'Tempo na sessão (min)', m.tempoSessaoMin, 'number');
+    definir(item, 'Tempo estimado por commits (min)', m.tempoEstimadoMin, 'number');
+    definir(item, 'PRs', m.prs.map((n) => `#${n}`).join(', '));
+  }
+  try {
+    gh('issue', 'edit', String(issue.number), '-R', REPO, '--add-assignee', OWNER);
+  } catch {
+    /* sem permissão para atribuir: segue sem responsável */
+  }
+  const fechada = issue.state === 'CLOSED';
+  if (it.estado === 'Concluído' && !fechada) {
+    gh('issue', 'close', String(issue.number), '-R', REPO, '--reason', 'completed');
+  } else if (it.estado !== 'Concluído' && fechada) {
+    gh('issue', 'reopen', String(issue.number), '-R', REPO);
+  }
   try {
     gql(
       `mutation($i: ID!, $s: ID!) { addSubIssue(input: {issueId: $i, subIssueId: $s}) { issue { id } } }`,
