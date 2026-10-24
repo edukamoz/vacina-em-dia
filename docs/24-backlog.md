@@ -72,7 +72,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Roteiro cronometrado com o caminho feliz de cada persona.
 - Slides (ou equivalente) com problema, solução, arquitetura, testes e custos.
 - Evidência: docs/20-roteiro-de-demonstracao.md
-- Atenção: Roteiro e slides prontos (doctos/Apresentacao.pptx); falta ensaiar.
+- Atenção: Roteiro e slides prontos (doctos/Apresentacao.html); falta ensaiar.
 
 **B36** (autora; requisitos: -)
 
@@ -484,9 +484,9 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 **B44** (autora; requisitos: RNF04)
 
-- Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).
+- Variáveis, medidas, estilos de texto e sombras na versão 2 (arquivo do Figma, ver docs/04-design-system.md §8).
 - Componentes e telas atualizados.
-- Evidência: docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md
+- Evidência: docs/04-design-system.md §8
 - Atenção: Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. As telas e componentes "v1 ·" já foram apagados pela autora; as telas ainda não usam as instâncias dos componentes.
 
 **B45** (PE1; requisitos: RNF04, RNF09)
