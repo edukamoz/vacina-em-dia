@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import tokensJson from '../../../../docs/04-design-system/tokens.json';
 import {
   THEME_NAMES,
@@ -75,6 +77,22 @@ describe('tokens do design system', () => {
       }
     },
   );
+
+  test.each(THEME_NAMES)(
+    'CT-TOK-08: o anel de foco do tema %s tem contraste mínimo de 3:1 com o fundo e a superfície',
+    (tema) => {
+      const c = getThemeColors(tema);
+      expect(contrast(c.foco, c.fundo)).toBeGreaterThanOrEqual(3);
+      expect(contrast(c.foco, c.superficie)).toBeGreaterThanOrEqual(3);
+    },
+  );
+
+  test('CT-TOK-09: o global.css define o anel de foco com a cor `foco` e o vão da cor do fundo', () => {
+    const css = readFileSync(join(__dirname, '../../global.css'), 'utf8');
+    const regra = /:focus-visible\s*\{[^}]*\}/.exec(css)?.[0] ?? '';
+    expect(regra).toContain('outline: 3px solid var(--cor-foco');
+    expect(regra).toContain('var(--cor-fundo');
+  });
 
   test('CT-TOK-07: sombras e gradientes existem nos temas Claro e Escuro e somem no Alto contraste', () => {
     for (const nivel of ['1', '2', '3'] as const) {
