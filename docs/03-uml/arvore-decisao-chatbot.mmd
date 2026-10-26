@@ -1,0 +1,23 @@
+flowchart TD
+    A(["Pergunta da pessoa<br/>(texto digitado ou voz transcrita)"]) --> B{"Tem letras<br/>ou números?"}
+    B -- não --> R1["Pede para repetir"]
+    B -- sim --> C{"Regra de segurança:<br/>sintoma, reação, remédio<br/>ou emergência?"}
+    C -- sim --> R2["Não dá orientação médica.<br/>Manda procurar um profissional<br/>ou a unidade de saúde (SAMU 192)"]
+    C -- não --> D["Classificador de intenções<br/>TF-IDF + SVM (39 intenções)"]
+    D --> E{"Confiança<br/>de pelo menos 0,30?"}
+    E -- não --> F{"A pergunta cita<br/>uma vacina?"}
+    F -- sim --> R3["Explica a vacina com os dados<br/>do calendário oficial (PNI)"]
+    F -- não --> R4["Resposta padrão: não entendi.<br/>Orienta procurar um profissional<br/>ou a unidade de saúde"]
+    E -- sim --> G{"Que tipo de<br/>intenção é?"}
+    G -- "Conversa, ajuda do app<br/>e privacidade" --> R5["Resposta curada,<br/>escrita à mão"]
+    G -- "Calendário oficial" --> R6["Resposta montada com as linhas do<br/>calendário, citando fonte e versão"]
+    G -- "Consulta à conta" --> R7["O app responde com os dados<br/>de quem está logado"]
+    G -- "Ação na conta" --> H{"É pergunta (como, onde,<br/>posso...) ou comando?"}
+    H -- pergunta --> R8["Explica o passo a passo"]
+    H -- comando --> R9["Pergunta: Posso marcar...?<br/>Só grava se a pessoa confirmar"]
+    G -- "Abrir tela" --> R10["Oferece o botão<br/>para abrir a tela"]
+
+    classDef fim fill:#e8f5ee,stroke:#1a7f5a,color:#10261c
+    classDef seguro fill:#fdecea,stroke:#b3261e,color:#3b0d0a
+    class R1,R3,R5,R6,R7,R8,R9,R10 fim
+    class R2,R4 seguro
