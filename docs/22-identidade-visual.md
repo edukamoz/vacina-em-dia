@@ -90,5 +90,5 @@ Português do Brasil, frases curtas, voz ativa, **sem "por favor", exclamação,
 | Regras e componentes | `docs/04-design-system.md` |
 | Briefing da versão 2 | `docs/04-design-system/briefing-redesign.md` |
 | Logo, ícones e ilustrações | `assets/` |
-| Protótipo e variáveis no Figma | `docs/04-design-system.md`, seção 8, e `docs/04-design-system/figma-plugin/` |
+| Protótipo e variáveis no Figma | `docs/04-design-system.md`, seção 8 |
 | Acessibilidade verificada | `docs/19-rastreabilidade.md` (RNF04) e `docs/07-testes/` |

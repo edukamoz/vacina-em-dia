@@ -129,7 +129,7 @@ def legenda(tipo, titulo):
     r.font.size = Pt(10)
 
 
-def fonte(texto='Elaborado pelo autor (2026).'):
+def fonte(texto='Elaborado pela equipe (2026).'):
     par = doc.add_paragraph()
     par.alignment = WD_ALIGN_PARAGRAPH.CENTER
     r = par.add_run(f'Fonte: {texto}')
@@ -176,7 +176,7 @@ def tabela(titulo, cabecalho, linhas, larguras=None, tamanho=9, origem=None):
         for linha in t.rows:
             for i, w in enumerate(larguras):
                 linha.cells[i].width = Cm(w)
-    fonte(origem or 'Elaborado pelo autor (2026).')
+    fonte(origem or 'Elaborado pela equipe (2026).')
 
 
 def limpar(texto_):
@@ -219,7 +219,7 @@ def figura(arquivo, titulo, largura_cm, paisagem=False, origem=None):
     par = doc.add_paragraph()
     par.alignment = WD_ALIGN_PARAGRAPH.CENTER
     par.add_run().add_picture(str(arquivo), width=Cm(largura_cm))
-    fonte(origem or 'Elaborado pelo autor (2026).')
+    fonte(origem or 'Elaborado pela equipe (2026).')
     if paisagem:
         volta = doc.add_section(WD_SECTION.NEW_PAGE)
         volta.orientation = WD_ORIENT.PORTRAIT
@@ -252,7 +252,7 @@ for _ in range(4):
     doc.add_paragraph()
 par = doc.add_paragraph()
 par.alignment = WD_ALIGN_PARAGRAPH.CENTER
-par.add_run('Projeto Interdisciplinar VI (PI-VI)\nEduardo Kamo Iguei\nOrientador: Prof. Dr. Cassio R. F. Riedo')
+par.add_run('Projeto Interdisciplinar VI (PI-VI)\nEduardo Kamo Iguei\nFernando Ribeiro dos Santos\nGustavo Lopes Ferreira\nIago Yuri Rossan\nLucas Vinicios Consani\nOrientador: Prof. Dr. Cassio R. F. Riedo')
 for _ in range(5):
     doc.add_paragraph()
 par = doc.add_paragraph()
@@ -263,7 +263,7 @@ doc.add_page_break()
 # ---------------------------------------------------------------- 1
 h1('1. Identificação do Projeto')
 p('**1.1. Nome do Projeto:** Vacina em Dia: carteira de vacinação digital com lembretes e assistente por voz.')
-p('**1.2. Grupo/Equipe:** Eduardo Kamo Iguei, RA 3011392413005 (projeto individual).')
+p('**1.2. Grupo/Equipe:** Eduardo Kamo Iguei (RA 3011392413005); Fernando Ribeiro dos Santos (RA 3011392413020); Gustavo Lopes Ferreira (RA 3011392413016); Iago Yuri Rossan (RA 3011392413038); Lucas Vinicios Consani (RA 3011392413046).')
 p(f'**1.3. Data da Elaboração:** 07/10/2026 (primeira versão); atualizado em {HOJE}.')
 p(f'**1.4. Versão do Documento:** 1.1, {HOJE}. Documento mantido junto com o código; cada alteração significativa gera nova versão.')
 p('O código-fonte, as decisões de arquitetura (ADRs) e as demais documentações ficam no repositório https://github.com/edukamoz/vacina-em-dia. O Product Backlog está no GitHub Projects ("proj-vacina-em-dia") e, em texto, em `docs/24-backlog.md`; o projeto usou o Jira até 10/10/2026.')

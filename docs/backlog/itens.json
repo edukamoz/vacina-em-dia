@@ -720,7 +720,7 @@
    "estado": "Em análise",
    "sprint": 6,
    "evidencia": "docs/20-roteiro-de-demonstracao.md",
-   "nota": "Roteiro e slides prontos (doctos/Apresentacao.pptx); falta ensaiar.",
+   "nota": "Roteiro e slides prontos (doctos/Apresentacao.html); falta ensaiar.",
    "curto": "Roteiro e apresentação final"
   },
   {
@@ -862,12 +862,12 @@
    "personas": "autora",
    "requisitos": "RNF04",
    "criterios": [
-    "Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).",
+    "Variáveis, medidas, estilos de texto e sombras na versão 2 (arquivo do Figma, ver docs/04-design-system.md §8).",
     "Componentes e telas atualizados."
    ],
    "estado": "Em análise",
    "sprint": 6,
-   "evidencia": "docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md",
+   "evidencia": "docs/04-design-system.md §8",
    "nota": "Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. As telas e componentes \"v1 ·\" já foram apagados pela autora; as telas ainda não usam as instâncias dos componentes.",
    "curto": "Atualizar o Figma para a versão 2"
   },

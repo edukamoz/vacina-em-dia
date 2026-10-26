@@ -13,7 +13,6 @@ export default tseslint.config(
       '**/.expo/**',
       '**/web-build/**',
       'docs/api/**',
-      'docs/04-design-system/figma-plugin/**',
       'apps/mobile/babel.config.js',
       'apps/mobile/metro.config.js',
       '**/*.config.js',
