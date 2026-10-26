@@ -491,15 +491,15 @@ body.mostra .hud,.hud:hover{opacity:1}
 </section>
 
 <!-- 10 QUALIDADE -->
-<section class="slide" id="s10" data-t="rise" data-title="Qualidade e testes" data-notes="<b>Qualidade e testes (12/11).</b> Pirâmide: muitos testes unitários, alguns de integração, poucos de ponta a ponta. 1.250 testes Jest (236 + 585 + 429), pytest no PLN, 179 casos de caixa preta (partição e valor limite), 42 casos de estados, 10 testes ponta a ponta com axe (WCAG). O pipeline falha abaixo de 80% de cobertura. Jest em vez de JUnit é decisão do autor.">
+<section class="slide" id="s10" data-t="rise" data-title="Qualidade e testes" data-notes="<b>Qualidade e testes (12/11).</b> Pirâmide: muitos testes unitários, alguns de integração, poucos de ponta a ponta. 1.612 testes Jest (254 + 643 + 715, nos três pacotes) e 264 de pytest no PLN, 179 casos de caixa preta (partição e valor limite), 42 casos de estados, 12 testes ponta a ponta com axe (WCAG). O pipeline falha abaixo de 80% de cobertura. Jest em vez de JUnit é decisão do autor.">
   <span class="kick" data-r>Qualidade e testes</span>
   <h2 data-r style="font-size:76px">Cada mudança passa por <em>oito portões</em></h2>
   <div class="tiles">
-    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="1250" data-sep="1">0</span></div><p>testes automatizados (Jest)</p></div>
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="1612" data-sep="1">0</span></div><p>testes automatizados (Jest)</p></div>
     <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="95">0</span><small>%</small></div><p>cobertura de linhas do app (mínimo 80%)</p></div>
     <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="179">0</span></div><p>casos de caixa preta</p></div>
     <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="42">0</span></div><p>casos do ciclo da dose</p></div>
-    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="10">0</span></div><p>testes de ponta a ponta + acessibilidade</p></div>
+    <div class="glass tile" data-r="pop"><div class="n"><span class="count" data-to="12">0</span></div><p>testes de ponta a ponta + acessibilidade</p></div>
   </div>
   <div class="pipe" id="pipe" data-r></div>
   <p class="meta" data-r>GitHub Actions em todo push e pull request. Falhou, não entra.</p>
