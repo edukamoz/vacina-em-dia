@@ -4,7 +4,7 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 
 | # | Critério | Disciplina | Situação hoje | Nota estimada | O que falta |
 |---|---|---|---|---|---|
-| 1 | Estado inicial (semestres anteriores) | CN2 | Não documentado | 0 | Descrever o ponto de partida (o que existia antes do semestre). **Depende do autor** |
+| 1 | Estado inicial (semestres anteriores) | CN2 | Documentado (Documentação Técnica 2.4 e slide "Estado inicial"): projeto começou do zero em outubro de 2026 | a confirmar | Conferir com o professor se basta "zero" como ponto de partida. **Dado fornecido pelo autor** |
 | 2 | Proposta para o semestre (problemas e expectativas) | LDM | `docs/01-visao-e-escopo.md` (Fase 0) completo | 4 | Resumo de 1 slide |
 | 3 | Relacionamento com o Product Owner | LDM | Reuniões simuladas, autor nos dois papéis (`docs/09`) | 2 | Definir quem é o PO e registrar as interações reais. **Depende do autor** |
 | 4 | Requisitos funcionais e não funcionais mais relevantes | QTS | `docs/02-requisitos.md` (RF01–RF12, RNF01–RNF10) | 4 | **Feito em 07/10/2026:** `docs/19-rastreabilidade.md` (requisito → tela → API → teste). Falta o checklist OWASP e o teste de carga |
@@ -22,7 +22,7 @@ Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 p
 | 16 | Casos de teste (estados, transições, sequências) | QTS | 42 casos em `docs/07-testes/casos-teste-estados-dose.md`, automatizados | 4 | Gerar a tabela de execução a partir do Jest (resultado real) |
 | 17 | **PLN: sistema de busca semântica (0–20)** | PLN | **Feito em 07/10/2026:** busca por n-gramas de caracteres + LSA sobre documentos enriquecidos, com avaliação em 63 consultas (acerto na 1ª posição de 68,3% para 88,9%); voz com Azure AI Speech; chatbot TF-IDF + SVM (F1 macro 0,93). Relatório honesto: o LSA isolado tem efeito pequeno | 15 | Revisão das consultas de teste; embeddings só com custo aprovado |
 
-Soma estimada atual: cerca de **72 de 100** (era 51 no início; Bicep, equivalência AWS para Azure, custos, caixa preta, busca com LSA e Docker foram feitos). Faltam sobretudo os itens que dependem do autor: estado inicial, Product Owner, reuniões e tempos reais.
+Soma estimada atual: cerca de **72 de 100** (era 51 no início; Bicep, equivalência AWS para Azure, custos, caixa preta, busca com LSA e Docker foram feitos). Faltam sobretudo os itens que dependem do autor: Product Owner, reuniões e tempos reais.
 
 ## 1. PLN, o critério de 20 pontos
 
@@ -67,7 +67,7 @@ Ordem pelo ganho de pontos e pelas dependências. Itens com **(autor)** só o au
 5. **Docker, manutenção**: seção no `README`/`docs/08`.
 6. **Busca semântica**: opção 2 do §1, se aprovada.
 7. **Roteiro de demonstração por persona** e slides.
-8. **(autor)** estado inicial (CN2), Product Owner, tempos reais, atas das reuniões, tenant do Entra, revisão do conteúdo do chatbot.
+8. **(autor)** Product Owner, tempos reais, atas das reuniões, tenant do Entra, revisão do conteúdo do chatbot.
 
 ## 4. Login: bloqueio no tenant (resolvido em 07/10/2026 com login próprio, ADR-014)
 
