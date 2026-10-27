@@ -278,13 +278,17 @@ h2('2.2. Solução Proposta')
 p('O Vacina em Dia é um aplicativo multiplataforma (web, Android e iOS) que roda na Microsoft Azure. As expectativas de alto nível e o que foi entregue até a data deste documento são:')
 marcador('**EX1 (para PR1), lembretes:** o cartão "Lembretes" mostra no app as doses atrasadas, as de hoje e as dos próximos 7 dias de toda a família, e um e-mail diário às 8h (opcional) avisa 7 dias antes e no dia da vacina. Entregue (ADR-017).')
 marcador('**EX2 (para PR2), registro digital único:** cada pessoa da família tem seu calendário e seu histórico, com ciclo de vida da dose (pendente, agendada, atrasada, aplicada e cancelada) e vacinas adicionadas à mão. Entregue.')
-marcador('**EX3 (para PR3), calendário oficial e dúvidas:** 100% das vacinas exibidas citam fonte e versão (Calendário Nacional de Vacinação 2026, Ministério da Saúde); o chatbot responde com texto curado e fonte, com F1 macro de 0,932 em 100 frases de teste (meta de 0,85). Entregue.')
-marcador('**EX4 (para PR4), acesso:** pergunta por voz (web e Android; transcrição pelo Azure AI Speech), telas em linguagem simples, três temas (claro, escuro e alto contraste) com contraste calculado pelo WCAG 2.1 AA. Entregue, com ressalvas de teste em aparelho físico e iOS (seção 11).')
+marcador('**EX3 (para PR3), calendário oficial e dúvidas:** 100% das vacinas exibidas citam fonte e versão (Calendário Nacional de Vacinação 2026, Ministério da Saúde); o chatbot responde com texto curado e fonte, com F1 macro de 0,901 em 195 frases de teste separadas (meta de 0,85). Entregue.')
+marcador('**EX4 (para PR4), acesso:** pergunta por voz (web e Android; transcrição pelo Azure AI Speech), telas em linguagem simples, três temas (claro, escuro e alto contraste) com contraste calculado pelo WCAG 2.1 AA. Entregue; testado em aparelho físico pelo autor e ainda não testado em iOS (seção 11).')
 marcador('**Recursos extras, entregues em 20/10/2026 (prioridade Could):** janelas (modais) para adicionar e editar pessoas e doses (B52); doação voluntária por Pix copia e cola, sem gateway (B53, ADR-021); foto de perfil guardada no Azure Blob Storage (B54, ADR-020); leitura da caderneta por foto, feita no aparelho com ML Kit (B55, ADR-022); primeira tela pensada para site grande, site pequeno e app instalado (B56); e APK do Android nas Releases do GitHub (B57).')
 h2('2.3. Público-Alvo')
 p('Os usuários finais são pais e responsáveis por crianças, idosos e cuidadores de familiares. A solução não é voltada a profissionais de saúde. O Quadro 2 apresenta as personas, construídas a partir do problema descrito.')
 cab, linhas = ler_tabelas('docs/01-visao-e-escopo.md', '4 PÚBLICO-ALVO')
-tabela('Personas do sistema', cab, linhas, larguras=[3, 4.2, 4.2, 3.6])
+tabela('Personas do sistema', cab, linhas, larguras=[3, 4.2, 4.2, 3.6])
+h2('2.4. Estado Inicial do Projeto')
+p('**Ponto de partida:** o projeto começou do zero, no início de outubro de 2026 (primeira sprint em 06/10/2026). Não havia código, banco de dados, ambiente na Azure, calendário vacinal digitalizado, dataset de intenções nem documentação anteriores; nenhuma parte foi aproveitada de semestres passados. A equipe partiu de uma ideia (uma carteira de vacinação digital com lembretes e voz) e do problema descrito na seção 2.1.')
+p('**Situação atual:** em cerca de quatro semanas de trabalho, o MVP (RF01 a RF09) e o mapa de postos (RF10) estão entregues e publicados na Azure, com integração e entrega contínuas no GitHub Actions, testes automatizados, chatbot por TF-IDF e SVM e busca por voz. Os números atualizados de testes, cobertura e métricas do chatbot estão nas seções 8 e 9. O app web, o instalador Android e o fluxo de voz também foram testados em aparelho físico pelo autor.')
+p('**Estado final pretendido:** na apresentação de 19/11/2026, o sistema completo rodando na Azure e em contêiner (`docker compose up`), as três documentações e o panfleto entregues, e as limitações assumidas de forma explícita (seção 11): sem orientação médica, sem substituir a caderneta oficial e sem uso offline completo.')
 
 # ---------------------------------------------------------------- 3
 h1('3. Requisitos Funcionais e Não Funcionais')
@@ -461,12 +465,12 @@ tabela('Tecnologias de PLN', ['Item', 'Tecnologia', 'Detalhe'], [
     ['Hospedagem', 'Azure Functions Python 3.13 (Flex Consumption)', '1 instância sempre pronta e paralelismo HTTP 8'],
 ], larguras=[3.6, 6.0, 6.2])
 h2('9.3. Dataset e Treinamento')
-p('O **dataset de intenções** tem **490 frases em 20 intenções**, escritas e revisadas à mão, sem dados pessoais (origem: criação própria do autor, com apoio de rascunho que ele revisa). O **conjunto de teste** tem **100 frases separadas** do treino; o script de avaliação recusa o teste se houver frase repetida nos dois conjuntos. A semente é fixa (42), então o resultado é reprodutível.')
+p('O **dataset de intenções** tem **1.060 frases em 39 intenções**, escritas e revisadas à mão, sem dados pessoais (origem: criação própria do autor, com apoio de rascunho que ele revisa). O **conjunto de teste** tem **195 frases separadas** do treino; o script de avaliação recusa o teste se houver frase repetida nos dois conjuntos. A semente é fixa (42), então o resultado é reprodutível.')
 tabela('Avaliação do classificador de intenções', ['Métrica', 'Valor'], [
-    ['Acurácia no conjunto de teste', '94,0%'],
-    ['F1 macro', '0,932 (meta de 0,85, a validar com o professor: atingida)'],
-    ['F1 ponderado', '0,932'],
-    ['Validação cruzada em 5 partes, só no treino: acurácia e F1 macro', '68,8% e 0,670'],
+    ['Acurácia no conjunto de teste', '90,8%'],
+    ['F1 macro', '0,901 (meta de 0,85, a validar com o professor: atingida)'],
+    ['F1 ponderado', '0,901'],
+    ['Validação cruzada em 5 partes, só no treino: acurácia e F1 macro', '71,1% e 0,702'],
 ], larguras=[8.0, 7.8])
 p('A validação cruzada é bem menor que o teste porque o modelo ainda depende de haver exemplos parecidos com a pergunta; o dataset é pequeno, e isso está registrado como limitação em `docs/07-testes/avaliacao-chatbot.md`.')
 p('**Busca semântica:** em 63 consultas de teste, o acerto na primeira posição subiu de **68,3%** (índice inicial) para **88,9%** e o MRR de 0,722 para 0,928, com a melhoria vinda sobretudo do enriquecimento dos documentos (apelidos e doenças); o efeito isolado do LSA é pequeno (`docs/07-testes/avaliacao-busca-semantica.md`). Embeddings de modelo ficam como evolução, dependendo de custo aprovado.')
@@ -493,7 +497,7 @@ h2('11.1. Identificação de Riscos')
 cab, linhas = ler_tabelas('docs/01-visao-e-escopo.md', '10 RISCOS')
 novos = [
     ['R9', 'Respostas 503 intermitentes da API sob rajadas (instância única que desliga por ociosidade), medidas em 07/10/2026.', 'Alta / Médio', '**Tratado:** 1 instância sempre pronta na API (cerca de US$ 6,50 por mês); 0 falhas em cerca de 1.000 requisições depois. Restam poucos casos de 10 a 20 s em rajadas. Atenção: o Bicep mantém 0 por padrão.'],
-    ['R10', 'Voz no celular não testada em aparelho físico nem em iOS (testada no navegador e no emulador Android).', 'Média / Médio', 'Testar em celular físico antes da apresentação; a captura usa `expo-audio` (PCM) e o mesmo WAV da web; texto continua como alternativa.'],
+    ['R10', 'Voz no celular testada em aparelho físico pelo autor (funcionou); não testada em iOS.', 'Baixa / Médio', '**Parcialmente tratado:** registrar modelo e versão do aparelho; a captura usa `expo-audio` (PCM) e o mesmo WAV da web; texto continua como alternativa.'],
     ['R11', 'Partida a frio do serviço de PLN (cerca de 50 s) ao reiniciar.', 'Média / Médio', '1 instância sempre pronta no PLN; fazer uma pergunta de aquecimento antes de apresentar.'],
     ['R12', 'Entrega do e-mail (Brevo) depende de remetente verificado; provedores gratuitos podem cair em spam; limite de 300 e-mails por dia.', 'Média / Médio', 'Verificar o remetente; avisar o usuário para olhar o spam; o aviso dentro do app não depende do e-mail.'],
     ['R13', 'Chaves do login e do Brevo como configuração da aplicação, e não no Key Vault; regra do SQL `AllowAzureServices` ampla.', 'Baixa / Alto', 'Migrar para o Key Vault quando houver o papel de escrita; trocar por regra específica (`docs/21`).'],

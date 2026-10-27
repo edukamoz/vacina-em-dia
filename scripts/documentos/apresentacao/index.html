@@ -218,6 +218,11 @@ h2 em{font-style:normal;color:var(--mint)}
 .arv .seg b{color:#ff9d93}
 .arv .tipos{display:flex;flex-wrap:wrap;gap:10px}
 .arv .tipos .chip{font-size:22px;padding:9px 18px}
+.ini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-top:40px}
+.ini .glass{padding:34px 36px}
+.ini h3{font-size:36px;margin:0 0 6px;color:var(--sun)}
+.ini small{display:block;font-size:24px;color:var(--mut);margin-bottom:18px}
+.ini ul{margin:0;padding-left:30px;font-size:28px;line-height:1.45}
 
 /* ---------- 9 PLN ---------- */
 .pln{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:30px}
@@ -538,7 +543,7 @@ body.mostra .hud,.hud:hover{opacity:1}
 </section>
 
 <!-- 13 GESTÃO -->
-<section class="slide" id="s13" data-t="slide" data-title="Gestão" data-notes="<b>Scrum e backlog.</b> GitHub Projects (proj-vacina-em-dia), que substituiu o Jira: 50 itens em 9 épicos, prioridade MoSCoW e critérios de aceite. A convenção de status é a do professor; Concluído só depois da reunião de encerramento da sprint (por isso o cadeado). Seis sprints semanais, a partir de 06/10, apontando para 12/11, 16/11 e 19/11.">
+<section class="slide" id="s13" data-t="slide" data-title="Gestão" data-notes="<b>Scrum e backlog.</b> GitHub Projects (proj-vacina-em-dia), que substituiu o Jira: 65 itens em 9 épicos, prioridade MoSCoW e critérios de aceite. A convenção de status é a do professor; Concluído só depois da reunião de encerramento da sprint (por isso o cadeado). Seis sprints semanais, a partir de 06/10, apontando para 12/11, 16/11 e 19/11.">
   <span class="kick" data-r>Gestão · Scrum</span>
   <h2 data-r style="font-size:76px">Backlog vivo, <em>seis sprints</em></h2>
   <div class="kan">
@@ -548,18 +553,29 @@ body.mostra .hud,.hud:hover{opacity:1}
     <div class="glass col" data-r="zoom"><h4>Concluído</h4><div class="lock"><i class="ic" data-ic="lock"></i>só depois da reunião de encerramento da sprint</div></div>
   </div>
   <div class="tl" id="tl" data-r><div class="rua"><i></i></div></div>
-  <div class="stats" data-r><span class="chip" style="color:var(--sun)">Exemplo do fluxo de um item</span><span class="chip">50 itens</span><span class="chip">9 épicos</span><span class="chip">MoSCoW</span><span class="chip">critérios de aceite</span></div>
+  <div class="stats" data-r><span class="chip" style="color:var(--sun)">Exemplo do fluxo de um item</span><span class="chip">65 itens</span><span class="chip">9 épicos</span><span class="chip">MoSCoW</span><span class="chip">critérios de aceite</span></div>
+</section>
+
+<!-- 13b PONTO DE PARTIDA -->
+<section class="slide" id="s13b" data-t="slide" data-title="Ponto de partida" data-notes="<b>Estado inicial.</b> Começamos do absoluto zero, no início de outubro de 2026: sem código, sem banco, sem ambiente na Azure, sem dataset e sem documentação de semestres anteriores. Nada foi aproveitado. Em cerca de quatro semanas chegamos ao MVP mais o mapa de postos, publicado na Azure, com pipeline e testes. Em 19/11 o objetivo é o sistema completo, as três documentações e o panfleto, com as limitações assumidas.">
+  <span class="kick" data-r>Estado inicial</span>
+  <h2 data-r style="font-size:76px">Do <em>absoluto zero</em> ao app na Azure</h2>
+  <div class="ini">
+    <div class="glass" data-r="left"><h3>Começo</h3><small>início de outubro de 2026</small><ul><li>Nenhum código</li><li>Nenhum ambiente na Azure</li><li>Sem dataset nem documentação</li><li>Nada aproveitado de semestres anteriores</li></ul></div>
+    <div class="glass" data-r="zoom"><h3>Hoje</h3><small>cerca de quatro semanas depois</small><ul><li>MVP (RF01 a RF09) e mapa de postos</li><li>Publicado na Azure, com pipeline</li><li>Chatbot de 39 intenções e busca por voz</li><li>Mais de 1.600 testes automatizados</li></ul></div>
+    <div class="glass" data-r="right"><h3>19/11</h3><small>entrega total</small><ul><li>Sistema completo na Azure e em Docker</li><li>Três documentações em PDF e panfleto</li><li>Limites assumidos com honestidade</li></ul></div>
+  </div>
 </section>
 
 <!-- 14 LIMITES -->
-<section class="slide" id="s14" data-t="blur" data-title="Limites e próximos passos" data-notes="<b>Limites.</b> Seja honesto(a) com o que ficou de fora. Voz, mapa e localização ainda sem teste em celular físico e iOS. O RF12 (compartilhar com cuidador) fica para uma versão futura.">
+<section class="slide" id="s14" data-t="blur" data-title="Limites e próximos passos" data-notes="<b>Limites.</b> Seja honesto(a) com o que ficou de fora. Voz, mapa e instalação já foram testados em celular físico pelo autor e funcionaram; falta testar no iOS. O RF12 (compartilhar com cuidador) fica para uma versão futura.">
   <span class="kick" data-r>Honestidade</span>
   <h2 data-r>Limites e <em>próximos passos</em></h2>
   <div class="lim">
     <div><h3 data-r>O que ainda falta</h3><ul>
       <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Não substitui a caderneta nem um profissional de saúde</li>
       <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Personas sem validação com usuários reais</li>
-      <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Voz, mapa e instalação ainda sem teste em celular físico e iOS</li>
+      <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Testado em celular físico e funcionou; falta testar no iOS</li>
       <li class="glass" data-r="left"><i class="ic" data-ic="alert"></i>Compartilhar com cuidador (RF12) fica para depois</li></ul></div>
     <div class="ok"><h3 data-r>O que acabou de entrar</h3><ul>
       <li class="glass" data-r="right"><i class="ic" data-ic="check"></i>PDF da carteira, com fonte e aviso em toda página</li>
@@ -583,7 +599,7 @@ body.mostra .hud,.hud:hover{opacity:1}
 </main>
 
 <div class="hud" id="hud">
-  <button id="bPrev" aria-label="Anterior">←</button><span class="num" id="num">1 / 16</span><button id="bNext" aria-label="Próximo">→</button>
+  <button id="bPrev" aria-label="Anterior">←</button><span class="num" id="num">1 / 17</span><button id="bNext" aria-label="Próximo">→</button>
   <span class="esp"></span>
   <button id="bVis">Visão geral (G)</button><button id="bNot">Notas (N)</button><button id="bMov">Movimento: ligado (M)</button><button id="bFull">Tela cheia (F)</button>
 </div>
