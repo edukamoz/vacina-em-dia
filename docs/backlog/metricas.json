@@ -650,6 +650,32 @@
       "janelaMin": 1241,
       "commits": 5,
       "tempoSessaoMin": 30
+    },
+    "B65": {
+      "prs": [
+        188
+      ],
+      "finalizadoEm": "2026-10-23",
+      "finalizadoEmTexto": "23/10/2026 21:52",
+      "linhasAlteradas": 1011,
+      "peso": 5,
+      "tempoEstimadoMin": 69,
+      "janelaMin": 48,
+      "commits": 4,
+      "tempoSessaoMin": 49
+    },
+    "B66": {
+      "prs": [
+        188
+      ],
+      "finalizadoEm": "2026-10-23",
+      "finalizadoEmTexto": "23/10/2026 21:52",
+      "linhasAlteradas": 1011,
+      "peso": 5,
+      "tempoEstimadoMin": 69,
+      "janelaMin": 48,
+      "commits": 4,
+      "tempoSessaoMin": 49
     }
   }
 }
