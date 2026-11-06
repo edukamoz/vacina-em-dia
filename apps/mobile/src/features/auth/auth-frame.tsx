@@ -8,6 +8,7 @@ import { LinkTexto } from '../../components/link-texto';
 import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
+import { ID_DO_CONTEUDO } from '../../lib/pular-conteudo';
 import { useVisual } from '../../theme/theme-provider';
 import { Inclinar } from '../../components/inclinar';
 import { Logo, Simbolo } from './logo';
@@ -66,6 +67,8 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
             </Texto>
           </View>
           <ScrollView
+            nativeID={ID_DO_CONTEUDO}
+            tabIndex={-1}
             className="flex-1"
             contentContainerClassName="flex-grow items-center justify-center p-xxl"
           >
@@ -78,7 +81,11 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
 
   return (
     <SafeAreaView className="flex-1 bg-fundo">
-      <ScrollView contentContainerClassName="items-center gap-xxl px-lg py-xl medio:p-xl">
+      <ScrollView
+        nativeID={ID_DO_CONTEUDO}
+        tabIndex={-1}
+        contentContainerClassName="items-center gap-xxl px-lg py-xl medio:p-xl"
+      >
         <Pressable
           accessibilityRole="link"
           accessibilityLabel="Vacina em Dia, voltar à apresentação"

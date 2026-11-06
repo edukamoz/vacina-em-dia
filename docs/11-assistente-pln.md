@@ -9,6 +9,8 @@ Serviço em `apps/nlp` (Azure Function em Python, ADR-002). **Sem IA generativa*
 3. **Classificador de intenções** (TF-IDF + SVM): 39 intenções. Confiança abaixo do limiar (0,30) devolve a **resposta padrão**, que orienta procurar um profissional ou uma unidade de saúde. Se a pergunta cita uma vacina, o assistente explica a vacina em vez de dizer que não entendeu.
 4. **Resposta**: curada. Para "para que serve", "quando toma" e "vacinas do grupo", o texto é montado a partir das linhas do calendário oficial (doenças evitadas, dose e momento) e **sempre cita a fonte e a versão**.
 
+**Árvore de decisão (atividade da aula "ChatBot I"):** o desenho completo, com o mapa para o código, está em `docs/03-uml/arvore-decisao-chatbot.md` (imagem: `arvore-decisao-chatbot.png`).
+
 ### Intenções
 
 O assistente também **olha a conta e age** (B61, ADR-025): ver a seção "Assistente com poder sobre a conta" abaixo.

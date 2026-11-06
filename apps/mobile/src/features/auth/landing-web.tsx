@@ -11,6 +11,7 @@ import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
 import { Paralaxe, Revelar, RolagemAnimada } from '../../components/rolagem-animada';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
+import { ID_DO_CONTEUDO } from '../../lib/pular-conteudo';
 import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import { FOTOS, type Foto } from './fotos';
 import { HeroModular } from './hero-modular';
@@ -182,7 +183,7 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
           <Botao titulo="Entrar" variante="secundario" onPress={() => router.push('/entrar')} />
         </View>
 
-        <View className="relative overflow-hidden">
+        <View nativeID={ID_DO_CONTEUDO} tabIndex={-1} className="relative overflow-hidden">
           {altoContraste ? null : (
             <>
               <Bolha

@@ -16,4 +16,17 @@ describe('resolveTheme (CT-TEMA)', () => {
       expect(resolveTheme(preference, system)).toBe(expected);
     },
   );
+
+  test.each([
+    ['system', 'light', 'highContrast'],
+    ['system', 'dark', 'highContrast'],
+    ['light', 'light', 'light'],
+    ['dark', 'dark', 'dark'],
+    ['highContrast', 'light', 'highContrast'],
+  ] as const)(
+    'CT-TEMA-02: com o sistema pedindo mais contraste, preferência %s com sistema %s resulta em %s',
+    (preference, system, expected) => {
+      expect(resolveTheme(preference, system, true)).toBe(expected);
+    },
+  );
 });

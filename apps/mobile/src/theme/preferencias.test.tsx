@@ -14,6 +14,7 @@ function Sonda() {
       <Text>{`efetivo=${movimentoReduzido} escolha=${movimento} tema=${theme}`}</Text>
       <Text onPress={() => setMovimento('reduzir')}>ligar</Text>
       <Text onPress={() => setMovimento('sistema')}>sistema</Text>
+      <Text onPress={() => setMovimento('animar')}>animar</Text>
     </>
   );
 }
@@ -61,7 +62,7 @@ describe('preferências de movimento e de texto (CT-PREF)', () => {
         <Sonda />
       </ThemeProvider>,
     );
-    expect(screen.getByText(/efetivo=false escolha=animar/)).toBeTruthy();
+    expect(screen.getByText(/efetivo=false escolha=sistema/)).toBeTruthy();
     await fireEvent.press(screen.getByText('ligar'));
     expect(screen.getByText(/efetivo=true escolha=reduzir/)).toBeTruthy();
     await waitFor(async () =>
@@ -85,10 +86,10 @@ describe('preferências de movimento e de texto (CT-PREF)', () => {
         <Sonda />
       </ThemeProvider>,
     );
-    expect(screen.getByText(/efetivo=true escolha=animar tema=highContrast/)).toBeTruthy();
+    expect(screen.getByText(/efetivo=true escolha=sistema tema=highContrast/)).toBeTruthy();
   });
 
-  test('CT-PREF-06b: "Animar sempre" vale mesmo que o aparelho peça menos movimento', async () => {
+  test('CT-PREF-06b: sem escolha, o app segue o aparelho; "Animar sempre" vale mesmo que ele peça menos movimento', async () => {
     jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(true);
     await render(
       <ThemeProvider>
@@ -96,9 +97,20 @@ describe('preferências de movimento e de texto (CT-PREF)', () => {
       </ThemeProvider>,
     );
     await act(async () => undefined);
-    expect(screen.getByText(/efetivo=false escolha=animar/)).toBeTruthy();
-    await fireEvent.press(screen.getByText('sistema'));
-    await waitFor(() => expect(screen.getByText(/efetivo=true escolha=sistema/)).toBeTruthy());
+    expect(screen.getByText(/efetivo=true escolha=sistema/)).toBeTruthy();
+    await fireEvent.press(screen.getByText('animar'));
+    await waitFor(() => expect(screen.getByText(/efetivo=false escolha=animar/)).toBeTruthy());
+  });
+
+  test('CT-PREF-06d: o aparelho sem pedido de menos movimento deixa o padrão animar', async () => {
+    jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(false);
+    await render(
+      <ThemeProvider>
+        <Sonda />
+      </ThemeProvider>,
+    );
+    await act(async () => undefined);
+    expect(screen.getByText(/efetivo=false escolha=sistema/)).toBeTruthy();
   });
 
   test('CT-PREF-06c: o atalho e o seletor trocam o modo de movimento', async () => {
@@ -108,7 +120,7 @@ describe('preferências de movimento e de texto (CT-PREF)', () => {
         <SeletorDeMovimento />
       </ThemeProvider>,
     );
-    expect(screen.getByRole('radio', { name: 'Animar sempre', checked: true })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Seguir o aparelho', checked: true })).toBeTruthy();
     await act(async () => {
       await fireEvent.press(screen.getByRole('switch', { name: 'Reduzir movimento' }));
     });

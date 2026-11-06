@@ -6,7 +6,6 @@ Os arquivos Word e PowerPoint ficam em `doctos/` (fora do Git, por decisão do a
 |---|---|---|
 | `gerar_doc_tecnica.py` | `doctos/Documentacao_Tecnica.docx` | `docs/` (requisitos, tecnologias, backlog) e os diagramas de `docs/03-uml/*.png` |
 | `gerar_doc_usuario.py` | `doctos/Documentacao_do_Usuario.docx` | capturas de tela em `doctos/capturas/` |
-| `gerar_apresentacao.py` | `doctos/Apresentacao.pptx` | capturas e diagramas |
 | `gerar_apresentacao_web.py` | `doctos/Apresentacao.html` (apresentação animada em um só arquivo, abre no navegador, sem internet) | modelo em `apresentacao/index.html`, capturas em `doctos/capturas/apresentacao/` (geradas pelo `capturas-apresentacao.spec.ts.txt`: copie para `apps/mobile/e2e/` com a extensão `.spec.ts`, rode com `E2E_CANAL=chrome npx playwright test` e apague a cópia) |
 | `capturas.mjs` | `doctos/capturas/*.png` (web e celular) | app e API no ar e Chrome instalado |
 | `capturas-novas.spec.ts.txt` | `doctos/capturas/celular-10…14`, `web-07`, `web-10`, `web-11` e `celular-07` (telas novas: foto, Pix, caderneta, janelas, apresentação e Conta) | Playwright com a API falsa dos testes de ponta a ponta (sem Docker nem dados reais); ver abaixo |
@@ -16,14 +15,14 @@ Os arquivos Word e PowerPoint ficam em `doctos/` (fora do Git, por decisão do a
 ## Passo a passo
 
 ```bash
-pip install python-docx python-pptx
+pip install python-docx
 docker compose up -d --build            # app em http://localhost:8080 e API
 # crie a conta de teste e os dados de exemplo (nomes fictícios) na API local
 npm install --no-save puppeteer-core
 node scripts/documentos/capturas.mjs     # APP_URL=http://localhost:8080 por padrão
 python scripts/documentos/gerar_doc_tecnica.py
 python scripts/documentos/gerar_doc_usuario.py
-python scripts/documentos/gerar_apresentacao.py
+python scripts/documentos/gerar_apresentacao_web.py
 ```
 
 Os PDFs de entrega saem da conversão dos arquivos Word (Arquivo > Salvar como > PDF) só no momento da entrega.

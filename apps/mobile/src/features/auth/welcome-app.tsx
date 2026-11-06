@@ -8,6 +8,7 @@ import { Texto } from '../../components/texto';
 import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import { FOTOS } from './fotos';
 import { Simbolo } from './logo';
+import { ID_DO_CONTEUDO } from '../../lib/pular-conteudo';
 
 /**
  * Abertura do aplicativo instalado (Android, iOS ou site instalado como app). Diferente da página
@@ -24,6 +25,8 @@ export function WelcomeApp() {
   return (
     <SafeAreaView className="flex-1 bg-primaria" style={gradienteMarca}>
       <ScrollView
+        nativeID={ID_DO_CONTEUDO}
+        tabIndex={-1}
         contentContainerClassName="flex-grow self-center w-full max-w-[520px]"
         showsVerticalScrollIndicator={false}
         bounces={false}

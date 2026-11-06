@@ -1,7 +1,7 @@
 # Vacina em Dia: Plano de Teste
 
 > Item do backlog: B24 (antes SCRUM-27 no Jira). Primeira entrega de Qualidade e Testes de Software (12/11/2026).
-> Versão 0.1 (rascunho), 06/10/2026. Autor: Eduardo Kamo Iguei.
+> Versão 0.1 (rascunho), 06/10/2026. Autores: Eduardo Kamo Iguei, Fernando Ribeiro dos Santos, Gustavo Lopes Ferreira, Iago Yuri Rossan e Lucas Vinicios Consani.
 > Este arquivo é a fonte em Markdown. Na entrega, o conteúdo vai para Word (ABNT) e depois PDF.
 > Documentos relacionados: `docs/02-requisitos.md`, `docs/03-uml/estados-dose.md`, `docs/07-testes/casos-teste-estados-dose.md`.
 
@@ -190,7 +190,7 @@ Os testes de um item são suspensos se o ambiente cair, se o pipeline estiver qu
 | Dados | Calendário de exemplo `FICTITIOUS` e conjunto de intenções criado e revisado manualmente, sem dados pessoais |
 | Dispositivos | Navegador, emulador Android e simulador iOS (RNF09) |
 | Rastreamento | GitHub Projects (casos de teste, plano e execuções como issues; ver `gestao-de-testes-github.md`) e este repositório |
-| Pessoas | Uma pessoa (o autor), acumulando todos os papéis (ver seção 8) |
+| Pessoas | Equipe de cinco pessoas; a divisão dos papéis entre elas é definida pelo grupo (ver seção 8) |
 
 ## 7 Cronograma estimado
 
@@ -212,18 +212,18 @@ Marcos: plano e casos de estados prontos até 12/10; pipeline verde até 19/10; 
 
 ## 8 Papéis do processo de teste
 
-O projeto é individual: **uma pessoa acumula todos os papéis**. Os papéis são "chapéus" usados em momentos diferentes do ciclo, não pessoas diferentes.
+O projeto é feito por uma **equipe de cinco pessoas** (nomes e RAs em `docs/09-documentacao-de-desenvolvimento.md`). Os papéis abaixo são funções do ciclo de teste: uma pessoa pode acumular mais de um e um papel pode ser dividido. **A atribuição de cada papel não está registrada neste repositório; o grupo preenche a coluna "Responsável".**
 
-| Papel | Responsabilidade | Quando atua |
-|---|---|---|
-| Gerente de teste | Planeja, define critérios, acompanha cronograma e riscos | Início de cada sprint e na reunião de encerramento |
-| Analista de teste | Interpreta requisitos e define o que testar | Antes de implementar o item |
-| Projetista de casos | Escreve casos de teste e dados de entrada | Antes e durante a implementação |
-| Automatizador | Escreve e mantém os testes em Jest e pytest | Durante a implementação |
-| Executor | Roda os testes, registra resultados e abre defeitos | Depois da implementação e a cada push |
-| Responsável pelo ambiente | Mantém pipeline, Docker e dados de teste | Sob demanda |
+| Papel | Responsabilidade | Quando atua | Responsável |
+|---|---|---|---|
+| Gerente de teste | Planeja, define critérios, acompanha cronograma e riscos | Início de cada sprint e na reunião de encerramento | [a definir] |
+| Analista de teste | Interpreta requisitos e define o que testar | Antes de implementar o item | [a definir] |
+| Projetista de casos | Escreve casos de teste e dados de entrada | Antes e durante a implementação | [a definir] |
+| Automatizador | Escreve e mantém os testes em Jest e pytest | Durante a implementação | [a definir] |
+| Executor | Roda os testes, registra resultados e abre defeitos | Depois da implementação e a cada push | [a definir] |
+| Responsável pelo ambiente | Mantém pipeline, Docker e dados de teste | Sob demanda | [a definir] |
 
-**Como funciona com uma só pessoa:** a falta de um segundo par de olhos é o principal ponto fraco. Para reduzir o risco:
+**Como reduzir o risco de um só olhar:** quando o mesmo código é escrito e testado pela mesma pessoa, falta um segundo par de olhos. Para reduzir o risco:
 
 - o **pipeline é o executor independente**: nenhum item é concluído sem pipeline verde, mesmo que "funcione na minha máquina";
 - os testes dos casos claros são escritos **antes** do código (domínio e máquina de estados), para não ajustar o teste ao que o código já faz;

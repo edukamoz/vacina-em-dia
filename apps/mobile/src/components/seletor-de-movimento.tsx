@@ -4,7 +4,7 @@ import { Chave } from './chave';
 import { GrupoDeRadios } from './grupo-de-radios';
 
 /**
- * Escolha do movimento na Conta: "Animar sempre" (o padrão), "Seguir o aparelho" ou "Reduzir
+ * Escolha do movimento na Conta: "Seguir o aparelho" (o padrão), "Animar sempre" ou "Reduzir
  * movimento". "Animar sempre" vale mesmo que o aparelho peça menos movimento; o tema Alto contraste
  * sempre deixa tudo parado.
  */

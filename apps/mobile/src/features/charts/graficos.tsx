@@ -13,17 +13,16 @@ import {
   type MesDoGrafico,
 } from '../../lib/estatisticas';
 import { useThemeColors } from '../../theme/theme-provider';
+import { useCoresDosEstados } from './cores-dos-estados';
+import {
+  AmostraDoEstado,
+  CamadaDeTextura,
+  Padroes,
+  usarPadrao,
+  usePrefixoDePadroes,
+} from './padroes';
 
-/** Cor de cada estado: as mesmas do selo da dose, para o gráfico e a lista dizerem a mesma coisa. */
-export function useCoresDosEstados(): Readonly<Record<EstadoDoGrafico, string>> {
-  const cores = useThemeColors();
-  return {
-    APPLIED: cores.aplicada,
-    SCHEDULED: cores.agendada,
-    PENDING: cores.pendente,
-    OVERDUE: cores.atrasada,
-  };
-}
+export { useCoresDosEstados };
 
 const RAIO = 70;
 const CIRCUNFERENCIA = 2 * Math.PI * RAIO;
@@ -39,7 +38,7 @@ const FOLGA = 4;
  */
 export function Rosca({ contagem }: { contagem: ContagemPorEstado }) {
   const cores = useThemeColors();
-  const corDoEstado = useCoresDosEstados();
+  const prefixo = usePrefixoDePadroes();
   const [foco, setFoco] = useState<EstadoDoGrafico | null>(null);
   const progresso = useProgresso(1, 900);
   const total = totalDaContagem(contagem);
@@ -67,6 +66,7 @@ export function Rosca({ contagem }: { contagem: ContagemPorEstado }) {
         className="h-[180px] w-[180px] items-center justify-center"
       >
         <Svg width={180} height={180} viewBox="0 0 180 180" style={{ position: 'absolute' }}>
+          <Padroes prefixo={prefixo} />
           <Circle cx={90} cy={90} r={RAIO} fill="none" stroke={cores.bordaSuave} strokeWidth={22} />
           {fatias.map(({ estado, inicio, comprimento }) => {
             const visivel = Math.max(0, comprimento * progresso - (fatias.length > 1 ? FOLGA : 0));
@@ -77,7 +77,7 @@ export function Rosca({ contagem }: { contagem: ContagemPorEstado }) {
                 cy={90}
                 r={RAIO}
                 fill="none"
-                stroke={corDoEstado[estado]}
+                stroke={usarPadrao(prefixo, estado)}
                 strokeWidth={foco === estado ? 28 : 22}
                 strokeOpacity={foco && foco !== estado ? 0.35 : 1}
                 strokeDasharray={`${visivel} ${CIRCUNFERENCIA}`}
@@ -110,11 +110,7 @@ export function Rosca({ contagem }: { contagem: ContagemPorEstado }) {
                 ativo ? 'border-borda bg-superficieSuave' : 'border-transparent'
               }`}
             >
-              <View
-                aria-hidden
-                className="h-[16px] w-[16px] rounded-[5px]"
-                style={{ backgroundColor: corDoEstado[estado] }}
-              />
+              <AmostraDoEstado estado={estado} />
               <Texto className="flex-1" importantForAccessibility="no">
                 {ROTULO_DO_ESTADO[estado]}
               </Texto>
@@ -232,7 +228,6 @@ export function BarrasPorPessoa({
 }: {
   linhas: readonly { readonly nome: string; readonly contagem: ContagemPorEstado }[];
 }) {
-  const corDoEstado = useCoresDosEstados();
   const cores = useThemeColors();
   const progresso = useProgresso(1, 800);
   return (
@@ -271,12 +266,10 @@ export function BarrasPorPessoa({
                 contagem[estado] > 0 ? (
                   <View
                     key={estado}
-                    style={{
-                      flexGrow: contagem[estado] * progresso,
-                      flexBasis: 0,
-                      backgroundColor: corDoEstado[estado],
-                    }}
-                  />
+                    style={{ flexGrow: contagem[estado] * progresso, flexBasis: 0 }}
+                  >
+                    <CamadaDeTextura estado={estado} />
+                  </View>
                 ) : null,
               )}
             </View>

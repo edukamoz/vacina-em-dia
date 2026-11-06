@@ -12,8 +12,12 @@
 |---|---|
 | Nome do projeto | Vacina em Dia: carteira de vacinação digital com lembretes e assistente por voz |
 | Projeto | Projeto Interdisciplinar VI (PI-VI) |
-| Grupo | Individual |
-| Integrante | Eduardo Kamo Iguei, RA 3011392413005 |
+| Grupo | Equipe de cinco integrantes |
+| Integrante 1 | Eduardo Kamo Iguei, RA 3011392413005 |
+| Integrante 2 | Fernando Ribeiro dos Santos, RA 3011392413020 |
+| Integrante 3 | Gustavo Lopes Ferreira, RA 3011392413016 |
+| Integrante 4 | Iago Yuri Rossan, RA 3011392413038 |
+| Integrante 5 | Lucas Vinicios Consani, RA 3011392413046 |
 | Curso | Tecnologia em Desenvolvimento de Software Multiplataforma, Fatec Votorantim |
 | Semestre | 6º semestre, 2026 |
 | Professor orientador | Prof. Dr. Cassio R. F. Riedo |
@@ -24,7 +28,7 @@
 
 O **Vacina em Dia** é um aplicativo para Android, iOS e web com o qual famílias organizam o calendário vacinal de seus membros, registram doses, recebem lembretes e tiram dúvidas por busca por voz e por um chatbot de intenções. O sistema roda inteiramente na Microsoft Azure e integra as disciplinas Laboratório de Desenvolvimento Multiplataforma, Computação em Nuvem II, Processamento de Linguagem Natural e Qualidade e Testes de Software. Atende aos ODS 3 (Saúde e Bem-Estar) e 10 (Redução das Desigualdades). O escopo, os requisitos e as decisões técnicas estão em `docs/01-visao-e-escopo.md`, `docs/02-requisitos.md` e `docs/05-adrs/`.
 
-O projeto é individual: o autor acumula os papéis de dono do produto, Scrum Master e desenvolvedor, e usa um assistente de programação (Claude Code) como par de programação, com as decisões sempre do autor.
+O projeto é feito por uma equipe de cinco integrantes (seção 1). Os registros de atividades e de reuniões desta versão foram feitos por Eduardo Kamo Iguei, que acumulou os papéis de dono do produto, Scrum Master e desenvolvedor e usou um assistente de programação (Claude Code) como par de programação. **A partir daqui, o campo "Membro" de cada atividade informa quem a fez**; a divisão dos papéis entre os integrantes é registrada pelo grupo.
 
 ## 3 Registro de atividades
 
@@ -103,7 +107,7 @@ Todas as atividades abaixo ocorreram em 06/10/2026 (datas dos commits no reposit
 
 ### 3.2 Registro de reuniões
 
-As reuniões do Scrum são **simuladas** (projeto individual): o autor acumula os papéis. **Padrão informado pelo autor:** sextas-feiras às 20:05, com duração de 30 a 40 minutos; a sexta-feira também é o dia da reunião com o professor. A data de cada reunião e a duração efetiva são registradas pelo autor depois que ela ocorre.
+As reuniões do Scrum registradas até esta versão são **simuladas**: o autor acumulava os papéis. **Padrão informado pelo autor:** sextas-feiras às 20:05, com duração de 30 a 40 minutos; a sexta-feira também é o dia da reunião com o professor. A data de cada reunião e a duração efetiva são registradas pelo autor depois que ela ocorre.
 
 **3.2.1 Planejamento da Sprint 1**
 

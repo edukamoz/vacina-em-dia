@@ -79,7 +79,7 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
         <Botao
           titulo="Sim, cancelar a dose"
           variante="perigo"
-          disabled={mutation.isPending}
+          carregando={mutation.isPending}
           onPress={() => enviar({ type: 'CANCEL', confirmed: true })}
         />
         <Botao titulo="Não, voltar" variante="secundario" onPress={() => setAcao(null)} />
@@ -104,7 +104,7 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
         {erro}
         <Botao
           titulo={textos.confirmar}
-          disabled={mutation.isPending}
+          carregando={mutation.isPending}
           onPress={() => enviar({ type: tipo, date: data })}
         />
         <Botao titulo="Voltar" variante="secundario" onPress={() => setAcao(null)} />
@@ -120,7 +120,7 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
         <Botao
           titulo="Desmarcar o agendamento"
           variante="secundario"
-          disabled={mutation.isPending}
+          carregando={mutation.isPending}
           onPress={() => enviar({ type: 'UNSCHEDULE' })}
         />
       ) : null}

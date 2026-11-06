@@ -9,6 +9,7 @@ import {
   type ModoDeMovimento,
   type TamanhoDoTexto,
 } from './preferencias';
+import { useAltoContrasteDoSistema } from './contraste-do-sistema';
 import { resolveTheme, type ThemePreference } from './resolve-theme';
 import {
   getBackgroundGradient,
@@ -49,7 +50,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
  * preferência de movimento do sistema.
  *
  * @param props.initialPreference - Escolha inicial; por padrão segue o sistema.
- * @param props.initialReduceMotion - `true` começa em "Reduzir movimento" (os testes ligam para não animar); senão começa em "Animar sempre".
+ * @param props.initialReduceMotion - `true` começa em "Reduzir movimento" (os testes ligam para não animar); senão começa em "Seguir o aparelho".
  * @param props.initialTextSize - Tamanho do texto inicial.
  */
 export function ThemeProvider({
@@ -70,7 +71,8 @@ export function ThemeProvider({
   const [tamanhoDoTexto, setTamanhoDoTexto] = useState<TamanhoDoTexto>(initialTextSize);
   const [movimentoDoSistema, setMovimentoDoSistema] = useState(false);
   const systemScheme = useColorScheme();
-  const theme = resolveTheme(preference, systemScheme);
+  const contrasteDoSistema = useAltoContrasteDoSistema();
+  const theme = resolveTheme(preference, systemScheme, contrasteDoSistema);
 
   useEffect(() => {
     let ativo = true;

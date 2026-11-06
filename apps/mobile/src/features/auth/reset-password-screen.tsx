@@ -109,7 +109,7 @@ export function ResetPasswordScreen() {
       ) : null}
       <Botao
         titulo={pending ? 'Salvando...' : 'Salvar a nova senha'}
-        disabled={pending}
+        carregando={pending}
         onPress={() => void submit()}
       />
       {failure ? (

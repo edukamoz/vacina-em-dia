@@ -21,9 +21,9 @@ export const ESCALA_DO_TEXTO: Readonly<Record<TamanhoDoTexto, number>> = {
 };
 
 /**
- * Como o movimento (animações e efeitos de profundidade) é tratado: `animar` anima sempre, mesmo
- * que o aparelho peça menos movimento; `reduzir` deixa tudo parado; `sistema` segue o aparelho.
- * O tema Alto contraste sempre deixa parado, seja qual for a escolha.
+ * Como o movimento (animações e efeitos de profundidade) é tratado: `sistema` segue o aparelho (o
+ * padrão); `animar` anima sempre, mesmo que o aparelho peça menos movimento; `reduzir` deixa tudo
+ * parado. O tema Alto contraste sempre deixa parado, seja qual for a escolha.
  */
 export type ModoDeMovimento = 'animar' | 'reduzir' | 'sistema';
 
@@ -37,8 +37,11 @@ export const ROTULOS_DO_MOVIMENTO: Readonly<Record<ModoDeMovimento, string>> = {
   reduzir: 'Reduzir movimento',
 };
 
-/** Modo de movimento de quem ainda não escolheu. */
-export const MOVIMENTO_PADRAO: ModoDeMovimento = 'animar';
+/**
+ * Modo de movimento de quem ainda não escolheu: segue o aparelho (WCAG 2.3.3, ADR-026). Quem já
+ * escolheu "Animar sempre" antes dessa mudança mantém a escolha guardada.
+ */
+export const MOVIMENTO_PADRAO: ModoDeMovimento = 'sistema';
 
 /** Preferências de aparência guardadas neste aparelho (não são dados pessoais). */
 export interface Preferencias {

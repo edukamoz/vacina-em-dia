@@ -86,7 +86,7 @@ function CustomDoseForm({ memberId, memberName }: { memberId: string; memberName
           {create.error.message}
         </Texto>
       ) : null}
-      <Botao titulo="Adicionar dose" disabled={create.isPending} onPress={salvar} />
+      <Botao titulo="Adicionar dose" carregando={create.isPending} onPress={salvar} />
     </Tela>
   );
 }

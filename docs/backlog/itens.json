@@ -720,7 +720,7 @@
    "estado": "Em análise",
    "sprint": 6,
    "evidencia": "docs/20-roteiro-de-demonstracao.md",
-   "nota": "Roteiro e slides prontos (doctos/Apresentacao.pptx); falta ensaiar.",
+   "nota": "Roteiro e slides prontos (doctos/Apresentacao.html); falta ensaiar.",
    "curto": "Roteiro e apresentação final"
   },
   {
@@ -862,12 +862,12 @@
    "personas": "autora",
    "requisitos": "RNF04",
    "criterios": [
-    "Variáveis, medidas, estilos de texto e sombras na versão 2 (plugin em docs/04-design-system/figma-plugin).",
+    "Variáveis, medidas, estilos de texto e sombras na versão 2 (arquivo do Figma, ver docs/04-design-system.md §8).",
     "Componentes e telas atualizados."
    ],
    "estado": "Em análise",
    "sprint": 6,
-   "evidencia": "docs/04-design-system.md §8; docs/04-design-system/figma-plugin/LEIA-ME.md",
+   "evidencia": "docs/04-design-system.md §8",
    "nota": "Figma na versão 2 em 20/10/2026: 31 telas e 16 componentes com variantes. As telas e componentes \"v1 ·\" já foram apagados pela autora; as telas ainda não usam as instâncias dos componentes.",
    "curto": "Atualizar o Figma para a versão 2"
   },
@@ -1244,7 +1244,7 @@
    "estado": "Em análise",
    "sprint": 3,
    "evidencia": "docs/07-testes/gestao-de-testes-github.md",
-   "nota": "Equivale ao Jira com Xray da aula. A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).",
+   "nota": "Equivale ao Jira com Xray da aula. A atividade da aula em si foi feita no Jira (B68). A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).",
    "curto": "Gestão de testes no GitHub Projects (equivalente ao Xray)"
   },
   {
@@ -1264,6 +1264,42 @@
    "evidencia": "scripts/backlog-metricas.mjs; docs/backlog/metricas.json; scripts/backlog-github.mjs",
    "nota": "O tempo é uma estimativa de trabalho em sessão (autor e agente), não as horas da Documentação de Desenvolvimento, que são da autora.",
    "curto": "Backlog com responsável, datas, peso e tempo; limpeza do repositório"
+  },
+  {
+   "id": "B67",
+   "jira": null,
+   "titulo": "Como equipe, quero automatizar cenários de teste do app pelo navegador com Robot Framework, para cumprir a atividade de Qualidade e Testes e ter evidência de regressão",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "Há ao menos um cenário, que não seja o de login, automatizado na estrutura do guia da professora (tests, resources, variables, results).",
+    "Os cenários passam e geram report.html, log.html e output.xml; a senha da conta de teste não fica no repositório."
+   ],
+   "estado": "Em análise",
+   "sprint": 5,
+   "evidencia": "testes-robot/",
+   "nota": "Dois cenários (cadastro com senhas diferentes e adicionar membro da família), rodados no Chrome contra o app publicado. Não rodam no CI; o segundo cria uma pessoa fictícia na conta de teste a cada execução.",
+   "curto": "Automação de testes web com Robot Framework"
+  },
+  {
+   "id": "B68",
+   "jira": null,
+   "titulo": "Como equipe, quero casos de teste, plano e execução no Jira com Xray, para cumprir a atividade da aula de gerenciamento de testes",
+   "epico": "E7",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF07",
+   "criterios": [
+    "O projeto no Jira tem ao menos 5 testes do Xray, um Test Plan e uma Test Execution, com a professora e o grupo adicionados.",
+    "Os testes foram executados e os relatórios foram anexados na tarefa do Teams."
+   ],
+   "estado": "Em análise",
+   "sprint": 5,
+   "evidencia": "Jira vacinaemdia.atlassian.net: SCRUM-41 a SCRUM-48",
+   "nota": "Feito só para a atividade; o backlog segue no GitHub Projects (B65). A execução (PASS ou FAIL) e o envio dos relatórios são do autor.",
+   "curto": "Testes no Jira com Xray (atividade da aula)"
   },
   {
    "id": "B48",

@@ -104,7 +104,7 @@ function MemberForm({ membro }: FormProps) {
 
       <Botao
         titulo={membro ? 'Salvar alterações' : 'Salvar e ver as vacinas'}
-        disabled={mutation.isPending}
+        carregando={mutation.isPending}
         onPress={salvar}
       />
 
@@ -128,7 +128,7 @@ function MemberForm({ membro }: FormProps) {
             <Botao
               titulo="Sim, excluir"
               variante="perigo"
-              disabled={remove.isPending}
+              carregando={remove.isPending}
               onPress={() =>
                 remove.mutate(membro.id, {
                   onSuccess: () => {

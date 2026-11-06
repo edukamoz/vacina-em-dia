@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-  Monta a pasta da entrega final: PDFs das documentações e do panfleto, a apresentação e o zip do código.
+  Monta a pasta da entrega final: PDFs das documentações e do panfleto, a apresentação em HTML e o zip do código.
 
 .DESCRIPTION
   Converte os arquivos Word de doctos/ para PDF com o Word instalado (a entrega é em PDF; o Word
-  continua sendo a fonte), exporta a apresentação em PDF com o PowerPoint e cria o zip do código
+  continua sendo a fonte), copia a apresentação animada (Apresentacao.html) e cria o zip do código
   com `git archive` (só o que está no Git: sem segredos, node_modules nem arquivos gerados).
   A saída fica em entrega/ (fora do Git). Rode só perto da data da entrega, depois de conferir os
   Word. Uso: powershell -ExecutionPolicy Bypass -File scripts/empacotar-entrega.ps1
@@ -45,17 +45,12 @@ try {
   if ($null -ne $word) { $word.Quit() }
 }
 
-$apresentacao = Join-Path $doctos 'Apresentacao.pptx'
+$apresentacao = Join-Path $doctos 'Apresentacao.html'
 if (Test-Path $apresentacao) {
-  $ppt = New-Object -ComObject PowerPoint.Application
-  try {
-    $pres = $ppt.Presentations.Open($apresentacao, $true, $false, $false)
-    $pres.SaveAs((Join-Path $saida 'Apresentacao.pdf'), 32)
-    $pres.Close()
-    Write-Host 'OK  Apresentacao.pdf'
-  } finally {
-    $ppt.Quit()
-  }
+  Copy-Item $apresentacao (Join-Path $saida 'Apresentacao.html') -Force
+  Write-Host 'OK  Apresentacao.html'
+} else {
+  Write-Warning "Não encontrei $apresentacao; pulei."
 }
 
 $zip = Join-Path $saida 'vacina-em-dia-codigo.zip'
