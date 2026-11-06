@@ -333,6 +333,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B63 | novo | Como equipe, quero aplicar ao projeto as estratégias de teste vistas nas aulas, para defender a qualidade na entrega e achar o que os testes automáticos não pegam | Should | Em análise | Sprint 3 |
 | B64 | novo | Como equipe, quero uma coleção de testes de API no Postman e testes por combinação de pares e aleatórios, para demonstrar a automação de testes de API e a robustez do projeto | Should | Concluído | Sprint 3 |
 | B65 | novo | Como equipe, quero casos de teste, plano e execução registrados no GitHub Projects, ligados aos itens do backlog, para ter a rastreabilidade que o Jira com Xray dava | Should | Em análise | Sprint 3 |
+| B67 | novo | Como equipe, quero automatizar cenários de teste do app pelo navegador com Robot Framework, para cumprir a atividade de Qualidade e Testes e ter evidência de regressão | Should | Em análise | Sprint 5 |
+| B68 | novo | Como equipe, quero casos de teste, plano e execução no Jira com Xray, para cumprir a atividade da aula de gerenciamento de testes | Should | Em análise | Sprint 5 |
 
 **B24** (todas; requisitos: RNF07)
 
@@ -407,7 +409,21 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Há ao menos 5 casos de teste (com passos, dados e resultado esperado), um plano de testes e uma execução com resultado, como issues ligadas aos itens do backlog.
 - Há um relatório de cobertura de requisitos por testes.
 - Evidência: docs/07-testes/gestao-de-testes-github.md
-- Atenção: Equivale ao Jira com Xray da aula. A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).
+- Atenção: Equivale ao Jira com Xray da aula. A atividade da aula em si foi feita no Jira (B68). A professora precisa ser adicionada ao projeto pela autora (é preciso o usuário do GitHub dela).
+
+**B67** (todas; requisitos: RNF07)
+
+- Há ao menos um cenário, que não seja o de login, automatizado na estrutura do guia da professora (tests, resources, variables, results).
+- Os cenários passam e geram report.html, log.html e output.xml; a senha da conta de teste não fica no repositório.
+- Evidência: testes-robot/
+- Atenção: Dois cenários (cadastro com senhas diferentes e adicionar membro da família), rodados no Chrome contra o app publicado. Não rodam no CI; o segundo cria uma pessoa fictícia na conta de teste a cada execução.
+
+**B68** (todas; requisitos: RNF07)
+
+- O projeto no Jira tem ao menos 5 testes do Xray, um Test Plan e uma Test Execution, com a professora e o grupo adicionados.
+- Os testes foram executados e os relatórios foram anexados na tarefa do Teams.
+- Evidência: Jira vacinaemdia.atlassian.net: SCRUM-41 a SCRUM-48
+- Atenção: Feito só para a atividade; o backlog segue no GitHub Projects (B65). A execução (PASS ou FAIL) e o envio dos relatórios são do autor.
 
 ## E8 Versão completa (SCRUM-12)
 
