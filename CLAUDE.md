@@ -187,7 +187,7 @@ Dados de vacinação são dados pessoais sobre saúde, portanto **sensíveis** (
   - **Em análise:** o item foi finalizado, mas ainda estamos dentro da data da sprint.
   - **Concluído:** só depois de analisado e confirmado na reunião de encerramento da sprint.
   - **Você nunca marca um item como Concluído.** Pode sugerir "Em análise" quando terminar; quem decide é o autor.
-- Backlog: `docs/24-backlog.md` (fonte em `docs/backlog/dados.py`, importado para o projeto com `scripts/backlog-github.mjs`), com épicos E1 a E9, prioridade MoSCoW e critérios de aceite. Trabalhe **um item por vez**, na ordem da sprint ativa. O Jira não é mais usado.
+- Backlog: `docs/24-backlog.md` (fonte em `docs/backlog/dados.py`, importado para o projeto com `scripts/backlog-github.mjs`), com épicos E1 a E9, prioridade MoSCoW e critérios de aceite. Trabalhe **um item por vez**, na ordem da sprint ativa. O Jira não é mais usado para o backlog; foi reaberto só para a atividade do Xray da aula (projeto `SCRUM`, itens SCRUM-41 a SCRUM-48; ver B68).
 
 ## 13. Documentação e entregas
 
