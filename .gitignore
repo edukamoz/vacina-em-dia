@@ -96,3 +96,14 @@ apps/mobile/build-e2e.log
 
 # Grafo de conhecimento do projeto (graphify), gerado localmente
 graphify-out/
+
+# --- Ferramentas e arquivos só da máquina do autor (continuam no disco, fora do Git) ---
+CLAUDE.md
+scripts/backlog-github.mjs
+scripts/backlog-metricas.mjs
+scripts/testes-github.mjs
+scripts/empacotar-entrega.ps1
+scripts/gerar-execucao-estados.mjs
+scripts/carga-leve.mjs
+scripts/postman/
+scripts/documentos/
