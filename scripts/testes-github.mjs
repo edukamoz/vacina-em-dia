@@ -74,6 +74,9 @@ let fs = campos();
 function garantirSelecao(nome, nomes, cores) {
   const existente = fs.find((f) => f.name === nome);
   if (existente) {
+    // Reenviar as opções recria os ids e apaga os valores já gravados; só atualiza se mudaram.
+    const atuais = (existente.options ?? []).map((o) => o.name);
+    if (nomes.every((x) => atuais.includes(x))) return;
     gql(
       `mutation($f: ID!, $o: [ProjectV2SingleSelectFieldOptionInput!]!) { updateProjectV2Field(input: {fieldId: $f, singleSelectOptions: $o}) { projectV2Field { ... on ProjectV2SingleSelectField { id } } } }`,
       { f: existente.id, o: opcoes(nomes, cores) },
