@@ -38,6 +38,25 @@ export const relationshipSchema = z.enum(RELATIONSHIPS).meta({
     'Parentesco com o dono da conta: SELF (a própria pessoa), MOTHER, FATHER, SON, DAUGHTER, GRANDMOTHER, GRANDFATHER, SISTER, BROTHER, SPOUSE ou OTHER.',
 });
 
+/** Parentescos que indicam uma pessoa do sexo masculino: nesses, o grupo gestante não se aplica. */
+export const MALE_RELATIONSHIPS: readonly Relationship[] = [
+  'FATHER',
+  'SON',
+  'GRANDFATHER',
+  'BROTHER',
+];
+
+/**
+ * Diz se o campo "gestante" faz sentido para o parentesco informado. Só some quando o parentesco
+ * deixa claro que a pessoa é do sexo masculino (pai, filho, avô, irmão); "Você", cônjuge, "outro"
+ * e "prefiro não informar" não dizem nada sobre o sexo, então o campo continua disponível.
+ *
+ * @param relationship - Parentesco escolhido, ou `null`.
+ */
+export function canBePregnant(relationship: Relationship | null | undefined): boolean {
+  return relationship == null || !MALE_RELATIONSHIPS.includes(relationship);
+}
+
 /** Parentesco da pessoa com quem usa a conta. */
 export type Relationship = z.infer<typeof relationshipSchema>;
 

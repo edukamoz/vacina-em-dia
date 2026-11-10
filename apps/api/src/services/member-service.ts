@@ -1,5 +1,6 @@
 import {
   ageInMonths,
+  canBePregnant,
   compareCivilDates,
   createDose,
   MAX_CUSTOM_DOSES,
@@ -135,7 +136,8 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         id: newId(),
         name: input.name,
         birthDate: input.birthDate,
-        isPregnant: input.isPregnant,
+        // Pai, filho, avô e irmão não entram no grupo gestante, mesmo que o pedido diga o contrário.
+        isPregnant: input.isPregnant && canBePregnant(input.relationship),
         relationship: input.relationship ?? null,
       };
       await members.save(ownerId, member);
@@ -153,7 +155,8 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         id: current.id,
         name: input.name,
         birthDate: input.birthDate,
-        isPregnant: input.isPregnant,
+        // Pai, filho, avô e irmão não entram no grupo gestante, mesmo que o pedido diga o contrário.
+        isPregnant: input.isPregnant && canBePregnant(input.relationship),
         relationship: input.relationship ?? null,
       };
       await members.save(ownerId, member);

@@ -247,6 +247,34 @@ describe('formulário de pessoa (RF02)', () => {
     expect(fake.calls[0]?.body).toMatchObject({ relationship: 'GRANDMOTHER' });
   });
 
+  test('CT-APP-M10: parentesco masculino esconde o campo de gestante e não envia gestação', async () => {
+    const fake = createFakeFetch({ 'POST /members': { status: 201, body: MEMBER } });
+    await renderScreen(<NewMemberScreen />, fake.fetchFn);
+    await fireEvent.changeText(screen.getByLabelText('Nome ou apelido'), 'Joana');
+    await fireEvent.changeText(screen.getByLabelText('Data de nascimento'), '20051990');
+    const gestante = () => screen.queryByText(/Esta pessoa está grávida/);
+    // Sem parentesco, o campo aparece; marca como grávida.
+    expect(gestante()).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('checkbox', { name: /Esta pessoa está grávida/ }));
+    // Escolhe "Pai": o campo some.
+    await fireEvent.press(screen.getByRole('button', { name: /Quem é esta pessoa para você\?/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Pai' }));
+    expect(gestante()).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar e ver as vacinas' }));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
+    expect(fake.calls[0]?.body).toMatchObject({ relationship: 'FATHER', isPregnant: false });
+  });
+
+  test('CT-APP-M11: parentesco feminino ou indefinido mantém o campo de gestante', async () => {
+    await renderScreen(<NewMemberScreen />, createFakeFetch({}).fetchFn);
+    await fireEvent.press(screen.getByRole('button', { name: /Quem é esta pessoa para você\?/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Filha' }));
+    expect(screen.getByText(/Esta pessoa está grávida/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: /Quem é esta pessoa para você\?/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Outro parente ou pessoa cuidada' }));
+    expect(screen.getByText(/Esta pessoa está grávida/)).toBeOnTheScreen();
+  });
+
   test('CT-APP-M05: excluir pede confirmação e só então apaga', async () => {
     const fake = createFakeFetch({
       'GET /members': { status: 200, body: { items: [MEMBER] } },
