@@ -104,17 +104,22 @@ export function createReminderService({
     async runDailyEmails() {
       const today = civilToday(clock);
       const inAWeek = addDays(today, REMINDER_LEAD_DAYS);
-      const byAccount = new Map<string, { email: string; today: number; inAWeek: number }>();
+      const byAccount = new Map<
+        string,
+        { email: string; today: number; inAWeek: number; soon: number }
+      >();
       for (const candidate of await reminders.listEmailCandidates(today)) {
         if (!isEmailReminderDay(candidate.dose, today)) continue;
         const entry = byAccount.get(candidate.accountId) ?? {
           email: candidate.email,
           today: 0,
           inAWeek: 0,
+          soon: 0,
         };
         const date = reminderDate(candidate.dose);
         if (date === today) entry.today += 1;
         else if (date === inAWeek) entry.inAWeek += 1;
+        else entry.soon += 1; // antecedência escolhida pela pessoa para esta dose
         byAccount.set(candidate.accountId, entry);
       }
 

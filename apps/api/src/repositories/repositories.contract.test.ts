@@ -160,6 +160,43 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       expect((await repos.doses.get(owner, d2))?.appliedDate).toBe('2026-10-01');
     });
 
+    test('CT-REC-130: a repetição, a série e o aviso antecipado gravam, leem e podem ser encerrados', async () => {
+      const owner = await newOwner();
+      const m = randomUUID();
+      await repos.members.save(owner, member(m));
+      const [d1, d2, series] = [randomUUID(), randomUUID(), randomUUID()];
+      const avulsa = (id: string, over: Partial<StoredDose> = {}): StoredDose => ({
+        ...dose(id, m, { ruleId: null }),
+        custom: { vaccine: 'Gripe', doseLabel: 'Anual' },
+        remindDaysBefore: 14,
+        seriesId: series,
+        occurrence: 1,
+        recurrence: {
+          unit: 'YEAR',
+          every: 1,
+          anchor: 'SCHEDULE',
+          anchorDate: '2026-12-01',
+          endDate: null,
+          maxDoses: 5,
+        },
+        ...over,
+      });
+      await repos.doses.saveMany(owner, [avulsa(d1)]);
+      expect(await repos.doses.get(owner, d1)).toEqual(avulsa(d1));
+      // Aplicar grava a dose e a próxima juntas; encerrar a série zera a repetição da dose aberta.
+      await repos.doses.saveMany(owner, [
+        avulsa(d1, { status: 'APPLIED', appliedDate: '2026-12-01' }),
+        avulsa(d2, { occurrence: 2, dueDate: '2027-12-01' }),
+      ]);
+      await repos.doses.saveMany(owner, [
+        avulsa(d2, { occurrence: 2, dueDate: '2027-12-01', recurrence: null }),
+      ]);
+      const encerrada = await repos.doses.get(owner, d2);
+      expect(encerrada?.recurrence ?? null).toBeNull();
+      expect(encerrada).toMatchObject({ seriesId: series, occurrence: 2, remindDaysBefore: 14 });
+      expect((await repos.doses.listByMember(owner, m)).map((d) => d.occurrence)).toEqual([1, 2]);
+    });
+
     test('CT-DB-05: outro dono não vê nem altera a dose', async () => {
       const [alice, bob] = [await newOwner(), await newOwner()];
       const m = randomUUID();

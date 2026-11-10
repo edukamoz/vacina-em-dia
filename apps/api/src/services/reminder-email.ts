@@ -4,8 +4,10 @@ import type { EmailMessage } from './email-ports';
 export interface ReminderCounts {
   /** Doses com data de hoje. */
   readonly today: number;
-  /** Doses com data daqui a 7 dias. */
+  /** Doses com data daqui a 7 dias (a antecedência padrão). */
   readonly inAWeek: number;
+  /** Doses avisadas na antecedência que a pessoa escolheu (diferente de 7 dias). */
+  readonly soon?: number;
 }
 
 /**
@@ -14,7 +16,7 @@ export interface ReminderCounts {
  * vê a caixa de entrada. Os detalhes aparecem no app, depois do login.
  *
  * @param to - Endereço da conta.
- * @param counts - Quantas doses são para hoje e quantas para daqui a 7 dias.
+ * @param counts - Quantas doses são para hoje, para daqui a 7 dias e para os próximos dias.
  * @param baseUrl - Endereço do app web, sem barra final; sem ele, o e-mail não traz o link.
  */
 export function buildReminderEmail(
@@ -33,6 +35,12 @@ export function buildReminderEmail(
       counts.inAWeek === 1
         ? '1 vacina é para daqui a 7 dias'
         : `${counts.inAWeek} vacinas são para daqui a 7 dias`,
+    );
+  }
+  const soon = counts.soon ?? 0;
+  if (soon > 0) {
+    parts.push(
+      soon === 1 ? '1 vacina é para os próximos dias' : `${soon} vacinas são para os próximos dias`,
     );
   }
   const resumo = parts.join(' e ');

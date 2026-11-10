@@ -83,6 +83,17 @@ export function toCustomDoseResponse(dose: StoredDose): DoseResponse | undefined
     dueDate: dose.dueDate,
     scheduledDate: dose.scheduledDate,
     appliedDate: dose.appliedDate,
+    recurrence: dose.recurrence
+      ? {
+          unit: dose.recurrence.unit,
+          every: dose.recurrence.every,
+          anchor: dose.recurrence.anchor,
+          endDate: dose.recurrence.endDate,
+          maxDoses: dose.recurrence.maxDoses,
+        }
+      : null,
+    occurrence: dose.occurrence ?? null,
+    remindDaysBefore: dose.remindDaysBefore ?? null,
   };
 }
 
