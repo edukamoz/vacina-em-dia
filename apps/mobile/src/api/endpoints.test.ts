@@ -75,3 +75,55 @@ describe('endpoints da API', () => {
     ).toThrow();
   });
 });
+
+describe('endpoints da família (B15)', () => {
+  test('CT-FAMR-232: cada função da família chama o método e o caminho certos', async () => {
+    const familia = {
+      role: 'OWNER',
+      guardians: [
+        {
+          id: 'v/1',
+          role: 'OWNER',
+          emailHint: 'm***@e***.com',
+          joinedAt: '2026-11-01T12:00:00.000Z',
+          isYou: true,
+        },
+      ],
+      memberCount: 0,
+      activeInvites: 0,
+    };
+    const fake = createFakeFetch({
+      'GET /family': { status: 200, body: familia },
+      'POST /family/invites': {
+        status: 201,
+        body: { code: 'ABCDE-FGHJK', expiresAt: '2026-11-17T12:00:00.000Z' },
+      },
+      'DELETE /family/invites': { status: 204 },
+      'POST /family/join': { status: 200, body: { household: familia, moved: 0 } },
+      'POST /family/leave': { status: 204 },
+      'DELETE /family/guardians/v%2F1': { status: 204 },
+      'POST /family/transfer': { status: 200, body: familia },
+    });
+    const ctx = { baseUrl: TEST_BASE_URL, sessionId: TEST_SESSION, fetchFn: fake.fetchFn };
+
+    await endpoints.getHousehold(ctx);
+    await endpoints.createHouseholdInvite(ctx);
+    await endpoints.revokeHouseholdInvites(ctx);
+    await endpoints.joinHousehold(ctx, { code: 'ABCDE-FGHJK', moveMembers: true });
+    await endpoints.leaveHousehold(ctx);
+    await endpoints.removeGuardian(ctx, 'v/1');
+    await endpoints.transferHousehold(ctx, { guardianId: 'v/1' });
+
+    expect(fake.calls.map((c) => c.key)).toEqual([
+      'GET /family',
+      'POST /family/invites',
+      'DELETE /family/invites',
+      'POST /family/join',
+      'POST /family/leave',
+      'DELETE /family/guardians/v%2F1',
+      'POST /family/transfer',
+    ]);
+    expect(fake.calls[3]?.body).toEqual({ code: 'ABCDE-FGHJK', moveMembers: true });
+    expect(fake.calls[6]?.body).toEqual({ guardianId: 'v/1' });
+  });
+});

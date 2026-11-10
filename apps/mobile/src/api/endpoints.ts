@@ -11,6 +11,11 @@ import {
   consentInputSchema,
   consentResponseSchema,
   doseResponseSchema,
+  householdResponseSchema,
+  inviteResponseSchema,
+  joinResponseSchema,
+  type JoinInput,
+  type TransferInput,
   memberDosesResponseSchema,
   memberListResponseSchema,
   memberResponseSchema,
@@ -122,6 +127,34 @@ export const endpoints = {
         body: reminderPreferencesInputSchema.parse(input),
       },
       reminderPreferencesResponseSchema,
+    ),
+
+  getHousehold: (ctx: ApiContext, signal?: AbortSignal) =>
+    apiRequest(ctx, { path: '/family', ...(signal ? { signal } : {}) }, householdResponseSchema),
+
+  createHouseholdInvite: (ctx: ApiContext) =>
+    apiRequest(ctx, { path: '/family/invites', method: 'POST' }, inviteResponseSchema),
+
+  revokeHouseholdInvites: (ctx: ApiContext) =>
+    apiRequestNoContent(ctx, { path: '/family/invites', method: 'DELETE' }),
+
+  joinHousehold: (ctx: ApiContext, input: JoinInput) =>
+    apiRequest(ctx, { path: '/family/join', method: 'POST', body: input }, joinResponseSchema),
+
+  leaveHousehold: (ctx: ApiContext) =>
+    apiRequestNoContent(ctx, { path: '/family/leave', method: 'POST' }),
+
+  removeGuardian: (ctx: ApiContext, guardianId: string) =>
+    apiRequestNoContent(ctx, {
+      path: `/family/guardians/${encodeURIComponent(guardianId)}`,
+      method: 'DELETE',
+    }),
+
+  transferHousehold: (ctx: ApiContext, input: TransferInput) =>
+    apiRequest(
+      ctx,
+      { path: '/family/transfer', method: 'POST', body: input },
+      householdResponseSchema,
     ),
 
   deleteAccount: (ctx: ApiContext) =>

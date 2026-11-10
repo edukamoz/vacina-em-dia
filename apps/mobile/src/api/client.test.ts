@@ -111,3 +111,30 @@ describe('cliente da API', () => {
     ).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
   });
 });
+
+describe('erro da API com a quantidade de pessoas (B15)', () => {
+  test('CT-FAMR-230: o erro HOUSEHOLD_HAS_MEMBERS leva a quantidade de pessoas', async () => {
+    const fetchFn = respond(409, {
+      code: 'HOUSEHOLD_HAS_MEMBERS',
+      message: 'Você já tem pessoas cadastradas.',
+      memberCount: 3,
+    });
+    await expect(
+      apiRequestNoContent(ctx(fetchFn), { path: '/family/join', method: 'POST', body: {} }),
+    ).rejects.toMatchObject({
+      code: 'HOUSEHOLD_HAS_MEMBERS',
+      status: 409,
+      memberCount: 3,
+    });
+  });
+
+  test('CT-FAMR-231: erros sem a quantidade não trazem memberCount', async () => {
+    const fetchFn = respond(400, { code: 'INVALID_INVITE', message: 'Este código não vale.' });
+    const erro = await apiRequestNoContent(ctx(fetchFn), {
+      path: '/family/join',
+      method: 'POST',
+    }).catch((e: unknown) => e);
+    expect(erro).toBeInstanceOf(ApiRequestError);
+    expect((erro as ApiRequestError).memberCount).toBeUndefined();
+  });
+});

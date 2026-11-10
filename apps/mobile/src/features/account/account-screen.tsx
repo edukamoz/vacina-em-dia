@@ -1,3 +1,4 @@
+import type { HouseholdResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { useWindowDimensions, View } from 'react-native';
@@ -17,10 +18,12 @@ import { modoDeLayout } from '../../lib/layout';
 import { useSession } from '../../session/session-provider';
 import { useTheme, useThemeColors } from '../../theme/theme-provider';
 import { ControlesDeAvisos } from '../avisos/controles-de-avisos';
+import { ResponsaveisDaFamilia } from '../household/responsaveis-da-familia';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
 import {
   useConsent,
   useDeleteAccount,
+  useHousehold,
   useMembers,
   useReminders,
   useSetEmailReminders,
@@ -63,6 +66,24 @@ function Secao({
 }
 
 /**
+ * O que vai acontecer com a família quando a conta for excluída (ADR-029): se a conta está só,
+ * apaga tudo; se divide a família, só sai dela e as pessoas ficam com os outros responsáveis; se
+ * é a dona, a propriedade passa ao responsável mais antigo.
+ */
+function textoDaExclusao(familia: HouseholdResponse | undefined): string {
+  const final = 'Não dá para desfazer.';
+  if (!familia || familia.guardians.length <= 1) {
+    return `Vamos apagar as pessoas cadastradas, as doses, o histórico e o consentimento. ${final}`;
+  }
+  const proximo = familia.guardians.find((g) => !g.isYou);
+  const heranca =
+    familia.role === 'OWNER' && proximo
+      ? ` A propriedade da família passa para ${proximo.emailHint}.`
+      : '';
+  return `Vamos apagar a sua conta e o seu consentimento. As pessoas e as doses continuam com os outros responsáveis da família.${heranca} ${final}`;
+}
+
+/**
  * Aba "Conta" (RF09): dados da conta e tema lado a lado (uma coluna no celular), depois privacidade
  * e sobre o aplicativo, e por fim sair e excluir a conta com todos os dados. A exclusão sempre pede
  * uma confirmação.
@@ -73,6 +94,7 @@ export function AccountScreen() {
   const consent = useConsent();
   const remove = useDeleteAccount();
   const reminders = useReminders();
+  const familia = useHousehold();
   const setEmail = useSetEmailReminders();
   const [confirmando, setConfirmando] = useState(false);
 
@@ -141,6 +163,16 @@ export function AccountScreen() {
             </Texto>
           ) : null}
           <ControlesDeAvisos />
+        </Secao>
+      </View>
+
+      <View className="gap-lg expandido:flex-row expandido:items-stretch">
+        <Secao
+          icone="familia"
+          titulo="Responsáveis da família"
+          apoio="Quem também cuida das vacinas da sua família"
+        >
+          <ResponsaveisDaFamilia />
         </Secao>
       </View>
 
@@ -226,10 +258,7 @@ export function AccountScreen() {
       ) : (
         <Cartao className="gap-md border-erro">
           <Texto variante="corpoNegrito">Excluir tudo?</Texto>
-          <Texto>
-            Vamos apagar as pessoas cadastradas, as doses, o histórico e o consentimento. Não dá
-            para desfazer.
-          </Texto>
+          <Texto>{textoDaExclusao(familia.data)}</Texto>
           {remove.error ? (
             <Texto className="text-erro" accessibilityRole="alert">
               {remove.error.message}

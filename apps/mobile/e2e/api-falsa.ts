@@ -156,6 +156,23 @@ export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
     estado.corpos[chave] = corpo;
 
     if (chave === 'GET /warmup') return json(route, 200, { status: 'ready' });
+    // A família da conta: nos testes de ponta a ponta, sempre só o dono (ADR-029).
+    if (chave === 'GET /family') {
+      return json(route, 200, {
+        role: 'OWNER',
+        guardians: [
+          {
+            id: 'v-teste-1',
+            role: 'OWNER',
+            emailHint: 'm***@e***.com.br',
+            joinedAt: '2026-10-01T12:00:00.000Z',
+            isYou: true,
+          },
+        ],
+        memberCount: estado.membros.length,
+        activeInvites: 0,
+      });
+    }
     if (chave === 'POST /auth/register') return json(route, 201, SESSAO);
     if (chave === 'POST /auth/login') {
       return corpo.password === 'uma frase longa é melhor'
