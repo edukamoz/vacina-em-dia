@@ -304,7 +304,7 @@ ITENS = [
     item('B72', None, 'Como equipe, quero ser avisada quando o calendário oficial do Ministério da Saúde mudar, para atualizar os dados com revisão e sem baixar à mão',
          'E4', S, 'todas', 'RNF10',
          ['Uma função agendada confere, em endereços fixos oficiais, se as páginas e os arquivos do calendário mudaram (por hash).', 'Quando mudar, a equipe recebe um aviso; a transcrição continua em PR, com revisão (nada de dado vacinal publicado sem conferência).', 'O app mostra a versão do calendário e a data da última verificação.', 'Nada do usuário vai às fontes oficiais.'],
-         AF, None, '', 'Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. A confirmar: se o gov.br aceita leitura automática pela Function (o Butantan bloqueou, ADR-024).'),
+         EA, None, '', 'Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. Acesso de rede a partir do Brasil confirmado em 10/11/2026 (docs/28); a partir da Azure ainda a confirmar com o POST /api/calendar/watch/check (o Butantan bloqueou a Function, ADR-024). Decisão no ADR-030. Falta mostrar a data da última verificação no app.'),
     item('B73', None, 'Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar',
          'E4', C, 'PE1, PE3', 'RF02, RF04',
          ['Há um tipo de membro "animal" (espécie e nascimento aproximado), sem gestação, parentesco humano nem calendário do PNI.', 'As vacinas são digitadas pela pessoa (dose avulsa com recorrência); só entra modelo pronto (por exemplo, antirrábica) com fonte citada.', 'O app deixa claro que o calendário de animais é definido pelo veterinário.'],

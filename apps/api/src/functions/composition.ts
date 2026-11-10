@@ -24,7 +24,10 @@ import { createMemberHandlers } from '../handlers/members';
 import { createReminderHandlers } from '../handlers/reminders';
 import { createNewsHandlers } from '../handlers/news';
 import { createUnitsHandlers } from '../handlers/units';
+import { createCalendarWatchHandlers } from '../handlers/calendar-watch';
 import { createWarmupHandler } from '../handlers/warmup';
+import { createCalendarFileFetcher } from '../clients/official-calendar-client';
+import { createCalendarWatchService } from '../services/calendar-watch-service';
 import { createWarmupService } from '../services/warmup-service';
 import { withSecurityHeaders, type HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
@@ -290,3 +293,23 @@ export const warmupHandler = createWarmupHandler(
     clock: () => Date.now(),
   }),
 );
+
+/**
+ * Vigia do calendário oficial (B72): confere uma vez por semana se os cinco PDFs do Ministério da
+ * Saúde continuam iguais aos que o projeto transcreveu. O estado fica no Blob Storage; o aviso vai
+ * por e-mail para `CALENDAR_WATCH_ALERT_EMAIL` (sem ele, a mudança só fica registrada).
+ */
+export const calendarWatchService = createCalendarWatchService({
+  fetchBytes: createCalendarFileFetcher(),
+  storage: storageConnection
+    ? createBlobFileStorage({
+        connectionString: storageConnection,
+        container: 'vigia-do-calendario',
+      })
+    : createInMemoryFileStorage(),
+  email,
+  alertTo: process.env['CALENDAR_WATCH_ALERT_EMAIL'],
+  clock,
+  reportError: (kind) => console.error(`Falha no vigia do calendário: ${kind}.`),
+});
+export const calendarWatchHandlers = createCalendarWatchHandlers(calendarWatchService);
