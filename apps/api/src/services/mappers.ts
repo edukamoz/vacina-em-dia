@@ -2,6 +2,7 @@ import {
   ageGroupOf,
   describeTiming,
   notesForRule,
+  officialRecurrenceRule,
   type CalendarDataset,
   type CalendarRule,
   type CalendarSourceResponse,
@@ -34,12 +35,20 @@ export function toMemberResponse(member: StoredMember, today: CivilDate): Member
  * @param dose - Dose guardada.
  * @param rule - Linha do calendário da dose.
  * @param dataset - Calendário, de onde saem as notas de rodapé.
+ * @param birthDate - Nascimento da pessoa; só é preciso para mostrar até quando se repete uma linha
+ *   com limite de idade (por exemplo, a influenza das crianças, até antes dos 6 anos).
  */
 export function toDoseResponse(
   dose: StoredDose,
   rule: CalendarRule,
   dataset: CalendarDataset,
+  birthDate?: CivilDate,
 ): DoseResponse {
+  // A repetição de uma linha oficial vem da própria linha (só as que o texto oficial diz se repetirem);
+  // o limite de idade só se calcula quando se sabe o nascimento.
+  const repeat = rule.recurrence
+    ? officialRecurrenceRule(rule, birthDate ?? dose.dueDate, dose.dueDate)
+    : null;
   return {
     id: dose.id,
     memberId: dose.memberId,
@@ -56,6 +65,18 @@ export function toDoseResponse(
     dueDate: dose.dueDate,
     scheduledDate: dose.scheduledDate,
     appliedDate: dose.appliedDate,
+    ...(repeat
+      ? {
+          recurrence: {
+            unit: repeat.unit,
+            every: repeat.every,
+            anchor: repeat.anchor,
+            endDate: birthDate ? repeat.endDate : null,
+            maxDoses: repeat.maxDoses,
+          },
+        }
+      : {}),
+    ...(dose.occurrence ? { occurrence: dose.occurrence } : {}),
   };
 }
 

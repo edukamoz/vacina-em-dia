@@ -197,6 +197,39 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       expect((await repos.doses.listByMember(owner, m)).map((d) => d.occurrence)).toEqual([1, 2]);
     });
 
+    test('CT-OFIC-40: dose oficial de uma série grava série e número, sem guardar a regra', async () => {
+      const owner = await newOwner();
+      const m = randomUUID();
+      await repos.members.save(owner, member(m));
+      const [d1, d2, serie] = [randomUUID(), randomUUID(), randomUUID()];
+      await repos.doses.saveMany(owner, [dose(d1, m, { ruleId: 'idoso-influenza' })]);
+      // Aplicar: a oficial ganha a série e o número 1 e a próxima nasce com o 2, na mesma linha.
+      await repos.doses.saveMany(owner, [
+        dose(d1, m, {
+          ruleId: 'idoso-influenza',
+          status: 'APPLIED',
+          appliedDate: '2026-12-01',
+          seriesId: serie,
+          occurrence: 1,
+          remindDaysBefore: null,
+        }),
+        dose(d2, m, {
+          ruleId: 'idoso-influenza',
+          dueDate: '2027-12-01',
+          seriesId: serie,
+          occurrence: 2,
+          remindDaysBefore: null,
+        }),
+      ]);
+      const lidas = await repos.doses.listByMember(owner, m);
+      expect(lidas.map((d) => [d.ruleId, d.occurrence, d.status])).toEqual([
+        ['idoso-influenza', 1, 'APPLIED'],
+        ['idoso-influenza', 2, 'PENDING'],
+      ]);
+      expect(lidas[1]?.recurrence ?? null).toBeNull();
+      expect(lidas[1]).not.toHaveProperty('custom');
+    });
+
     test('CT-DB-05: outro dono não vê nem altera a dose', async () => {
       const [alice, bob] = [await newOwner(), await newOwner()];
       const m = randomUUID();

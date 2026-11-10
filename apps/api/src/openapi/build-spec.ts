@@ -752,7 +752,7 @@ export function buildOpenApiDocument(): object {
     tags: ['Calendário e doses'],
     summary: 'Mudar o estado de uma dose',
     description:
-      'Aplica um evento do usuário à dose pela máquina de estados do ciclo de vida (RF04): agendar, desmarcar, reagendar, registrar a aplicação ou cancelar. O atraso não é um evento do cliente: só a rotina de prazo o aplica. Em caso de erro, o estado da dose permanece o mesmo. Em uma dose avulsa que se repete, registrar a aplicação cria sozinha a próxima dose (Pendente). Cancelar só esta dose (`scope` `THIS`, o padrão) pula a dose e a série continua; `SERIES` cancela e encerra a repetição.',
+      'Aplica um evento do usuário à dose pela máquina de estados do ciclo de vida (RF04): agendar, desmarcar, reagendar, registrar a aplicação ou cancelar. O atraso não é um evento do cliente: só a rotina de prazo o aplica. Em caso de erro, o estado da dose permanece o mesmo. Em uma dose que se repete (avulsa com repetição ou uma linha do calendário em que o texto oficial diz a periodicidade, como a influenza e a covid do idoso), registrar a aplicação cria sozinha a próxima dose (Pendente). Cancelar só esta dose (`scope` `THIS`, o padrão) pula a dose e a série continua; `SERIES` cancela e encerra a repetição.',
     security: secured,
     request: {
       params: dosePathParams,
