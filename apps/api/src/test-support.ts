@@ -42,7 +42,13 @@ export function buildApp(startAt: string = NOW) {
     newId,
     calendar,
   });
-  const doses = createDoseService({ members: store.members, doses: store.doses, clock, calendar });
+  const doses = createDoseService({
+    members: store.members,
+    doses: store.doses,
+    clock,
+    calendar,
+    newId,
+  });
   const accounts = createAccountService(store.accounts);
   const carteira = createCarteiraService({ doses, clock });
 

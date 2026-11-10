@@ -1,5 +1,8 @@
 import {
   canBecomeOverdue,
+  compareCivilDates,
+  createDose,
+  nextRecurrenceDate,
   transitionDose,
   type CalendarDataset,
   type CalendarRule,
@@ -34,6 +37,8 @@ export interface DoseServiceDeps {
   readonly doses: DoseRepository;
   readonly clock: Clock;
   readonly calendar: CalendarDataset;
+  /** Gera o identificador da próxima dose de uma série que se repete. */
+  readonly newId: () => string;
 }
 
 /**
@@ -52,6 +57,7 @@ export function createDoseService({
   doses,
   clock,
   calendar,
+  newId,
 }: DoseServiceDeps): DoseService {
   const rules = new Map<string, CalendarRule>(calendar.rules.map((rule) => [rule.id, rule]));
 
@@ -77,6 +83,50 @@ export function createDoseService({
     });
     if (changed.length > 0) await doses.saveMany(ownerId, changed);
     return result;
+  }
+
+  /**
+   * Cria a próxima dose de uma série que se repete, ou `undefined` quando a série terminou.
+   *
+   * Ao aplicar, a conta parte da data da aplicação. Ao cancelar só esta dose, a dose é "pulada": a
+   * conta parte da data prevista dela (ou de hoje, se já passou), para a próxima não nascer vencida.
+   * Não cria nada se a próxima já existe (aplicação repetida ou concorrente).
+   */
+  async function nextInSeries(
+    ownerId: string,
+    done: StoredDose,
+    event: DoseEventInput,
+    today: CivilDate,
+  ): Promise<StoredDose | undefined> {
+    const { recurrence, seriesId, occurrence } = done;
+    if (!recurrence || !seriesId || !occurrence) return undefined;
+    const appliedDate =
+      event.type === 'APPLY'
+        ? event.date
+        : compareCivilDates(done.dueDate, today) >= 0
+          ? done.dueDate
+          : today;
+    const dueDate = nextRecurrenceDate(recurrence, {
+      occurrence,
+      dueDate: done.dueDate,
+      appliedDate,
+    });
+    if (dueDate === null) return undefined;
+    const siblings = await doses.listByMember(ownerId, done.memberId);
+    if (siblings.some((d) => d.seriesId === seriesId && d.occurrence === occurrence + 1)) {
+      return undefined;
+    }
+    return {
+      id: newId(),
+      memberId: done.memberId,
+      ruleId: null,
+      custom: done.custom ?? null,
+      ...createDose(dueDate),
+      remindDaysBefore: done.remindDaysBefore ?? null,
+      recurrence,
+      seriesId,
+      occurrence: occurrence + 1,
+    };
   }
 
   const respond = (dose: StoredDose): DoseResponse | undefined => {
@@ -130,8 +180,17 @@ export function createDoseService({
       const result = transitionDose(base, event, { today, actor: 'USER' });
       if (!result.ok) return failure(result.error);
 
-      const updated: StoredDose = { ...base, ...result.dose };
-      await doses.saveMany(ownerId, [updated]);
+      let updated: StoredDose = { ...base, ...result.dose };
+      let next: StoredDose | undefined;
+      if (updated.recurrence && updated.seriesId && updated.occurrence) {
+        if (event.type === 'CANCEL' && event.scope === 'SERIES') {
+          updated = { ...updated, recurrence: null };
+        } else if (event.type === 'APPLY' || event.type === 'CANCEL') {
+          next = await nextInSeries(ownerId, updated, event, today);
+        }
+      }
+      // A dose e a próxima são gravadas juntas: não sobra série sem a próxima dose.
+      await doses.saveMany(ownerId, next ? [updated, next] : [updated]);
       const response = respond(updated);
       return response ? success(response) : failure({ code: 'NOT_FOUND' });
     },

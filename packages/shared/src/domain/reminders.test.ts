@@ -48,3 +48,27 @@ describe('lembretes: dias de e-mail', () => {
     expect(isEmailReminderDay(snapshot, HOJE)).toBe(esperado);
   });
 });
+
+describe('lembretes: aviso antecipado escolhido para a dose', () => {
+  test.each([
+    ['CT-REC-30', dose({ dueDate: '2026-10-16', remindDaysBefore: 14 }), 'UPCOMING'],
+    ['CT-REC-31', dose({ dueDate: '2026-10-21', remindDaysBefore: 14 }), null],
+    ['CT-REC-32', dose({ dueDate: '2026-10-07', remindDaysBefore: 0 }), null],
+    ['CT-REC-33', dose({ dueDate: '2026-10-06', remindDaysBefore: 0 }), 'TODAY'],
+    ['CT-REC-34', dose({ dueDate: '2026-10-14', remindDaysBefore: null }), null],
+    ['CT-REC-35', dose({ dueDate: '2026-10-13', remindDaysBefore: null }), 'UPCOMING'],
+  ] as const)('%s: classifica a dose', (_id, snapshot, esperado) => {
+    expect(reminderKind(snapshot, HOJE)).toBe(esperado);
+  });
+
+  test.each([
+    ['CT-REC-36', dose({ dueDate: '2026-10-09', remindDaysBefore: 3 }), true],
+    ['CT-REC-37', dose({ dueDate: '2026-10-13', remindDaysBefore: 3 }), false],
+    ['CT-REC-38', dose({ dueDate: '2026-10-06', remindDaysBefore: 3 }), true],
+    ['CT-REC-39', dose({ dueDate: '2026-10-20', remindDaysBefore: 14 }), true],
+    ['CT-REC-40', dose({ dueDate: '2026-10-13', remindDaysBefore: 14 }), false],
+    ['CT-REC-41', dose({ dueDate: '2026-10-06', remindDaysBefore: 0 }), true],
+  ] as const)('%s: dia de e-mail', (_id, snapshot, esperado) => {
+    expect(isEmailReminderDay(snapshot, HOJE)).toBe(esperado);
+  });
+});

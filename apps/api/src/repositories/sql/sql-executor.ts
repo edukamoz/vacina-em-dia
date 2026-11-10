@@ -3,7 +3,7 @@ export type SqlParam =
   | { readonly type: 'varchar'; readonly value: string | null; readonly length?: number }
   | { readonly type: 'nvarchar'; readonly value: string | null; readonly length?: number }
   | { readonly type: 'bit'; readonly value: boolean }
-  | { readonly type: 'int'; readonly value: number };
+  | { readonly type: 'int'; readonly value: number | null };
 
 /** Parâmetros nomeados de uma consulta (`@nome` no texto SQL). */
 export type SqlParams = Readonly<Record<string, SqlParam>>;
@@ -55,6 +55,14 @@ export function nullableText(row: SqlRow, column: string): string | null {
   const value = row[column];
   if (value === null || value === undefined) return null;
   if (typeof value !== 'string') throw new Error(`Coluna ${column} inesperada.`);
+  return value;
+}
+
+/** Lê uma coluna numérica (SMALLINT, INT) que aceita nulo. */
+export function nullableNumber(row: SqlRow, column: string): number | null {
+  const value = row[column];
+  if (value === null || value === undefined) return null;
+  if (typeof value !== 'number') throw new Error(`Coluna ${column} inesperada.`);
   return value;
 }
 

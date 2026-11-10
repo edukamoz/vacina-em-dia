@@ -75,6 +75,7 @@ const doseService = createDoseService({
   doses: store.doses,
   clock,
   calendar,
+  newId: randomUUID,
 });
 
 export const memberHandlers = createMemberHandlers(
