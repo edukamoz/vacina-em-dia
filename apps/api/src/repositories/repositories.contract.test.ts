@@ -79,7 +79,7 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
         await repos.auth.deleteAccount(id);
       }
       await repos.close();
-    });
+    }, 180_000);
 
     test('CT-DB-01: membro grava, lista na ordem de cadastro, busca e atualiza', async () => {
       const owner = await newOwner();

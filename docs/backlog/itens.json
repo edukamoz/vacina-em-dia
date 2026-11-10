@@ -356,9 +356,9 @@
     "Fica registrado quem aplicou cada dose.",
     "A exclusão da conta tem regra definida para o dono (transferir ou apagar) e remove os compartilhamentos."
    ],
-   "estado": "A fazer",
-   "sprint": null,
-   "evidencia": "",
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "PR #232 (API e banco); docs/05-adrs/ADR-029; CT-FAMR-*",
    "nota": "Pedido de 10/11/2026: ampliado de \"compartilhar com cuidador\" para várias contas por família. Toca toda regra de propriedade do dado (OWASP A01); decisões em aberto: o que ocorre quando o único dono exclui a conta e se haverá visibilidade por pessoa.",
    "curto": "Compartilhar com cuidador (RF12)"
   },
@@ -1321,9 +1321,9 @@
     "As 12 transições do ciclo de vida não mudam.",
     "No calendário oficial, só as linhas cujo texto oficial já diz a periodicidade ganham recorrência."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": 6,
-   "evidencia": "",
+   "evidencia": "PRs #227 e #229; docs/05-adrs/ADR-027; CT-REC-*",
    "nota": "Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória.",
    "curto": "Recorrência de vacinas"
   },
@@ -1342,9 +1342,9 @@
     "Os avisos são reagendados quando as doses mudam.",
     "Sem permissão do sistema, o app explica e segue funcionando."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": 6,
-   "evidencia": "",
+   "evidencia": "PR #230; docs/05-adrs/ADR-028; CT-AVISO-*",
    "nota": "Só Android e iOS; não há notificação local na web. Não depende de servidor, credencial nem custo. Avisos não sabem de mudanças feitas em outro aparelho até o app abrir (por isso o B71).",
    "curto": "Notificações no aparelho"
   },
