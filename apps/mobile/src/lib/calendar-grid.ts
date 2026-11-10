@@ -58,6 +58,11 @@ export function monthGrid(mes: Month): (CivilDate | null)[][] {
   );
 }
 
+/** Nome do mês (1 a 12) em minúsculas, por exemplo "março". */
+export function monthName(month: number): string {
+  return NOMES_DOS_MESES[month - 1] ?? '';
+}
+
 /** Nome do mês por extenso, por exemplo "outubro de 2026". */
 export function monthLabel({ year, month }: Month): string {
   return `${NOMES_DOS_MESES[month - 1] ?? ''} de ${year}`;
