@@ -68,7 +68,8 @@ Hoje cada pessoa cadastrada (`member`) pertence a **uma conta** (`member.account
 
 - **Fatia 1 (API e banco): implementada** na branch `feature/B15-familia-api-e-banco`: migração `007`, repositórios por família (memória e Azure SQL), serviço, rotas e Swagger. Casos `CT-FAMR-01` a `34` (código e esquemas), `CT-FAMR-40` a `55` (contrato dos repositórios, nas duas implementações), `CT-FAMR-60` a `63` (SQL) e `CT-FAMR-100` a `142` (serviço e HTTP).
 - **Uma decisão de implementação:** o repositório SQL exige que toda conta tenha vínculo com uma família. A migração cria a família de cada conta existente, `auth.createAccount` cria a da conta nova na mesma transação, e `households.get` cria a que faltar.
-- **Fatia 2 (app): a fazer.**
+- **Fatia 2 (app): implementada** na branch `feature/B15-familia-no-app`: seção "Responsáveis da família" na aba Conta (lista com e-mail oculto, convidar com aviso e código mostrado uma vez, cancelar convites, passar a propriedade, remover e sair, sempre com confirmação), tela "Entrar na família" com a confirmação de levar as pessoas, e o texto de excluir a conta conforme o papel. Casos `CT-FAMR-200` a `232`. No navegador (tema Claro): axe com 0 violações nas três telas. **Não testado em celular real nem com leitor de tela.**
+- **Achado de acessibilidade, fora desta fatia:** o texto de exemplo (placeholder) do `CampoTexto` sai cinza claro no navegador (contraste 2,53:1, abaixo dos 4,5:1). Esta fatia evita placeholder; o componente em si merece um ajuste à parte.
 
 ## Verificações e fontes
 

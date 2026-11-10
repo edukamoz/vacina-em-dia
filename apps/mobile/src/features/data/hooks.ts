@@ -4,8 +4,10 @@ import type {
   ConsentInput,
   CustomDoseInput,
   DoseEventInput,
+  JoinInput,
   MemberInput,
   ProfilePhoto,
+  TransferInput,
 } from '@vacina/shared';
 import { ApiRequestError } from '../../api/client';
 import { endpoints } from '../../api/endpoints';
@@ -262,5 +264,85 @@ export function useRemoveProfilePhoto() {
   return useMutation({
     mutationFn: () => endpoints.deleteProfilePhoto(api),
     onSuccess: () => client.setQueryData(['profile-photo'], null),
+  });
+}
+
+/** A família da conta e os responsáveis (B15, ADR-029). */
+export function useHousehold() {
+  const { api } = useSession();
+  return useQuery({
+    queryKey: ['household'],
+    queryFn: ({ signal }) => endpoints.getHousehold(api, signal),
+  });
+}
+
+/**
+ * Atualiza tudo o que depende de quem está na família: a lista de responsáveis e, como entrar,
+ * sair ou ser removido muda quais pessoas aparecem, as pessoas, as doses e os lembretes.
+ */
+async function refreshAfterHouseholdChange(client: ReturnType<typeof useQueryClient>) {
+  await client.invalidateQueries({ queryKey: ['household'] });
+  await client.invalidateQueries({ queryKey: ['members'] });
+  await client.invalidateQueries({ queryKey: ['member-doses'] });
+  await client.invalidateQueries({ queryKey: ['reminders'] });
+}
+
+/** O dono gera um convite; o código só vem nesta resposta. */
+export function useCreateHouseholdInvite() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => endpoints.createHouseholdInvite(api),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['household'] }),
+  });
+}
+
+/** O dono cancela os convites ainda não usados. */
+export function useRevokeHouseholdInvites() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => endpoints.revokeHouseholdInvites(api),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['household'] }),
+  });
+}
+
+/** Entra numa família com um código de convite. */
+export function useJoinHousehold() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: JoinInput) => endpoints.joinHousehold(api, input),
+    onSuccess: () => refreshAfterHouseholdChange(client),
+  });
+}
+
+/** Sai da família. */
+export function useLeaveHousehold() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => endpoints.leaveHousehold(api),
+    onSuccess: () => refreshAfterHouseholdChange(client),
+  });
+}
+
+/** O dono remove um responsável. */
+export function useRemoveGuardian() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (guardianId: string) => endpoints.removeGuardian(api, guardianId),
+    onSuccess: () => refreshAfterHouseholdChange(client),
+  });
+}
+
+/** O dono passa a propriedade a outro responsável. */
+export function useTransferHousehold() {
+  const { api } = useSession();
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: TransferInput) => endpoints.transferHousehold(api, input),
+    onSuccess: () => refreshAfterHouseholdChange(client),
   });
 }

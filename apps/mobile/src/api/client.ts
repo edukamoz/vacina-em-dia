@@ -21,6 +21,8 @@ export class ApiRequestError extends Error {
     /** Código de erro da API (`CONSENT_REQUIRED`, `GUARD_VIOLATION`...), quando houver. */
     readonly code?: string,
     serverMessage?: string,
+    /** Quantas pessoas a conta tem, quando o erro é `HOUSEHOLD_HAS_MEMBERS`. */
+    readonly memberCount?: number,
   ) {
     super(serverMessage ?? MESSAGES[kind]);
     this.name = 'ApiRequestError';
@@ -102,7 +104,13 @@ async function send(context: ApiContext, options: RequestOptions): Promise<Respo
 
   const parsed = apiErrorSchema.safeParse(await response.json().catch(() => undefined));
   throw parsed.success
-    ? new ApiRequestError('server', response.status, parsed.data.code, parsed.data.message)
+    ? new ApiRequestError(
+        'server',
+        response.status,
+        parsed.data.code,
+        parsed.data.message,
+        parsed.data.memberCount,
+      )
     : new ApiRequestError('server', response.status);
 }
 
