@@ -1,5 +1,7 @@
 import {
+  canBePregnant,
   consentInputSchema,
+  MALE_RELATIONSHIPS,
   memberDosesResponseSchema,
   memberIdSchema,
   memberInputSchema,
@@ -61,5 +63,20 @@ describe('esquemas de família e consentimento', () => {
 
   test('CT-FAM-S06: o calendário do membro exige fonte, membro e doses', () => {
     expect(memberDosesResponseSchema.safeParse({ items: [] }).success).toBe(false);
+  });
+});
+
+describe('grupo gestante e parentesco', () => {
+  test('CT-FAM-G01: só os parentescos masculinos tiram a opção de gestante', () => {
+    expect([...MALE_RELATIONSHIPS].sort()).toEqual(['BROTHER', 'FATHER', 'GRANDFATHER', 'SON']);
+    for (const parentesco of MALE_RELATIONSHIPS) expect(canBePregnant(parentesco)).toBe(false);
+  });
+
+  test('CT-FAM-G02: os demais parentescos, e a falta dele, mantêm a opção', () => {
+    for (const parentesco of RELATIONSHIPS.filter((r) => !MALE_RELATIONSHIPS.includes(r))) {
+      expect(canBePregnant(parentesco)).toBe(true);
+    }
+    expect(canBePregnant(null)).toBe(true);
+    expect(canBePregnant(undefined)).toBe(true);
   });
 });

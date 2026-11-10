@@ -151,6 +151,24 @@ export function ThemeProvider({
 }
 
 /**
+ * Estilo com as variáveis de cor do tema (`--cor-*`). Serve para o que o React Native desenha fora
+ * da árvore normal (por exemplo, dentro de um `Modal`), onde as variáveis do `ThemeProvider` não
+ * chegam: aplique este estilo na vista de raiz do conteúdo.
+ */
+export function useEstiloDoTema() {
+  const { theme } = useTheme();
+  return useMemo(
+    () =>
+      vars(
+        Object.fromEntries(
+          Object.entries(getThemeColors(theme)).map(([token, hex]) => [`--cor-${token}`, hex]),
+        ),
+      ),
+    [theme],
+  );
+}
+
+/**
  * Lê o tema atual e a função para trocá-lo.
  *
  * @throws Error se usado fora do `ThemeProvider`.

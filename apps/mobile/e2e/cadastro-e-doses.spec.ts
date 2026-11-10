@@ -105,3 +105,37 @@ test.describe('Foto de perfil', () => {
     expect(api.foto).toBeNull();
   });
 });
+
+test.describe('Formulário de pessoa: parentesco e gestação (RF02)', () => {
+  test('CT-E2E-06: a lista do parentesco flutua sem empurrar o formulário, e "Pai" esconde a gestação', async ({
+    page,
+    api,
+  }) => {
+    api.consentimentoAceito = true;
+    await page.goto('/entrar');
+    await page.getByLabel('E-mail').fill('mariana@exemplo.com.br');
+    await page.getByLabel('Senha', { exact: true }).fill(SENHA);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('button', { name: 'Adicionar pessoa' }).click();
+
+    const gestacao = page.getByRole('checkbox', { name: /Esta pessoa está grávida/ });
+    await expect(gestacao).toBeVisible();
+    const antes = await gestacao.boundingBox();
+
+    // A lista abre por cima: o campo de gestação continua exatamente no mesmo lugar.
+    await page.getByRole('button', { name: /Quem é esta pessoa para você\?/ }).click();
+    const lista = page.getByRole('radiogroup', { name: 'Quem é esta pessoa para você?' });
+    await expect(lista).toBeVisible();
+    expect(await gestacao.boundingBox()).toEqual(antes);
+
+    // Escolher um parentesco masculino fecha a lista e tira o campo da gestação.
+    await page.getByRole('radio', { name: 'Pai' }).click();
+    await expect(lista).toBeHidden();
+    await expect(gestacao).toBeHidden();
+
+    // E um feminino traz o campo de volta.
+    await page.getByRole('button', { name: /Quem é esta pessoa para você\?/ }).click();
+    await page.getByRole('radio', { name: 'Mãe' }).click();
+    await expect(gestacao).toBeVisible();
+  });
+});

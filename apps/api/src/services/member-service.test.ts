@@ -64,6 +64,30 @@ describe('serviço de membros da família (RF02)', () => {
     expect(calendar.items.every((d) => d.status === 'PENDING')).toBe(true);
   });
 
+  test('CT-FAM-04b: parentesco masculino nunca entra no grupo gestante, ao criar ou editar', async () => {
+    const app = buildApp();
+    await app.consent(OWNER, false);
+    const pai = await app.members.create(OWNER, {
+      ...ADULT,
+      isPregnant: true,
+      relationship: 'FATHER',
+    });
+    if (!pai.ok) throw new Error('falhou');
+    expect(pai.value.isPregnant).toBe(false);
+    // Sem parentesco masculino, o pedido vale.
+    const mae = await app.members.create(OWNER, { ...ADULT, isPregnant: true, relationship: 'MOTHER' });
+    if (!mae.ok) throw new Error('falhou');
+    expect(mae.value.isPregnant).toBe(true);
+    // Trocar para um parentesco masculino tira a pessoa do grupo gestante.
+    const editada = await app.members.update(OWNER, mae.value.id, {
+      ...ADULT,
+      isPregnant: true,
+      relationship: 'BROTHER',
+    });
+    if (!editada.ok) throw new Error('falhou');
+    expect(editada.value.isPregnant).toBe(false);
+  });
+
   test('CT-FAM-05: data de nascimento no futuro é recusada; hoje é aceito', async () => {
     const app = buildApp();
     await app.consent();

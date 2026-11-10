@@ -1,4 +1,4 @@
-import type { MemberResponse, Relationship } from '@vacina/shared';
+import { canBePregnant, type MemberResponse, type Relationship } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -35,6 +35,8 @@ function MemberForm({ membro }: FormProps) {
   const [tentou, setTentou] = useState(false);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
 
+  // Pai, filho, avô e irmão não têm o campo de gestante; se estava marcado, deixa de valer.
+  const mostraGestante = canBePregnant(parentesco);
   const birthDate = parseBrDate(nascimento);
   const erroNome = tentou && nome.trim() === '' ? 'Informe o nome ou um apelido.' : undefined;
   const erroNascimento =
@@ -49,7 +51,12 @@ function MemberForm({ membro }: FormProps) {
     setTentou(true);
     if (nome.trim() === '' || !birthDate || birthDate > todayCivil()) return;
     mutation.mutate(
-      { name: nome.trim(), birthDate, isPregnant: gestante, relationship: parentesco },
+      {
+        name: nome.trim(),
+        birthDate,
+        isPregnant: mostraGestante && gestante,
+        relationship: parentesco,
+      },
       {
         onSuccess: (salvo) => {
           selectMember(salvo.id);
@@ -90,11 +97,13 @@ function MemberForm({ membro }: FormProps) {
         opcoes={OPCOES_DE_PARENTESCO}
         aoEscolher={setParentesco}
       />
-      <Alternar
-        rotulo="Esta pessoa está grávida (inclui as vacinas da gestação)"
-        marcado={gestante}
-        aoAlterar={setGestante}
-      />
+      {mostraGestante ? (
+        <Alternar
+          rotulo="Esta pessoa está grávida (inclui as vacinas da gestação)"
+          marcado={gestante}
+          aoAlterar={setGestante}
+        />
+      ) : null}
 
       {mutation.error ? (
         <Texto className="text-erro" accessibilityRole="alert">
