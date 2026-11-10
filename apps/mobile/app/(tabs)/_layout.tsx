@@ -6,6 +6,7 @@ import { EstadoCarregando, EstadoErro } from '../../src/components/estados';
 import { Tela } from '../../src/components/tela';
 import { AssistenteProvider } from '../../src/features/assistant/assistente-contexto';
 import { JanelaDoAssistente } from '../../src/features/assistant/janela-do-assistente';
+import { AgendadorDeAvisos } from '../../src/features/avisos/agendador-de-avisos';
 import { useConsent } from '../../src/features/data/hooks';
 import { modoDeLayout, posicaoDaBarra } from '../../src/lib/layout';
 import { useThemeColors } from '../../src/theme/theme-provider';
@@ -58,6 +59,7 @@ export default function TabsLayout() {
         </Tabs>
         <BalaoAssistente />
         <JanelaDoAssistente />
+        <AgendadorDeAvisos />
       </View>
     </AssistenteProvider>
   );
