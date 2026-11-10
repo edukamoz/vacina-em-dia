@@ -2,7 +2,7 @@
 
 Itens do Jira: SCRUM-16 (calendário), SCRUM-15 (família) e SCRUM-18 (doses). Este documento é a referência rápida; a especificação completa da API está em `GET /api/docs` (Swagger).
 
-O app usa o **Calendário Nacional de Vacinação 2026**, do Ministério da Saúde (PNI), transcrito dos cinco arquivos oficiais obtidos em 06/10/2026 em <https://www.gov.br/saude/pt-br/vacinacao/calendario>:
+O app usa o **Calendário Nacional de Vacinação 2026**, do Ministério da Saúde (PNI), transcrito dos cinco arquivos oficiais obtidos em 06/10/2026 em <https://www.gov.br/saude/pt-br/vacinacao/calendario>. As notas de rodapé foram atualizadas em 10/11/2026 para o texto dos arquivos revisados em 28/10/2026 (ver `28-conferencia-do-calendario-2026-11-10.md`); a transcrição é visual e aguarda a confirmação do autor:
 
 | Faixa | Arquivo | Linhas |
 |---|---|---|

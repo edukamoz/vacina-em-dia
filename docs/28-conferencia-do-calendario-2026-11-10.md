@@ -1,6 +1,6 @@
 # Conferência do calendário vacinal contra os PDFs oficiais (10/11/2026)
 
-Item do backlog: B72 (vigia do calendário oficial). Este documento registra uma **conferência visual** do calendário do projeto (`packages/shared/src/calendar/pni-2026.ts`, transcrito em 06/10/2026) contra os cinco PDFs que o Ministério da Saúde publica **hoje** em <https://www.gov.br/saude/pt-br/vacinacao/calendario>. Nada no calendário do projeto foi alterado por esta conferência.
+Item do backlog: B72 (vigia do calendário oficial). Este documento registra uma **conferência visual** do calendário do projeto (`packages/shared/src/calendar/pni-2026.ts`, transcrito em 06/10/2026) contra os cinco PDFs que o Ministério da Saúde publica **hoje** em <https://www.gov.br/saude/pt-br/vacinacao/calendario>. Esta conferência em si não alterou o calendário; a atualização das notas veio depois (ver “Andamento”).
 
 ## Como foi feito
 
@@ -61,6 +61,11 @@ criança.1, criança.3, criança.5, criança.7, adolescente.1, 3, 5 e 7, adulto.
 2. Ajustar o trecho de `recurrence.basis` e o teste `CT-OFIC-04` à nova redação da nota da influenza da criança.
 3. Tratar o **idoso.5** como prioridade: decidir se a pneumocócica 20-valente passa a ser sugerida a todos com 85 anos ou mais.
 4. Construir o vigia (B72) usando os hashes abaixo como ponto de partida.
+
+## Andamento
+
+- **Notas atualizadas** (branch `feature/B72-notas-do-calendario-revisado`): as notas de rodapé do calendário agora seguem o texto dos PDFs de 10/11/2026, inclusive o idoso.5 (todos a partir de 85 anos), a nova definição de "área com circulação viral confirmada" (nota comum `area-viral`, ligada às linhas de febre amarela) e a observação do CRIE/RIE (no aviso da fonte). A nota gestante.2 foi removida. A data de obtenção passou para 10/11/2026.
+- **Pendente do autor:** confirmar a transcrição nota por nota contra os PDFs (leitura visual, sem revisão clínica) e decidir se o rótulo "6 a 8 meses" da febre amarela excepcional da criança deve ser ajustado.
 
 ## Impressão digital dos PDFs de 10/11/2026
 
