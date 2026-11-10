@@ -211,6 +211,10 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B04 | SCRUM-15 | Como cuidadora, quero cadastrar as pessoas da minha família (com parentesco), para acompanhar a vacinação de todas em uma só conta (RF02) | Must | Concluído | Sprint 3 |
 | B05 | SCRUM-16 | Como mãe, quero ver o calendário vacinal de cada pessoa conforme a idade, com fonte e versão, para saber o que é indicado e quando (RF03) | Must | Em análise | Sprint 3 |
 | B06 | SCRUM-17 | Como cuidadora, quero consultar o histórico de doses de cada pessoa, para ter a caderneta digital à mão (RF08) | Must | Concluído | Sprint 4 |
+| B72 | novo | Como equipe, quero ser avisada quando o calendário oficial do Ministério da Saúde mudar, para atualizar os dados com revisão e sem baixar à mão | Should | A fazer | - |
+| B73 | novo | Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar | Could | A fazer | - |
+| B74 | novo | Como viajante, quero saber que vacinas considerar para o meu destino e a data da viagem, e ver o que já tenho no histórico, para me preparar com antecedência | Could | A fazer | - |
+| B75 | novo | Como usuária, quero ver, no detalhe da dose, informações da vacina (tipo, composição, reações comuns e quem deve conversar com um profissional antes), para me informar | Should | A fazer | - |
 
 **B04** (PE1, PE3; requisitos: RF02; RNF03, RNF04)
 
@@ -233,6 +237,37 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Doses avulsas aparecem com a etiqueta "Adicionada por você".
 - Evidência: CT-APP-H*
 
+**B72** (todas; requisitos: RNF10)
+
+- Uma função agendada confere, em endereços fixos oficiais, se as páginas e os arquivos do calendário mudaram (por hash).
+- Quando mudar, a equipe recebe um aviso; a transcrição continua em PR, com revisão (nada de dado vacinal publicado sem conferência).
+- O app mostra a versão do calendário e a data da última verificação.
+- Nada do usuário vai às fontes oficiais.
+- Atenção: Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. A confirmar: se o gov.br aceita leitura automática pela Function (o Butantan bloqueou, ADR-024).
+
+**B73** (PE1, PE3; requisitos: RF02, RF04)
+
+- Há um tipo de membro "animal" (espécie e nascimento aproximado), sem gestação, parentesco humano nem calendário do PNI.
+- As vacinas são digitadas pela pessoa (dose avulsa com recorrência); só entra modelo pronto (por exemplo, antirrábica) com fonte citada.
+- O app deixa claro que o calendário de animais é definido pelo veterinário.
+- Atenção: Fora do escopo original (CLAUDE.md §3); aprovado pelo autor em 10/11/2026 para quando for possível. Não achei calendário oficial nacional para animais: só a antirrábica aparece como obrigatória, em fontes estaduais e municipais. Depende do B69.
+
+**B74** (PE1, PE3; requisitos: RF03; RNF10)
+
+- A pessoa informa destino (no Brasil ou no exterior) e mês; o app mostra o que o histórico dela já tem e as recomendações cadastradas, com fonte e data.
+- É um checklist, não um oráculo: sempre manda procurar um serviço de saúde do viajante e linka as fontes oficiais.
+- A tabela de recomendações é preenchida pelo autor a partir de fonte oficial, versionada, com fonte e data.
+- Sem orientação médica individual.
+- Atenção: Não consegui confirmar lista atual de áreas nem exigência para o Nordeste (página do Ministério sobre febre amarela não trata de viagem interna; a da Anvisa sobre o CIVP não abriu). O autor valida cada linha da tabela.
+
+**B75** (PE1, PE2, PE3; requisitos: RF03, RF07; RNF10)
+
+- Cada vacina do calendário tem uma ficha com tipo, composição, reações comuns, contraindicações e precauções, com fonte (bula ou manual do Ministério) e data.
+- A ficha aparece em "Sobre esta vacina" com o aviso de que não substitui o profissional.
+- O app não cruza alergias cadastradas com a bula para dizer se a pessoa pode ou não tomar (isso seria orientação médica individual).
+- O chatbot responde sobre reações comuns com respostas curadas, e o F1 é reavaliado.
+- Atenção: Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.
+
 ## E5 Doses e lembretes (SCRUM-9)
 
 | ID | Jira | Item | Prioridade | Estado | Sprint |
@@ -240,6 +275,9 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B07 | SCRUM-18 | Como responsável, quero agendar, registrar como aplicada, reagendar ou cancelar uma dose, para manter o registro certo (RF04) | Must | Concluído | Sprint 3 |
 | B08 | novo | Como cuidadora, quero cadastrar uma dose que não está no calendário (dose avulsa), para registrar tudo que a pessoa tomou | Should | Concluído | Sprint 3 |
 | B09 | SCRUM-19 | Como mãe, quero receber lembretes antes da data de cada dose e ver as atrasadas em destaque, para não esquecer (RF05) | Must | Em análise | Sprint 4 |
+| B69 | novo | Como mãe, quero cadastrar uma vacina que se repete (todo ano, a cada 6 meses, a cada N dias, semanas, meses ou anos) e receber o aviso antes de cada repetição, para não esquecer as que tomo de tempos em tempos | Should | A fazer | Sprint 6 |
+| B70 | novo | Como mãe, quero receber avisos de dose no celular, mesmo sem abrir o app, para não depender só do e-mail | Should | A fazer | Sprint 6 |
+| B71 | novo | Como cuidadora, quero ser avisada no navegador e no celular quando outro responsável mudar uma dose, e ter lembretes também na versão web, para acompanhar a família | Could | A fazer | - |
 
 **B07** (PE1, PE3; requisitos: RF04; RNF01, RNF07, RNF10)
 
@@ -260,6 +298,34 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Dose atrasada aparece em "Precisam de atenção" com texto, ícone e cor.
 - O e-mail de lembrete traz só quantidades, nunca nomes nem datas de nascimento.
 - Evidência: CT-LEM-*; docs/02-requisitos.md
+
+**B69** (PE1, PE3; requisitos: RF04, RF05; RNF01)
+
+- Ao criar a dose avulsa, a pessoa escolhe a periodicidade (dia, semana, mês ou ano, a cada N) e, se quiser, quando termina (data ou número de repetições).
+- Ao aplicar a dose, a próxima nasce Pendente; a pessoa escolhe se a contagem parte da data da aplicação ou da data prevista.
+- Mês curto é tratado (31/01 mais 1 mês dá 28/02).
+- Cancelar vale só para aquela dose ou para a série toda.
+- Dá para escolher quantos dias antes avisar, por dose.
+- As 12 transições do ciclo de vida não mudam.
+- No calendário oficial, só as linhas cujo texto oficial já diz a periodicidade ganham recorrência.
+- Atenção: Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória.
+
+**B70** (PE1, PE2, PE3; requisitos: RF05; RNF03, RNF05)
+
+- O app agenda notificações locais para doses atrasadas, de hoje e dos próximos dias, no horário que a pessoa escolher.
+- O aviso traz só quantidades, sem nome de pessoa nem de vacina, porque aparece na tela bloqueada.
+- E-mail e aviso no aparelho podem ser ligados e desligados separadamente na Conta.
+- Os avisos são reagendados quando as doses mudam.
+- Sem permissão do sistema, o app explica e segue funcionando.
+- Atenção: Só Android e iOS; não há notificação local na web. Não depende de servidor, credencial nem custo. Avisos não sabem de mudanças feitas em outro aparelho até o app abrir (por isso o B71).
+
+**B71** (PE3; requisitos: RF05, RF12; RNF02, RNF03)
+
+- A web instalada (PWA) recebe notificação com service worker e chaves VAPID guardadas como segredo.
+- As assinaturas ficam no banco, vinculadas à conta, e saem junto com a exclusão da conta.
+- A permissão é pedida por um gesto da pessoa.
+- Push nativo (FCM e APNs) só entra se for aprovado, porque exige credenciais e build próprios.
+- Atenção: No iPhone só funciona com o app instalado na tela de início (iOS 16.4 ou mais; confirmar na documentação da Apple). Depende do B15 para fazer sentido. Hoje não há service worker (decisão do docs/25).
 
 ## E6 PLN: voz e chatbot (SCRUM-10)
 
@@ -431,7 +497,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 |---|---|---|---|---|---|
 | B13 | SCRUM-38 | Como mãe, quero ver no mapa os postos de saúde perto de mim, para saber onde procurar a vacina (RF10) | Could | Em análise | Sprint 6 |
 | B14 | SCRUM-39 | Como mãe, quero exportar a carteira de vacinação em PDF, para levar à escola ou à consulta (RF11) | Could | Em análise | Sprint 1 |
-| B15 | SCRUM-40 | Como cuidadora, quero compartilhar a carteira de uma pessoa com outro cuidador autorizado, para dividirmos o cuidado (RF12) | Won't (por enquanto) | A fazer | Sprint 6 |
+| B15 | SCRUM-40 | Como cuidadora, quero que mais de uma pessoa cuide da mesma família, com convite, papéis e saída a qualquer momento, para dividirmos o cuidado (RF12) | Should | A fazer | - |
 
 **B13** (PE1, PE3; requisitos: RF10; RNF01, RNF03, RNF04)
 
@@ -452,9 +518,12 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 **B15** (PE3; requisitos: RF12; RNF02, RNF03)
 
-- O compartilhamento exige autorização explícita e pode ser revogado.
-- A exclusão da conta remove os compartilhamentos.
-- Atenção: Fica para depois da entrega, salvo decisão do autor.
+- Uma família tem mais de um responsável; o convite é de uso único, tem validade e é guardado só como hash.
+- O compartilhamento exige autorização explícita e pode ser revogado; cada pessoa pode sair da família.
+- Nenhuma conta enxerga dados de uma família da qual não faz parte (teste de isolamento).
+- Fica registrado quem aplicou cada dose.
+- A exclusão da conta tem regra definida para o dono (transferir ou apagar) e remove os compartilhamentos.
+- Atenção: Pedido de 10/11/2026: ampliado de "compartilhar com cuidador" para várias contas por família. Toca toda regra de propriedade do dado (OWASP A01); decisões em aberto: o que ocorre quando o único dono exclui a conta e se haverá visibilidade por pessoa.
 
 ## E9 Experiência e design
 
