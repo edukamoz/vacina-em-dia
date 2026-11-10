@@ -13,7 +13,7 @@ import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
 import { useThemeColors, useVisual } from '../../theme/theme-provider';
-import { useDosesOfMembers, useMembers } from '../data/hooks';
+import { useConferenciaDoCalendario, useDosesOfMembers, useMembers } from '../data/hooks';
 import { formatCivilDate } from '../doses/format-date';
 
 /** Uma linha do histórico: a dose, de quem é e a data que a coloca no ano. */
@@ -159,6 +159,7 @@ function TabelaDoHistorico({
  * ano. No computador vira uma tabela (Vacina, Pessoa, Data e Estado); no celular, cartões.
  */
 export function HistoryScreen() {
+  const conferencia = useConferenciaDoCalendario();
   const router = useRouter();
   const largura = useWindowDimensions().width;
   const cores = useThemeColors();
@@ -263,7 +264,7 @@ export function HistoryScreen() {
           )}
         </View>
       ))}
-      {fonte && <AvisoFonte fonte={fonte} />}
+      {fonte && <AvisoFonte conferencia={conferencia.data} fonte={fonte} />}
     </Tela>
   );
 }

@@ -18,6 +18,8 @@ O calendário oficial é publicado como cinco PDFs em endereços fixos do portal
 6. **Superfície HTTP:** `GET /api/calendar/watch` (público: só a data da última conferência e `changed`) e `POST /api/calendar/watch/check` (nível `function`: exige a chave da função; confere na hora e serve para testar o acesso ao portal a partir da Azure).
 7. **Boa conduta com o portal:** só baixa de `https://www.gov.br/saude/`, um arquivo por vez, `User-Agent` `vacina-em-dia-vigia/0.1`, tempo de 30 s, teto de 8 MB, uma vez por semana. O `robots.txt` do portal não bloqueia `/saude/` (conferido em 10/11/2026). Nenhum dado de usuário vai às fontes oficiais.
 
+8. **No app:** o rodapé da fonte (`AvisoFonte`, nas abas Doses e Histórico e no painel) lê `GET /api/calendar/watch` e mostra "Conferido com o site do Ministério da Saúde em dd/mm/aaaa"; se `changed` for verdadeiro, acrescenta que o Ministério publicou arquivos diferentes e a atualização está em análise. Se a consulta falhar ou nunca tiver rodado, a frase não aparece.
+
 ## Alternativas
 
 | Opção | Por que não |

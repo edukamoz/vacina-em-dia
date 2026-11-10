@@ -139,6 +139,28 @@ describe('AvisoFonte', () => {
     await render(<AvisoFonte fonte={{ ...FONTE, isFictitious: true }} />);
     expect(screen.getByText(/Calendário de exemplo/)).toBeOnTheScreen();
   });
+
+  test('CT-UI-07b: mostra quando o calendário foi conferido com o Ministério', async () => {
+    const conferencia = { checkedAt: '2026-11-16T15:00:00.000Z', changed: false };
+    await render(<AvisoFonte fonte={FONTE} conferencia={conferencia} />);
+    expect(
+      screen.getByText(/Conferido com o site do Ministério da Saúde em 16\/11\/2026\./),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/arquivos diferentes/)).not.toBeOnTheScreen();
+  });
+
+  test('CT-UI-07c: se o Ministério publicou algo diferente, o rodapé avisa que está em análise', async () => {
+    const conferencia = { checkedAt: '2026-11-16T15:00:00.000Z', changed: true };
+    await render(<AvisoFonte fonte={FONTE} conferencia={conferencia} />);
+    expect(screen.getByText(/arquivos diferentes dos que o app usa/)).toBeOnTheScreen();
+  });
+
+  test('CT-UI-07d: sem conferência (carregando, fora do ar ou nunca feita) a frase não aparece', async () => {
+    await render(<AvisoFonte fonte={FONTE} />);
+    expect(screen.queryByText(/Conferido com o site/)).not.toBeOnTheScreen();
+    await render(<AvisoFonte fonte={FONTE} conferencia={{ checkedAt: null, changed: false }} />);
+    expect(screen.queryByText(/Conferido com o site/)).not.toBeOnTheScreen();
+  });
 });
 
 describe('estados', () => {

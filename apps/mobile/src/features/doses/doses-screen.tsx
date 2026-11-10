@@ -14,7 +14,7 @@ import { podeLerDocumento } from '../../lib/ler-documento';
 import { todayCivil } from '../../lib/dates';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSelectedMember } from '../calendar/use-selected-member';
-import { useMemberDoses } from '../data/hooks';
+import { useConferenciaDoCalendario, useMemberDoses } from '../data/hooks';
 import { BaixarCarteira } from './baixar-carteira';
 import { DoseCard } from './dose-card';
 import { Festa } from './festa';
@@ -53,6 +53,7 @@ export function agruparDoses(doses: readonly DoseResponse[]) {
  * carrossel de pessoas (troca de quem se vê) e o resumo com anel de progresso.
  */
 export function DosesScreen() {
+  const conferencia = useConferenciaDoCalendario();
   const router = useRouter();
   const cores = useThemeColors();
   const { members, items, selected, selectMember } = useSelectedMember();
@@ -172,7 +173,7 @@ export function DosesScreen() {
         <Icone nome="seta" cor={cores.textoSecundario} />
       </Pressable>
       <NovidadesCard />
-      {doses.data && <AvisoFonte fonte={doses.data.source} />}
+      {doses.data && <AvisoFonte conferencia={conferencia.data} fonte={doses.data.source} />}
     </Tela>
   );
 }

@@ -20,7 +20,7 @@ import {
   totalDaContagem,
 } from '../../lib/estatisticas';
 import { useThemeColors } from '../../theme/theme-provider';
-import { useDosesOfMembers, useMembers } from '../data/hooks';
+import { useConferenciaDoCalendario, useDosesOfMembers, useMembers } from '../data/hooks';
 import { BarrasPorMes, BarrasPorPessoa, Rosca, useCoresDosEstados } from './graficos';
 
 /** Número grande com legenda, no alto do painel. */
@@ -95,6 +95,7 @@ function BlocoDoGrafico({
  * tem um rótulo de texto para leitor de tela e há uma tabela com os mesmos números.
  */
 export function PainelScreen({ hoje = todayCivil() }: { hoje?: string }) {
+  const conferencia = useConferenciaDoCalendario();
   const router = useRouter();
   const cores = useThemeColors();
   const corDoEstado = useCoresDosEstados();
@@ -324,7 +325,7 @@ export function PainelScreen({ hoje = todayCivil() }: { hoje?: string }) {
           </View>
         </View>
       )}
-      {fonte && <AvisoFonte fonte={fonte} />}
+      {fonte && <AvisoFonte conferencia={conferencia.data} fonte={fonte} />}
     </Tela>
   );
 }
