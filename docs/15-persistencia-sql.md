@@ -13,6 +13,8 @@ Os dados passam a viver no Azure SQL (ADR-004), com a API sem senha de banco (AD
 | Migração `002-redefinicao-de-senha.sql` (tabela `password_reset_token`) | Aplicada em 07/10/2026 |
 | Migração `003-parentesco-do-membro.sql` (coluna `member.relationship`) | **Escrita, ainda não aplicada no banco da nuvem** (aplicar antes de publicar a API que a usa) |
 | Migração `004-dose-avulsa.sql` (`dose.rule_id` opcional, `custom_vaccine`, `custom_dose_label`, restrição `ck_dose_origin`) | **Escrita, ainda não aplicada no banco da nuvem** (aplicar antes de publicar a API que a usa) |
+| Migração `005-lembretes.sql` (`app_account.reminders_enabled`, tabela `reminder_log`) | Aplicada (a rotina diária de lembretes roda na nuvem) |
+| Migração `006-recorrencia-de-vacinas.sql` (colunas `remind_days_before`, `series_id`, `occurrence` e `recur_*` em `dose`, restrições `ck_dose_remind`, `ck_dose_series` e `ck_dose_recurrence`, índice único `ux_dose_series_occurrence`; ADR-027) | **Escrita, ainda não aplicada no banco da nuvem** (aplicar antes de publicar a API que a usa) |
 | Histórico de eventos da dose (`dose_event`), lembretes e dispositivos push | Não existem ainda (SCRUM-19) |
 
 ## Esquema implementado

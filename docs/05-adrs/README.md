@@ -27,6 +27,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-019](ADR-019-carteira-em-pdf.md) | Carteira de vacinação em PDF gerada na API com PDFKit (RF11) | Aceita |
 | [ADR-020](ADR-020-foto-de-perfil-no-blob-storage.md) | Foto de perfil guardada no Azure Blob Storage | Aceita |
 | [ADR-026](ADR-026-movimento-padrao-segue-o-aparelho.md) | Movimento padrão segue o aparelho (WCAG 2.3.3) | Proposta |
+| [ADR-027](ADR-027-recorrencia-de-vacinas.md) | Recorrência de vacinas e aviso antecipado por dose | Aceita |
 
 ## Estados possíveis
 
