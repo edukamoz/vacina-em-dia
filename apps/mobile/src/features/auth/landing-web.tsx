@@ -164,8 +164,8 @@ function CartaoDePersona({ persona, cor }: { persona: (typeof PERSONAS)[number];
  * - Computador (`compacta` falso): promessa e mosaico lado a lado, objetos que seguem o mouse e
  *   personas em três colunas.
  * - Celular e janela estreita (`compacta`): mosaico de 2 colunas, personas num carrossel que se
- *   arrasta com o dedo, um cartão ensinando a instalar o app e um botão "Criar conta" fixo no pé
- *   da tela.
+ *   arrasta com o dedo, um cartão ensinando a instalar o app e um botão "Criar conta" no pé da
+ *   tela (fora da rolagem, não sobre ela, então não cobre o conteúdo nem anda com a barra do navegador).
  *
  * @param props.compacta - Janela abaixo de 1024 px.
  */
@@ -429,7 +429,7 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
           </View>
         </Revelar>
 
-        <View className={`${SECAO} gap-md pb-xxl pt-lg ${compacta ? 'pb-[112px]' : ''}`}>
+        <View className={`${SECAO} gap-md pb-xxl pt-lg`}>
           <Texto variante="apoio" className="text-textoSecundario">
             O Vacina em Dia não substitui a caderneta oficial de vacinação nem a orientação de
             profissionais de saúde.
@@ -440,7 +440,7 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
         </View>
       </RolagemAnimada>
       {compacta ? (
-        <View className="absolute inset-x-0 bottom-0 border-t-fina border-bordaSuave bg-superficie px-lg py-md">
+        <View className="border-t-fina border-bordaSuave bg-superficie px-lg py-md">
           <Botao titulo="Criar conta" onPress={() => router.push('/criar-conta')} />
         </View>
       ) : null}
