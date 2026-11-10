@@ -29,14 +29,15 @@ export interface InvalidDoseDateError {
 export interface LimitReachedError {
   readonly code: 'LIMIT_REACHED';
   /** O que atingiu o limite; muda só a mensagem. Sem valor, são as pessoas da conta. */
-  readonly scope?: 'members' | 'customDoses';
+  readonly scope?: 'members' | 'customDoses' | 'invites';
 }
 
 /** Limite de uso do assistente atingido (ADR-010). */
 export interface RateLimitedError {
   readonly code: 'RATE_LIMITED';
   /** O que foi limitado; muda só a mensagem. Sem valor, é o assistente. */
-  readonly scope?: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | 'news';
+  readonly scope?:
+    'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | 'news' | 'household';
   /** Segundos até a próxima janela livre. */
   readonly retryAfterSeconds: number;
 }
@@ -106,6 +107,38 @@ export interface StorageUnavailableError {
   readonly code: 'STORAGE_UNAVAILABLE';
 }
 
+/** Código de convite inexistente, vencido ou já usado (a API não distingue os três). */
+export interface InvalidInviteError {
+  readonly code: 'INVALID_INVITE';
+}
+
+/** Quem entra já tem pessoas cadastradas e não confirmou levá-las para a nova família. */
+export interface HouseholdHasMembersError {
+  readonly code: 'HOUSEHOLD_HAS_MEMBERS';
+  /** Quantas pessoas a conta tem. */
+  readonly memberCount: number;
+}
+
+/** A conta divide a própria família com outros responsáveis e precisa sair antes de entrar em outra. */
+export interface NotAloneError {
+  readonly code: 'NOT_ALONE';
+}
+
+/** Só o dono da família pode fazer isto. */
+export interface OwnerOnlyError {
+  readonly code: 'OWNER_ONLY';
+}
+
+/** O dono precisa passar a propriedade antes de sair da família. */
+export interface OwnerMustTransferError {
+  readonly code: 'OWNER_MUST_TRANSFER';
+}
+
+/** A conta já faz parte desta família. */
+export interface AlreadyInHouseholdError {
+  readonly code: 'ALREADY_IN_HOUSEHOLD';
+}
+
 /** Erros de domínio dos casos de uso, mapeados para HTTP em um único ponto. */
 export type ServiceError =
   | NotFoundError
@@ -128,6 +161,12 @@ export type ServiceError =
   | InvalidImageError
   | ImageTooLargeError
   | StorageUnavailableError
+  | InvalidInviteError
+  | HouseholdHasMembersError
+  | NotAloneError
+  | OwnerOnlyError
+  | OwnerMustTransferError
+  | AlreadyInHouseholdError
   | TransitionError;
 
 /** Resultado de um caso de uso: o valor ou um erro de domínio, nunca uma exceção. */

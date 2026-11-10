@@ -64,6 +64,12 @@ Hoje cada pessoa cadastrada (`member`) pertence a **uma conta** (`member.account
 2. **App:** seção "Responsáveis da família" na aba Conta (lista, convidar, remover, sair, passar a propriedade) e a tela para entrar com um código, com a confirmação de levar as pessoas.
 3. **Depois:** registro de quem aplicou cada dose, convite por e-mail e push do servidor.
 
+## Andamento
+
+- **Fatia 1 (API e banco): implementada** na branch `feature/B15-familia-api-e-banco`: migração `007`, repositórios por família (memória e Azure SQL), serviço, rotas e Swagger. Casos `CT-FAMR-01` a `34` (código e esquemas), `CT-FAMR-40` a `55` (contrato dos repositórios, nas duas implementações), `CT-FAMR-60` a `63` (SQL) e `CT-FAMR-100` a `142` (serviço e HTTP).
+- **Uma decisão de implementação:** o repositório SQL exige que toda conta tenha vínculo com uma família. A migração cria a família de cada conta existente, `auth.createAccount` cria a da conta nova na mesma transação, e `households.get` cria a que faltar.
+- **Fatia 2 (app): a fazer.**
+
 ## Verificações e fontes
 
 - O mapa de onde a regra de dono é usada foi feito no código em 10/11/2026: `ownerId` em ~35 arquivos da API, com a consulta concentrada em `repositories/sql/sql-repositories.ts` e `repositories/in-memory-store.ts`.

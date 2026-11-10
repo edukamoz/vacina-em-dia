@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   RECURRENCE_ANCHORS,
   RECURRENCE_UNITS,
@@ -13,6 +14,8 @@ import type {
   AuthRepository,
   ConsentRepository,
   DoseRepository,
+  HouseholdRepository,
+  HouseholdRole,
   MemberRepository,
   ReminderRepository,
   StoredAccount,
@@ -40,6 +43,7 @@ export interface SqlRepositories {
   readonly consents: ConsentRepository;
   readonly accounts: AccountRepository;
   readonly reminders: ReminderRepository;
+  readonly households: HouseholdRepository;
   readonly auth: AuthRepository;
   /** Consulta mínima que acorda o banco pausado (Azure SQL gratuito) e confirma que responde. */
   readonly ping: () => Promise<void>;
@@ -64,7 +68,10 @@ const nullableInt = (value: number | null) => ({ type: 'int', value }) as const;
 /** Instante ISO 8601 (UTC) como parâmetro; o banco converte para DATETIME2 com o estilo 127. */
 const when = (value: string) => str(value, 30);
 
-const MEMBER_COLUMNS = `id, display_name, CONVERT(char(10), birth_date, 23) AS birth_date, is_pregnant, relationship`;
+const MEMBER_COLUMNS = `m.id, m.display_name, CONVERT(char(10), m.birth_date, 23) AS birth_date, m.is_pregnant, m.relationship`;
+
+/** Junção que dá a uma conta o acesso às pessoas da família dela (ADR-029). */
+const FAMILY_ACCESS = 'JOIN family_membership fm ON fm.family_id = m.family_id';
 
 /** Parentesco guardado; `null` quando não informado. O banco só aceita os códigos conhecidos. */
 function relationshipOf(row: SqlRow): Relationship | null {
@@ -160,24 +167,31 @@ function toRefreshToken(row: SqlRow): StoredRefreshToken {
 }
 
 /**
- * Cria os repositórios sobre o Azure SQL. O dono é sempre uma conta (`account_id`): um membro só é
- * alcançado com o `account_id` do dono, e uma dose só é alcançada pelo membro do dono, então um
- * usuário nunca lê nem grava dado de outro (CLAUDE.md §10).
+ * Cria os repositórios sobre o Azure SQL. O "dono" que chega a cada método é uma conta, e o acesso
+ * passa sempre pelo vínculo dela com a família (`family_membership`): uma pessoa só é alcançada
+ * pelas contas da família dela, e uma dose só é alcançada pela pessoa, então ninguém lê nem grava
+ * dado de outra família (ADR-029; CLAUDE.md §10).
  *
  * @param db - Executor de consultas (a porta; em produção, o `mssql`).
+ * @param newId - Gerador de identificadores da família e do vínculo, injetável para testar.
  */
-export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
+export function createSqlRepositories(
+  db: SqlExecutor,
+  newId: () => string = randomUUID,
+): SqlRepositories {
   const members: MemberRepository = {
     async list(ownerId) {
       const result = await db.run(
-        `SELECT ${MEMBER_COLUMNS} FROM member WHERE account_id = @owner ORDER BY seq`,
+        `SELECT ${MEMBER_COLUMNS} FROM member m ${FAMILY_ACCESS}
+         WHERE fm.account_id = @owner ORDER BY m.seq`,
         { owner: str(ownerId) },
       );
       return result.rows.map(toMember);
     },
     async get(ownerId, id) {
       const result = await db.run(
-        `SELECT ${MEMBER_COLUMNS} FROM member WHERE account_id = @owner AND id = @id`,
+        `SELECT ${MEMBER_COLUMNS} FROM member m ${FAMILY_ACCESS}
+         WHERE fm.account_id = @owner AND m.id = @id`,
         { owner: str(ownerId), id: str(id) },
       );
       const row = result.rows[0];
@@ -185,12 +199,16 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     },
     async save(ownerId, member) {
       await db.run(
-        `UPDATE member SET display_name = @name, birth_date = CONVERT(date, @birth, 23),
+        `UPDATE m SET display_name = @name, birth_date = CONVERT(date, @birth, 23),
            is_pregnant = @pregnant, relationship = @relationship
-         WHERE id = @id AND account_id = @owner;
+         FROM member m ${FAMILY_ACCESS}
+         WHERE m.id = @id AND fm.account_id = @owner;
          IF @@ROWCOUNT = 0
-           INSERT INTO member (id, account_id, display_name, birth_date, is_pregnant, relationship)
-           VALUES (@id, @owner, @name, CONVERT(date, @birth, 23), @pregnant, @relationship);`,
+           INSERT INTO member (id, account_id, family_id, display_name, birth_date, is_pregnant,
+             relationship)
+           SELECT @id, @owner, fm.family_id, @name, CONVERT(date, @birth, 23), @pregnant,
+             @relationship
+           FROM family_membership fm WHERE fm.account_id = @owner;`,
         {
           id: str(member.id),
           owner: str(ownerId),
@@ -202,10 +220,10 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
       );
     },
     async remove(ownerId, id) {
-      await db.run('DELETE FROM member WHERE id = @id AND account_id = @owner', {
-        id: str(id),
-        owner: str(ownerId),
-      });
+      await db.run(
+        `DELETE m FROM member m ${FAMILY_ACCESS} WHERE m.id = @id AND fm.account_id = @owner`,
+        { id: str(id), owner: str(ownerId) },
+      );
     },
   };
 
@@ -213,7 +231,7 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     async listByMember(ownerId, memberId) {
       const result = await db.run(
         `SELECT ${DOSE_COLUMNS} FROM dose d JOIN member m ON m.id = d.member_id
-         WHERE m.account_id = @owner AND d.member_id = @member ORDER BY d.seq`,
+         ${FAMILY_ACCESS} WHERE fm.account_id = @owner AND d.member_id = @member ORDER BY d.seq`,
         { owner: str(ownerId), member: str(memberId) },
       );
       return result.rows.map(toDose);
@@ -221,7 +239,7 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     async get(ownerId, id) {
       const result = await db.run(
         `SELECT ${DOSE_COLUMNS} FROM dose d JOIN member m ON m.id = d.member_id
-         WHERE m.account_id = @owner AND d.id = @id`,
+         ${FAMILY_ACCESS} WHERE fm.account_id = @owner AND d.id = @id`,
         { owner: str(ownerId), id: str(id) },
       );
       const row = result.rows[0];
@@ -238,8 +256,8 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
                recur_unit = @unit, recur_every = @every, recur_anchor = @anchor,
                recur_anchor_date = CONVERT(date, @anchorDate, 23),
                recur_end_date = CONVERT(date, @endDate, 23), recur_max_doses = @maxDoses
-             FROM dose d JOIN member m ON m.id = d.member_id
-             WHERE d.id = @id AND m.account_id = @owner;
+             FROM dose d JOIN member m ON m.id = d.member_id ${FAMILY_ACCESS}
+             WHERE d.id = @id AND fm.account_id = @owner;
              IF @@ROWCOUNT = 0
                INSERT INTO dose (id, member_id, rule_id, custom_vaccine, custom_dose_label, status,
                  due_date, scheduled_date, applied_date, remind_days_before, series_id, occurrence,
@@ -249,7 +267,7 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
                  CONVERT(date, @scheduled, 23), CONVERT(date, @applied, 23), @remind, @series,
                  @occurrence, @unit, @every, @anchor, CONVERT(date, @anchorDate, 23),
                  CONVERT(date, @endDate, 23), @maxDoses
-               FROM member m WHERE m.id = @member AND m.account_id = @owner;`,
+               FROM member m ${FAMILY_ACCESS} WHERE m.id = @member AND fm.account_id = @owner;`,
             {
               id: str(dose.id),
               owner: str(ownerId),
@@ -313,7 +331,36 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
   const accounts: AccountRepository = {
     async deleteAll(ownerId) {
       await db.transaction(async (tx) => {
-        await tx.run('DELETE FROM member WHERE account_id = @owner', { owner: str(ownerId) });
+        const mine = await tx.run(
+          'SELECT family_id, role FROM family_membership WHERE account_id = @owner',
+          { owner: str(ownerId) },
+        );
+        const row = mine.rows[0];
+        if (row) {
+          const familyId = text(row, 'family_id');
+          const count = await tx.run(
+            'SELECT COUNT(*) AS n FROM family_membership WHERE family_id = @family',
+            { family: str(familyId) },
+          );
+          if ((nullableNumber(count.rows[0] ?? {}, 'n') ?? 0) <= 1) {
+            // A única conta: apaga a família inteira (pessoas, doses e convites, em cascata).
+            await tx.run('DELETE FROM family WHERE id = @family', { family: str(familyId) });
+          } else {
+            // Divide a família: só sai dela. Se era a dona, a propriedade passa ao mais antigo.
+            if (text(row, 'role') === 'OWNER') {
+              await tx.run(
+                `UPDATE family_membership SET role = 'OWNER'
+                 WHERE id = (SELECT TOP 1 id FROM family_membership
+                             WHERE family_id = @family AND account_id <> @owner
+                             ORDER BY joined_at, id)`,
+                { family: str(familyId), owner: str(ownerId) },
+              );
+            }
+            await tx.run('DELETE FROM family_membership WHERE account_id = @owner', {
+              owner: str(ownerId),
+            });
+          }
+        }
         await tx.run('DELETE FROM consent WHERE account_id = @owner', { owner: str(ownerId) });
       });
     },
@@ -341,7 +388,8 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
            CONVERT(char(10), d.applied_date, 23) AS applied_date
          FROM app_account a
          JOIN consent c ON c.account_id = a.id
-         JOIN member m ON m.account_id = a.id
+         JOIN family_membership fm ON fm.account_id = a.id
+         JOIN member m ON m.family_id = fm.family_id
          JOIN dose d ON d.member_id = m.id
          WHERE a.reminders_enabled = 1
            AND d.status IN ('PENDING', 'SCHEDULED')
@@ -394,16 +442,26 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
   const auth: AuthRepository = {
     async createAccount(account) {
       try {
-        await db.run(
-          `INSERT INTO app_account (id, email, password_hash, created_at)
-           VALUES (@id, @email, @hash, CONVERT(datetime2(3), @at, 127))`,
-          {
-            id: str(account.id),
-            email: nstr(account.email, 254),
-            hash: str(account.passwordHash, 200),
-            at: when(account.createdAt),
-          },
-        );
+        await db.transaction(async (tx) => {
+          await tx.run(
+            `INSERT INTO app_account (id, email, password_hash, created_at)
+             VALUES (@id, @email, @hash, CONVERT(datetime2(3), @at, 127))`,
+            {
+              id: str(account.id),
+              email: nstr(account.email, 254),
+              hash: str(account.passwordHash, 200),
+              at: when(account.createdAt),
+            },
+          );
+          // Toda conta nasce dona de uma família própria (ADR-029).
+          const family = newId();
+          await tx.run('INSERT INTO family (id) VALUES (@family)', { family: str(family) });
+          await tx.run(
+            `INSERT INTO family_membership (id, family_id, account_id, role)
+             VALUES (@membership, @family, @account, 'OWNER')`,
+            { membership: str(newId()), family: str(family), account: str(account.id) },
+          );
+        });
         return true;
       } catch (error) {
         if (isDuplicateKeyError(error)) return false;
@@ -510,9 +568,208 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     },
   };
 
+  /** Garante que a conta tem família: cria a própria, com a conta como dona, se ainda não tiver. */
+  async function ensureHousehold(tx: SqlExecutor, accountId: string): Promise<void> {
+    const found = await tx.run(
+      'SELECT 1 AS ok FROM family_membership WHERE account_id = @account',
+      {
+        account: str(accountId),
+      },
+    );
+    if (found.rows.length > 0) return;
+    const family = newId();
+    await tx.run('INSERT INTO family (id) VALUES (@family)', { family: str(family) });
+    await tx.run(
+      `INSERT INTO family_membership (id, family_id, account_id, role)
+       VALUES (@membership, @family, @account, 'OWNER')`,
+      { membership: str(newId()), family: str(family), account: str(accountId) },
+    );
+  }
+
+  /** Cria uma família nova e vazia, dona a conta (depois de sair ou ser removida da anterior). */
+  async function startOver(tx: SqlExecutor, accountId: string): Promise<void> {
+    const family = newId();
+    await tx.run('INSERT INTO family (id) VALUES (@family)', { family: str(family) });
+    await tx.run(
+      `INSERT INTO family_membership (id, family_id, account_id, role)
+       VALUES (@membership, @family, @account, 'OWNER')`,
+      { membership: str(newId()), family: str(family), account: str(accountId) },
+    );
+  }
+
+  /** Vínculo da conta: família, papel e quantos responsáveis a família tem. */
+  async function mineOf(tx: SqlExecutor, accountId: string) {
+    const result = await tx.run(
+      `SELECT fm.id, fm.family_id, fm.role,
+         (SELECT COUNT(*) FROM family_membership x WHERE x.family_id = fm.family_id) AS guardians,
+         (SELECT COUNT(*) FROM member m WHERE m.family_id = fm.family_id) AS members
+       FROM family_membership fm WHERE fm.account_id = @account`,
+      { account: str(accountId) },
+    );
+    const row = result.rows[0];
+    if (!row) throw new Error('Conta sem família.');
+    return {
+      id: text(row, 'id'),
+      familyId: text(row, 'family_id'),
+      role: text(row, 'role') as HouseholdRole,
+      guardians: nullableNumber(row, 'guardians') ?? 0,
+      members: nullableNumber(row, 'members') ?? 0,
+    };
+  }
+
+  const households: HouseholdRepository = {
+    async get(accountId) {
+      try {
+        await db.transaction((tx) => ensureHousehold(tx, accountId));
+      } catch (error) {
+        // Duas chamadas ao mesmo tempo: a outra criou a família; basta ler.
+        if (!isDuplicateKeyError(error)) throw error;
+      }
+      const mine = await mineOf(db, accountId);
+      const result = await db.run(
+        `SELECT id, account_id, role, CONVERT(char(23), joined_at, 127) AS joined_at
+         FROM family_membership WHERE family_id = @family ORDER BY joined_at, id`,
+        { family: str(mine.familyId) },
+      );
+      return {
+        id: mine.familyId,
+        memberCount: mine.members,
+        guardians: result.rows.map((row) => ({
+          id: text(row, 'id'),
+          accountId: text(row, 'account_id'),
+          role: text(row, 'role') as HouseholdRole,
+          joinedAt: instant(row, 'joined_at'),
+        })),
+      };
+    },
+    async countActiveInvites(householdId, nowIso) {
+      const result = await db.run(
+        `SELECT COUNT(*) AS n FROM family_invite
+         WHERE family_id = @family AND used_at IS NULL
+           AND expires_at > CONVERT(datetime2(3), @now, 127)`,
+        { family: str(householdId), now: when(nowIso) },
+      );
+      return nullableNumber(result.rows[0] ?? {}, 'n') ?? 0;
+    },
+    async createInvite(invite) {
+      await db.run(
+        `INSERT INTO family_invite (token_hash, family_id, created_by_account_id, expires_at)
+         VALUES (@hash, @family, @creator, CONVERT(datetime2(3), @expires, 127))`,
+        {
+          hash: str(invite.tokenHash, 64),
+          family: str(invite.householdId),
+          creator: str(invite.createdByAccountId),
+          expires: when(invite.expiresAt),
+        },
+      );
+    },
+    async revokeInvites(householdId) {
+      await db.run('DELETE FROM family_invite WHERE family_id = @family AND used_at IS NULL', {
+        family: str(householdId),
+      });
+    },
+    async join(accountId, tokenHash, nowIso, moveMembers) {
+      return db.transaction(async (tx) => {
+        await ensureHousehold(tx, accountId);
+        const invite = await tx.run(
+          `SELECT family_id FROM family_invite
+           WHERE token_hash = @hash AND used_at IS NULL
+             AND expires_at > CONVERT(datetime2(3), @now, 127)`,
+          { hash: str(tokenHash, 64), now: when(nowIso) },
+        );
+        const target = invite.rows[0] ? text(invite.rows[0], 'family_id') : undefined;
+        if (!target) return { status: 'INVALID' } as const;
+        const mine = await mineOf(tx, accountId);
+        if (mine.familyId === target) return { status: 'ALREADY_MEMBER' } as const;
+        if (mine.guardians > 1) return { status: 'NOT_ALONE' } as const;
+        if (mine.members > 0 && !moveMembers) {
+          return { status: 'HAS_MEMBERS', memberCount: mine.members } as const;
+        }
+        // O código vale uma vez: só quem o marcar como usado primeiro continua.
+        const used = await tx.run(
+          `UPDATE family_invite SET used_at = CONVERT(datetime2(3), @now, 127),
+             used_by_account_id = @account
+           WHERE token_hash = @hash AND used_at IS NULL`,
+          { hash: str(tokenHash, 64), now: when(nowIso), account: str(accountId) },
+        );
+        if (used.rowsAffected === 0) return { status: 'INVALID' } as const;
+        await tx.run('UPDATE member SET family_id = @target WHERE family_id = @mine', {
+          target: str(target),
+          mine: str(mine.familyId),
+        });
+        await tx.run('DELETE FROM family_membership WHERE account_id = @account', {
+          account: str(accountId),
+        });
+        await tx.run('DELETE FROM family WHERE id = @mine', { mine: str(mine.familyId) });
+        await tx.run(
+          `INSERT INTO family_membership (id, family_id, account_id, role, joined_at)
+           VALUES (@membership, @target, @account, 'GUARDIAN', CONVERT(datetime2(3), @now, 127))`,
+          {
+            membership: str(newId()),
+            target: str(target),
+            account: str(accountId),
+            now: when(nowIso),
+          },
+        );
+        return { status: 'JOINED', moved: mine.members } as const;
+      });
+    },
+    async leave(accountId) {
+      return db.transaction(async (tx) => {
+        await ensureHousehold(tx, accountId);
+        const mine = await mineOf(tx, accountId);
+        if (mine.guardians === 1) return 'ALONE' as const;
+        if (mine.role === 'OWNER') return 'OWNER_MUST_TRANSFER' as const;
+        await tx.run('DELETE FROM family_membership WHERE account_id = @account', {
+          account: str(accountId),
+        });
+        await startOver(tx, accountId);
+        return 'LEFT' as const;
+      });
+    },
+    async remove(ownerAccountId, guardianId) {
+      return db.transaction(async (tx) => {
+        await ensureHousehold(tx, ownerAccountId);
+        const mine = await mineOf(tx, ownerAccountId);
+        if (mine.role !== 'OWNER') return 'FORBIDDEN' as const;
+        const target = await tx.run(
+          `SELECT account_id FROM family_membership
+           WHERE id = @guardian AND family_id = @family AND account_id <> @owner`,
+          { guardian: str(guardianId), family: str(mine.familyId), owner: str(ownerAccountId) },
+        );
+        const targetAccount = target.rows[0] ? text(target.rows[0], 'account_id') : undefined;
+        if (!targetAccount) return 'NOT_FOUND' as const;
+        await tx.run('DELETE FROM family_membership WHERE account_id = @account', {
+          account: str(targetAccount),
+        });
+        await startOver(tx, targetAccount);
+        return 'REMOVED' as const;
+      });
+    },
+    async transfer(ownerAccountId, guardianId) {
+      return db.transaction(async (tx) => {
+        await ensureHousehold(tx, ownerAccountId);
+        const mine = await mineOf(tx, ownerAccountId);
+        if (mine.role !== 'OWNER') return 'FORBIDDEN' as const;
+        const target = await tx.run(
+          `SELECT id FROM family_membership
+           WHERE id = @guardian AND family_id = @family AND account_id <> @owner`,
+          { guardian: str(guardianId), family: str(mine.familyId), owner: str(ownerAccountId) },
+        );
+        if (target.rows.length === 0) return 'NOT_FOUND' as const;
+        await tx.run(
+          `UPDATE family_membership SET role = CASE WHEN id = @guardian THEN 'OWNER' ELSE 'GUARDIAN' END
+           WHERE family_id = @family AND (id = @guardian OR id = @mine)`,
+          { guardian: str(guardianId), family: str(mine.familyId), mine: str(mine.id) },
+        );
+        return 'TRANSFERRED' as const;
+      });
+    },
+  };
+
   const ping = async () => {
     await db.run('SELECT 1 AS ok');
   };
 
-  return { members, doses, consents, accounts, reminders, auth, ping };
+  return { members, doses, consents, accounts, reminders, households, auth, ping };
 }

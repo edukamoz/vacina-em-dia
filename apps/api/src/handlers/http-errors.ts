@@ -46,7 +46,9 @@ export function toErrorResult(error: ServiceError): HttpResult {
         message:
           error.scope === 'customDoses'
             ? 'Você chegou ao limite de doses cadastradas à mão para esta pessoa.'
-            : 'Você chegou ao limite de pessoas cadastradas.',
+            : error.scope === 'invites'
+              ? 'Você já tem convites demais abertos. Cancele os antigos para criar outro.'
+              : 'Você chegou ao limite de pessoas cadastradas.',
       });
     case 'RATE_LIMITED':
       return {
@@ -98,6 +100,38 @@ export function toErrorResult(error: ServiceError): HttpResult {
         code: 'STORAGE_UNAVAILABLE',
         message: 'Não foi possível guardar a foto agora. Tente de novo em instantes.',
       });
+    case 'INVALID_INVITE':
+      return json(400, {
+        code: 'INVALID_INVITE',
+        message: 'Este código não vale. Confira o código ou peça um novo ao dono da família.',
+      });
+    case 'HOUSEHOLD_HAS_MEMBERS':
+      return json(409, {
+        code: 'HOUSEHOLD_HAS_MEMBERS',
+        message: 'Você já tem pessoas cadastradas. Confirme se quer levá-las para a nova família.',
+        memberCount: error.memberCount,
+      });
+    case 'NOT_ALONE':
+      return json(409, {
+        code: 'NOT_ALONE',
+        message:
+          'Você divide a sua família com outros responsáveis. Saia dela antes de entrar em outra.',
+      });
+    case 'OWNER_ONLY':
+      return json(403, {
+        code: 'OWNER_ONLY',
+        message: 'Só o dono da família pode fazer isto.',
+      });
+    case 'OWNER_MUST_TRANSFER':
+      return json(409, {
+        code: 'OWNER_MUST_TRANSFER',
+        message: 'Você é o dono da família. Passe a propriedade a outro responsável antes de sair.',
+      });
+    case 'ALREADY_IN_HOUSEHOLD':
+      return json(409, {
+        code: 'ALREADY_IN_HOUSEHOLD',
+        message: 'Você já faz parte desta família.',
+      });
     case 'ASSISTANT_UNAVAILABLE':
       return json(503, {
         code: 'ASSISTANT_UNAVAILABLE',
@@ -123,9 +157,20 @@ export function toErrorResult(error: ServiceError): HttpResult {
 }
 
 function rateLimitedMessage(
-  scope: 'assistant' | 'login' | 'register' | 'reset' | 'units' | 'photo' | 'news' | undefined,
+  scope:
+    | 'assistant'
+    | 'login'
+    | 'register'
+    | 'reset'
+    | 'units'
+    | 'photo'
+    | 'news'
+    | 'household'
+    | undefined,
 ): string {
   switch (scope) {
+    case 'household':
+      return 'Muitas tentativas com códigos de convite. Tente de novo mais tarde.';
     case 'photo':
       return 'Muitas trocas de foto em pouco tempo. Tente de novo mais tarde.';
     case 'reset':

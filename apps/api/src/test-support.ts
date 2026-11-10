@@ -2,13 +2,17 @@ import { PNI_2026 } from '@vacina/shared';
 import { createAccountHandlers } from './handlers/account';
 import { createConsentHandlers } from './handlers/consent';
 import { createDoseHandlers } from './handlers/doses';
+import { createHouseholdHandlers } from './handlers/household';
 import { createMemberHandlers } from './handlers/members';
+import { createInMemoryAuthRepository } from './repositories/in-memory-auth';
 import { createInMemoryStore } from './repositories/in-memory-store';
 import { createAccountService } from './services/account-service';
 import { createCarteiraService } from './services/carteira-service';
 import { createConsentService } from './services/consent-service';
 import { createDoseService } from './services/dose-service';
+import { createHouseholdService } from './services/household-service';
 import { createMemberService } from './services/member-service';
+import { createFixedWindowLimiter } from './services/rate-limiter';
 
 /** "Agora" padrão dos testes: o dia civil em Brasília é 2026-10-06. */
 export const NOW = '2026-10-06T15:00:00.000Z';
@@ -28,9 +32,11 @@ export const OTHER_OWNER = 'sessao-de-teste-0002';
 export function buildApp(startAt: string = NOW) {
   let now = startAt;
   let counter = 0;
+  let draw = 0;
   const clock = () => now;
   const newId = () => `id-${(counter += 1)}`;
-  const store = createInMemoryStore();
+  const store = createInMemoryStore(undefined, newId, () => now);
+  const auth = createInMemoryAuthRepository();
   const calendar = PNI_2026;
 
   const consents = createConsentService({ consents: store.consents, clock });
@@ -51,9 +57,20 @@ export function buildApp(startAt: string = NOW) {
   });
   const accounts = createAccountService(store.accounts);
   const carteira = createCarteiraService({ doses, clock });
+  const household = createHouseholdService({
+    households: store.households,
+    consents: store.consents,
+    accounts: auth,
+    clock,
+    limiter: createFixedWindowLimiter(clock),
+    // Sorteio previsível só nos testes: cada convite sai diferente, sempre na mesma ordem.
+    random: (max) => (draw += 7) % max,
+  });
 
   return {
     store,
+    auth,
+    household,
     consents,
     members,
     doses,
@@ -63,6 +80,7 @@ export function buildApp(startAt: string = NOW) {
       members: createMemberHandlers(members, doses, carteira),
       doses: createDoseHandlers(doses),
       consent: createConsentHandlers(consents),
+      household: createHouseholdHandlers(household),
       account: createAccountHandlers(accounts),
     },
     /** Avança (ou volta) o relógio dos serviços. */
