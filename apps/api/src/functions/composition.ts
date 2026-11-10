@@ -19,6 +19,7 @@ import { createAuthHandlers, unavailableAuthHandlers } from '../handlers/auth';
 import { createConsentHandlers } from '../handlers/consent';
 import { createDoseHandlers } from '../handlers/doses';
 import { internalErrorResult, unauthorizedResult } from '../handlers/http-errors';
+import { createHouseholdHandlers } from '../handlers/household';
 import { createMemberHandlers } from '../handlers/members';
 import { createReminderHandlers } from '../handlers/reminders';
 import { createNewsHandlers } from '../handlers/news';
@@ -40,6 +41,7 @@ import { createCarteiraService } from '../services/carteira-service';
 import { createAuthService } from '../services/auth-service';
 import { createConsentService } from '../services/consent-service';
 import { createDoseService } from '../services/dose-service';
+import { createHouseholdService } from '../services/household-service';
 import { createMemberService } from '../services/member-service';
 import { createReminderService } from '../services/reminder-service';
 import { loadBundledUnits } from '../services/units-dataset';
@@ -166,6 +168,17 @@ const authService = tokens
     })
   : undefined;
 export const authHandlers = authService ? createAuthHandlers(authService) : unavailableAuthHandlers;
+
+/** Família com vários responsáveis (ADR-029): convite por código, entrar, sair e passar a propriedade. */
+export const householdHandlers = createHouseholdHandlers(
+  createHouseholdService({
+    households: store.households,
+    consents: store.consents,
+    accounts: authRepository,
+    clock,
+    limiter: createFixedWindowLimiter(clock),
+  }),
+);
 
 /** A sessão de demonstração vale até ser desligada com `DEMO_SESSION_ENABLED=false`. */
 const demoEnabled = process.env['DEMO_SESSION_ENABLED'] !== 'false';

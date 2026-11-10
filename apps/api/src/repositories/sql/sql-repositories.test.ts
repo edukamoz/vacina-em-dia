@@ -345,3 +345,78 @@ describe('repositórios SQL: dose que se repete (B69)', () => {
     expect(call?.params['lead']).toEqual({ type: 'int', value: 7 });
   });
 });
+
+describe('repositórios SQL: família com vários responsáveis (B15)', () => {
+  test('CT-FAMR-60: os candidatos ao e-mail vêm das pessoas da família da conta', async () => {
+    const { executor, calls } = fakeDb();
+    await createSqlRepositories(executor).reminders.listEmailCandidates('2026-11-10');
+    const texto = calls[0]?.text ?? '';
+    expect(texto).toContain('JOIN family_membership fm ON fm.account_id = a.id');
+    expect(texto).toContain('JOIN member m ON m.family_id = fm.family_id');
+    expect(texto).not.toMatch(/\bm\.account_id/);
+  });
+
+  test('CT-FAMR-61: criar a conta cria a família e o vínculo de dono na mesma transação', async () => {
+    const { executor, calls } = fakeDb();
+    let n = 0;
+    const repos = createSqlRepositories(executor, () => `id-${(n += 1)}`);
+    expect(
+      await repos.auth.createAccount({
+        id: 'conta-1',
+        email: 'a@b.c',
+        passwordHash: 'h',
+        createdAt: '2026-11-10T12:00:00.000Z',
+      }),
+    ).toBe(true);
+    expect(calls).toHaveLength(3);
+    expect(calls[0]?.text).toContain('INSERT INTO app_account');
+    expect(calls[1]?.text).toContain('INSERT INTO family (id)');
+    expect(calls[2]?.text).toContain('INSERT INTO family_membership');
+    expect(calls[2]?.text).toContain("'OWNER'");
+    expect(calls[2]?.params['account']).toEqual({ type: 'varchar', value: 'conta-1', length: 64 });
+  });
+
+  test('CT-FAMR-62: valores hostis nunca entram no texto SQL das operações de família', async () => {
+    const hostil = "x'; DROP TABLE family;--";
+    const { executor, calls } = fakeDb([
+      {
+        id: 'v',
+        family_id: 'f',
+        role: 'OWNER',
+        guardians: 1,
+        members: 0,
+        account_id: 'a',
+        joined_at: '2026-11-10T12:00:00',
+      },
+    ]);
+    const repos = createSqlRepositories(executor);
+    await repos.households.createInvite({
+      tokenHash: hostil,
+      householdId: hostil,
+      createdByAccountId: hostil,
+      expiresAt: '2026-11-17T12:00:00.000Z',
+    });
+    await repos.households.revokeInvites(hostil);
+    await repos.households.countActiveInvites(hostil, '2026-11-10T12:00:00.000Z');
+    await repos.households.join(hostil, hostil, '2026-11-10T12:00:00.000Z', true);
+    await repos.households.remove(hostil, hostil);
+    await repos.households.transfer(hostil, hostil);
+    for (const call of calls) {
+      expect(call.text).not.toContain('DROP TABLE');
+      expect(call.text).not.toContain(hostil);
+    }
+  });
+
+  test('CT-FAMR-63: ao excluir a conta, só a única da família apaga a família inteira', async () => {
+    const sozinha = fakeDb([{ family_id: 'f', role: 'OWNER', n: 1 }]);
+    await createSqlRepositories(sozinha.executor).accounts.deleteAll('conta');
+    expect(
+      sozinha.calls.some((c) => c.text.includes('DELETE FROM family WHERE id = @family')),
+    ).toBe(true);
+
+    const dividida = fakeDb([{ family_id: 'f', role: 'GUARDIAN', n: 2 }]);
+    await createSqlRepositories(dividida.executor).accounts.deleteAll('conta');
+    expect(dividida.calls.some((c) => c.text.includes('DELETE FROM family WHERE'))).toBe(false);
+    expect(dividida.calls.some((c) => c.text.includes('DELETE FROM family_membership'))).toBe(true);
+  });
+});

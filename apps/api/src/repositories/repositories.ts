@@ -90,9 +90,95 @@ export interface ReminderRepository {
   releaseEmailDay(accountId: string, today: CivilDate): Promise<void>;
 }
 
+/** Papel de uma conta na família: o dono gerencia os acessos; o responsável vê e edita tudo. */
+export type HouseholdRole = 'OWNER' | 'GUARDIAN';
+
+/** Vínculo de uma conta com a família (ADR-029). */
+export interface StoredGuardian {
+  /** Identificador do vínculo; é o que a API mostra, nunca o identificador da conta. */
+  readonly id: string;
+  readonly accountId: string;
+  readonly role: HouseholdRole;
+  /** Quando a conta entrou na família (ISO 8601 em UTC). */
+  readonly joinedAt: string;
+}
+
+/** A família de uma conta: os responsáveis, do mais antigo ao mais novo, e quantas pessoas tem. */
+export interface StoredHousehold {
+  readonly id: string;
+  readonly guardians: readonly StoredGuardian[];
+  readonly memberCount: number;
+}
+
+/** Convite guardado: só o hash do código, nunca o código. */
+export interface StoredInvite {
+  readonly tokenHash: string;
+  readonly householdId: string;
+  readonly createdByAccountId: string;
+  /** Até quando vale (ISO 8601 em UTC). */
+  readonly expiresAt: string;
+}
+
+/** Resultado de entrar numa família com um código. */
+export type JoinOutcome =
+  | { readonly status: 'JOINED'; readonly moved: number }
+  /** Código que não existe, venceu ou já foi usado (a API não distingue os três). */
+  | { readonly status: 'INVALID' }
+  | { readonly status: 'ALREADY_MEMBER' }
+  /** A conta divide a própria família com outros responsáveis: precisa sair antes. */
+  | { readonly status: 'NOT_ALONE' }
+  /** A conta tem pessoas cadastradas e não confirmou levá-las. */
+  | { readonly status: 'HAS_MEMBERS'; readonly memberCount: number };
+
+/** Resultado de sair da família. */
+export type LeaveOutcome = 'LEFT' | 'OWNER_MUST_TRANSFER' | 'ALONE';
+
+/** Resultado de remover um responsável. */
+export type RemoveOutcome = 'REMOVED' | 'FORBIDDEN' | 'NOT_FOUND';
+
+/** Resultado de passar a propriedade. */
+export type TransferOutcome = 'TRANSFERRED' | 'FORBIDDEN' | 'NOT_FOUND';
+
+/**
+ * Acesso à família e aos convites (ADR-029). Toda conta pertence a exatamente uma família: a
+ * primeira consulta cria a família própria, com a conta como dona. As pessoas e as doses pertencem à
+ * família, então todo responsável as alcança (e só os responsáveis dela). Cada operação que muda
+ * mais de uma linha é atômica.
+ */
+export interface HouseholdRepository {
+  /** A família da conta; cria a família própria na primeira vez. */
+  get(accountId: string): Promise<StoredHousehold>;
+  /** Quantos convites da família ainda valem em `nowIso` (não usados e não vencidos). */
+  countActiveInvites(householdId: string, nowIso: string): Promise<number>;
+  /** Guarda um convite. */
+  createInvite(invite: StoredInvite): Promise<void>;
+  /** Apaga os convites ainda não usados da família. */
+  revokeInvites(householdId: string): Promise<void>;
+  /**
+   * Entra na família do convite. Só entra quem é a única conta da própria família; as pessoas dela
+   * só vão junto com `moveMembers`, e a família de origem, já vazia, é apagada. O código vale uma vez.
+   */
+  join(
+    accountId: string,
+    tokenHash: string,
+    nowIso: string,
+    moveMembers: boolean,
+  ): Promise<JoinOutcome>;
+  /** Sai da família: a conta ganha uma família nova e vazia e perde o acesso às pessoas. */
+  leave(accountId: string): Promise<LeaveOutcome>;
+  /** O dono remove um responsável da própria família; o removido ganha uma família nova e vazia. */
+  remove(ownerAccountId: string, guardianId: string): Promise<RemoveOutcome>;
+  /** O dono passa a propriedade a outro responsável da família (e vira responsável). */
+  transfer(ownerAccountId: string, guardianId: string): Promise<TransferOutcome>;
+}
+
 /** Operações sobre a conta inteira. */
 export interface AccountRepository {
-  /** Apaga todos os dados do dono: membros, doses e consentimento (RF09). */
+  /**
+   * Exclui os dados da conta (RF09). Se ela é a única da família, apaga tudo: pessoas, doses e
+   * consentimento. Se divide a família, só sai dela e apaga o próprio consentimento: as pessoas
+   * ficam com a família; se era a dona, a propriedade passa ao responsável mais antigo (ADR-029).
+   */
   deleteAll(ownerId: string): Promise<void>;
 }
 

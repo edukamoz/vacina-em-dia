@@ -206,6 +206,12 @@ export const apiErrorSchema = z
       'INVALID_IMAGE',
       'IMAGE_TOO_LARGE',
       'STORAGE_UNAVAILABLE',
+      'INVALID_INVITE',
+      'HOUSEHOLD_HAS_MEMBERS',
+      'NOT_ALONE',
+      'OWNER_ONLY',
+      'OWNER_MUST_TRANSFER',
+      'ALREADY_IN_HOUSEHOLD',
       'INTERNAL_ERROR',
     ]),
     message: z
@@ -215,6 +221,9 @@ export const apiErrorSchema = z
       .array(z.string())
       .optional()
       .meta({ description: 'Campos inválidos, quando o erro é de validação.' }),
+    memberCount: z.number().int().min(0).optional().meta({
+      description: 'Quantas pessoas você tem, quando o erro é HOUSEHOLD_HAS_MEMBERS.',
+    }),
   })
   .meta({ id: 'ApiError' });
 

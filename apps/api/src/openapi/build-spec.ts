@@ -13,6 +13,12 @@ import {
   doseEventInputSchema,
   doseIdSchema,
   doseResponseSchema,
+  guardianIdSchema,
+  householdResponseSchema,
+  inviteResponseSchema,
+  joinInputSchema,
+  joinResponseSchema,
+  transferInputSchema,
   forgotPasswordInputSchema,
   loginInputSchema,
   customDoseInputSchema,
@@ -793,6 +799,172 @@ export function buildOpenApiDocument(): object {
       422: errorResponse(
         '`GUARD_VIOLATION`: regra de data ou de confirmação violada (agendar no passado, aplicar no futuro, cancelar sem confirmar).',
       ),
+      500: internalError,
+    },
+  });
+
+  const consentRequired = errorResponse('`CONSENT_REQUIRED`: o consentimento ainda não foi dado.');
+  const guardianPathParams = z.object({ id: guardianIdSchema });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/family',
+    tags: ['Família'],
+    summary: 'Consultar a minha família e os responsáveis',
+    description:
+      'Devolve a família da conta (toda conta pertence a exatamente uma): o seu papel, os responsáveis, com o e-mail parcialmente oculto e o identificador do vínculo (nunca o da conta), e quantas pessoas a família tem. A primeira consulta cria a família própria, com a conta como dona (ADR-029).',
+    security: secured,
+    responses: {
+      200: { description: 'A família.', content: jsonContent(householdResponseSchema) },
+      401: unauthorized,
+      403: consentRequired,
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/family/invites',
+    tags: ['Família'],
+    summary: 'Gerar um convite para outro responsável',
+    description:
+      'O dono gera um código de uso único, que vale 7 dias e é mostrado **só nesta resposta** (no banco fica só o hash). Quem tiver o código e uma conta entra na família com `POST /family/join` e passa a ver os dados de saúde de todas as pessoas dela. No máximo 5 convites abertos por família.',
+    security: secured,
+    responses: {
+      201: { description: 'Convite gerado.', content: jsonContent(inviteResponseSchema) },
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED` ou `OWNER_ONLY` (só o dono convida).'),
+      422: errorResponse('`LIMIT_REACHED`: já há 5 convites abertos.'),
+      429: errorResponse('`RATE_LIMITED`: muitos convites em pouco tempo.'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'delete',
+    path: '/family/invites',
+    tags: ['Família'],
+    summary: 'Cancelar os convites ainda não usados',
+    description: 'O dono cancela todos os convites que ainda não foram usados.',
+    security: secured,
+    responses: {
+      204: { description: 'Convites cancelados.' },
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED` ou `OWNER_ONLY`.'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/family/join',
+    tags: ['Família'],
+    summary: 'Entrar numa família com um código de convite',
+    description:
+      'Só entra quem é a única conta da própria família. Se a conta já tem pessoas cadastradas, a resposta é `HOUSEHOLD_HAS_MEMBERS` (409, com `memberCount`) e nada muda até a pessoa confirmar com `moveMembers: true`: aí as pessoas passam para a nova família e a de origem, já vazia, é apagada. O código vale uma vez; código inexistente, vencido ou já usado dão a mesma resposta, e as tentativas têm limite (10 por hora).',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: joinInputSchema,
+            examples: {
+              entrar: { summary: 'Entrar com o código', value: { code: 'ABCDE-FGHJK' } },
+              levar: {
+                summary: 'Entrar levando as pessoas que já cadastrei',
+                value: { code: 'ABCDE-FGHJK', moveMembers: true },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: 'Entrou na família.', content: jsonContent(joinResponseSchema) },
+      400: errorResponse(
+        'Corpo inválido, ou `INVALID_INVITE`: o código não existe, venceu ou já foi usado.',
+      ),
+      401: unauthorized,
+      403: consentRequired,
+      409: errorResponse(
+        '`HOUSEHOLD_HAS_MEMBERS` (confirme levar as pessoas), `NOT_ALONE` (a conta divide a família com outros responsáveis) ou `ALREADY_IN_HOUSEHOLD`.',
+      ),
+      429: errorResponse('`RATE_LIMITED`: muitas tentativas com códigos.'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/family/leave',
+    tags: ['Família'],
+    summary: 'Sair da família',
+    description:
+      'O responsável sai: ganha uma família nova e vazia e **perde o acesso na hora**; as pessoas ficam com a família. O dono precisa passar a propriedade antes (`OWNER_MUST_TRANSFER`). Quem está só não tem de quem sair (404).',
+    security: secured,
+    responses: {
+      204: { description: 'Saiu da família.' },
+      401: unauthorized,
+      403: consentRequired,
+      404: errorResponse('A conta está só na própria família.'),
+      409: errorResponse('`OWNER_MUST_TRANSFER`: passe a propriedade antes de sair.'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'delete',
+    path: '/family/guardians/{id}',
+    tags: ['Família'],
+    summary: 'Remover um responsável',
+    description:
+      'O dono remove um responsável da família. Quem foi removido ganha uma família nova e vazia e perde o acesso na hora; as pessoas ficam.',
+    security: secured,
+    request: { params: guardianPathParams },
+    responses: {
+      204: { description: 'Responsável removido.' },
+      400: errorResponse('Identificador inválido.'),
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED` ou `OWNER_ONLY`.'),
+      404: errorResponse('Responsável não encontrado nesta família (ou é você mesmo).'),
+      500: internalError,
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/family/transfer',
+    tags: ['Família'],
+    summary: 'Passar a propriedade da família',
+    description:
+      'O dono passa a propriedade a outro responsável da família e passa a ser responsável. Permite ao dono sair da família depois.',
+    security: secured,
+    request: {
+      body: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: transferInputSchema,
+            examples: {
+              passar: {
+                summary: 'Passar a propriedade',
+                value: { guardianId: 'b6f0c7e2-1f4a-4f5e-9d2b-2a7b1c3d4e5f' },
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'A família com os papéis atualizados.',
+        content: jsonContent(householdResponseSchema),
+      },
+      400: validationError,
+      401: unauthorized,
+      403: errorResponse('`CONSENT_REQUIRED` ou `OWNER_ONLY`.'),
+      404: errorResponse('Responsável não encontrado nesta família (ou é você mesmo).'),
       500: internalError,
     },
   });

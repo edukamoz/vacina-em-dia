@@ -325,5 +325,245 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       await repos.auth.deleteAccount(id);
       expect(await repos.auth.findPasswordResetToken(hash)).toBeUndefined();
     });
+
+    // ---- Família com vários responsáveis (B15, ADR-029) ----
+    const AGORA = '2026-11-10T12:00:00.000Z';
+    const DEPOIS = '2026-11-17T12:00:00.000Z';
+    const ANTES = '2026-11-09T12:00:00.000Z';
+
+    /** Gera um convite da família da conta e devolve o hash para entrar. */
+    async function convidar(donoId: string, expiresAt = DEPOIS): Promise<string> {
+      const familia = await repos.households.get(donoId);
+      const tokenHash = randomUUID().replace(/-/g, '').padEnd(64, '0');
+      await repos.households.createInvite({
+        tokenHash,
+        householdId: familia.id,
+        createdByAccountId: donoId,
+        expiresAt,
+      });
+      return tokenHash;
+    }
+
+    /** Duas contas na mesma família: devolve (dono, responsável) já unidas. */
+    async function duplaNaMesmaFamilia() {
+      const [dono, resp] = [await newOwner(), await newOwner()];
+      const hash = await convidar(dono);
+      expect(await repos.households.join(resp, hash, AGORA, false)).toEqual({
+        status: 'JOINED',
+        moved: 0,
+      });
+      return { dono, resp };
+    }
+
+    test('CT-FAMR-40: a primeira consulta cria a família própria, com a conta como dona', async () => {
+      const conta = await newOwner();
+      const familia = await repos.households.get(conta);
+      expect(familia.memberCount).toBe(0);
+      expect(familia.guardians).toHaveLength(1);
+      expect(familia.guardians[0]).toMatchObject({ accountId: conta, role: 'OWNER' });
+      // Consultar de novo devolve a mesma família, sem criar outra.
+      expect((await repos.households.get(conta)).id).toBe(familia.id);
+    });
+
+    test('CT-FAMR-41: dois responsáveis enxergam e editam as mesmas pessoas e doses', async () => {
+      const { dono, resp } = await duplaNaMesmaFamilia();
+      const [m, d] = [randomUUID(), randomUUID()];
+      await repos.members.save(dono, member(m, 'Bebê'));
+      await repos.doses.saveMany(dono, [dose(d, m)]);
+      expect((await repos.members.list(resp)).map((x) => x.name)).toEqual(['Bebê']);
+      expect(await repos.members.get(resp, m)).toMatchObject({ id: m });
+      expect((await repos.doses.listByMember(resp, m)).map((x) => x.id)).toEqual([d]);
+      // O responsável aplica a dose e o dono vê.
+      await repos.doses.saveMany(resp, [
+        dose(d, m, { status: 'APPLIED', appliedDate: '2026-11-01' }),
+      ]);
+      expect((await repos.doses.get(dono, d))?.status).toBe('APPLIED');
+      // E cadastra uma pessoa que o dono também vê.
+      const m2 = randomUUID();
+      await repos.members.save(resp, member(m2, 'Vovó'));
+      expect((await repos.members.list(dono)).map((x) => x.name)).toEqual(['Bebê', 'Vovó']);
+    });
+
+    test('CT-FAMR-42: outra família não vê, não altera e não remove nada da primeira', async () => {
+      const { dono } = await duplaNaMesmaFamilia();
+      const fora = await newOwner();
+      const [m, d] = [randomUUID(), randomUUID()];
+      await repos.members.save(dono, member(m));
+      await repos.doses.saveMany(dono, [dose(d, m)]);
+      expect(await repos.members.list(fora)).toEqual([]);
+      expect(await repos.members.get(fora, m)).toBeUndefined();
+      expect(await repos.doses.get(fora, d)).toBeUndefined();
+      expect(await repos.doses.listByMember(fora, m)).toEqual([]);
+      await repos.doses.saveMany(fora, [dose(d, m, { status: 'CANCELLED' })]);
+      await repos.members.remove(fora, m);
+      expect((await repos.doses.get(dono, d))?.status).toBe('PENDING');
+      expect(await repos.members.get(dono, m)).toBeDefined();
+    });
+
+    test('CT-FAMR-43: o código vale uma vez; inválido, vencido e usado têm o mesmo resultado', async () => {
+      const [dono, a, b] = [await newOwner(), await newOwner(), await newOwner()];
+      const hash = await convidar(dono);
+      expect(await repos.households.join(a, hash, AGORA, false)).toMatchObject({
+        status: 'JOINED',
+      });
+      expect(await repos.households.join(b, hash, AGORA, false)).toEqual({ status: 'INVALID' });
+      expect(await repos.households.join(b, 'f'.repeat(64), AGORA, false)).toEqual({
+        status: 'INVALID',
+      });
+      const vencido = await convidar(dono, ANTES);
+      expect(await repos.households.join(b, vencido, AGORA, false)).toEqual({ status: 'INVALID' });
+    });
+
+    test('CT-FAMR-44: entrar na própria família, com o próprio código, não faz nada', async () => {
+      const dono = await newOwner();
+      const hash = await convidar(dono);
+      expect(await repos.households.join(dono, hash, AGORA, false)).toEqual({
+        status: 'ALREADY_MEMBER',
+      });
+      expect((await repos.households.get(dono)).guardians).toHaveLength(1);
+    });
+
+    test('CT-FAMR-45: quem tem pessoas só entra confirmando levá-las; a família de origem some', async () => {
+      const [dono, novo] = [await newOwner(), await newOwner()];
+      const [m1, m2, d] = [randomUUID(), randomUUID(), randomUUID()];
+      await repos.members.save(novo, member(m1, 'Filha'));
+      await repos.members.save(novo, member(m2, 'Filho'));
+      await repos.doses.saveMany(novo, [dose(d, m1)]);
+      const origem = (await repos.households.get(novo)).id;
+      const hash = await convidar(dono);
+
+      expect(await repos.households.join(novo, hash, AGORA, false)).toEqual({
+        status: 'HAS_MEMBERS',
+        memberCount: 2,
+      });
+      // Nada mudou: o convite continua valendo e as pessoas continuam onde estavam.
+      expect((await repos.households.get(novo)).id).toBe(origem);
+      expect(await repos.members.list(dono)).toEqual([]);
+
+      expect(await repos.households.join(novo, hash, AGORA, true)).toEqual({
+        status: 'JOINED',
+        moved: 2,
+      });
+      expect((await repos.members.list(dono)).map((x) => x.name)).toEqual(['Filha', 'Filho']);
+      expect((await repos.doses.get(dono, d))?.memberId).toBe(m1);
+      const depois = await repos.households.get(novo);
+      expect(depois.id).not.toBe(origem);
+      expect(depois.memberCount).toBe(2);
+      expect(depois.guardians.map((g) => g.role).sort()).toEqual(['GUARDIAN', 'OWNER']);
+    });
+
+    test('CT-FAMR-46: quem divide a própria família com outros não entra em outra', async () => {
+      const { dono } = await duplaNaMesmaFamilia();
+      const outro = await newOwner();
+      const hash = await convidar(outro);
+      expect(await repos.households.join(dono, hash, AGORA, false)).toEqual({
+        status: 'NOT_ALONE',
+      });
+    });
+
+    test('CT-FAMR-47: o responsável que sai ganha uma família vazia e perde o acesso', async () => {
+      const { dono, resp } = await duplaNaMesmaFamilia();
+      const m = randomUUID();
+      await repos.members.save(dono, member(m));
+      expect(await repos.households.leave(resp)).toBe('LEFT');
+      expect(await repos.members.list(resp)).toEqual([]);
+      expect(await repos.members.get(resp, m)).toBeUndefined();
+      expect(await repos.members.get(dono, m)).toBeDefined();
+      const minha = await repos.households.get(resp);
+      expect(minha.guardians).toHaveLength(1);
+      expect(minha.guardians[0]).toMatchObject({ accountId: resp, role: 'OWNER' });
+      expect((await repos.households.get(dono)).guardians).toHaveLength(1);
+    });
+
+    test('CT-FAMR-48: o dono precisa passar a propriedade antes de sair; quem está só não sai', async () => {
+      const { dono } = await duplaNaMesmaFamilia();
+      expect(await repos.households.leave(dono)).toBe('OWNER_MUST_TRANSFER');
+      expect(await repos.households.leave(await newOwner())).toBe('ALONE');
+    });
+
+    test('CT-FAMR-49: o dono remove um responsável; quem não é dono não remove ninguém', async () => {
+      const { dono, resp } = await duplaNaMesmaFamilia();
+      const alvo = (await repos.households.get(dono)).guardians.find((g) => g.accountId === resp);
+      const dele = (await repos.households.get(dono)).guardians.find((g) => g.accountId === dono);
+      expect(await repos.households.remove(resp, String(dele?.id))).toBe('FORBIDDEN');
+      expect(await repos.households.remove(dono, String(dele?.id))).toBe('NOT_FOUND');
+      expect(await repos.households.remove(dono, 'nao-existe')).toBe('NOT_FOUND');
+      expect(await repos.households.remove(dono, String(alvo?.id))).toBe('REMOVED');
+      expect((await repos.households.get(dono)).guardians).toHaveLength(1);
+      const familiaDele = await repos.households.get(resp);
+      expect(familiaDele.guardians).toHaveLength(1);
+      expect(familiaDele.guardians[0]?.role).toBe('OWNER');
+    });
+
+    test('CT-FAMR-50: não se remove o responsável de outra família', async () => {
+      const [a, b] = [await duplaNaMesmaFamilia(), await duplaNaMesmaFamilia()];
+      const deB = (await repos.households.get(b.dono)).guardians.find(
+        (g) => g.accountId === b.resp,
+      );
+      expect(await repos.households.remove(a.dono, String(deB?.id))).toBe('NOT_FOUND');
+      expect((await repos.households.get(b.dono)).guardians).toHaveLength(2);
+    });
+
+    test('CT-FAMR-51: o dono passa a propriedade e vira responsável; o responsável não passa', async () => {
+      const { dono, resp } = await duplaNaMesmaFamilia();
+      const g = (await repos.households.get(dono)).guardians;
+      const idDono = String(g.find((x) => x.accountId === dono)?.id);
+      const idResp = String(g.find((x) => x.accountId === resp)?.id);
+      expect(await repos.households.transfer(resp, idDono)).toBe('FORBIDDEN');
+      expect(await repos.households.transfer(dono, 'nao-existe')).toBe('NOT_FOUND');
+      expect(await repos.households.transfer(dono, idDono)).toBe('NOT_FOUND');
+      expect(await repos.households.transfer(dono, idResp)).toBe('TRANSFERRED');
+      const depois = (await repos.households.get(dono)).guardians;
+      expect(depois.find((x) => x.accountId === dono)?.role).toBe('GUARDIAN');
+      expect(depois.find((x) => x.accountId === resp)?.role).toBe('OWNER');
+    });
+
+    test('CT-FAMR-52: convites ativos contam só os não usados e não vencidos; revogar zera', async () => {
+      const [dono, outro] = [await newOwner(), await newOwner()];
+      const familia = (await repos.households.get(dono)).id;
+      const usado = await convidar(dono);
+      await convidar(dono);
+      await convidar(dono, ANTES);
+      expect(await repos.households.countActiveInvites(familia, AGORA)).toBe(3 - 1);
+      await repos.households.join(outro, usado, AGORA, false);
+      expect(await repos.households.countActiveInvites(familia, AGORA)).toBe(1);
+      await repos.households.revokeInvites(familia);
+      expect(await repos.households.countActiveInvites(familia, AGORA)).toBe(0);
+    });
+
+    test('CT-FAMR-53: excluir a conta que está só apaga tudo, inclusive a família', async () => {
+      const conta = await newOwner();
+      const [m, d] = [randomUUID(), randomUUID()];
+      await repos.members.save(conta, member(m));
+      await repos.doses.saveMany(conta, [dose(d, m)]);
+      await repos.accounts.deleteAll(conta);
+      expect(await repos.members.get(conta, m)).toBeUndefined();
+      expect(await repos.doses.get(conta, d)).toBeUndefined();
+    });
+
+    test('CT-FAMR-54: excluir a conta de um responsável só a tira da família; as pessoas ficam', async () => {
+      const { dono, resp } = await duplaNaMesmaFamilia();
+      const m = randomUUID();
+      await repos.members.save(resp, member(m, 'Criada pela responsável'));
+      await repos.accounts.deleteAll(resp);
+      await repos.auth.deleteAccount(resp);
+      expect(await repos.members.get(dono, m)).toMatchObject({ name: 'Criada pela responsável' });
+      expect((await repos.households.get(dono)).guardians).toHaveLength(1);
+    });
+
+    test('CT-FAMR-55: excluir a conta do dono passa a propriedade ao responsável mais antigo', async () => {
+      const [dono, antigo, novo] = [await newOwner(), await newOwner(), await newOwner()];
+      await repos.households.join(antigo, await convidar(dono), '2026-11-10T12:00:00.000Z', false);
+      await repos.households.join(novo, await convidar(dono), '2026-11-10T12:05:00.000Z', false);
+      const m = randomUUID();
+      await repos.members.save(dono, member(m));
+      await repos.accounts.deleteAll(dono);
+      await repos.auth.deleteAccount(dono);
+      const familia = await repos.households.get(antigo);
+      expect(familia.guardians).toHaveLength(2);
+      expect(familia.guardians.find((g) => g.accountId === antigo)?.role).toBe('OWNER');
+      expect(familia.guardians.find((g) => g.accountId === novo)?.role).toBe('GUARDIAN');
+      expect(await repos.members.get(novo, m)).toBeDefined();
+    });
   });
 });
