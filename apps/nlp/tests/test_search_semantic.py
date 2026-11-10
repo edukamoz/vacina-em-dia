@@ -38,8 +38,11 @@ def test_ct_nlp_130_tolera_erro_de_transcricao_da_fala(calendar, consulta, esper
 
 def test_ct_nlp_131_consulta_de_grupo_traz_vacinas_do_grupo(calendar):
     gestante = {rule.vaccine for rule in calendar.rules_in_group("PREGNANT")}
-    nomes = {hit.vaccine for hit in VaccineSearch(calendar).search("vacinas para gestante")[:3]}
-    assert nomes & gestante
+    # A palavra "vacinas" aparece em notas oficiais de outras faixas (ex.: "vacinas de um só
+    # laboratório", na dengue) e puxaria resultados de fora do grupo; a consulta traz só o grupo.
+    nomes = {hit.vaccine for hit in VaccineSearch(calendar).search("gestante")[:3]}
+    assert nomes
+    assert nomes <= gestante
 
 
 def test_ct_nlp_132_parametros_invalidos_sao_recusados(calendar):
