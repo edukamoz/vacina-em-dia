@@ -69,6 +69,31 @@ async function perguntar(texto: string) {
 
 beforeEach(() => jest.clearAllMocks());
 
+// A idade da Maria é calculada com o relógio. Fixa só o `Date` (os demais timers continuam
+// reais, para não travar promessas nem animações): em 10/10/2026 ela tem 8 meses completos.
+beforeEach(() => {
+  jest.useFakeTimers({
+    now: new Date('2026-10-10T12:00:00'),
+    doNotFake: [
+      'setTimeout',
+      'clearTimeout',
+      'setInterval',
+      'clearInterval',
+      'setImmediate',
+      'clearImmediate',
+      'nextTick',
+      'queueMicrotask',
+      'requestAnimationFrame',
+      'cancelAnimationFrame',
+      'requestIdleCallback',
+      'cancelIdleCallback',
+      'performance',
+      'hrtime',
+    ],
+  });
+});
+afterEach(() => jest.useRealTimers());
+
 describe('assistente com poder sobre a conta (B61)', () => {
   test('CT-APP-ACO01: pergunta sobre a conta é respondida com os dados da pessoa, citando a fonte', async () => {
     const { pronto } = abrir(resposta('conta_quem_na_familia', {}));
