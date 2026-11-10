@@ -344,19 +344,22 @@
   {
    "id": "B15",
    "jira": "SCRUM-40",
-   "titulo": "Como cuidadora, quero compartilhar a carteira de uma pessoa com outro cuidador autorizado, para dividirmos o cuidado (RF12)",
+   "titulo": "Como cuidadora, quero que mais de uma pessoa cuide da mesma família, com convite, papéis e saída a qualquer momento, para dividirmos o cuidado (RF12)",
    "epico": "E8",
-   "prioridade": "Won't (por enquanto)",
+   "prioridade": "Should",
    "personas": "PE3",
    "requisitos": "RF12; RNF02, RNF03",
    "criterios": [
-    "O compartilhamento exige autorização explícita e pode ser revogado.",
-    "A exclusão da conta remove os compartilhamentos."
+    "Uma família tem mais de um responsável; o convite é de uso único, tem validade e é guardado só como hash.",
+    "O compartilhamento exige autorização explícita e pode ser revogado; cada pessoa pode sair da família.",
+    "Nenhuma conta enxerga dados de uma família da qual não faz parte (teste de isolamento).",
+    "Fica registrado quem aplicou cada dose.",
+    "A exclusão da conta tem regra definida para o dono (transferir ou apagar) e remove os compartilhamentos."
    ],
    "estado": "A fazer",
-   "sprint": 6,
+   "sprint": null,
    "evidencia": "",
-   "nota": "Fica para depois da entrega, salvo decisão do autor.",
+   "nota": "Pedido de 10/11/2026: ampliado de \"compartilhar com cuidador\" para várias contas por família. Toca toda regra de propriedade do dado (OWASP A01); decisões em aberto: o que ocorre quando o único dono exclui a conta e se haverá visibilidade por pessoa.",
    "curto": "Compartilhar com cuidador (RF12)"
   },
   {
@@ -1300,6 +1303,149 @@
    "evidencia": "Jira vacinaemdia.atlassian.net: SCRUM-41 a SCRUM-48",
    "nota": "Feito só para a atividade; o backlog segue no GitHub Projects (B65). A execução (PASS ou FAIL) e o envio dos relatórios são do autor.",
    "curto": "Testes no Jira com Xray (atividade da aula)"
+  },
+  {
+   "id": "B69",
+   "jira": null,
+   "titulo": "Como mãe, quero cadastrar uma vacina que se repete (todo ano, a cada 6 meses, a cada N dias, semanas, meses ou anos) e receber o aviso antes de cada repetição, para não esquecer as que tomo de tempos em tempos",
+   "epico": "E5",
+   "prioridade": "Should",
+   "personas": "PE1, PE3",
+   "requisitos": "RF04, RF05; RNF01",
+   "criterios": [
+    "Ao criar a dose avulsa, a pessoa escolhe a periodicidade (dia, semana, mês ou ano, a cada N) e, se quiser, quando termina (data ou número de repetições).",
+    "Ao aplicar a dose, a próxima nasce Pendente; a pessoa escolhe se a contagem parte da data da aplicação ou da data prevista.",
+    "Mês curto é tratado (31/01 mais 1 mês dá 28/02).",
+    "Cancelar vale só para aquela dose ou para a série toda.",
+    "Dá para escolher quantos dias antes avisar, por dose.",
+    "As 12 transições do ciclo de vida não mudam.",
+    "No calendário oficial, só as linhas cujo texto oficial já diz a periodicidade ganham recorrência."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória.",
+   "curto": "Recorrência de vacinas"
+  },
+  {
+   "id": "B70",
+   "jira": null,
+   "titulo": "Como mãe, quero receber avisos de dose no celular, mesmo sem abrir o app, para não depender só do e-mail",
+   "epico": "E5",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF05; RNF03, RNF05",
+   "criterios": [
+    "O app agenda notificações locais para doses atrasadas, de hoje e dos próximos dias, no horário que a pessoa escolher.",
+    "O aviso traz só quantidades, sem nome de pessoa nem de vacina, porque aparece na tela bloqueada.",
+    "E-mail e aviso no aparelho podem ser ligados e desligados separadamente na Conta.",
+    "Os avisos são reagendados quando as doses mudam.",
+    "Sem permissão do sistema, o app explica e segue funcionando."
+   ],
+   "estado": "A fazer",
+   "sprint": 6,
+   "evidencia": "",
+   "nota": "Só Android e iOS; não há notificação local na web. Não depende de servidor, credencial nem custo. Avisos não sabem de mudanças feitas em outro aparelho até o app abrir (por isso o B71).",
+   "curto": "Notificações no aparelho"
+  },
+  {
+   "id": "B71",
+   "jira": null,
+   "titulo": "Como cuidadora, quero ser avisada no navegador e no celular quando outro responsável mudar uma dose, e ter lembretes também na versão web, para acompanhar a família",
+   "epico": "E5",
+   "prioridade": "Could",
+   "personas": "PE3",
+   "requisitos": "RF05, RF12; RNF02, RNF03",
+   "criterios": [
+    "A web instalada (PWA) recebe notificação com service worker e chaves VAPID guardadas como segredo.",
+    "As assinaturas ficam no banco, vinculadas à conta, e saem junto com a exclusão da conta.",
+    "A permissão é pedida por um gesto da pessoa.",
+    "Push nativo (FCM e APNs) só entra se for aprovado, porque exige credenciais e build próprios."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "No iPhone só funciona com o app instalado na tela de início (iOS 16.4 ou mais; confirmar na documentação da Apple). Depende do B15 para fazer sentido. Hoje não há service worker (decisão do docs/25).",
+   "curto": "Notificações pelo servidor e pelo navegador"
+  },
+  {
+   "id": "B72",
+   "jira": null,
+   "titulo": "Como equipe, quero ser avisada quando o calendário oficial do Ministério da Saúde mudar, para atualizar os dados com revisão e sem baixar à mão",
+   "epico": "E4",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "RNF10",
+   "criterios": [
+    "Uma função agendada confere, em endereços fixos oficiais, se as páginas e os arquivos do calendário mudaram (por hash).",
+    "Quando mudar, a equipe recebe um aviso; a transcrição continua em PR, com revisão (nada de dado vacinal publicado sem conferência).",
+    "O app mostra a versão do calendário e a data da última verificação.",
+    "Nada do usuário vai às fontes oficiais."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. A confirmar: se o gov.br aceita leitura automática pela Function (o Butantan bloqueou, ADR-024).",
+   "curto": "Vigia do calendário oficial"
+  },
+  {
+   "id": "B73",
+   "jira": null,
+   "titulo": "Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar",
+   "epico": "E4",
+   "prioridade": "Could",
+   "personas": "PE1, PE3",
+   "requisitos": "RF02, RF04",
+   "criterios": [
+    "Há um tipo de membro \"animal\" (espécie e nascimento aproximado), sem gestação, parentesco humano nem calendário do PNI.",
+    "As vacinas são digitadas pela pessoa (dose avulsa com recorrência); só entra modelo pronto (por exemplo, antirrábica) com fonte citada.",
+    "O app deixa claro que o calendário de animais é definido pelo veterinário."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Fora do escopo original (CLAUDE.md §3); aprovado pelo autor em 10/11/2026 para quando for possível. Não achei calendário oficial nacional para animais: só a antirrábica aparece como obrigatória, em fontes estaduais e municipais. Depende do B69.",
+   "curto": "Vacinas de animais de estimação"
+  },
+  {
+   "id": "B74",
+   "jira": null,
+   "titulo": "Como viajante, quero saber que vacinas considerar para o meu destino e a data da viagem, e ver o que já tenho no histórico, para me preparar com antecedência",
+   "epico": "E4",
+   "prioridade": "Could",
+   "personas": "PE1, PE3",
+   "requisitos": "RF03; RNF10",
+   "criterios": [
+    "A pessoa informa destino (no Brasil ou no exterior) e mês; o app mostra o que o histórico dela já tem e as recomendações cadastradas, com fonte e data.",
+    "É um checklist, não um oráculo: sempre manda procurar um serviço de saúde do viajante e linka as fontes oficiais.",
+    "A tabela de recomendações é preenchida pelo autor a partir de fonte oficial, versionada, com fonte e data.",
+    "Sem orientação médica individual."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Não consegui confirmar lista atual de áreas nem exigência para o Nordeste (página do Ministério sobre febre amarela não trata de viagem interna; a da Anvisa sobre o CIVP não abriu). O autor valida cada linha da tabela.",
+   "curto": "Vacinas para viagem"
+  },
+  {
+   "id": "B75",
+   "jira": null,
+   "titulo": "Como usuária, quero ver, no detalhe da dose, informações da vacina (tipo, composição, reações comuns e quem deve conversar com um profissional antes), para me informar",
+   "epico": "E4",
+   "prioridade": "Should",
+   "personas": "PE1, PE2, PE3",
+   "requisitos": "RF03, RF07; RNF10",
+   "criterios": [
+    "Cada vacina do calendário tem uma ficha com tipo, composição, reações comuns, contraindicações e precauções, com fonte (bula ou manual do Ministério) e data.",
+    "A ficha aparece em \"Sobre esta vacina\" com o aviso de que não substitui o profissional.",
+    "O app não cruza alergias cadastradas com a bula para dizer se a pessoa pode ou não tomar (isso seria orientação médica individual).",
+    "O chatbot responde sobre reações comuns com respostas curadas, e o F1 é reavaliado."
+   ],
+   "estado": "A fazer",
+   "sprint": null,
+   "evidencia": "",
+   "nota": "Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.",
+   "curto": "Informações sobre cada vacina"
   },
   {
    "id": "B48",
