@@ -15,10 +15,10 @@ import { describeAge, todayCivil } from '../../lib/dates';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSession } from '../../session/session-provider';
 import { useDosesOfMembers, useMembers } from '../data/hooks';
-import { PARENTESCO_ROTULO } from './parentesco';
+import { ESPECIE_ROTULO, PARENTESCO_ROTULO } from './parentesco';
 
 /** Rótulo de cada faixa etária, em linguagem simples. */
-export const GRUPO_ROTULO: Readonly<Record<MemberResponse['ageGroup'], string>> = {
+export const GRUPO_ROTULO: Readonly<Record<NonNullable<MemberResponse['ageGroup']>, string>> = {
   CHILD: 'Criança',
   ADOLESCENT_YOUTH: 'Adolescente ou jovem',
   ADULT: 'Adulto',
@@ -81,7 +81,7 @@ export function FamilyScreen() {
       {data && pessoas.length === 0 && (
         <EstadoVazio
           titulo="Ninguém cadastrado ainda"
-          descricao="Adicione você, seu filho ou outra pessoa da família para ver o calendário de vacinas."
+          descricao="Adicione você, seu filho ou outra pessoa da família para ver o calendário de vacinas. Também dá para cadastrar seu animal de estimação."
         />
       )}
       {pessoas.length > 0 && (
@@ -110,12 +110,18 @@ export function FamilyScreen() {
                       className="text-textoSecundario"
                       importantForAccessibility="no"
                     >
-                      {[
-                        membro.relationship ? PARENTESCO_ROTULO[membro.relationship] : null,
-                        describeAge(membro.birthDate, today),
-                        GRUPO_ROTULO[membro.ageGroup],
-                        membro.isPregnant ? 'gestante' : null,
-                      ]
+                      {(membro.kind === 'PET'
+                        ? [
+                            ESPECIE_ROTULO[membro.species ?? 'OTHER'],
+                            describeAge(membro.birthDate, today),
+                          ]
+                        : [
+                            membro.relationship ? PARENTESCO_ROTULO[membro.relationship] : null,
+                            describeAge(membro.birthDate, today),
+                            membro.ageGroup ? GRUPO_ROTULO[membro.ageGroup] : null,
+                            membro.isPregnant ? 'gestante' : null,
+                          ]
+                      )
                         .filter(Boolean)
                         .join(' · ')}
                     </Texto>

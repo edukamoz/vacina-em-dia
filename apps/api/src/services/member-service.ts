@@ -11,6 +11,8 @@ import {
   type CustomDoseInput,
   type DoseResponse,
   type MemberInput,
+  type MemberKind,
+  type Species,
   type Relationship,
   type MemberResponse,
 } from '@vacina/shared';
@@ -25,9 +27,14 @@ import type {
 import { failure, success, type Result } from './errors';
 import { toCustomDoseResponse, toMemberResponse } from './mappers';
 
-/** Dados de um membro vindos do cliente; o parentesco pode faltar (vale "não informado"). */
-export type MemberData = Omit<MemberInput, 'relationship'> & {
+/**
+ * Dados de um membro vindos do cliente; parentesco, tipo e espécie podem faltar (valem "não
+ * informado", pessoa e sem espécie).
+ */
+export type MemberData = Omit<MemberInput, 'relationship' | 'kind' | 'species'> & {
   readonly relationship?: Relationship | null;
+  readonly kind?: MemberKind;
+  readonly species?: Species | null;
 };
 
 /** Quantidade máxima de membros por conta. */
@@ -59,6 +66,28 @@ export interface MemberService {
   ): Promise<Result<DoseResponse>>;
 }
 
+/**
+ * Campos que dependem do tipo. Pai, filho, avô e irmão não entram no grupo gestante, mesmo que o
+ * pedido diga o contrário; animal não tem parentesco nem gestação e leva a espécie.
+ */
+function personFields(input: MemberData) {
+  const kind = input.kind ?? 'PERSON';
+  if (kind === 'PET') {
+    return {
+      isPregnant: false,
+      relationship: null,
+      kind,
+      species: input.species ?? 'OTHER',
+    } as const;
+  }
+  return {
+    isPregnant: input.isPregnant && canBePregnant(input.relationship),
+    relationship: input.relationship ?? null,
+    kind,
+    species: null,
+  } as const;
+}
+
 /** Dependências do serviço, todas injetadas para testar sem rede e sem relógio real. */
 export interface MemberServiceDeps {
   readonly members: MemberRepository;
@@ -86,7 +115,13 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
     if (compareCivilDates(input.birthDate, today) > 0) {
       return failure({ code: 'INVALID_BIRTH_DATE' });
     }
-    if (ageInMonths(input.birthDate, today) < ADULT_AGE_MONTHS && !consent.guardianDeclaration) {
+    // A declaração de responsável é sobre cuidar de menores de idade; não vale para animais.
+    const isPet = input.kind === 'PET';
+    if (
+      !isPet &&
+      ageInMonths(input.birthDate, today) < ADULT_AGE_MONTHS &&
+      !consent.guardianDeclaration
+    ) {
       return failure({ code: 'GUARDIAN_DECLARATION_REQUIRED' });
     }
     return null;
@@ -94,6 +129,8 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
 
   /** Gera as doses que o membro ainda não tem (T1: Pendente). Não duplica nada. */
   async function generateDoses(ownerId: string, member: StoredMember, today: string) {
+    // Animal não tem calendário oficial: as vacinas dele são digitadas (dose avulsa).
+    if (member.kind === 'PET') return;
     const applicable = rulesForMember(calendar, member, today);
     const existing = await doses.listByMember(ownerId, member.id);
     const missing = new Set(
@@ -136,9 +173,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         id: newId(),
         name: input.name,
         birthDate: input.birthDate,
-        // Pai, filho, avô e irmão não entram no grupo gestante, mesmo que o pedido diga o contrário.
-        isPregnant: input.isPregnant && canBePregnant(input.relationship),
-        relationship: input.relationship ?? null,
+        ...personFields(input),
       };
       await members.save(ownerId, member);
       await generateDoses(ownerId, member, today);
@@ -155,9 +190,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         id: current.id,
         name: input.name,
         birthDate: input.birthDate,
-        // Pai, filho, avô e irmão não entram no grupo gestante, mesmo que o pedido diga o contrário.
-        isPregnant: input.isPregnant && canBePregnant(input.relationship),
-        relationship: input.relationship ?? null,
+        ...personFields(input),
       };
       await members.save(ownerId, member);
       await generateDoses(ownerId, member, today);

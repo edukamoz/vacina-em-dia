@@ -139,3 +139,34 @@ test.describe('Formulário de pessoa: parentesco e gestação (RF02)', () => {
     await expect(gestacao).toBeVisible();
   });
 });
+
+test.describe('Animal de estimação (B73)', () => {
+  test('CT-E2E-07: cadastra um animal e vê que não há calendário oficial', async ({
+    page,
+    api,
+  }) => {
+    api.consentimentoAceito = true;
+    await page.goto('/entrar');
+    await page.getByLabel('E-mail').fill('mariana@exemplo.com.br');
+    await page.getByLabel('Senha', { exact: true }).fill(SENHA);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('button', { name: 'Adicionar pessoa' }).click();
+    await page.getByRole('radio', { name: 'Um animal de estimação' }).click();
+    await page.getByLabel('Nome do animal').fill('Rex');
+    await page.getByLabel('Data de nascimento (aproximada)').fill('10032022');
+    await page.getByRole('button', { name: /Qual é a espécie\?/ }).click();
+    await page.getByRole('radio', { name: 'Cachorro' }).click();
+    await page.getByRole('button', { name: 'Salvar e ver as vacinas' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Doses de Rex' })).toBeVisible();
+    await expect(
+      page.getByText('Nenhuma vacina de Rex cadastrada').filter({ visible: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText(/Não existe calendário nacional de vacinação para animais/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+  });
+});

@@ -88,6 +88,36 @@ describe('doses (RF03 e RF04)', () => {
     expect(mockPush).toHaveBeenCalledWith({ pathname: '/dose/[id]', params: { id: 'd-over' } });
   });
 
+  test('CT-APP-K12: animal sem vacinas: explica que não há calendário oficial e esconde o que é só de gente', async () => {
+    const REX = {
+      ...MEMBER,
+      id: 'm-pet',
+      name: 'Rex',
+      birthDate: '2022-03-10',
+      kind: 'PET' as const,
+      species: 'DOG' as const,
+      relationship: null,
+      ageGroup: null,
+    };
+    const fake = createFakeFetch({
+      'GET /members': { status: 200, body: { items: [REX] } },
+      'GET /members/m-pet/doses': { status: 200, body: memberDoses([], REX) },
+    });
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    expect(await screen.findByRole('header', { name: 'Doses de Rex' })).toBeOnTheScreen();
+    expect(await screen.findByText('Nenhuma vacina de Rex cadastrada')).toBeOnTheScreen();
+    expect(
+      screen.getByText(/Não existe calendário nacional de vacinação para animais/),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText(/quem define o que o seu animal precisa é o veterinário/),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/Calendário Nacional de Vacinação 2026/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Postos de saúde perto de você/)).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Ler caderneta por foto' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Adicionar dose' })).toBeOnTheScreen();
+  });
+
   test('CT-APP-K02: o carrossel mostra a família e trocar de pessoa carrega as doses dela', async () => {
     const fake = createFakeFetch({
       ...FAMILY,

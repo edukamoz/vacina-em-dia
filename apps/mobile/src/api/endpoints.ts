@@ -31,7 +31,7 @@ import {
   type RegisterInput,
   type ResetPasswordInput,
   type DoseEventInput,
-  type MemberInput,
+  type MemberBody,
 } from '@vacina/shared';
 import { apiRequest, apiRequestBytes, apiRequestNoContent, type ApiContext } from './client';
 
@@ -187,7 +187,7 @@ export const endpoints = {
   listMembers: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(ctx, { path: '/members', ...(signal ? { signal } : {}) }, memberListResponseSchema),
 
-  createMember: (ctx: ApiContext, input: MemberInput) =>
+  createMember: (ctx: ApiContext, input: MemberBody) =>
     apiRequest(ctx, { path: '/members', method: 'POST', body: input }, memberResponseSchema),
 
   createCustomDose: (ctx: ApiContext, memberId: string, input: CustomDoseInput) =>
@@ -197,7 +197,7 @@ export const endpoints = {
       doseResponseSchema,
     ),
 
-  updateMember: (ctx: ApiContext, id: string, input: MemberInput) =>
+  updateMember: (ctx: ApiContext, id: string, input: MemberBody) =>
     apiRequest(
       ctx,
       { path: `/members/${encodeURIComponent(id)}`, method: 'PUT', body: input },

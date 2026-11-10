@@ -47,6 +47,19 @@ export function agruparDoses(doses: readonly DoseResponse[]) {
   return { atencao, proximas: [...agendadas, ...pendentes], aplicadas };
 }
 
+/** Rodapé das doses de um animal: não há calendário oficial, então quem define é o veterinário. */
+function AvisoAnimal() {
+  return (
+    <View className="rounded-[16px] border-fina border-bordaSuave bg-superficieSuave p-lg">
+      <Texto variante="apoio" className="text-textoSecundario" accessibilityRole="text">
+        Não existe calendário nacional de vacinação para animais de estimação. As vacinas e as datas
+        são as que você cadastrou; quem define o que o seu animal precisa é o veterinário. O Vacina
+        em Dia só ajuda a lembrar.
+      </Texto>
+    </View>
+  );
+}
+
 /**
  * Aba "Doses" (RF03 e RF04): as doses da pessoa escolhida em três grupos ("Precisam de atenção",
  * "Próximas" e "Aplicadas"), sempre com a fonte e a versão do calendário oficial. Antes dos grupos, o
@@ -88,6 +101,7 @@ export function DosesScreen() {
     );
   }
 
+  const animal = selected.kind === 'PET';
   const primeiroNome = selected.name.split(' ')[0] ?? selected.name;
   const grupos = doses.data ? agruparDoses(doses.data.items) : null;
   const aplicadasVisiveis = grupos?.aplicadas.slice(0, LIMITE_APLICADAS) ?? [];
@@ -106,7 +120,7 @@ export function DosesScreen() {
       acao={
         <View className="flex-row flex-wrap gap-md">
           <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
-          {podeLerDocumento ? (
+          {podeLerDocumento && !animal ? (
             <Botao
               titulo="Ler caderneta por foto"
               variante="secundario"
@@ -125,9 +139,15 @@ export function DosesScreen() {
       {doses.error && (
         <EstadoErro mensagem={doses.error.message} onTentarDeNovo={() => void doses.refetch()} />
       )}
-      {grupos && grupos.atencao.length + grupos.proximas.length === 0 && (
-        <Festa nome={primeiroNome} />
+      {animal && doses.data && doses.data.items.length === 0 && (
+        <EstadoVazio
+          titulo={`Nenhuma vacina de ${primeiroNome} cadastrada`}
+          descricao="Toque em Adicionar dose e informe a vacina e a data que o veterinário indicou. Dá para marcar que ela se repete, por exemplo todo ano."
+        />
       )}
+      {grupos &&
+        !(animal && doses.data && doses.data.items.length === 0) &&
+        grupos.atencao.length + grupos.proximas.length === 0 && <Festa nome={primeiroNome} />}
       {secoes.map(({ titulo, lista }) =>
         lista.length === 0 ? null : (
           <View key={titulo} className="gap-lg">
@@ -150,30 +170,36 @@ export function DosesScreen() {
         <LinkTexto titulo="Ver todas no Histórico" onPress={() => router.push('/historico')} />
       )}
       {doses.data && <BaixarCarteira memberId={selected.id} nome={primeiroNome} />}
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel="Postos de saúde perto de você. Veja no mapa onde tomar as doses."
-        onPress={() => router.push('/postos')}
-        className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
-      >
-        <View
-          aria-hidden
-          className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
+      {animal ? null : (
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel="Postos de saúde perto de você. Veja no mapa onde tomar as doses."
+          onPress={() => router.push('/postos')}
+          className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
         >
-          <Icone nome="local" cor={cores.primaria} />
-        </View>
-        <View className="flex-1">
-          <Texto variante="titulo3" importantForAccessibility="no">
-            Postos de saúde perto de você
-          </Texto>
-          <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-            Veja no mapa onde tomar as doses.
-          </Texto>
-        </View>
-        <Icone nome="seta" cor={cores.textoSecundario} />
-      </Pressable>
-      <NovidadesCard />
-      {doses.data && <AvisoFonte conferencia={conferencia.data} fonte={doses.data.source} />}
+          <View
+            aria-hidden
+            className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
+          >
+            <Icone nome="local" cor={cores.primaria} />
+          </View>
+          <View className="flex-1">
+            <Texto variante="titulo3" importantForAccessibility="no">
+              Postos de saúde perto de você
+            </Texto>
+            <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
+              Veja no mapa onde tomar as doses.
+            </Texto>
+          </View>
+          <Icone nome="seta" cor={cores.textoSecundario} />
+        </Pressable>
+      )}
+      {animal ? null : <NovidadesCard />}
+      {animal ? (
+        <AvisoAnimal />
+      ) : (
+        doses.data && <AvisoFonte conferencia={conferencia.data} fonte={doses.data.source} />
+      )}
     </Tela>
   );
 }

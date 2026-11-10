@@ -1,5 +1,6 @@
 import {
   canBePregnant,
+  SPECIES,
   consentInputSchema,
   MALE_RELATIONSHIPS,
   memberDosesResponseSchema,
@@ -16,6 +17,8 @@ describe('esquemas de família e consentimento', () => {
       birthDate: '2024-05-20',
       isPregnant: false,
       relationship: null,
+      kind: 'PERSON',
+      species: null,
     });
   });
 
@@ -78,5 +81,28 @@ describe('grupo gestante e parentesco', () => {
     }
     expect(canBePregnant(null)).toBe(true);
     expect(canBePregnant(undefined)).toBe(true);
+  });
+});
+
+describe('animal de estimação no cadastro de membro', () => {
+  const base = { name: 'Rex', birthDate: '2022-03-10' };
+
+  test('CT-PET-S01: pessoa continua sendo o padrão e não tem espécie', () => {
+    expect(memberInputSchema.parse(base)).toMatchObject({ kind: 'PERSON', species: null });
+  });
+
+  test('CT-PET-S02: animal exige a espécie', () => {
+    const sem = memberInputSchema.safeParse({ ...base, kind: 'PET' });
+    expect(sem.success).toBe(false);
+    for (const species of SPECIES) {
+      expect(memberInputSchema.safeParse({ ...base, kind: 'PET', species }).success).toBe(true);
+    }
+  });
+
+  test('CT-PET-S03: pessoa com espécie e espécie desconhecida são recusadas', () => {
+    expect(memberInputSchema.safeParse({ ...base, species: 'DOG' }).success).toBe(false);
+    expect(memberInputSchema.safeParse({ ...base, kind: 'PET', species: 'DRAGON' }).success).toBe(
+      false,
+    );
   });
 });

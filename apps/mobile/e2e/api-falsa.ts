@@ -20,7 +20,9 @@ interface Membro {
   birthDate: string;
   isPregnant: boolean;
   relationship: string | null;
-  ageGroup: 'CHILD' | 'ADULT';
+  kind: 'PERSON' | 'PET';
+  species: string | null;
+  ageGroup: 'CHILD' | 'ADULT' | null;
 }
 
 interface Dose {
@@ -272,10 +274,13 @@ export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
         birthDate: String(corpo.birthDate),
         isPregnant: corpo.isPregnant === true,
         relationship: (corpo.relationship as string | null | undefined) ?? null,
-        ageGroup: grupoDeIdade(String(corpo.birthDate)),
+        kind: corpo.kind === 'PET' ? 'PET' : 'PERSON',
+        species: corpo.kind === 'PET' ? String(corpo.species) : null,
+        ageGroup: corpo.kind === 'PET' ? null : grupoDeIdade(String(corpo.birthDate)),
       };
       estado.membros.push(membro);
-      estado.doses.push(...dosesDoMembro(membro));
+      // Animal não tem calendário oficial: nenhuma dose nasce.
+      if (membro.kind === 'PERSON') estado.doses.push(...dosesDoMembro(membro));
       return json(route, 201, membro);
     }
 

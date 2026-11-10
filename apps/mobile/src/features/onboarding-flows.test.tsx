@@ -275,6 +275,51 @@ describe('formulário de pessoa (RF02)', () => {
     expect(screen.getByText(/Esta pessoa está grávida/)).toBeOnTheScreen();
   });
 
+  test('CT-APP-M12: cadastra um animal: espécie obrigatória, sem parentesco nem gestação', async () => {
+    const fake = createFakeFetch({ 'POST /members': { status: 201, body: MEMBER } });
+    await renderScreen(<NewMemberScreen />, fake.fetchFn);
+    await fireEvent.press(screen.getByRole('radio', { name: 'Um animal de estimação' }));
+    expect(screen.getByRole('header', { name: 'Adicionar animal' })).toBeOnTheScreen();
+    expect(screen.queryByText(/Quem é esta pessoa para você/)).not.toBeOnTheScreen();
+    expect(screen.queryByText(/Esta pessoa está grávida/)).not.toBeOnTheScreen();
+    await fireEvent.changeText(screen.getByLabelText('Nome do animal'), 'Rex');
+    await fireEvent.changeText(
+      screen.getByLabelText('Data de nascimento (aproximada)'),
+      '10032022',
+    );
+
+    // Sem a espécie, não envia.
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar e ver as vacinas' }));
+    expect(await screen.findByText('Escolha a espécie do animal.')).toBeOnTheScreen();
+    expect(fake.calls.some((c) => c.key === 'POST /members')).toBe(false);
+
+    await fireEvent.press(screen.getByRole('button', { name: /Qual é a espécie\?/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Cachorro' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar e ver as vacinas' }));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
+    expect(fake.calls.find((c) => c.key === 'POST /members')?.body).toEqual({
+      name: 'Rex',
+      birthDate: '2022-03-10',
+      kind: 'PET',
+      species: 'DOG',
+    });
+  });
+
+  test('CT-APP-M13: ao editar, o tipo não pode ser trocado', async () => {
+    const REX = {
+      ...MEMBER,
+      name: 'Rex',
+      kind: 'PET' as const,
+      species: 'CAT' as const,
+      ageGroup: null,
+    };
+    const fake = createFakeFetch({ 'GET /members': { status: 200, body: { items: [REX] } } });
+    await renderScreen(<EditMemberScreen id="m-1" />, fake.fetchFn);
+    expect(await screen.findByRole('header', { name: 'Editar Rex' })).toBeOnTheScreen();
+    expect(screen.queryByRole('radio', { name: 'Uma pessoa da família' })).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /Qual é a espécie\?: Gato/ })).toBeOnTheScreen();
+  });
+
   test('CT-APP-M05: excluir pede confirmação e só então apaga', async () => {
     const fake = createFakeFetch({
       'GET /members': { status: 200, body: { items: [MEMBER] } },

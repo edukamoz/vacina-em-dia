@@ -212,7 +212,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B05 | SCRUM-16 | Como mãe, quero ver o calendário vacinal de cada pessoa conforme a idade, com fonte e versão, para saber o que é indicado e quando (RF03) | Must | Em análise | Sprint 3 |
 | B06 | SCRUM-17 | Como cuidadora, quero consultar o histórico de doses de cada pessoa, para ter a caderneta digital à mão (RF08) | Must | Concluído | Sprint 4 |
 | B72 | novo | Como equipe, quero ser avisada quando o calendário oficial do Ministério da Saúde mudar, para atualizar os dados com revisão e sem baixar à mão | Should | Em andamento | - |
-| B73 | novo | Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar | Could | A fazer | - |
+| B73 | novo | Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar | Could | Em andamento | - |
 | B74 | novo | Como viajante, quero saber que vacinas considerar para o meu destino e a data da viagem, e ver o que já tenho no histórico, para me preparar com antecedência | Could | A fazer | - |
 | B75 | novo | Como usuária, quero ver, no detalhe da dose, informações da vacina (tipo, composição, reações comuns e quem deve conversar com um profissional antes), para me informar | Should | A fazer | - |
 

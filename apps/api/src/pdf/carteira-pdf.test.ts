@@ -18,6 +18,8 @@ const MEMBRO: MemberDosesResponse['member'] = {
   birthDate: '2025-05-20',
   isPregnant: false,
   relationship: 'DAUGHTER',
+  kind: 'PERSON',
+  species: null,
   ageGroup: 'CHILD',
 };
 
