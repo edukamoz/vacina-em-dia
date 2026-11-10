@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 import { useTheme } from '../theme/theme-provider';
 import { getThemeColors } from '../theme/tokens';
+import { useRolarParaCampo } from './rolagem-com-teclado';
 import { Texto } from './texto';
 
 /**
@@ -19,6 +20,7 @@ export function CampoTexto({
   erro,
   ajuda,
   aoLado,
+  onFocus,
   ...rest
 }: Omit<TextInputProps, 'accessibilityLabel'> & {
   rotulo: string;
@@ -27,11 +29,19 @@ export function CampoTexto({
   aoLado?: ReactNode;
 }) {
   const { theme } = useTheme();
+  const campo = useRef<TextInput>(null);
+  const rolarParaCampo = useRolarParaCampo();
   return (
     <View className="gap-sm">
       <Texto variante="rotulo">{rotulo}</Texto>
       <View className="relative justify-center">
         <TextInput
+          ref={campo}
+          onFocus={(evento) => {
+            // Com o teclado aberto, rola a tela até o campo para a pessoa ver o que digita.
+            rolarParaCampo?.(campo.current);
+            onFocus?.(evento);
+          }}
           accessibilityLabel={rotulo}
           placeholderTextColor={getThemeColors(theme).textoSecundario}
           className={`min-h-principal rounded-campo border-padrao bg-superficie py-sm pl-lg text-corpo font-regular text-texto ${

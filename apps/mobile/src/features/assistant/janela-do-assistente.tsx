@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSobreposicaoDoTeclado } from '../../components/rolagem-com-teclado';
 import { modoDeLayout } from '../../lib/layout';
 import { useVisual } from '../../theme/theme-provider';
 import { AssistantPanel } from './assistant-panel';
@@ -19,6 +21,11 @@ export function JanelaDoAssistente({ largura }: { largura?: number }) {
   const { altoContraste, sombra } = useVisual();
   const janela = useWindowDimensions().width;
   const compacto = modoDeLayout(largura ?? janela) === 'compacto';
+  // No celular a folha vai até o fundo da tela: sobe o teclado quando ele abre e, fechado, a barra
+  // do sistema (botões ou gestos), para o campo de pergunta e os botões nunca ficarem por trás.
+  const moldura = useRef<View>(null);
+  const teclado = useSobreposicaoDoTeclado(moldura);
+  const { bottom } = useSafeAreaInsets();
   // Só monta a conversa depois da primeira abertura, e a mantém montada ao fechar.
   const [montada, setMontada] = useState(aberto);
   if (aberto && !montada) setMontada(true);
@@ -29,6 +36,7 @@ export function JanelaDoAssistente({ largura }: { largura?: number }) {
     : 'border-fina border-bordaSuave';
   return (
     <View
+      ref={moldura}
       pointerEvents={aberto ? 'box-none' : 'none'}
       style={{ display: aberto ? 'flex' : 'none' }}
       className="absolute inset-0 z-10"
@@ -46,10 +54,13 @@ export function JanelaDoAssistente({ largura }: { largura?: number }) {
         aria-modal
         aria-label="Assistente"
         accessibilityViewIsModal
-        style={sombra(3)}
+        style={[
+          sombra(3),
+          compacto ? { bottom: teclado, paddingBottom: teclado > 0 ? 0 : bottom } : null,
+        ]}
         className={`absolute overflow-hidden bg-superficie ${borda} ${
           compacto
-            ? 'inset-x-0 bottom-0 top-[56px] rounded-t-folha'
+            ? 'inset-x-0 top-[56px] rounded-t-folha'
             : 'bottom-xl right-xl h-[620px] max-h-[88%] w-[400px] max-w-[92%] rounded-folha'
         }`}
       >
