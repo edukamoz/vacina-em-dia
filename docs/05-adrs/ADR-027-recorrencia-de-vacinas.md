@@ -39,7 +39,7 @@ O ciclo de vida da dose (5 estados e 12 transições, CLAUDE.md §8) é uma regr
 - **Migração `006-recorrencia-de-vacinas.sql` obrigatória antes do deploy** da API que a usa (o deploy não aplica migrações). Ela só acrescenta colunas anuláveis, restrições e um índice; nenhuma dose existente muda.
 - O contrato da API cresce de forma compatível: `recurrence`, `occurrence` e `remindDaysBefore` na dose (opcionais), `recurrence` e `remindDaysBefore` na dose avulsa, `scope` no cancelamento. O app antigo continua funcionando.
 - A regra é pura (`nextRecurrenceDate`, `addPeriod` em `@vacina/shared`), sem ler o relógio; casos `CT-REC-*`.
-- O app precisa de telas para escolher a repetição, o aviso e o alcance do cancelamento (segunda etapa do B69).
+- O app ganhou as telas (segunda parte do B69): no formulário da dose avulsa, a seção "Esta vacina se repete" (a cada N dias, semanas, meses ou anos; contar da aplicação ou em datas fixas; terminar nunca, em uma data ou depois de N doses) e o aviso antecipado; no detalhe, a repetição, o número da dose, a data da próxima dose da série e a pergunta "só esta dose ou parar de repetir" ao cancelar. Casos `CT-APP-REP01` a `33` (lógica) e `CT-APP-REP40` a `56` (telas).
 - **Limite honesto:** aplicar uma dose muito antiga com `APPLICATION` gera uma próxima já vencida, que aparece Atrasada; é o comportamento esperado (a pessoa está atrasada), e não pula períodos.
 
 ## Verificações e fontes

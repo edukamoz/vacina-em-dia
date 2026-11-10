@@ -11,6 +11,8 @@ import { todayCivil } from '../../lib/dates';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useCreateCustomDose } from '../data/hooks';
 import { formatCivilDate } from './format-date';
+import { CamposDeRepeticao } from './repeticao-campos';
+import { ESTADO_INICIAL_REPETICAO, montarRepeticao, type FormaDeRepetir } from './repeticao';
 
 /** Formulário da dose avulsa de uma pessoa já escolhida. */
 function CustomDoseForm({ memberId, memberName }: { memberId: string; memberName: string }) {
@@ -20,6 +22,10 @@ function CustomDoseForm({ memberId, memberName }: { memberId: string; memberName
   const [dose, setDose] = useState('');
   const [data, setData] = useState(() => todayCivil());
   const [tentou, setTentou] = useState(false);
+  const [repeticao, setRepeticao] = useState<FormaDeRepetir>(ESTADO_INICIAL_REPETICAO);
+
+  const montagem = montarRepeticao(repeticao, data);
+  const errosDeRepeticao = tentou && !montagem.ok ? montagem.erros : {};
 
   const erroVacina = tentou && vacina.trim().length < 2 ? 'Informe o nome da vacina.' : undefined;
   const erroDose =
@@ -27,9 +33,9 @@ function CustomDoseForm({ memberId, memberName }: { memberId: string; memberName
 
   function salvar() {
     setTentou(true);
-    if (vacina.trim().length < 2 || dose.trim() === '') return;
+    if (vacina.trim().length < 2 || dose.trim() === '' || !montagem.ok) return;
     create.mutate(
-      { vaccine: vacina.trim(), doseLabel: dose.trim(), dueDate: data },
+      { vaccine: vacina.trim(), doseLabel: dose.trim(), dueDate: data, ...montagem.extras },
       {
         onSuccess: (criada) =>
           router.replace({ pathname: '/dose/[id]', params: { id: criada.id } }),
@@ -75,6 +81,13 @@ function CustomDoseForm({ memberId, memberName }: { memberId: string; memberName
           aplicação&quot;.
         </Texto>
       </View>
+
+      <CamposDeRepeticao
+        forma={repeticao}
+        aoMudar={(mudanca) => setRepeticao((atual) => ({ ...atual, ...mudanca }))}
+        erros={errosDeRepeticao}
+        primeiraData={data}
+      />
 
       <Texto variante="apoio" className="text-textoSecundario">
         Esta dose fica marcada como &quot;Adicionada por você&quot;: não faz parte do calendário

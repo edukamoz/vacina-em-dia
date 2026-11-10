@@ -10,9 +10,10 @@ import { SeloOrigem } from '../../components/selo-origem';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { todayCivil } from '../../lib/dates';
-import { useDose, useDoseEvent, useMembers } from '../data/hooks';
+import { useDose, useDoseEvent, useMemberDoses, useMembers } from '../data/hooks';
 import { doseDateRow, doseHint } from './dose-card';
 import { formatCivilDate } from './format-date';
+import { descreverAviso, descreverRepeticao } from './repeticao';
 
 /** O que a pessoa está fazendo agora na tela: escolhendo a data de uma ação ou confirmando o cancelamento. */
 type Acao = 'APPLY' | 'SCHEDULE' | 'CANCEL';
@@ -38,6 +39,35 @@ const PAINEL = {
   SCHEDULE: { pergunta: 'Para que dia?', confirmar: 'Confirmar agendamento' },
 } as const;
 
+/**
+ * Numa dose já aplicada ou cancelada de uma série que se repete, diz quando é a próxima dose (a
+ * API a cria sozinha) ou que a série terminou. Só aparece quando a lista da pessoa já carregou.
+ */
+function ProximaDaSerie({ dose }: { dose: DoseResponse }) {
+  const procura = dose.recurrence && dose.occurrence ? dose.memberId : null;
+  const doses = useMemberDoses(procura);
+  if (!dose.recurrence || !dose.occurrence || !doses.isSuccess) return null;
+  const proxima = doses.data.items.find(
+    (outra) =>
+      outra.origin === 'CUSTOM' &&
+      outra.vaccine === dose.vaccine &&
+      outra.doseLabel === dose.doseLabel &&
+      outra.occurrence === (dose.occurrence ?? 0) + 1,
+  );
+  return (
+    <Cartao className="gap-xs">
+      <Texto variante="rotulo" className="text-textoSecundario">
+        Próxima dose da série
+      </Texto>
+      <Texto variante="corpoNegrito" accessibilityLiveRegion="polite">
+        {proxima
+          ? `Prevista para ${formatCivilDate(proxima.dueDate)}`
+          : 'Esta foi a última dose da série.'}
+      </Texto>
+    </Cartao>
+  );
+}
+
 function DoseActions({ dose }: { dose: DoseResponse }) {
   const mutation = useDoseEvent(dose.id);
   const [acao, setAcao] = useState<Acao | null>(null);
@@ -46,11 +76,14 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
 
   if (!acoes) {
     return (
-      <Texto className="text-textoSecundario">
-        {dose.status === 'APPLIED'
-          ? 'Esta dose já foi aplicada. Ela aparece no Histórico.'
-          : 'Esta dose foi cancelada e não precisa mais ser tomada.'}
-      </Texto>
+      <View className="gap-md">
+        <Texto className="text-textoSecundario">
+          {dose.status === 'APPLIED'
+            ? 'Esta dose já foi aplicada. Ela aparece no Histórico.'
+            : 'Esta dose foi cancelada e não precisa mais ser tomada.'}
+        </Texto>
+        <ProximaDaSerie dose={dose} />
+      </View>
     );
   }
 
@@ -69,19 +102,39 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
   ) : null;
 
   if (acao === 'CANCEL') {
+    const repete = Boolean(dose.recurrence);
     return (
       <Cartao className="gap-md border-erro">
         <Texto variante="corpoNegrito">Cancelar esta dose?</Texto>
         <Texto>
-          Ela deixa de aparecer como necessária. Cancele só se um profissional de saúde orientou.
+          {repete
+            ? 'Esta vacina se repete. Você pode pular só esta dose, e a próxima continua sendo criada, ou parar a repetição de vez.'
+            : 'Ela deixa de aparecer como necessária. Cancele só se um profissional de saúde orientou.'}
         </Texto>
         {erro}
-        <Botao
-          titulo="Sim, cancelar a dose"
-          variante="perigo"
-          carregando={mutation.isPending}
-          onPress={() => enviar({ type: 'CANCEL', confirmed: true })}
-        />
+        {repete ? (
+          <>
+            <Botao
+              titulo="Cancelar só esta dose"
+              variante="perigo"
+              carregando={mutation.isPending}
+              onPress={() => enviar({ type: 'CANCEL', confirmed: true, scope: 'THIS' })}
+            />
+            <Botao
+              titulo="Cancelar e parar de repetir"
+              variante="perigo"
+              carregando={mutation.isPending}
+              onPress={() => enviar({ type: 'CANCEL', confirmed: true, scope: 'SERIES' })}
+            />
+          </>
+        ) : (
+          <Botao
+            titulo="Sim, cancelar a dose"
+            variante="perigo"
+            carregando={mutation.isPending}
+            onPress={() => enviar({ type: 'CANCEL', confirmed: true })}
+          />
+        )}
         <Botao titulo="Não, voltar" variante="secundario" onPress={() => setAcao(null)} />
       </Cartao>
     );
@@ -191,6 +244,17 @@ export function DoseDetailScreen({ id }: { id: string }) {
         ) : (
           <Linha rotulo="Data" valor={doseHint(dose)} />
         )}
+        {dose.recurrence ? (
+          <>
+            <Linha rotulo="Se repete" valor={descreverRepeticao(dose.recurrence)} />
+            {dose.occurrence ? (
+              <Linha rotulo="Esta é a" valor={`${dose.occurrence}ª dose da série`} />
+            ) : null}
+          </>
+        ) : null}
+        {dose.remindDaysBefore !== null && dose.remindDaysBefore !== undefined ? (
+          <Linha rotulo="Aviso" valor={descreverAviso(dose.remindDaysBefore)} />
+        ) : null}
         {dose.origin === 'CUSTOM' ? (
           <Texto className="text-textoSecundario">
             Você adicionou esta dose. Ela não faz parte do calendário oficial; siga a orientação do
