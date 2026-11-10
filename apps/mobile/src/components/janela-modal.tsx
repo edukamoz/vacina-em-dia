@@ -1,10 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Animated, Platform, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Animated, Platform, Pressable, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { modoDeLayout } from '../lib/layout';
 import { useMovimentoReduzido, useThemeColors, useVisual } from '../theme/theme-provider';
 import { CURVA, DURACAO, USA_DRIVER_NATIVO, VistaAnimada } from './animacao';
 import { Icone } from './icone';
+import { RolagemComTeclado } from './rolagem-com-teclado';
 import { Texto } from './texto';
 
 /**
@@ -43,6 +45,9 @@ export function JanelaModal({
   const reduzido = useMovimentoReduzido();
   const janela = useWindowDimensions().width;
   const compacto = modoDeLayout(largura ?? janela) === 'compacto';
+  // A folha do celular encosta no fundo da tela; sobe o que a barra do sistema (botões ou gestos)
+  // ocupa, para nenhum botão ficar por trás dela.
+  const { bottom } = useSafeAreaInsets();
   const progresso = useRef(new Animated.Value(reduzido ? 1 : 0)).current;
 
   const fechar = () => (router.canGoBack() ? router.back() : router.replace('/'));
@@ -101,7 +106,11 @@ export function JanelaModal({
         aria-modal
         aria-label={titulo}
         accessibilityViewIsModal
-        style={[sombra(3), { opacity: progresso, transform: [{ translateY: subida }] }]}
+        style={[
+          sombra(3),
+          { opacity: progresso, transform: [{ translateY: subida }] },
+          compacto ? { paddingBottom: bottom } : null,
+        ]}
         className={`w-full overflow-hidden bg-superficie ${borda} ${
           compacto ? 'max-h-[92%] rounded-t-folha' : 'max-h-[88%] max-w-[680px] rounded-folha'
         }`}
@@ -123,14 +132,14 @@ export function JanelaModal({
             <Icone nome="fechar" cor={cores.texto} />
           </Pressable>
         </View>
-        <ScrollView
+        <RolagemComTeclado
           keyboardShouldPersistTaps="handled"
           contentContainerClassName="gap-lg p-lg"
           showsVerticalScrollIndicator={false}
         >
           {acao}
           {children}
-        </ScrollView>
+        </RolagemComTeclado>
       </VistaAnimada>
     </View>
   );

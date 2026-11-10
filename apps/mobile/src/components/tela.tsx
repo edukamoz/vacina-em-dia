@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ID_DO_CONTEUDO } from '../lib/pular-conteudo';
 import { useVisual } from '../theme/theme-provider';
@@ -8,6 +8,7 @@ import { Children } from 'react';
 import { Entrada } from './animacao';
 import { Botao } from './botao';
 import { JanelaModal } from './janela-modal';
+import { RolagemComTeclado } from './rolagem-com-teclado';
 import { RolagemDaTelaContext } from './rolagem-da-tela';
 import { Texto } from './texto';
 
@@ -69,7 +70,7 @@ export function Tela({
       edges={reservaBalao ? ['top', 'left', 'right'] : ['top', 'bottom', 'left', 'right']}
     >
       <RolagemDaTelaContext.Provider value={setTravada}>
-        <ScrollView
+        <RolagemComTeclado
           nativeID={ID_DO_CONTEUDO}
           tabIndex={-1}
           scrollEnabled={!travada}
@@ -101,7 +102,7 @@ export function Tela({
               {filho}
             </Entrada>
           ))}
-        </ScrollView>
+        </RolagemComTeclado>
       </RolagemDaTelaContext.Provider>
     </SafeAreaView>
   );

@@ -1,10 +1,11 @@
 import { Children, type ReactNode } from 'react';
-import { ScrollView, useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { Entrada } from '../../components/animacao';
 import { LinkTexto } from '../../components/link-texto';
+import { RolagemComTeclado } from '../../components/rolagem-com-teclado';
 import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
@@ -66,14 +67,14 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
               As vacinas da sua família, em dia
             </Texto>
           </View>
-          <ScrollView
+          <RolagemComTeclado
             nativeID={ID_DO_CONTEUDO}
             tabIndex={-1}
             className="flex-1"
             contentContainerClassName="flex-grow items-center justify-center p-xxl"
           >
             {formulario}
-          </ScrollView>
+          </RolagemComTeclado>
         </View>
       </SafeAreaView>
     );
@@ -81,7 +82,7 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
 
   return (
     <SafeAreaView className="flex-1 bg-fundo">
-      <ScrollView
+      <RolagemComTeclado
         nativeID={ID_DO_CONTEUDO}
         tabIndex={-1}
         contentContainerClassName="items-center gap-xxl px-lg py-xl medio:p-xl"
@@ -95,7 +96,7 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
           <Logo />
         </Pressable>
         {formulario}
-      </ScrollView>
+      </RolagemComTeclado>
     </SafeAreaView>
   );
 }
