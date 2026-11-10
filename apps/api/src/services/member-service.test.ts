@@ -75,7 +75,11 @@ describe('serviço de membros da família (RF02)', () => {
     if (!pai.ok) throw new Error('falhou');
     expect(pai.value.isPregnant).toBe(false);
     // Sem parentesco masculino, o pedido vale.
-    const mae = await app.members.create(OWNER, { ...ADULT, isPregnant: true, relationship: 'MOTHER' });
+    const mae = await app.members.create(OWNER, {
+      ...ADULT,
+      isPregnant: true,
+      relationship: 'MOTHER',
+    });
     if (!mae.ok) throw new Error('falhou');
     expect(mae.value.isPregnant).toBe(true);
     // Trocar para um parentesco masculino tira a pessoa do grupo gestante.
