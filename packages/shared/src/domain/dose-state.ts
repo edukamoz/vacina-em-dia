@@ -50,6 +50,11 @@ export interface DoseSnapshot {
   readonly scheduledDate: CivilDate | null;
   /** Data da aplicação, quando houver. */
   readonly appliedDate: CivilDate | null;
+  /**
+   * Quantos dias antes da data o aviso aparece, escolhido pela pessoa para esta dose. Ausente ou
+   * `null` usa o padrão do app (7 dias). Não participa da máquina de estados.
+   */
+  readonly remindDaysBefore?: number | null | undefined;
 }
 
 /** Contexto de uma tentativa de transição. */

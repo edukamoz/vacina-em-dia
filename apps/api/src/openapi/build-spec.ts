@@ -681,7 +681,7 @@ export function buildOpenApiDocument(): object {
     tags: ['Calendário e doses'],
     summary: 'Cadastrar uma dose avulsa',
     description:
-      'Cadastra uma dose que não consta no calendário oficial, mas que a pessoa precisa acompanhar (por exemplo, por indicação de um profissional). O nome da vacina e a dose são texto livre e a data prevista é de hoje em diante. A dose nasce Pendente (T1), segue o mesmo ciclo de estados das oficiais e aparece com origem `CUSTOM`. Para o que já foi tomado, cadastre e depois registre a aplicação. Máximo de 30 doses avulsas por pessoa.',
+      'Cadastra uma dose que não consta no calendário oficial, mas que a pessoa precisa acompanhar (por exemplo, por indicação de um profissional). O nome da vacina e a dose são texto livre e a data prevista é de hoje em diante. A dose nasce Pendente (T1), segue o mesmo ciclo de estados das oficiais e aparece com origem `CUSTOM`. Para o que já foi tomado, cadastre e depois registre a aplicação. Máximo de 30 doses avulsas por pessoa (uma série que se repete conta como uma). Em `recurrence`, a pessoa diz se a vacina se repete (a cada N dias, semanas, meses ou anos), de onde a próxima data é contada (`APPLICATION`: da aplicação; `SCHEDULE`: de uma grade fixa que parte da primeira data) e, se quiser, quando termina. Em `remindDaysBefore`, quantos dias antes o aviso aparece (de 0 a 60; vazio usa 7).',
     security: secured,
     request: {
       params: memberPathParams,
@@ -694,6 +694,16 @@ export function buildOpenApiDocument(): object {
               viagem: {
                 summary: 'Vacina indicada para uma viagem',
                 value: { vaccine: 'Febre tifoide', doseLabel: '1ª dose', dueDate: '2026-11-04' },
+              },
+              repetida: {
+                summary: 'Vacina que se repete todo ano, com aviso 14 dias antes',
+                value: {
+                  vaccine: 'Gripe',
+                  doseLabel: 'Anual',
+                  dueDate: '2026-11-04',
+                  recurrence: { unit: 'YEAR', every: 1, anchor: 'SCHEDULE' },
+                  remindDaysBefore: 14,
+                },
               },
             },
           },
@@ -736,7 +746,7 @@ export function buildOpenApiDocument(): object {
     tags: ['Calendário e doses'],
     summary: 'Mudar o estado de uma dose',
     description:
-      'Aplica um evento do usuário à dose pela máquina de estados do ciclo de vida (RF04): agendar, desmarcar, reagendar, registrar a aplicação ou cancelar. O atraso não é um evento do cliente: só a rotina de prazo o aplica. Em caso de erro, o estado da dose permanece o mesmo.',
+      'Aplica um evento do usuário à dose pela máquina de estados do ciclo de vida (RF04): agendar, desmarcar, reagendar, registrar a aplicação ou cancelar. O atraso não é um evento do cliente: só a rotina de prazo o aplica. Em caso de erro, o estado da dose permanece o mesmo. Em uma dose avulsa que se repete, registrar a aplicação cria sozinha a próxima dose (Pendente). Cancelar só esta dose (`scope` `THIS`, o padrão) pula a dose e a série continua; `SERIES` cancela e encerra a repetição.',
     security: secured,
     request: {
       params: dosePathParams,
@@ -762,6 +772,10 @@ export function buildOpenApiDocument(): object {
               cancelar: {
                 summary: 'Cancelar (exige confirmação)',
                 value: { type: 'CANCEL', confirmed: true },
+              },
+              cancelarSerie: {
+                summary: 'Cancelar e encerrar a repetição (dose que se repete)',
+                value: { type: 'CANCEL', confirmed: true, scope: 'SERIES' },
               },
             },
           },

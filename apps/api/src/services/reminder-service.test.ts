@@ -261,3 +261,58 @@ describe('handlers dos lembretes', () => {
     expect(result.jsonBody).toMatchObject({ leadDays: 7, emailEnabled: true, items: [] });
   });
 });
+
+describe('lembretes: aviso antecipado escolhido para a dose (B69)', () => {
+  const candidate = (accountId: string, patch: Partial<DoseSnapshot>): ReminderCandidate => ({
+    accountId,
+    email: `${accountId}@exemplo.com.br`,
+    dose: dose(patch),
+  });
+
+  test('CT-REC-110: o e-mail separa as doses avisadas pela antecedência escolhida', async () => {
+    const { service, email } = setup([
+      candidate('conta-a', { dueDate: '2026-10-09', remindDaysBefore: 3 }),
+      candidate('conta-a', { dueDate: '2026-10-13' }),
+      candidate('conta-a', { dueDate: '2026-10-06' }),
+    ]);
+    expect(await service.runDailyEmails()).toEqual({ recipients: 1, sent: 1, failed: 0 });
+    expect(email.sent[0]?.text).toContain(
+      '1 vacina é para hoje e 1 vacina é para daqui a 7 dias e 1 vacina é para os próximos dias',
+    );
+  });
+
+  test('CT-REC-111: dose fora da antecedência escolhida não entra no e-mail', async () => {
+    const { service, email } = setup([
+      candidate('conta-a', { dueDate: '2026-10-13', remindDaysBefore: 3 }),
+    ]);
+    expect(await service.runDailyEmails()).toEqual({ recipients: 0, sent: 0, failed: 0 });
+    expect(email.sent).toHaveLength(0);
+  });
+
+  test('CT-REC-112: o texto de próximos dias traz só quantidade', () => {
+    const message = buildReminderEmail('x@exemplo.com.br', { today: 0, inAWeek: 0, soon: 2 });
+    expect(message.text).toContain('2 vacinas são para os próximos dias');
+    expect(message.text).not.toMatch(/daqui a 7 dias/);
+  });
+
+  test('CT-REC-113: a lista do app usa a antecedência escolhida na dose', async () => {
+    const { app, service } = setup();
+    await app.consent();
+    const created = await app.members.create(OWNER, ADULT);
+    if (!created.ok) throw new Error('falhou');
+    // 20 dias à frente: só aparece quando a pessoa pediu 30 dias de antecedência.
+    await app.members.addCustomDose(OWNER, created.value.id, {
+      vaccine: 'Gripe',
+      doseLabel: '1ª dose',
+      dueDate: '2026-10-26',
+      remindDaysBefore: 30,
+    });
+    await addCustom(app, created.value.id, 'Tifoide', '2026-10-26');
+    const lista = await service.list(OWNER);
+    // O adulto também tem doses oficiais atrasadas; só interessam as duas avulsas.
+    const avulsas = lista.items
+      .map((i) => i.vaccine)
+      .filter((v) => ['Gripe', 'Tifoide'].includes(v));
+    expect(avulsas).toEqual(['Gripe']);
+  });
+});

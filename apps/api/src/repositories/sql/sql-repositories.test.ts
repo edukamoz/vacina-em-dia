@@ -187,3 +187,161 @@ describe('repositórios SQL', () => {
     expect(calls[0]?.params['enabled']).toEqual({ type: 'bit', value: false });
   });
 });
+
+describe('repositórios SQL: dose que se repete (B69)', () => {
+  const linhaBase = {
+    id: 'd2',
+    member_id: 'm',
+    rule_id: null,
+    custom_vaccine: 'Gripe',
+    custom_dose_label: 'Anual',
+    status: 'PENDING',
+    due_date: '2027-11-04',
+    scheduled_date: null,
+    applied_date: null,
+  };
+
+  test('CT-REC-120: lê a repetição, a série, o número da dose e o aviso antecipado', async () => {
+    const repos = createSqlRepositories(
+      fakeDb([
+        {
+          ...linhaBase,
+          remind_days_before: 14,
+          series_id: 's1',
+          occurrence: 2,
+          recur_unit: 'YEAR',
+          recur_every: 1,
+          recur_anchor: 'SCHEDULE',
+          recur_anchor_date: '2026-11-04',
+          recur_end_date: '2035-11-04',
+          recur_max_doses: 5,
+        },
+      ]).executor,
+    );
+    expect(await repos.doses.get('dono', 'd2')).toMatchObject({
+      remindDaysBefore: 14,
+      seriesId: 's1',
+      occurrence: 2,
+      recurrence: {
+        unit: 'YEAR',
+        every: 1,
+        anchor: 'SCHEDULE',
+        anchorDate: '2026-11-04',
+        endDate: '2035-11-04',
+        maxDoses: 5,
+      },
+    });
+  });
+
+  test('CT-REC-121: dose sem repetição não ganha os campos novos', async () => {
+    const repos = createSqlRepositories(fakeDb([linhaBase]).executor);
+    const dose = await repos.doses.get('dono', 'd2');
+    expect(dose).toBeDefined();
+    expect(dose).not.toHaveProperty('recurrence');
+    expect(dose).not.toHaveProperty('seriesId');
+    expect(dose).not.toHaveProperty('remindDaysBefore');
+  });
+
+  test('CT-REC-122: unidade de repetição desconhecida lança erro', async () => {
+    const repos = createSqlRepositories(
+      fakeDb([
+        {
+          ...linhaBase,
+          series_id: 's1',
+          occurrence: 1,
+          recur_unit: 'HORA',
+          recur_every: 1,
+          recur_anchor: 'APPLICATION',
+          recur_anchor_date: '2026-11-04',
+          recur_end_date: null,
+          recur_max_doses: null,
+        },
+      ]).executor,
+    );
+    await expect(repos.doses.get('dono', 'd2')).rejects.toThrow('Repetição de dose inesperada.');
+  });
+
+  test('CT-REC-123: grava a repetição só em parâmetros e limitada ao dono', async () => {
+    const { executor, calls } = fakeDb();
+    await createSqlRepositories(executor).doses.saveMany('dono', [
+      {
+        id: 'd2',
+        memberId: 'm',
+        ruleId: null,
+        custom: { vaccine: 'Gripe', doseLabel: 'Anual' },
+        status: 'PENDING',
+        dueDate: '2027-11-04',
+        scheduledDate: null,
+        appliedDate: null,
+        remindDaysBefore: 14,
+        seriesId: 's1',
+        occurrence: 2,
+        recurrence: {
+          unit: 'YEAR',
+          every: 1,
+          anchor: 'SCHEDULE',
+          anchorDate: '2026-11-04',
+          endDate: null,
+          maxDoses: 5,
+        },
+      },
+    ]);
+    const call = calls[0];
+    expect(call?.text).toContain('account_id = @owner');
+    expect(call?.text).not.toContain('Gripe');
+    expect(call?.params['unit']).toEqual({ type: 'varchar', value: 'YEAR', length: 5 });
+    expect(call?.params['every']).toEqual({ type: 'int', value: 1 });
+    expect(call?.params['remind']).toEqual({ type: 'int', value: 14 });
+    expect(call?.params['series']).toEqual({ type: 'varchar', value: 's1', length: 64 });
+    expect(call?.params['occurrence']).toEqual({ type: 'int', value: 2 });
+    expect(call?.params['maxDoses']).toEqual({ type: 'int', value: 5 });
+    expect(call?.params['anchorDate']).toEqual({
+      type: 'varchar',
+      value: '2026-11-04',
+      length: 10,
+    });
+  });
+
+  test('CT-REC-124: ao encerrar a série, os campos da repetição são gravados como nulos', async () => {
+    const { executor, calls } = fakeDb();
+    await createSqlRepositories(executor).doses.saveMany('dono', [
+      {
+        id: 'd2',
+        memberId: 'm',
+        ruleId: null,
+        custom: { vaccine: 'Gripe', doseLabel: 'Anual' },
+        status: 'CANCELLED',
+        dueDate: '2027-11-04',
+        scheduledDate: null,
+        appliedDate: null,
+        recurrence: null,
+        seriesId: 's1',
+        occurrence: 2,
+      },
+    ]);
+    const params = calls[0]?.params ?? {};
+    expect(params['unit']).toEqual({ type: 'varchar', value: null, length: 5 });
+    expect(params['every']).toEqual({ type: 'int', value: null });
+    expect(params['anchorDate']).toEqual({ type: 'varchar', value: null, length: 10 });
+    expect(params['remind']).toEqual({ type: 'int', value: null });
+  });
+
+  test('CT-REC-125: os candidatos ao e-mail respeitam o aviso antecipado de cada dose', async () => {
+    const { executor, calls } = fakeDb([
+      {
+        account_id: 'a1',
+        email: 'a@b.c',
+        status: 'PENDING',
+        due_date: '2026-10-09',
+        scheduled_date: null,
+        applied_date: null,
+        remind_days_before: 3,
+      },
+    ]);
+    const found = await createSqlRepositories(executor).reminders.listEmailCandidates('2026-10-06');
+    expect(found[0]?.dose).toMatchObject({ remindDaysBefore: 3, dueDate: '2026-10-09' });
+    const call = calls[0];
+    expect(call?.text).toContain('COALESCE(d.remind_days_before, @lead)');
+    expect(call?.params['lead']).toEqual({ type: 'int', value: 7 });
+  });
+});

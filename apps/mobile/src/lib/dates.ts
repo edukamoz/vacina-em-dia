@@ -13,6 +13,16 @@ export function todayCivil(now: Date = new Date()): CivilDate {
 }
 
 /**
+ * Minutos desde a meia-noite, na hora local do aparelho. Junto com {@link todayCivil}, é o "agora"
+ * que o planejador de avisos recebe de fora.
+ *
+ * @param now - Instante atual, injetável para testar.
+ */
+export function minutosDoDia(now: Date = new Date()): number {
+  return now.getHours() * 60 + now.getMinutes();
+}
+
+/**
  * Aplica a máscara `DD/MM/AAAA` enquanto a pessoa digita: guarda só os dígitos e coloca as barras.
  *
  * @param input - Texto digitado.

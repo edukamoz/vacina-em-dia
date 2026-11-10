@@ -16,6 +16,7 @@ import { PIX_DA_DOACAO } from '../../lib/config-pix';
 import { modoDeLayout } from '../../lib/layout';
 import { useSession } from '../../session/session-provider';
 import { useTheme, useThemeColors } from '../../theme/theme-provider';
+import { ControlesDeAvisos } from '../avisos/controles-de-avisos';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
 import {
   useConsent,
@@ -123,8 +124,9 @@ export function AccountScreen() {
           apoio="O aviso dentro do aplicativo sempre aparece na aba Doses."
         >
           <Texto className="text-textoSecundario">
-            Se quiser, também enviamos um e-mail às 8h, no dia da vacina e 7 dias antes. O e-mail
-            traz só a quantidade de vacinas, sem nomes.
+            Se quiser, também enviamos um e-mail às 8h, no dia da vacina e na antecedência escolhida
+            em cada dose (7 dias, se você não escolheu). O e-mail traz só a quantidade de vacinas,
+            sem nomes.
           </Texto>
           {reminders.data ? (
             <Chave
@@ -138,6 +140,7 @@ export function AccountScreen() {
               Não foi possível salvar. Tente de novo.
             </Texto>
           ) : null}
+          <ControlesDeAvisos />
         </Secao>
       </View>
 

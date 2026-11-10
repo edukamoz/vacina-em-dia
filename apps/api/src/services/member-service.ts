@@ -19,6 +19,7 @@ import type {
   DoseRepository,
   MemberRepository,
   StoredMember,
+  StoredDose,
 } from '../repositories/repositories';
 import { failure, success, type Result } from './errors';
 import { toCustomDoseResponse, toMemberResponse } from './mappers';
@@ -178,15 +179,35 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         return failure({ code: 'INVALID_DOSE_DATE' });
       }
       const existing = await doses.listByMember(ownerId, memberId);
-      if (existing.filter((dose) => dose.ruleId === null).length >= MAX_CUSTOM_DOSES) {
+      // Uma série que se repete conta como uma só: só a primeira dose dela entra na conta.
+      const customSlots = existing.filter(
+        (dose) => dose.ruleId === null && (dose.occurrence == null || dose.occurrence === 1),
+      );
+      if (customSlots.length >= MAX_CUSTOM_DOSES) {
         return failure({ code: 'LIMIT_REACHED', scope: 'customDoses' });
       }
-      const dose = {
+      const { recurrence, remindDaysBefore } = input;
+      const dose: StoredDose = {
         id: newId(),
         memberId,
         ruleId: null,
         custom: { vaccine: input.vaccine, doseLabel: input.doseLabel },
         ...createDose(input.dueDate),
+        ...(remindDaysBefore == null ? {} : { remindDaysBefore }),
+        ...(recurrence
+          ? {
+              recurrence: {
+                unit: recurrence.unit,
+                every: recurrence.every,
+                anchor: recurrence.anchor,
+                anchorDate: input.dueDate,
+                endDate: recurrence.endDate ?? null,
+                maxDoses: recurrence.maxDoses ?? null,
+              },
+              seriesId: newId(),
+              occurrence: 1,
+            }
+          : {}),
       };
       await doses.saveMany(ownerId, [dose]);
       const response = toCustomDoseResponse(dose);

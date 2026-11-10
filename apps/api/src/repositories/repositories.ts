@@ -1,4 +1,4 @@
-import type { CivilDate, DoseSnapshot, Relationship } from '@vacina/shared';
+import type { CivilDate, DoseSnapshot, RecurrenceRule, Relationship } from '@vacina/shared';
 
 /** Membro guardado pelo repositório. */
 export interface StoredMember {
@@ -18,6 +18,12 @@ export interface StoredDose extends DoseSnapshot {
   readonly ruleId: string | null;
   /** Nome e dose informados pela pessoa; só em dose avulsa (`ruleId` nulo). */
   readonly custom?: { readonly vaccine: string; readonly doseLabel: string } | null;
+  /** Regra de repetição; `null` ou ausente quando a dose não se repete (ou a série foi encerrada). */
+  readonly recurrence?: RecurrenceRule | null;
+  /** Identificador da série de doses que se repetem; ausente em dose que nunca se repetiu. */
+  readonly seriesId?: string | null;
+  /** Número desta dose na série (1 é a primeira). */
+  readonly occurrence?: number | null;
 }
 
 /** Consentimento guardado (RF09). */

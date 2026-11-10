@@ -1,4 +1,13 @@
-import type { DoseStatus, Relationship } from '@vacina/shared';
+import {
+  RECURRENCE_ANCHORS,
+  RECURRENCE_UNITS,
+  REMINDER_LEAD_DAYS,
+  type DoseStatus,
+  type RecurrenceAnchor,
+  type RecurrenceRule,
+  type RecurrenceUnit,
+  type Relationship,
+} from '@vacina/shared';
 import type {
   AccountRepository,
   AuthRepository,
@@ -17,6 +26,7 @@ import {
   instant,
   isDuplicateKeyError,
   isoUtc,
+  nullableNumber,
   nullableText,
   text,
   type SqlExecutor,
@@ -49,6 +59,7 @@ const nullableStr = (value: string | null, length: number) =>
   ({ type: 'varchar', value, length }) as const;
 const nullableNstr = (value: string | null, length: number) =>
   ({ type: 'nvarchar', value, length }) as const;
+const nullableInt = (value: number | null) => ({ type: 'int', value }) as const;
 
 /** Instante ISO 8601 (UTC) como parâmetro; o banco converte para DATETIME2 com o estilo 127. */
 const when = (value: string) => str(value, 30);
@@ -72,15 +83,45 @@ function toMember(row: SqlRow): StoredMember {
 }
 
 const DOSE_COLUMNS = `d.id, d.member_id, d.rule_id, d.custom_vaccine, d.custom_dose_label, d.status,
+  d.remind_days_before, d.series_id, d.occurrence, d.recur_unit, d.recur_every, d.recur_anchor,
+  d.recur_max_doses,
   CONVERT(char(10), d.due_date, 23) AS due_date,
   CONVERT(char(10), d.scheduled_date, 23) AS scheduled_date,
-  CONVERT(char(10), d.applied_date, 23) AS applied_date`;
+  CONVERT(char(10), d.applied_date, 23) AS applied_date,
+  CONVERT(char(10), d.recur_anchor_date, 23) AS recur_anchor_date,
+  CONVERT(char(10), d.recur_end_date, 23) AS recur_end_date`;
+
+/** Regra de repetição da linha, ou `null` quando a dose não se repete (campos `recur_*` nulos). */
+function recurrenceOf(row: SqlRow): RecurrenceRule | null {
+  const unit = nullableText(row, 'recur_unit');
+  if (unit === null) return null;
+  const anchor = text(row, 'recur_anchor');
+  const every = nullableNumber(row, 'recur_every');
+  if (
+    !(RECURRENCE_UNITS as readonly string[]).includes(unit) ||
+    !(RECURRENCE_ANCHORS as readonly string[]).includes(anchor) ||
+    every === null
+  ) {
+    throw new Error('Repetição de dose inesperada.');
+  }
+  return {
+    unit: unit as RecurrenceUnit,
+    every,
+    anchor: anchor as RecurrenceAnchor,
+    anchorDate: text(row, 'recur_anchor_date'),
+    endDate: nullableText(row, 'recur_end_date'),
+    maxDoses: nullableNumber(row, 'recur_max_doses'),
+  };
+}
 
 function toDose(row: SqlRow): StoredDose {
   const status = text(row, 'status');
   if (!DOSE_STATUSES.includes(status)) throw new Error('Estado de dose inesperado.');
   const ruleId = nullableText(row, 'rule_id');
   const customVaccine = nullableText(row, 'custom_vaccine');
+  const remindDaysBefore = nullableNumber(row, 'remind_days_before');
+  const seriesId = nullableText(row, 'series_id');
+  const recurrence = recurrenceOf(row);
   return {
     id: text(row, 'id'),
     memberId: text(row, 'member_id'),
@@ -93,6 +134,9 @@ function toDose(row: SqlRow): StoredDose {
     dueDate: text(row, 'due_date'),
     scheduledDate: nullableText(row, 'scheduled_date'),
     appliedDate: nullableText(row, 'applied_date'),
+    ...(remindDaysBefore === null ? {} : { remindDaysBefore }),
+    ...(seriesId === null ? {} : { seriesId, occurrence: nullableNumber(row, 'occurrence') }),
+    ...(recurrence === null ? {} : { recurrence }),
   };
 }
 
@@ -186,16 +230,25 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     async saveMany(ownerId, list) {
       await db.transaction(async (tx) => {
         for (const dose of list) {
+          const recurrence = dose.recurrence ?? null;
           await tx.run(
             `UPDATE d SET status = @status, due_date = CONVERT(date, @due, 23),
-               scheduled_date = CONVERT(date, @scheduled, 23), applied_date = CONVERT(date, @applied, 23)
+               scheduled_date = CONVERT(date, @scheduled, 23), applied_date = CONVERT(date, @applied, 23),
+               remind_days_before = @remind, series_id = @series, occurrence = @occurrence,
+               recur_unit = @unit, recur_every = @every, recur_anchor = @anchor,
+               recur_anchor_date = CONVERT(date, @anchorDate, 23),
+               recur_end_date = CONVERT(date, @endDate, 23), recur_max_doses = @maxDoses
              FROM dose d JOIN member m ON m.id = d.member_id
              WHERE d.id = @id AND m.account_id = @owner;
              IF @@ROWCOUNT = 0
                INSERT INTO dose (id, member_id, rule_id, custom_vaccine, custom_dose_label, status,
-                 due_date, scheduled_date, applied_date)
+                 due_date, scheduled_date, applied_date, remind_days_before, series_id, occurrence,
+                 recur_unit, recur_every, recur_anchor, recur_anchor_date, recur_end_date,
+                 recur_max_doses)
                SELECT @id, m.id, @rule, @customVaccine, @customDoseLabel, @status, CONVERT(date, @due, 23),
-                 CONVERT(date, @scheduled, 23), CONVERT(date, @applied, 23)
+                 CONVERT(date, @scheduled, 23), CONVERT(date, @applied, 23), @remind, @series,
+                 @occurrence, @unit, @every, @anchor, CONVERT(date, @anchorDate, 23),
+                 CONVERT(date, @endDate, 23), @maxDoses
                FROM member m WHERE m.id = @member AND m.account_id = @owner;`,
             {
               id: str(dose.id),
@@ -208,6 +261,15 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
               due: str(dose.dueDate, 10),
               scheduled: nullableStr(dose.scheduledDate, 10),
               applied: nullableStr(dose.appliedDate, 10),
+              remind: nullableInt(dose.remindDaysBefore ?? null),
+              series: nullableStr(dose.seriesId ?? null, 64),
+              occurrence: nullableInt(dose.occurrence ?? null),
+              unit: nullableStr(recurrence?.unit ?? null, 5),
+              every: nullableInt(recurrence?.every ?? null),
+              anchor: nullableStr(recurrence?.anchor ?? null, 11),
+              anchorDate: nullableStr(recurrence?.anchorDate ?? null, 10),
+              endDate: nullableStr(recurrence?.endDate ?? null, 10),
+              maxDoses: nullableInt(recurrence?.maxDoses ?? null),
             },
           );
         }
@@ -273,7 +335,7 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
     },
     async listEmailCandidates(today) {
       const result = await db.run(
-        `SELECT a.id AS account_id, a.email, d.status,
+        `SELECT a.id AS account_id, a.email, d.status, d.remind_days_before,
            CONVERT(char(10), d.due_date, 23) AS due_date,
            CONVERT(char(10), d.scheduled_date, 23) AS scheduled_date,
            CONVERT(char(10), d.applied_date, 23) AS applied_date
@@ -284,12 +346,15 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
          WHERE a.reminders_enabled = 1
            AND d.status IN ('PENDING', 'SCHEDULED')
            AND COALESCE(CASE WHEN d.status = 'SCHEDULED' THEN d.scheduled_date END, d.due_date)
-             IN (CONVERT(date, @today, 23), DATEADD(day, 7, CONVERT(date, @today, 23)))
+             IN (
+               CONVERT(date, @today, 23),
+               DATEADD(day, COALESCE(d.remind_days_before, @lead), CONVERT(date, @today, 23))
+             )
            AND NOT EXISTS (
              SELECT 1 FROM reminder_log r WHERE r.account_id = a.id AND r.sent_on = CONVERT(date, @today, 23)
            )
          ORDER BY a.id`,
-        { today: str(today, 10) },
+        { today: str(today, 10), lead: nullableInt(REMINDER_LEAD_DAYS) },
       );
       return result.rows.map((row) => ({
         accountId: text(row, 'account_id'),
@@ -299,6 +364,9 @@ export function createSqlRepositories(db: SqlExecutor): SqlRepositories {
           dueDate: text(row, 'due_date'),
           scheduledDate: nullableText(row, 'scheduled_date'),
           appliedDate: nullableText(row, 'applied_date'),
+          ...(nullableNumber(row, 'remind_days_before') === null
+            ? {}
+            : { remindDaysBefore: nullableNumber(row, 'remind_days_before') }),
         },
       }));
     },
