@@ -11,6 +11,7 @@ export * from './schemas/auth-api';
 export * from './schemas/dose';
 export * from './schemas/dose-api';
 export * from './schemas/family-api';
+export * from './schemas/household-api';
 export * from './schemas/profile-photo-api';
 export * from './schemas/reminder-api';
 export * from './schemas/news-api';
