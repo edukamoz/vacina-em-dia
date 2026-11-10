@@ -25,6 +25,10 @@ Os dados ficam em `packages/shared/src/calendar/pni-2026.ts`, com fonte, versão
 - **"3 doses" numa linha** vira uma única dose no ciclo de vida do app (simplificação assumida).
 - **Notas de rodapé oficiais** acompanham cada linha e são exibidas na tela.
 
+## Linhas que se repetem (B69, ADR-027)
+
+Três linhas têm a periodicidade **escrita** no texto oficial, e só elas se repetem no app (cada uma cita o trecho em `recurrence.basis`, em `packages/shared/src/calendar/pni-2026.ts`): influenza do idoso (todo ano), covid do idoso (a cada 6 meses) e influenza da criança (todo ano, até antes dos 6 anos). Ao aplicar a dose, a próxima nasce Pendente na mesma linha, contando da data da aplicação. **dT** e **gestante** ficam de fora de propósito (ver o ADR-027). Ao atualizar o calendário para uma nova versão, confira de novo cada `basis` contra o texto oficial; um teste (`CT-OFIC-01` a `06`) impede que outra linha ganhe repetição sem aparecer nele.
+
 ## Pontos a conferir pelo autor
 
 - O rotavírus aparece como "sorotipos G1" na imagem do PDF da criança e como "G11" na camada de texto do arquivo. Foi usado **G1** (a imagem).
