@@ -134,3 +134,4 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 | @types/leaflet | 1.9.22 | Tipos do Leaflet (desenvolvimento) |
 | @react-native-async-storage/async-storage | 2.2.0 | Lista de postos guardada no aparelho, para funcionar sem internet (ADR-018) |
 | react-native-svg | 15.15.4 | Marca do Vacina em Dia nas telas de entrada (versão indicada pelo `expo install`) |
+| expo-notifications | ~57.0.25 | Avisos de dose agendados no aparelho, só no app de Android e iOS (B70; ADR-028). Versão do SDK 57 (`npx expo install`, conferida no registro em 10/11/2026) |

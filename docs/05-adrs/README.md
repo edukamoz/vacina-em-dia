@@ -28,6 +28,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-020](ADR-020-foto-de-perfil-no-blob-storage.md) | Foto de perfil guardada no Azure Blob Storage | Aceita |
 | [ADR-026](ADR-026-movimento-padrao-segue-o-aparelho.md) | Movimento padrão segue o aparelho (WCAG 2.3.3) | Proposta |
 | [ADR-027](ADR-027-recorrencia-de-vacinas.md) | Recorrência de vacinas e aviso antecipado por dose | Aceita |
+| [ADR-028](ADR-028-avisos-no-aparelho.md) | Avisos de dose no aparelho, por notificações locais agendadas | Aceita |
 
 ## Estados possíveis
 
