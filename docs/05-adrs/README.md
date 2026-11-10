@@ -29,6 +29,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-026](ADR-026-movimento-padrao-segue-o-aparelho.md) | Movimento padrão segue o aparelho (WCAG 2.3.3) | Proposta |
 | [ADR-027](ADR-027-recorrencia-de-vacinas.md) | Recorrência de vacinas e aviso antecipado por dose | Aceita |
 | [ADR-028](ADR-028-avisos-no-aparelho.md) | Avisos de dose no aparelho, por notificações locais agendadas | Aceita |
+| [ADR-029](ADR-029-familia-com-varios-responsaveis.md) | Família com vários responsáveis | Aceita |
 
 ## Estados possíveis
 
