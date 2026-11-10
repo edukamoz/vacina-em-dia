@@ -103,9 +103,14 @@ describe('primeira tela: um desenho para cada forma de uso', () => {
     const dim = jest
       .spyOn(Dimensions, 'get')
       .mockReturnValue({ width: largura, height: 900, scale: 1, fontScale: 1 });
+    // O ambiente do Jest não traz `window.navigator` (um navegador de verdade sempre traz).
+    const tinhaNavigator = Object.getOwnPropertyDescriptor(window, 'navigator');
+    Object.defineProperty(window, 'navigator', { value: {}, configurable: true, writable: true });
     try {
       await renderScreen(ui, createFakeFetch({}).fetchFn);
     } finally {
+      if (tinhaNavigator) Object.defineProperty(window, 'navigator', tinhaNavigator);
+      else delete (window as { navigator?: unknown }).navigator;
       os.restore();
       dim.mockRestore();
     }
