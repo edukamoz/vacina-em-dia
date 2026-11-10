@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"
+    />
     <title>%WEB_TITLE%</title>
     <!-- App instalável (PWA): manifesto e ícone do iOS. O tema e a descrição vêm do app.json. -->
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -14,20 +17,34 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
-      /* These styles make the body full-height */
+      /*
+       * Tela cheia sem folga: o corpo não tem margem, não rola e não "estica" (overscroll), e a raiz
+       * fica presa à janela visível (100dvh acompanha a barra de endereço do celular, que sobe e
+       * desce). Sem isto, a página rolava alguns pixels, o botão fixo "Criar conta" andava e o pé da
+       * tela aparecia em branco. O fundo vem do tema (--cor-fundo) para nunca aparecer branco.
+       */
       html,
       body {
         height: 100%;
-      }
-      /* These styles disable body scrolling if you are using <ScrollView> */
-      body {
+        margin: 0;
+        padding: 0;
         overflow: hidden;
+        overscroll-behavior: none;
+        background-color: var(--cor-fundo, #ffffff);
       }
-      /* These styles make the root element full-height */
       #root {
         display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
         height: 100%;
         flex: 1;
+      }
+      @supports (height: 100dvh) {
+        #root {
+          height: 100dvh;
+        }
       }
     </style>
   </head>

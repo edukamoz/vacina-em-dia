@@ -105,6 +105,13 @@ export function ThemeProvider({
     document.documentElement.dataset.movimento = movimentoReduzido ? 'reduzido' : 'normal';
   }, [movimentoReduzido]);
 
+  // Pinta a página inteira (<html>) com o fundo do tema: nenhuma faixa branca aparece quando o
+  // navegador do celular mostra ou esconde a barra de endereço.
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    document.documentElement.style.backgroundColor = getThemeColors(theme).fundo;
+  }, [theme]);
+
   const value = useMemo(
     () => ({
       theme,
