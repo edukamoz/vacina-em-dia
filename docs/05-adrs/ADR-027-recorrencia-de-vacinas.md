@@ -42,6 +42,25 @@ O ciclo de vida da dose (5 estados e 12 transições, CLAUDE.md §8) é uma regr
 - O app ganhou as telas (segunda parte do B69): no formulário da dose avulsa, a seção "Esta vacina se repete" (a cada N dias, semanas, meses ou anos; contar da aplicação ou em datas fixas; terminar nunca, em uma data ou depois de N doses) e o aviso antecipado; no detalhe, a repetição, o número da dose, a data da próxima dose da série e a pergunta "só esta dose ou parar de repetir" ao cancelar. Casos `CT-APP-REP01` a `33` (lógica) e `CT-APP-REP40` a `56` (telas).
 - **Limite honesto:** aplicar uma dose muito antiga com `APPLICATION` gera uma próxima já vencida, que aparece Atrasada; é o comportamento esperado (a pessoa está atrasada), e não pula períodos.
 
+## Atualização de 10/11/2026: repetição nas linhas do calendário oficial
+
+O passo seguinte do item 7 foi dado. Uma linha oficial só se repete quando o **texto oficial transcrito** diz a periodicidade; nada foi deduzido nem preenchido de memória (CLAUDE.md §8), e cada repetição cita o trecho em `basis`:
+
+| Linha | Repetição | Texto oficial |
+|---|---|---|
+| `idoso-influenza` | todo ano | linha do idoso: "1 dose anual a cada temporada" |
+| `idoso-covid` | a cada 6 meses | linha do idoso: "1 dose semestral" |
+| `crianca-influenza-1` | todo ano, **até antes dos 6 anos** | nota da criança: "Crianças de 6 meses a menores de 6 anos devem ser vacinadas todo ano" |
+
+- **Como funciona:** ao aplicar uma dessas doses, a próxima nasce Pendente **na mesma linha** (mesmo `ruleId`), contando da **data da aplicação**. A série ganha identificador e número na primeira aplicação; a regra não é guardada na dose (vem da linha), então **não há migração**. O limite de idade da criança vira data final (o dia anterior ao 6º aniversário), e a próxima dose não é criada se cair depois dela. Cancelar pergunta o alcance, como na dose avulsa.
+- **O que ficou de fora, de propósito:**
+  - **dT** (adulto e idoso, "3 doses + reforços periódicos"): o app trata a linha como **uma** dose; repetir a cada 10 anos depois da primeira aplicação estaria errado enquanto a série de 3 doses não termina. A nota oficial fala em reforço a cada 10 anos, mas isso exige separar a série primária dos reforços, o que o calendário do app ainda não faz.
+  - **Gestante** ("por temporada", "a cada gestação"): depende da gestação, não de um intervalo fixo.
+  - **Segunda dose da criança que toma influenza pela primeira vez** (30 dias de intervalo): a linha do app tem só a "1ª dose".
+- **Aproximação a conhecer:** "a cada temporada" é sazonal (a campanha tem época), e o app conta um ano da aplicação. Se a pessoa tomar fora da época, a próxima data pode não coincidir com a campanha.
+- **Efeito na cobertura:** cada aplicação cria uma próxima dose Pendente, então os números de "aplicadas de total" das pessoas com essas linhas nunca chegam a 100%; é o comportamento esperado de uma dose que se repete.
+- Casos `CT-OFIC-01` a `12` (calendário e regra), `CT-OFIC-20` a `31` (serviço), `CT-OFIC-40` (contrato dos repositórios) e `CT-OFIC-50` a `53` (telas).
+
 ## Verificações e fontes
 
 - Regra e casos de teste: `packages/shared/src/domain/recurrence.test.ts` (CT-REC-01 a 27 e 30 a 41), `packages/shared/src/schemas/recorrencia.test.ts` (CT-REC-50 a 86), `apps/api/src/services/recorrencia.test.ts` (CT-REC-90 a 106), `apps/api/src/services/reminder-service.test.ts` (CT-REC-110 a 113) e `apps/api/src/repositories` (CT-REC-120 a 125 e 130).

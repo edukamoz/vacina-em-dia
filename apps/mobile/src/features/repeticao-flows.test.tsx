@@ -231,3 +231,62 @@ describe('detalhe da dose que se repete (B69)', () => {
     expect(screen.queryByText('Próxima dose da série')).not.toBeOnTheScreen();
   });
 });
+
+describe('detalhe de uma dose oficial que se repete (B69)', () => {
+  const FLU = (over: Partial<DoseResponse> = {}): DoseResponse =>
+    dose({
+      id: 'd-1',
+      origin: 'OFFICIAL',
+      ruleId: 'idoso-influenza',
+      vaccine: 'influenza trivalente',
+      doseLabel: '1 dose anual a cada temporada',
+      dueDate: '2026-10-06',
+      recurrence: { unit: 'YEAR', every: 1, anchor: 'APPLICATION', endDate: null, maxDoses: null },
+      ...over,
+    });
+
+  test('CT-OFIC-50: mostra que a dose se repete a cada ano, contando da aplicação', async () => {
+    await renderScreen(<DoseDetailScreen id="d-1" />, detalhe(FLU()).fetchFn);
+    expect(await screen.findByText('Todo ano, contando da data da aplicação')).toBeOnTheScreen();
+    // Dose oficial não mostra "Aviso" nem número da dose antes de a série começar.
+    expect(screen.queryByText('Aviso')).not.toBeOnTheScreen();
+  });
+
+  test('CT-OFIC-51: cancelar uma dose oficial que se repete também pergunta o alcance', async () => {
+    const fake = detalhe(FLU());
+    await renderScreen(<DoseDetailScreen id="d-1" />, fake.fetchFn);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Cancelar dose' }));
+    expect(screen.getByRole('button', { name: 'Cancelar só esta dose' })).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar e parar de repetir' }));
+    await waitFor(() =>
+      expect(fake.calls.find((c) => c.key === 'POST /doses/d-1/events')?.body).toEqual({
+        type: 'CANCEL',
+        confirmed: true,
+        scope: 'SERIES',
+      }),
+    );
+  });
+
+  test('CT-OFIC-52: dose oficial aplicada mostra a próxima da mesma linha do calendário', async () => {
+    const aplicada = FLU({ status: 'APPLIED', appliedDate: '2026-10-06', occurrence: 1 });
+    const proxima = FLU({ id: 'd-2', occurrence: 2, dueDate: '2027-10-06' });
+    const outraLinha = FLU({
+      id: 'd-3',
+      ruleId: 'idoso-covid',
+      occurrence: 2,
+      dueDate: '2027-04-06',
+    });
+    await renderScreen(
+      <DoseDetailScreen id="d-1" />,
+      detalhe(aplicada, [aplicada, outraLinha, proxima]).fetchFn,
+    );
+    expect(await screen.findByText('Prevista para 06/10/2027')).toBeOnTheScreen();
+  });
+
+  test('CT-OFIC-53: dose oficial sem repetição não fala de série', async () => {
+    const dt = FLU({ ruleId: 'idoso-dt', recurrence: null });
+    await renderScreen(<DoseDetailScreen id="d-1" />, detalhe(dt).fetchFn);
+    expect(await screen.findByText('Oficial')).toBeOnTheScreen();
+    expect(screen.queryByText('Se repete')).not.toBeOnTheScreen();
+  });
+});

@@ -1324,7 +1324,7 @@
    "estado": "Em andamento",
    "sprint": 6,
    "evidencia": "PRs #227 e #229; docs/05-adrs/ADR-027; CT-REC-*",
-   "nota": "Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória.",
+   "nota": "Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória. Feito em 10/11/2026 para influenza do idoso, covid do idoso e influenza da criança; dT e gestante ficam de fora (ADR-027).",
    "curto": "Recorrência de vacinas"
   },
   {

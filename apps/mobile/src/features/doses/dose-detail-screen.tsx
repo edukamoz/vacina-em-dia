@@ -47,12 +47,15 @@ function ProximaDaSerie({ dose }: { dose: DoseResponse }) {
   const procura = dose.recurrence && dose.occurrence ? dose.memberId : null;
   const doses = useMemberDoses(procura);
   if (!dose.recurrence || !dose.occurrence || !doses.isSuccess) return null;
+  // Dose avulsa se reconhece pelo nome e pela dose digitados; dose oficial, pela linha do calendário.
   const proxima = doses.data.items.find(
     (outra) =>
-      outra.origin === 'CUSTOM' &&
-      outra.vaccine === dose.vaccine &&
-      outra.doseLabel === dose.doseLabel &&
-      outra.occurrence === (dose.occurrence ?? 0) + 1,
+      outra.occurrence === (dose.occurrence ?? 0) + 1 &&
+      (dose.origin === 'CUSTOM'
+        ? outra.origin === 'CUSTOM' &&
+          outra.vaccine === dose.vaccine &&
+          outra.doseLabel === dose.doseLabel
+        : outra.ruleId === dose.ruleId),
   );
   return (
     <Cartao className="gap-xs">

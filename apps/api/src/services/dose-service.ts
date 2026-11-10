@@ -3,10 +3,12 @@ import {
   compareCivilDates,
   createDose,
   nextRecurrenceDate,
+  officialRecurrenceRule,
   transitionDose,
   type CalendarDataset,
   type CalendarRule,
   type CivilDate,
+  type RecurrenceRule,
   type DoseEventInput,
   type DoseResponse,
   type MemberDosesResponse,
@@ -85,6 +87,42 @@ export function createDoseService({
     return result;
   }
 
+  /** A série a que a dose pertence: a regra de repetição e a posição dela nela. */
+  interface Series {
+    readonly rule: RecurrenceRule;
+    readonly seriesId: string;
+    readonly occurrence: number;
+    /** Verdadeiro quando a repetição vem da linha do calendário oficial (e não da própria dose). */
+    readonly official: boolean;
+  }
+
+  /**
+   * Descobre se a dose se repete. Na dose avulsa, a regra está guardada na própria dose; na oficial,
+   * ela vem da linha do calendário (só as linhas em que o texto oficial diz a periodicidade) e a
+   * série ganha identificador na primeira aplicação.
+   */
+  async function seriesOf(ownerId: string, dose: StoredDose): Promise<Series | undefined> {
+    if (dose.ruleId === null) {
+      const { recurrence, seriesId, occurrence } = dose;
+      return recurrence && seriesId && occurrence
+        ? { rule: recurrence, seriesId, occurrence, official: false }
+        : undefined;
+    }
+    const calendarRule = rules.get(dose.ruleId);
+    if (!calendarRule?.recurrence) return undefined;
+    const member = await members.get(ownerId, dose.memberId);
+    if (!member) return undefined;
+    const rule = officialRecurrenceRule(calendarRule, member.birthDate, dose.dueDate);
+    return rule
+      ? {
+          rule,
+          seriesId: dose.seriesId ?? newId(),
+          occurrence: dose.occurrence ?? 1,
+          official: true,
+        }
+      : undefined;
+  }
+
   /**
    * Cria a próxima dose de uma série que se repete, ou `undefined` quando a série terminou.
    *
@@ -95,22 +133,18 @@ export function createDoseService({
   async function nextInSeries(
     ownerId: string,
     done: StoredDose,
+    series: Series,
     event: DoseEventInput,
     today: CivilDate,
   ): Promise<StoredDose | undefined> {
-    const { recurrence, seriesId, occurrence } = done;
-    if (!recurrence || !seriesId || !occurrence) return undefined;
+    const { rule, seriesId, occurrence } = series;
     const appliedDate =
       event.type === 'APPLY'
         ? event.date
         : compareCivilDates(done.dueDate, today) >= 0
           ? done.dueDate
           : today;
-    const dueDate = nextRecurrenceDate(recurrence, {
-      occurrence,
-      dueDate: done.dueDate,
-      appliedDate,
-    });
+    const dueDate = nextRecurrenceDate(rule, { occurrence, dueDate: done.dueDate, appliedDate });
     if (dueDate === null) return undefined;
     const siblings = await doses.listByMember(ownerId, done.memberId);
     if (siblings.some((d) => d.seriesId === seriesId && d.occurrence === occurrence + 1)) {
@@ -119,21 +153,32 @@ export function createDoseService({
     return {
       id: newId(),
       memberId: done.memberId,
-      ruleId: null,
-      custom: done.custom ?? null,
+      ruleId: done.ruleId,
+      // Dose avulsa leva o nome e a regra; a oficial vem da linha do calendário e não guarda a regra.
+      ...(done.ruleId === null ? { custom: done.custom ?? null, recurrence: rule } : {}),
       ...createDose(dueDate),
       remindDaysBefore: done.remindDaysBefore ?? null,
-      recurrence,
       seriesId,
       occurrence: occurrence + 1,
     };
   }
 
-  const respond = (dose: StoredDose): DoseResponse | undefined => {
+  /** Resposta de uma dose; `birthDate` só importa para a repetição com limite de idade. */
+  const respond = (dose: StoredDose, birthDate?: CivilDate): DoseResponse | undefined => {
     if (dose.ruleId === null) return toCustomDoseResponse(dose);
     const rule = rules.get(dose.ruleId);
-    return rule ? toDoseResponse(dose, rule, calendar) : undefined;
+    return rule ? toDoseResponse(dose, rule, calendar, birthDate) : undefined;
   };
+
+  /** Nascimento da pessoa, só quando a repetição da linha tem limite de idade (evita uma consulta). */
+  async function birthDateIfNeeded(
+    ownerId: string,
+    dose: StoredDose,
+  ): Promise<CivilDate | undefined> {
+    const rule = dose.ruleId === null ? undefined : rules.get(dose.ruleId);
+    if (rule?.recurrence?.endsAtAgeMonths == null) return undefined;
+    return (await members.get(ownerId, dose.memberId))?.birthDate;
+  }
 
   return {
     async listForMember(ownerId, memberId) {
@@ -147,7 +192,7 @@ export function createDoseService({
       );
       const order = new Map(calendar.rules.map((rule, index) => [rule.id, index]));
       const items = fresh
-        .map(respond)
+        .map((dose) => respond(dose, member.birthDate))
         .filter((dose): dose is DoseResponse => dose !== undefined)
         .sort(
           (a, b) =>
@@ -165,7 +210,7 @@ export function createDoseService({
       const current = await doses.get(ownerId, id);
       if (!current) return failure({ code: 'NOT_FOUND' });
       const [fresh] = await refreshOverdue(ownerId, [current], civilToday(clock));
-      const response = fresh ? respond(fresh) : undefined;
+      const response = fresh ? respond(fresh, await birthDateIfNeeded(ownerId, fresh)) : undefined;
       return response ? success(response) : failure({ code: 'NOT_FOUND' });
     },
 
@@ -182,16 +227,22 @@ export function createDoseService({
 
       let updated: StoredDose = { ...base, ...result.dose };
       let next: StoredDose | undefined;
-      if (updated.recurrence && updated.seriesId && updated.occurrence) {
+      const series = await seriesOf(ownerId, updated);
+      if (series) {
         if (event.type === 'CANCEL' && event.scope === 'SERIES') {
-          updated = { ...updated, recurrence: null };
+          // Dose avulsa guarda a regra e a perde; a oficial só não cria a próxima.
+          if (!series.official) updated = { ...updated, recurrence: null };
         } else if (event.type === 'APPLY' || event.type === 'CANCEL') {
-          next = await nextInSeries(ownerId, updated, event, today);
+          next = await nextInSeries(ownerId, updated, series, event, today);
+          // A oficial ganha o identificador da série e o número na primeira aplicação.
+          if (series.official) {
+            updated = { ...updated, seriesId: series.seriesId, occurrence: series.occurrence };
+          }
         }
       }
       // A dose e a próxima são gravadas juntas: não sobra série sem a próxima dose.
       await doses.saveMany(ownerId, next ? [updated, next] : [updated]);
-      const response = respond(updated);
+      const response = respond(updated, await birthDateIfNeeded(ownerId, updated));
       return response ? success(response) : failure({ code: 'NOT_FOUND' });
     },
   };

@@ -309,7 +309,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - As 12 transições do ciclo de vida não mudam.
 - No calendário oficial, só as linhas cujo texto oficial já diz a periodicidade ganham recorrência.
 - Evidência: PRs #227 e #229; docs/05-adrs/ADR-027; CT-REC-*
-- Atenção: Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória.
+- Atenção: Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória. Feito em 10/11/2026 para influenza do idoso, covid do idoso e influenza da criança; dT e gestante ficam de fora (ADR-027).
 
 **B70** (PE1, PE2, PE3; requisitos: RF05; RNF03, RNF05)
 

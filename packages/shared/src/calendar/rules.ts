@@ -1,4 +1,5 @@
-import { addMonths, ageInMonths, type CivilDate } from '../domain/civil-date';
+import { addDays, addMonths, ageInMonths, type CivilDate } from '../domain/civil-date';
+import type { RecurrenceRule } from '../domain/recurrence';
 import type { CalendarDataset, CalendarGroup, CalendarRule, CalendarTiming } from './types';
 
 /** Faixa etária (sem a gestante, que depende de um grupo específico do membro). */
@@ -123,4 +124,33 @@ export function describeTiming(timing: CalendarTiming): string {
       return rest === 0 ? yearsText : `${yearsText} e ${rest} ${rest === 1 ? 'mês' : 'meses'}`;
     }
   }
+}
+
+/**
+ * Regra de repetição de uma linha oficial, no formato que a máquina de repetição usa (ADR-027).
+ * Sempre conta **da data da aplicação**: o texto oficial diz "a cada temporada" ou "semestral",
+ * não uma data fixa. Quando a linha tem limite de idade ("menores de 6 anos"), a data final é o dia
+ * anterior ao da idade limite.
+ *
+ * @param rule - Linha do calendário.
+ * @param birthDate - Nascimento da pessoa (só importa para o limite de idade).
+ * @param dueDate - Data prevista da dose que está sendo aplicada.
+ * @returns A regra de repetição, ou `null` se a linha não se repete.
+ */
+export function officialRecurrenceRule(
+  rule: CalendarRule,
+  birthDate: CivilDate,
+  dueDate: CivilDate,
+): RecurrenceRule | null {
+  const recurrence = rule.recurrence;
+  if (!recurrence) return null;
+  const endsAt = recurrence.endsAtAgeMonths;
+  return {
+    unit: recurrence.unit,
+    every: recurrence.every,
+    anchor: 'APPLICATION',
+    anchorDate: dueDate,
+    endDate: endsAt == null ? null : addDays(addMonths(birthDate, endsAt), -1),
+    maxDoses: null,
+  };
 }
