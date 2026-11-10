@@ -3,3 +3,4 @@ export * from './dose-generation';
 export * from './dose-state';
 export * from './geo';
 export * from './reminders';
+export * from './recurrence';

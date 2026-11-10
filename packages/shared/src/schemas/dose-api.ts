@@ -1,4 +1,12 @@
 import { z } from 'zod';
+import {
+  MAX_REMIND_DAYS_BEFORE,
+  MAX_SERIES_DOSES,
+  RECURRENCE_ANCHORS,
+  RECURRENCE_MAX_EVERY,
+  RECURRENCE_UNITS,
+  compareCivilDates,
+} from '../domain';
 import { civilDateSchema, doseStatusSchema } from './dose';
 
 /** Esquema do identificador de uma dose na URL (letras minúsculas, números e hífen). */
@@ -15,6 +23,60 @@ export const doseOriginSchema = z.enum(['OFFICIAL', 'CUSTOM']).meta({
 
 /** Quantidade máxima de doses avulsas por pessoa. */
 export const MAX_CUSTOM_DOSES = 30;
+
+/** Esquema da repetição de uma dose avulsa, como a pessoa a informa. */
+export const recurrenceInputSchema = z
+  .object({
+    unit: z.enum(RECURRENCE_UNITS).meta({
+      example: 'YEAR',
+      description: 'Unidade de tempo: DAY (dia), WEEK (semana), MONTH (mês) ou YEAR (ano).',
+    }),
+    every: z.number().int().min(1).meta({
+      example: 1,
+      description:
+        'A cada quantas unidades se repete. Máximo: 365 dias, 104 semanas, 120 meses ou 50 anos.',
+    }),
+    anchor: z.enum(RECURRENCE_ANCHORS).meta({
+      example: 'APPLICATION',
+      description:
+        'De onde a próxima data é contada. APPLICATION: da data em que a dose foi aplicada. SCHEDULE: de uma grade fixa que parte da primeira data prevista.',
+    }),
+    endDate: civilDateSchema.nullable().optional().meta({
+      example: null,
+      description: 'Data limite da série; depois dela nenhuma dose é criada. Opcional.',
+    }),
+    maxDoses: z.number().int().min(2).max(MAX_SERIES_DOSES).nullable().optional().meta({
+      example: 5,
+      description: 'Total de doses da série, contando a primeira (de 2 a 120). Opcional.',
+    }),
+  })
+  .superRefine((value, ctx) => {
+    if (value.every > RECURRENCE_MAX_EVERY[value.unit]) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['every'],
+        message: `O máximo para esta unidade é ${RECURRENCE_MAX_EVERY[value.unit]}.`,
+      });
+    }
+  })
+  .meta({ id: 'RecurrenceInput' });
+
+/** Esquema da repetição de uma dose, como a API a devolve. */
+export const recurrenceResponseSchema = z
+  .object({
+    unit: z.enum(RECURRENCE_UNITS),
+    every: z.number().int().min(1),
+    anchor: z.enum(RECURRENCE_ANCHORS),
+    endDate: civilDateSchema.nullable(),
+    maxDoses: z.number().int().nullable(),
+  })
+  .meta({ id: 'Recurrence' });
+
+/** Esquema do aviso antecipado de uma dose, em dias (0 avisa só no próprio dia). */
+export const remindDaysBeforeSchema = z.number().int().min(0).max(MAX_REMIND_DAYS_BEFORE).meta({
+  example: 7,
+  description: 'Quantos dias antes da data o aviso aparece (de 0 a 60). Vazio usa o padrão de 7.',
+});
 
 /**
  * Esquema do corpo para cadastrar uma dose avulsa (RF04): vacina que não aparece no calendário
@@ -43,6 +105,21 @@ export const customDoseInputSchema = z
       example: '2026-11-04',
       description: 'Data prevista; hoje ou depois. Para o que já foi tomado, registre a aplicação.',
     }),
+    recurrence: recurrenceInputSchema.optional().meta({
+      description:
+        'Se a vacina se repete. Ao aplicar a dose, a próxima é criada sozinha como Pendente.',
+    }),
+    remindDaysBefore: remindDaysBeforeSchema.nullable().optional(),
+  })
+  .superRefine((value, ctx) => {
+    const end = value.recurrence?.endDate;
+    if (end && compareCivilDates(end, value.dueDate) <= 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['recurrence', 'endDate'],
+        message: 'A data final deve ser depois da primeira data prevista.',
+      });
+    }
   })
   .meta({ id: 'CustomDoseInput' });
 
@@ -72,6 +149,14 @@ export const doseResponseSchema = z
     dueDate: civilDateSchema.meta({ example: '2026-09-15', description: 'Data prevista.' }),
     scheduledDate: civilDateSchema.nullable().meta({ example: null }),
     appliedDate: civilDateSchema.nullable().meta({ example: null }),
+    recurrence: recurrenceResponseSchema.nullable().optional().meta({
+      description: 'Repetição da dose; vazio quando a dose não se repete.',
+    }),
+    occurrence: z.number().int().min(1).nullable().optional().meta({
+      example: 1,
+      description: 'Número desta dose na série que se repete (1 é a primeira).',
+    }),
+    remindDaysBefore: remindDaysBeforeSchema.nullable().optional(),
   })
   .meta({ id: 'Dose' });
 
