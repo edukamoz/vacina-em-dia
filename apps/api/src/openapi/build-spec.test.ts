@@ -111,6 +111,9 @@ describe('especificação OpenAPI', () => {
     const open = new Set([
       '/health',
       '/warmup',
+      // Vigia do calendário: a leitura é pública e a conferência manual usa a chave da função.
+      '/calendar/watch',
+      '/calendar/watch/check',
       '/openapi.json',
       '/auth/register',
       '/auth/login',

@@ -125,6 +125,53 @@ export function buildOpenApiDocument(): object {
     },
   });
 
+  const statusDoVigia = z.object({
+    checkedAt: z
+      .string()
+      .nullable()
+      .meta({ example: '2026-11-16T12:00:00.000Z', description: 'Última verificação, ou nula.' }),
+    changed: z.boolean().meta({
+      description:
+        'Verdadeiro quando algum arquivo oficial difere do que o projeto transcreveu (conferência pendente).',
+    }),
+  });
+
+  registry.registerPath({
+    method: 'get',
+    path: '/calendar/watch',
+    tags: ['Sistema'],
+    summary: 'Ver quando o calendário oficial foi conferido',
+    description:
+      'O vigia confere uma vez por semana se os cinco arquivos do Calendário Nacional de Vacinação continuam iguais aos que o app transcreveu. Não exige login e traz só a data da última conferência e se há diferença.',
+    responses: {
+      200: { description: 'Estado do vigia.', content: jsonContent(statusDoVigia) },
+    },
+  });
+
+  registry.registerPath({
+    method: 'post',
+    path: '/calendar/watch/check',
+    tags: ['Sistema'],
+    summary: 'Conferir o calendário oficial agora',
+    description:
+      'Roda a conferência na hora, sem esperar a semana. Uso do autor: exige a chave da função (`x-functions-key`), não o login do app. Baixa os cinco arquivos do portal do Ministério da Saúde, compara as impressões digitais e, se algo mudou, envia o e-mail de aviso uma única vez por mudança. Também serve para testar o acesso ao portal a partir da Azure.',
+    responses: {
+      200: {
+        description: 'Resumo da conferência: só contagens e ids de arquivo.',
+        content: jsonContent(
+          z.object({
+            checkedAt: z.string().meta({ example: '2026-11-16T12:00:00.000Z' }),
+            unchanged: z.number().int().meta({ example: 5 }),
+            changed: z.array(z.string()).meta({ example: [] }),
+            failed: z.number().int().meta({ example: 0 }),
+            alerted: z.boolean(),
+          }),
+        ),
+      },
+      401: { description: 'Chave da função ausente ou inválida.' },
+    },
+  });
+
   registry.registerPath({
     method: 'get',
     path: '/openapi.json',

@@ -1382,7 +1382,7 @@
     "O app mostra a versão do calendário e a data da última verificação.",
     "Nada do usuário vai às fontes oficiais."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": null,
    "evidencia": "",
    "nota": "Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. A confirmar: se o gov.br aceita leitura automática pela Function (o Butantan bloqueou, ADR-024).",
