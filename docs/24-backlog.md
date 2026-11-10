@@ -275,8 +275,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B07 | SCRUM-18 | Como responsável, quero agendar, registrar como aplicada, reagendar ou cancelar uma dose, para manter o registro certo (RF04) | Must | Concluído | Sprint 3 |
 | B08 | novo | Como cuidadora, quero cadastrar uma dose que não está no calendário (dose avulsa), para registrar tudo que a pessoa tomou | Should | Concluído | Sprint 3 |
 | B09 | SCRUM-19 | Como mãe, quero receber lembretes antes da data de cada dose e ver as atrasadas em destaque, para não esquecer (RF05) | Must | Em análise | Sprint 4 |
-| B69 | novo | Como mãe, quero cadastrar uma vacina que se repete (todo ano, a cada 6 meses, a cada N dias, semanas, meses ou anos) e receber o aviso antes de cada repetição, para não esquecer as que tomo de tempos em tempos | Should | A fazer | Sprint 6 |
-| B70 | novo | Como mãe, quero receber avisos de dose no celular, mesmo sem abrir o app, para não depender só do e-mail | Should | A fazer | Sprint 6 |
+| B69 | novo | Como mãe, quero cadastrar uma vacina que se repete (todo ano, a cada 6 meses, a cada N dias, semanas, meses ou anos) e receber o aviso antes de cada repetição, para não esquecer as que tomo de tempos em tempos | Should | Em andamento | Sprint 6 |
+| B70 | novo | Como mãe, quero receber avisos de dose no celular, mesmo sem abrir o app, para não depender só do e-mail | Should | Em andamento | Sprint 6 |
 | B71 | novo | Como cuidadora, quero ser avisada no navegador e no celular quando outro responsável mudar uma dose, e ter lembretes também na versão web, para acompanhar a família | Could | A fazer | - |
 
 **B07** (PE1, PE3; requisitos: RF04; RNF01, RNF07, RNF10)
@@ -308,6 +308,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Dá para escolher quantos dias antes avisar, por dose.
 - As 12 transições do ciclo de vida não mudam.
 - No calendário oficial, só as linhas cujo texto oficial já diz a periodicidade ganham recorrência.
+- Evidência: PRs #227 e #229; docs/05-adrs/ADR-027; CT-REC-*
 - Atenção: Decisões do autor (10/11/2026): as duas formas de contar ficam disponíveis; seguir a ordem proposta. A periodicidade oficial vem só de texto oficial; nada de memória.
 
 **B70** (PE1, PE2, PE3; requisitos: RF05; RNF03, RNF05)
@@ -317,6 +318,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - E-mail e aviso no aparelho podem ser ligados e desligados separadamente na Conta.
 - Os avisos são reagendados quando as doses mudam.
 - Sem permissão do sistema, o app explica e segue funcionando.
+- Evidência: PR #230; docs/05-adrs/ADR-028; CT-AVISO-*
 - Atenção: Só Android e iOS; não há notificação local na web. Não depende de servidor, credencial nem custo. Avisos não sabem de mudanças feitas em outro aparelho até o app abrir (por isso o B71).
 
 **B71** (PE3; requisitos: RF05, RF12; RNF02, RNF03)
@@ -497,7 +499,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 |---|---|---|---|---|---|
 | B13 | SCRUM-38 | Como mãe, quero ver no mapa os postos de saúde perto de mim, para saber onde procurar a vacina (RF10) | Could | Em análise | Sprint 6 |
 | B14 | SCRUM-39 | Como mãe, quero exportar a carteira de vacinação em PDF, para levar à escola ou à consulta (RF11) | Could | Em análise | Sprint 1 |
-| B15 | SCRUM-40 | Como cuidadora, quero que mais de uma pessoa cuide da mesma família, com convite, papéis e saída a qualquer momento, para dividirmos o cuidado (RF12) | Should | A fazer | - |
+| B15 | SCRUM-40 | Como cuidadora, quero que mais de uma pessoa cuide da mesma família, com convite, papéis e saída a qualquer momento, para dividirmos o cuidado (RF12) | Should | Em andamento | Sprint 6 |
 
 **B13** (PE1, PE3; requisitos: RF10; RNF01, RNF03, RNF04)
 
@@ -523,6 +525,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Nenhuma conta enxerga dados de uma família da qual não faz parte (teste de isolamento).
 - Fica registrado quem aplicou cada dose.
 - A exclusão da conta tem regra definida para o dono (transferir ou apagar) e remove os compartilhamentos.
+- Evidência: PR #232 (API e banco); docs/05-adrs/ADR-029; CT-FAMR-*
 - Atenção: Pedido de 10/11/2026: ampliado de "compartilhar com cuidador" para várias contas por família. Toca toda regra de propriedade do dado (OWASP A01); decisões em aberto: o que ocorre quando o único dono exclui a conta e se haverá visibilidade por pessoa.
 
 ## E9 Experiência e design
