@@ -1,5 +1,6 @@
 import {
   accountInfoSchema,
+  calendarWatchStatusSchema,
   newsResponseSchema,
   reminderListResponseSchema,
   reminderPreferencesInputSchema,
@@ -162,6 +163,13 @@ export const endpoints = {
 
   getNews: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(ctx, { path: '/news', ...(signal ? { signal } : {}) }, newsResponseSchema),
+
+  getCalendarWatch: (ctx: ApiContext, signal?: AbortSignal) =>
+    apiRequest(
+      ctx,
+      { path: '/calendar/watch', ...(signal ? { signal } : {}) },
+      calendarWatchStatusSchema,
+    ),
 
   getProfilePhoto: (ctx: ApiContext, signal?: AbortSignal) =>
     apiRequest(ctx, { path: '/account/photo', ...(signal ? { signal } : {}) }, profilePhotoSchema),

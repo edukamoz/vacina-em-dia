@@ -224,6 +224,10 @@ export async function instalarApiFalsa(page: Page): Promise<EstadoDaApi> {
       return json(route, 204);
     }
 
+    if (chave === 'GET /calendar/watch') {
+      return json(route, 200, { checkedAt: '2026-11-16T15:00:00.000Z', changed: false });
+    }
+
     if (chave === 'GET /news') {
       return json(route, 200, {
         items: [

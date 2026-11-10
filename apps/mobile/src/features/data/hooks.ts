@@ -206,6 +206,20 @@ export function useNews() {
   });
 }
 
+/**
+ * Quando o calendário oficial foi conferido com o portal do Ministério (vigia, B72). É um detalhe
+ * do rodapé da fonte: a consulta é pública, guardada por 6 horas e, se falhar, o rodapé só some.
+ */
+export function useConferenciaDoCalendario() {
+  const { api } = useSession();
+  return useQuery({
+    queryKey: ['calendar-watch'],
+    queryFn: ({ signal }) => endpoints.getCalendarWatch(api, signal),
+    staleTime: 6 * 60 * 60 * 1000,
+    retry: false,
+  });
+}
+
 /** Liga ou desliga os lembretes por e-mail e atualiza a lista. */
 export function useSetEmailReminders() {
   const { api } = useSession();
