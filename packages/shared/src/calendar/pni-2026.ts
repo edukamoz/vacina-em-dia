@@ -1,4 +1,10 @@
-import type { CalendarDataset, CalendarGroup, CalendarRule, CalendarTiming } from './types';
+import type {
+  CalendarDataset,
+  CalendarGroup,
+  CalendarRecurrence,
+  CalendarRule,
+  CalendarTiming,
+} from './types';
 
 const PREFIX: Record<CalendarGroup, string> = {
   CHILD: 'crianca',
@@ -11,6 +17,7 @@ const PREFIX: Record<CalendarGroup, string> = {
 interface Options {
   readonly notes?: readonly number[];
   readonly conditional?: boolean;
+  readonly recurrence?: CalendarRecurrence;
 }
 
 function rule(
@@ -20,7 +27,7 @@ function rule(
   dose: string,
   diseases: string,
   timing: CalendarTiming,
-  { notes = [], conditional = false }: Options = {},
+  { notes = [], conditional = false, recurrence }: Options = {},
 ): CalendarRule {
   return {
     id: `${PREFIX[group]}-${slug}`,
@@ -31,6 +38,7 @@ function rule(
     timing,
     noteIds: notes.map((n) => `${PREFIX[group]}.${n}`),
     conditional,
+    ...(recurrence ? { recurrence } : {}),
   };
 }
 
@@ -135,7 +143,16 @@ export const PNI_2026: CalendarDataset = {
     child('meningo-c-2', 5, 'meningocócica C', '2ª dose', MENC),
     child('penta-3', 6, 'penta (DTP+Hib+HB)', '3ª dose', PENTA),
     child('vip-3', 6, 'poliomielite inativada VIP', '3ª dose', POLIO),
-    child('influenza-1', 6, 'influenza trivalente', '1ª dose', INFLUENZA, { notes: [2] }),
+    child('influenza-1', 6, 'influenza trivalente', '1ª dose', INFLUENZA, {
+      notes: [2],
+      recurrence: {
+        unit: 'YEAR',
+        every: 1,
+        endsAtAgeMonths: 72,
+        basis:
+          'Nota da criança: "Crianças de 6 meses a menores de 6 anos devem ser vacinadas todo ano".',
+      },
+    }),
     child('covid-1', 6, 'covid-19', '1ª dose', COVID, { notes: [3] }),
     child(
       'febre-amarela-excepcional',
@@ -240,8 +257,17 @@ export const PNI_2026: CalendarDataset = {
       'influenza trivalente',
       '1 dose anual a cada temporada',
       INFLUENZA,
+      {
+        recurrence: {
+          unit: 'YEAR',
+          every: 1,
+          basis: 'Linha do idoso: "1 dose anual a cada temporada".',
+        },
+      },
     ),
-    history('ELDERLY', 'covid', 'covid-19', '1 dose semestral', COVID),
+    history('ELDERLY', 'covid', 'covid-19', '1 dose semestral', COVID, {
+      recurrence: { unit: 'MONTH', every: 6, basis: 'Linha do idoso: "1 dose semestral".' },
+    }),
 
     // ---- Gestante ----
     pregnant('hepatite-b', null, 'hepatite B', '3 doses', 'hepatite B e hepatite D'),

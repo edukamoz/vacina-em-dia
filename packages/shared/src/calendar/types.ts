@@ -23,6 +23,25 @@ export type CalendarTiming =
   | { readonly kind: 'HISTORY' }
   | { readonly kind: 'GESTATION'; readonly week: number | null };
 
+/**
+ * Repetição de uma linha do calendário, **só quando o texto oficial diz a periodicidade** (por
+ * exemplo, "1 dose anual" ou "1 dose semestral"). Nada é deduzido nem preenchido de memória
+ * (CLAUDE.md §8): `basis` cita de onde o texto oficial a tira.
+ */
+export interface CalendarRecurrence {
+  /** Unidade do intervalo. */
+  readonly unit: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
+  /** A cada quantas unidades a dose se repete. */
+  readonly every: number;
+  /**
+   * Idade, em meses, em que a repetição acaba: nenhuma dose cai a partir do dia em que a pessoa a
+   * completa. Só para linhas com limite de idade no texto oficial ("menores de 6 anos" = 72).
+   */
+  readonly endsAtAgeMonths?: number | null;
+  /** O trecho oficial em que a periodicidade está escrita. */
+  readonly basis: string;
+}
+
 /** Uma linha do calendário oficial: uma vacina, numa faixa, com sua dose e prazo. */
 export interface CalendarRule {
   /** Identificador estável da regra (usado no banco e nas doses geradas). */
@@ -41,6 +60,8 @@ export interface CalendarRule {
   readonly noteIds: readonly string[];
   /** Verdadeiro quando a indicação depende de condição (risco, profissão, grupo específico). */
   readonly conditional: boolean;
+  /** Se a dose se repete e de quanto em quanto tempo, conforme o texto oficial; ausente se não. */
+  readonly recurrence?: CalendarRecurrence | null;
 }
 
 /** Fonte e versão do calendário (RNF10). */
