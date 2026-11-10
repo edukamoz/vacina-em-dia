@@ -25,10 +25,10 @@ describe('recorrência das linhas do calendário oficial (B69)', () => {
     expect(r.recurrence).toMatchObject({ unit: 'MONTH', every: 6 });
   });
 
-  test('CT-OFIC-04: influenza da criança: a nota oficial diz "todo ano" de 6 meses a menores de 6 anos', () => {
+  test('CT-OFIC-04: influenza da criança: a nota oficial diz "todo ano" de 6 meses a 5 anos, 11 meses e 29 dias', () => {
     const r = regra('crianca-influenza-1');
     const nota = notesForRule(PNI_2026, r).join(' ');
-    expect(nota).toMatch(/de 6 meses a menores de 6 anos/);
+    expect(nota).toMatch(/entre 6 meses e 5 anos, 11 meses e 29 dias/);
     expect(nota).toMatch(/todo ano/);
     expect(r.recurrence).toMatchObject({ unit: 'YEAR', every: 1, endsAtAgeMonths: 72 });
   });

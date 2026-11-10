@@ -15,7 +15,8 @@ const PREFIX: Record<CalendarGroup, string> = {
 };
 
 interface Options {
-  readonly notes?: readonly number[];
+  /** Número da nota do grupo (ex.: 4) ou id de uma nota comum a vários grupos (ex.: 'area-viral'). */
+  readonly notes?: readonly (number | string)[];
   readonly conditional?: boolean;
   readonly recurrence?: CalendarRecurrence;
 }
@@ -36,7 +37,7 @@ function rule(
     dose,
     diseases,
     timing,
-    noteIds: notes.map((n) => `${PREFIX[group]}.${n}`),
+    noteIds: notes.map((n) => (typeof n === 'string' ? n : `${PREFIX[group]}.${n}`)),
     conditional,
     ...(recurrence ? { recurrence } : {}),
   };
@@ -108,7 +109,7 @@ export const PNI_2026: CalendarDataset = {
     publisher: 'Ministério da Saúde (PNI)',
     version: '2026',
     url: 'https://www.gov.br/saude/pt-br/vacinacao/calendario',
-    retrievedAt: '2026-10-06',
+    retrievedAt: '2026-11-10',
     files: [
       'Calendário Nacional de Vacinação - Criança.pdf',
       'Calendário Nacional de Vacinação - Adolescentes e jovens.pdf',
@@ -118,7 +119,7 @@ export const PNI_2026: CalendarDataset = {
     ],
     isFictitious: false,
     notice:
-      'O aplicativo não substitui a caderneta oficial nem a orientação de profissionais de saúde.',
+      'O aplicativo não substitui a caderneta oficial nem a orientação de profissionais de saúde. Observação do Ministério da Saúde: pessoas com condições clínicas especiais que as tornem mais vulneráveis, quer sejam desde o nascimento ou adquiridas ao longo da vida, devem procurar o Centro de Referência para Imunobiológicos Especiais (CRIE) mais próximo ou uma sala de vacina da Rede de Imunobiológicos para Pessoas com Situações Especiais (RIE).',
   },
 
   rules: [
@@ -150,7 +151,7 @@ export const PNI_2026: CalendarDataset = {
         every: 1,
         endsAtAgeMonths: 72,
         basis:
-          'Nota da criança: "Crianças de 6 meses a menores de 6 anos devem ser vacinadas todo ano".',
+          'Nota da criança: "Criança na faixa etária entre 6 meses e 5 anos, 11 meses e 29 dias deve ser vacinada todo ano".',
       },
     }),
     child('covid-1', 6, 'covid-19', '1ª dose', COVID, { notes: [3] }),
@@ -160,11 +161,13 @@ export const PNI_2026: CalendarDataset = {
       'febre amarela',
       '1 dose, em casos excepcionais',
       FEBRE_AMARELA,
-      { notes: [4], conditional: true },
+      { notes: [4, 'area-viral'], conditional: true },
     ),
     child('covid-2', 7, 'covid-19', '2ª dose', COVID, { notes: [3] }),
     child('covid-3', 9, 'covid-19', '3ª dose', COVID, { notes: [3] }),
-    child('febre-amarela-1', 9, 'febre amarela', '1 dose', FEBRE_AMARELA, { notes: [4] }),
+    child('febre-amarela-1', 9, 'febre amarela', '1 dose', FEBRE_AMARELA, {
+      notes: [4, 'area-viral'],
+    }),
     child('pneumo-20-reforco', 12, 'pneumocócica 20-valente', '1 dose de reforço', PNEUMO),
     child('meningo-acwy', 12, 'meningocócica ACWY', '1 dose', MENACWY),
     child('scr-1', 12, 'tríplice viral SCR', '1ª dose', SCR),
@@ -177,7 +180,7 @@ export const PNI_2026: CalendarDataset = {
     child('vip-reforco-2', 48, 'poliomielite inativada VIP', '2ª dose reforço', POLIO),
     child('varicela-2', 48, 'varicela', '2ª dose', VARICELA, { notes: [5] }),
     child('febre-amarela-reforco', 48, 'febre amarela', '1 dose reforço', FEBRE_AMARELA, {
-      notes: [4],
+      notes: [4, 'area-viral'],
     }),
     child('pneumo-20-5-anos', 60, 'pneumocócica 20-valente', '1 dose', PNEUMO, {
       notes: [6],
@@ -189,7 +192,7 @@ export const PNI_2026: CalendarDataset = {
     history('ADOLESCENT_YOUTH', 'hpv', 'HPV4', '1 dose', HPV, { notes: [1] }),
     history('ADOLESCENT_YOUTH', 'hepatite-b', 'hepatite B', '3 doses', HEPB),
     history('ADOLESCENT_YOUTH', 'febre-amarela', 'febre amarela', '1 dose', FEBRE_AMARELA, {
-      notes: [2],
+      notes: [2, 'area-viral'],
     }),
     history('ADOLESCENT_YOUTH', 'scr', 'tríplice viral SCR', '2 doses', SCR, { notes: [3] }),
     history('ADOLESCENT_YOUTH', 'varicela', 'varicela', '2 doses', VARICELA, {
@@ -210,7 +213,9 @@ export const PNI_2026: CalendarDataset = {
     // ---- Adulto (25 a 59 anos, 11 meses e 29 dias) ----
     history('ADULT', 'hepatite-b', 'hepatite B', '3 doses', HEPB),
     history('ADULT', 'dt', 'dT', '3 doses + reforços periódicos', DT, { notes: [1] }),
-    history('ADULT', 'febre-amarela', 'febre amarela', '1 dose', FEBRE_AMARELA, { notes: [2] }),
+    history('ADULT', 'febre-amarela', 'febre amarela', '1 dose', FEBRE_AMARELA, {
+      notes: [2, 'area-viral'],
+    }),
     history(
       'ADULT',
       'scr',
@@ -237,7 +242,7 @@ export const PNI_2026: CalendarDataset = {
       'febre amarela',
       '1 dose, em casos excepcionais',
       FEBRE_AMARELA,
-      { notes: [2], conditional: true },
+      { notes: [2, 'area-viral'], conditional: true },
     ),
     history('ELDERLY', 'scr', 'tríplice viral SCR', '2 doses', 'sarampo, caxumba, rubéola', {
       notes: [3],
@@ -281,7 +286,7 @@ export const PNI_2026: CalendarDataset = {
       '1 dose (em casos excepcionais)',
       FEBRE_AMARELA,
       {
-        notes: [1],
+        notes: [1, 'area-viral'],
         conditional: true,
       },
     ),
@@ -291,7 +296,6 @@ export const PNI_2026: CalendarDataset = {
       'dTpa',
       '1 dose a partir da 20ª semana gestacional, em cada gestação',
       'difteria, tétano e coqueluche',
-      { notes: [2] },
     ),
     pregnant(
       'vsr',
@@ -303,59 +307,61 @@ export const PNI_2026: CalendarDataset = {
   ],
 
   notes: {
+    'area-viral':
+      'Área com circulação viral confirmada (casos humanos, epizootia ou potenciais vetores infectados), em contextos de surto, alto risco epidemiológico e emergência em saúde pública.',
+
     'crianca.1':
       'Atenção aos prazos. A 1ª dose deve ser aplicada entre 1 mês 15 dias e 11 meses 29 dias de idade; a 2ª dose entre 3 meses 15 dias e 23 meses 29 dias de idade; intervalo de 60 dias entre as doses. Caso a 1ª dose não seja recebida no período indicado, perde-se a oportunidade de vacinação contra o rotavírus.',
     'crianca.2':
-      'Crianças de 6 meses a menores de 6 anos devem ser vacinadas todo ano. Quem vai receber a vacina pela primeira vez deve tomar 2 doses com 30 dias de intervalo. As que já tomaram em anos anteriores recebem apenas 1 dose por ano.',
+      'Criança na faixa etária entre 6 meses e 5 anos, 11 meses e 29 dias deve ser vacinada todo ano. Quem vai receber a vacina pela primeira vez deve tomar 2 doses com 30 dias de intervalo. As que já tomaram em anos anteriores recebem apenas 1 dose por ano.',
     'crianca.3':
       'Criança em atraso de esquema vacinal, vacinar até 4 anos 11 meses 29 dias, com intervalo mínimo de 4 semanas entre 1ª e 2ª dose e 8 semanas entre 2ª e 3ª dose. Para imunocomprometidos, após a 3ª dose, manter doses periódicas de 6/6 meses, até 4 anos, 11 meses e 29 dias de idade.',
     'crianca.4':
-      'A vacina de febre amarela pode ser recomendada para a idade de 6 a 8 meses quando há alto risco de contrair a doença. Isso vale para quem vive ou vai viajar para área de risco epidemiológico, na impossibilidade de adiamento e mediante avaliação pelo serviço de saúde. E diante desse risco, todas as crianças devem manter a situação vacinal atualizada. No caso de viagem, a vacinação deve ser realizada pelo menos 10 dias antes, tempo necessário à proteção.',
+      'A vacina de febre amarela pode ser recomendada para a idade de 6 a 8 meses quando há alto risco de contrair a doença. Isso vale para quem vive ou vai viajar para área com circulação viral confirmada*, na impossibilidade de adiamento e precedido por avaliação pelo serviço de saúde sobre risco benefício da vacinação. No caso de viagem, a vacinação deve ser realizada pelo menos 10 dias antes.',
     'crianca.5':
       'Em casos de indisponibilidade da vacina varicela monovalente, a vacina tetraviral poderá ser utilizada.',
-    'crianca.6':
-      'Somente povos indígenas, a partir de 5 anos de idade, sem histórico vacinal com pneumo conjugada.',
+    'crianca.6': 'Somente para os povos indígenas, sem histórico vacinal com pneumo conjugada.',
     'crianca.7':
-      'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias, o mais precocemente possível para melhor proteção. Não vacinados entre 15 anos a 19 anos, 11 meses e 29 dias, ver estratégia de cada estado.',
+      'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias, o mais precocemente possível para melhor proteção. Não vacinados entre 15 anos e 19 anos, 11 meses e 29 dias, ver estratégia de cada estado.',
 
     'adolescente.1':
       'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias. Não vacinados entre 15 anos e 19 anos, 11 meses e 29 dias, ver estratégia de cada estado.',
     'adolescente.2':
-      'Manter a situação vacinal atualizada, principalmente para os residentes e viajantes para área de risco epidemiológico. Para os viajantes, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
+      'Manter a situação vacinal atualizada, principalmente para quem vive ou vai viajar para área com circulação viral confirmada*. Para os viajantes, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
     'adolescente.3':
       'Toda a população nesta idade deve estar vacinada, principalmente aqueles em contato com imunodeprimidos, trabalhadores que atuam na área de pediatria e mulheres que programam engravidar.',
     'adolescente.4':
-      'Somente para trabalhadores da saúde e povos indígenas, sem história da doença ou na dúvida.',
-    'adolescente.5': 'Somente para povos indígenas sem histórico vacinal com pneumo conjugada.',
+      'Somente para trabalhadores da saúde e povos indígenas, conforme histórico vacinal e sem história da doença ou na dúvida.',
+    'adolescente.5': 'Somente para povos indígenas, sem histórico vacinal com pneumo conjugada.',
     'adolescente.6':
-      'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias de idade. Além da vacina, outras medidas são importantes para a prevenção e controle da dengue. Utilizar um só laboratório para o esquema vacinal.',
-    'adolescente.7': 'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias de idade.',
+      'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias de idade. Além da vacina, outras medidas são importantes para a prevenção e controle da dengue. Utilizar vacinas de um só laboratório para o esquema vacinal.',
+    'adolescente.7':
+      'Em caso de atraso, vacinar até 14 anos, 11 meses e 29 dias de idade, o mais precocemente possível, para melhor proteção.',
     'adolescente.8':
-      'Para profissionais de saúde, parteiras tradicionais e estagiários que atuam com recém-nascidos, recomenda-se a vacina dTpa.',
+      'Para profissionais de saúde atuantes em quaisquer áreas, parteiras tradicionais e estagiários que atuam com recém-nascidos, recomenda-se a vacina dTpa.',
 
     'adulto.1':
-      '1 dose de reforço aos 34 anos e, na sequência, 1 dose a cada 10 anos, antecipando para 5 anos em caso de exposição a risco de difteria e tétano. Para profissionais de saúde, parteiras tradicionais e estagiários que atuam com recém-nascidos, recomenda-se a vacina dTpa.',
+      'Para adultos com histórico vacinal em dia, conforme agenda oportuna, 1 dose de reforço aos 34 anos e, na sequência, 1 dose a cada 10 anos, antecipando para 5 anos em caso de exposição a risco de difteria e/ou tétano. Para profissionais de saúde atuantes em quaisquer áreas, parteiras tradicionais e estagiários que atuam com recém-nascidos, recomenda-se a vacina dTpa.',
     'adulto.2':
-      'Manter a situação vacinal atualizada, principalmente para os residentes e viajantes para área de risco epidemiológico. Para os viajantes, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
+      'Manter a situação vacinal atualizada, principalmente para quem vive ou vai viajar para área com circulação viral confirmada*. Para os viajantes, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
     'adulto.3':
       'Toda a população nesta idade deve estar vacinada, principalmente aqueles em contato com imunodeprimidos, trabalhadores que atuam na área de pediatria e mulheres que programam engravidar.',
     'adulto.4':
-      'Somente para trabalhadores da saúde e povos indígenas, sem história da doença ou na dúvida.',
-    'adulto.5': 'Somente para povos indígenas sem histórico vacinal com pneumo conjugada.',
+      'Somente para trabalhadores da saúde e povos indígenas, conforme histórico vacinal e sem história da doença ou na dúvida.',
+    'adulto.5': 'Somente para povos indígenas, sem histórico vacinal com pneumo conjugada.',
 
     'idoso.1':
-      '1 dose de reforço a cada 10 anos após a última dose de vacina com componentes toxóides diftérico e tetânico, antecipando para 5 anos em caso de exposição a risco de difteria e tétano. Para profissionais de saúde, parteiras tradicionais e estagiários que atuam com recém-nascidos, recomenda-se a vacina dTpa.',
+      '1 dose de reforço a cada 10 anos após a última dose de vacina com componentes toxóides diftérico e tetânico, antecipando para 5 anos em caso de exposição a risco de difteria e/ou tétano. Para profissionais de saúde atuantes em quaisquer áreas, parteiras tradicionais e estagiários que atuam com recém-nascidos, recomenda-se a vacina dTpa.',
     'idoso.2':
-      'Somente para não vacinados, quando há alto risco de contrair a doença. Isso vale para os residentes e viajantes para área de risco epidemiológico e deve ser precedido por avaliação pelo serviço de saúde. Para os viajantes, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
+      'Somente para os não vacinados que vivem ou vão viajar para área com circulação viral confirmada* e deve ser precedido por avaliação pelo serviço de saúde sobre risco benefício da vacinação. Para os viajantes, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
     'idoso.3':
       'Somente para trabalhador de saúde com atuação profissional. Recomenda-se atualizar a situação vacinal, precedido por avaliação pelo serviço de saúde.',
     'idoso.4':
-      'Somente para trabalhadores da saúde e povos indígenas, sem história da doença ou na dúvida. A vacinação deve ser precedida por avaliação pelo serviço de saúde.',
+      'Somente para trabalhadores da saúde e povos indígenas, conforme histórico vacinal e sem história da doença ou na dúvida. A vacinação deve ser precedida por avaliação pelo serviço de saúde.',
     'idoso.5':
-      'Somente para não vacinados que vivem acamados e/ou institucionalizados (como em casas geriátricas, hospitais, unidades de acolhimento, instituições de longa permanência e casas de repouso) e povos indígenas sem histórico vacinal com pneumocócica conjugada.',
+      'Pessoas entre 60 e 84 anos, 11 meses e 29 dias acamadas e/ou institucionalizadas (como em casas geriátricas, hospitais, unidades de acolhimento/instituições de longa permanência/casas de repouso); todos os idosos a partir de 85 anos de idade e povos indígenas sem histórico vacinal com pneumo conjugada.',
 
     'gestante.1':
-      'Somente se considera a vacinação em caso de residente ou viajante para área de risco epidemiológico, na impossibilidade de adiamento e mediante avaliação pelo serviço de saúde sobre o risco-benefício da vacinação. Neste contexto, recomenda-se 1 dose para aquelas sem comprovação vacinal, para as vacinadas com 1 dose antes dos 5 anos de idade e para as que receberam apenas dose fracionada (em 2018). Em caso de viajantes, é de 10 dias o prazo mínimo para a vacinação antes da viagem, tendo em vista o tempo necessário à soroconversão.',
-    'gestante.2': 'Esta vacina protege também o bebê nos seus primeiros meses de vida.',
+      'Somente se considera a vacinação em caso de gestantes que vivem ou vão viajar para área com circulação viral confirmada*, na impossibilidade de adiamento e precedido por avaliação pelo serviço de saúde sobre o risco benefício da vacinação. Neste contexto, recomenda-se 1 dose para aquelas sem comprovação vacinal, para as vacinadas com 1 dose antes dos 5 anos de idade e para as que receberam apenas dose fracionada (em 2018). Em caso de viagem, recomenda-se vacinar pelo menos 10 dias antes da viagem.',
   },
 };

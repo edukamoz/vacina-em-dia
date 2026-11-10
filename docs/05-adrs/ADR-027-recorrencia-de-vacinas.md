@@ -50,7 +50,7 @@ O passo seguinte do item 7 foi dado. Uma linha oficial só se repete quando o **
 |---|---|---|
 | `idoso-influenza` | todo ano | linha do idoso: "1 dose anual a cada temporada" |
 | `idoso-covid` | a cada 6 meses | linha do idoso: "1 dose semestral" |
-| `crianca-influenza-1` | todo ano, **até antes dos 6 anos** | nota da criança: "Crianças de 6 meses a menores de 6 anos devem ser vacinadas todo ano" |
+| `crianca-influenza-1` | todo ano, **até antes dos 6 anos** | nota da criança: "Criança na faixa etária entre 6 meses e 5 anos, 11 meses e 29 dias deve ser vacinada todo ano" |
 
 - **Como funciona:** ao aplicar uma dessas doses, a próxima nasce Pendente **na mesma linha** (mesmo `ruleId`), contando da **data da aplicação**. A série ganha identificador e número na primeira aplicação; a regra não é guardada na dose (vem da linha), então **não há migração**. O limite de idade da criança vira data final (o dia anterior ao 6º aniversário), e a próxima dose não é criada se cair depois dela. Cancelar pergunta o alcance, como na dose avulsa.
 - **O que ficou de fora, de propósito:**
