@@ -62,3 +62,5 @@ A API limita a taxa de requisições (resposta 429): espaçar as consultas.
 - Abrir a calculadora oficial, montar a estimativa com estes serviços e salvar o resultado (PDF ou link) na Documentação Técnica.
 - Confirmar as franquias gratuitas (Functions, Azure SQL, Speech) e o preço do e-mail.
 - Atualizar este arquivo se o serviço de e-mail ou outro recurso for adotado.
+
+**Atualização de 12/11/2026.** O alerta do orçamento `vacinaemdia-orcamento` (R$ 100 por ano) previu R$ 604 com as duas instâncias sempre prontas (cerca de R$ 2,41 por dia; R$ 88,98 gastos desde 01/10). Por decisão do autor, a instância sempre pronta foi **desligada nas duas Function Apps** (API e PLN) e deve ser religada só para a apresentação (entre 30/11 e 02/12, por volta das 19h): `az functionapp scale config always-ready set --name <app> --resource-group rg-vacinaemdia --settings http=1`. Enquanto estiver desligada, a primeira pergunta ao assistente pode levar cerca de 50 s e estourar o limite de 15 s da API.
