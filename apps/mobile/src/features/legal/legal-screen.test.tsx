@@ -33,6 +33,16 @@ describe('textos legais', () => {
     expect(texto).toContain(PRIVACY_CONTACT);
   });
 
+  test('CT-APP-LG05: a política cita os animais de estimação e o compartilhamento com outros responsáveis', () => {
+    const politica = POLITICA_DE_PRIVACIDADE.secoes.flatMap((s) => s.paragrafos).join(' ');
+    expect(politica).toContain('animal de estimação');
+    expect(politica).toContain('vê e pode editar os dados de saúde de todas as pessoas e animais');
+    expect(politica).toContain('e-mail parcialmente oculto');
+    const termos = TERMOS_DE_USO.secoes.flatMap((s) => s.paragrafos).join(' ');
+    expect(termos).toContain('animais de estimação');
+    expect(termos).toContain('outro responsável');
+  });
+
   test('CT-APP-LG04: os termos dizem que o app não substitui a caderneta nem o profissional de saúde', () => {
     const texto = TERMOS_DE_USO.secoes.flatMap((s) => s.paragrafos).join(' ');
     expect(texto).toMatch(/não substitui a caderneta de vacinação oficial/);

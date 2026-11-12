@@ -17,7 +17,7 @@ export interface LegalDocument {
  *
  * Rascunho para validação do autor antes da apresentação; não é parecer jurídico.
  */
-export const LEGAL_VERSION = '2026-10-08';
+export const LEGAL_VERSION = '2026-11-12';
 
 /** Contato para pedidos sobre dados pessoais (LGPD, art. 18). */
 export const PRIVACY_CONTACT = 'eduardokamoz@gmail.com';
@@ -53,6 +53,8 @@ export const TERMOS_DE_USO: LegalDocument = {
       titulo: 'Os dados que você cadastra',
       paragrafos: [
         'Você pode cadastrar pessoas da sua família. Cadastre apenas pessoas que você tem autorização para cadastrar. No caso de crianças e adolescentes, você declara ser o responsável legal.',
+        'Você também pode cadastrar animais de estimação e anotar as vacinas deles. Para animais, não há calendário oficial: as vacinas são só as que você digita, seguindo a orientação do veterinário.',
+        'Se você convidar outro responsável para a sua família, ele passa a ver e editar os dados de todas as pessoas e animais cadastrados. Convide só quem você conhece e em quem confia. Quem entra na família de outra pessoa também passa a ver os dados dela.',
         'As informações que você digita, como nome ou apelido, datas e vacinas adicionadas por você, são de sua responsabilidade. O aplicativo marca as vacinas adicionadas por você como "Adicionada por você"; elas não vêm do calendário oficial.',
       ],
     },
@@ -103,6 +105,8 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
       paragrafos: [
         'Da sua conta: e-mail, senha (guardada de forma embaralhada, sem como ler a senha original), a data e a versão do consentimento que você deu e a sua escolha de receber ou não lembretes por e-mail e, se você escolher uma, a foto de perfil (reduzida no seu aparelho e guardada em local privado; você pode apagá-la quando quiser, e ela some com a conta).',
         'De cada pessoa que você cadastra: nome ou apelido, data de nascimento, se está gestante e, se você quiser, o parentesco com você.',
+        'De cada animal de estimação que você cadastrar: nome ou apelido, espécie (cachorro, gato ou outro) e as vacinas que você digitar. Esses dados ficam na mesma conta e seguem as mesmas regras de segurança e de exclusão.',
+        'Da sua família no aplicativo: quem são os responsáveis (cada um aparece para os outros com o e-mail parcialmente oculto) e os códigos de convite, guardados só de forma embaralhada, com validade de 7 dias e uso único.',
         'Das doses: a vacina, a dose, as datas e a situação (pendente, agendada, atrasada, aplicada ou cancelada). Nas vacinas adicionadas por você, guardamos também o nome da vacina e a dose que você digitou.',
         'Foto de caderneta ou comprovante: se você usar "Ler caderneta por foto" (só no aplicativo do celular), o texto da foto é lido no próprio aparelho. A foto não é enviada nem guardada por nós, e só as doses que você conferir e confirmar são salvas.',
         'Dados técnicos: o aplicativo registra eventos de funcionamento e erros para manter o serviço estável. Esses registros usam identificadores que não revelam quem você é e não trazem nome, e-mail, data de nascimento nem texto de mensagens.',
@@ -119,7 +123,15 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
       titulo: 'Lembretes',
       paragrafos: [
         'Na aba Doses, o aplicativo mostra as vacinas atrasadas, as de hoje e as dos próximos 7 dias.',
-        'Se você não desligar, enviamos também um e-mail às 8h (horário de Brasília), no dia da vacina e 7 dias antes, no máximo um por dia. O e-mail traz só a quantidade de vacinas, sem nome de pessoa nem de vacina. Você pode desligar esse e-mail a qualquer momento na aba Conta.',
+        'Se você não desligar, enviamos também um e-mail às 8h (horário de Brasília), no dia da vacina e na antecedência que você escolheu (7 dias antes, se você não escolheu; você pode marcar vários avisos para a mesma vacina), no máximo um por dia. O e-mail traz só a quantidade de vacinas, sem nome de pessoa nem de vacina. Você pode desligar esse e-mail a qualquer momento na aba Conta.',
+      ],
+    },
+    {
+      titulo: 'Família com vários responsáveis',
+      paragrafos: [
+        'O dono da família pode convidar outras pessoas, que já tenham conta, por um código de uso único. Quem entra vê e pode editar os dados de saúde de todas as pessoas e animais da família, e cada responsável usa o próprio login e o próprio consentimento. O aplicativo avisa isso antes de gerar o convite.',
+        'Cada responsável recebe os próprios lembretes, de acordo com as próprias preferências. Os responsáveis aparecem uns para os outros só com o e-mail parcialmente oculto.',
+        'O dono pode remover um responsável, e o responsável pode sair a qualquer momento: o acesso termina na hora e as pessoas ficam com a família. Quem já tem pessoas cadastradas e entra na família de outra pessoa precisa confirmar que elas passam a fazer parte dessa família.',
       ],
     },
     {
@@ -148,7 +160,7 @@ export const POLITICA_DE_PRIVACIDADE: LegalDocument = {
     {
       titulo: 'Por quanto tempo guardamos',
       paragrafos: [
-        'Guardamos os dados enquanto sua conta existir. Quando você exclui a conta, apagamos os dados da conta, das pessoas cadastradas e das doses.',
+        'Guardamos os dados enquanto sua conta existir. Quando você exclui a conta e é a única responsável pela família, apagamos os dados da conta, das pessoas e animais cadastrados e das doses. Se há outros responsáveis, só a sua conta é apagada e as pessoas continuam com a família; se você é o dono, a propriedade passa ao responsável mais antigo (o aplicativo avisa antes de você confirmar).',
       ],
     },
     {
