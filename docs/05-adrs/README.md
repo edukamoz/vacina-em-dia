@@ -32,6 +32,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-029](ADR-029-familia-com-varios-responsaveis.md) | Família com vários responsáveis | Aceita |
 | [ADR-030](ADR-030-vigia-do-calendario-oficial.md) | Vigia do calendário oficial (detecção por impressão digital) | Aceita |
 | [ADR-031](ADR-031-animais-de-estimacao.md) | Animais de estimação como um tipo de membro | Aceita |
+| [ADR-032](ADR-032-roteiro-de-vacinas-para-viagem.md) | Roteiro de vacinas para viagem, sem tabela de países | Aceita |
 
 ## Estados possíveis
 
