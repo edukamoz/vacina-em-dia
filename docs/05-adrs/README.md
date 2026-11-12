@@ -33,6 +33,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-030](ADR-030-vigia-do-calendario-oficial.md) | Vigia do calendário oficial (detecção por impressão digital) | Aceita |
 | [ADR-031](ADR-031-animais-de-estimacao.md) | Animais de estimação como um tipo de membro | Aceita |
 | [ADR-032](ADR-032-roteiro-de-vacinas-para-viagem.md) | Roteiro de vacinas para viagem, sem tabela de países | Aceita |
+| [ADR-033](ADR-033-fichas-das-vacinas.md) | Fichas "Sobre esta vacina", com trechos copiados dos manuais do Ministério | Aceita |
 
 ## Estados possíveis
 

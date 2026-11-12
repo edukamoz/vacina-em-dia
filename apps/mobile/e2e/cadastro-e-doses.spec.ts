@@ -54,6 +54,21 @@ test.describe('Cadastro até a primeira dose (RF01, RF02, RF03, RF04, RF09)', ()
     // Detalhe e registro da aplicação.
     await page.getByRole('button', { name: /BCG, dose única/ }).click();
     await expect(page.getByText('tuberculose').filter({ visible: true }).first()).toBeVisible();
+    // A ficha da vacina (B75) começa fechada e abre com o texto do manual do Ministério.
+    await page.getByRole('button', { name: 'Sobre esta vacina' }).click();
+    await expect(
+      page
+        .getByText(/bacilos vivos/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText(/não diz se você pode ou não tomar/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Sobre esta vacina' }).click();
     await page.getByRole('button', { name: 'Registrar aplicação' }).click();
     await page
       .getByRole('button', { name: '1 de outubro de 2026', exact: true })

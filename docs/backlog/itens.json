@@ -1441,7 +1441,7 @@
     "O app não cruza alergias cadastradas com a bula para dizer se a pessoa pode ou não tomar (isso seria orientação médica individual).",
     "O chatbot responde sobre reações comuns com respostas curadas, e o F1 é reavaliado."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": null,
    "evidencia": "",
    "nota": "Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.",

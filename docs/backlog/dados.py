@@ -316,7 +316,7 @@ ITENS = [
     item('B75', None, 'Como usuária, quero ver, no detalhe da dose, informações da vacina (tipo, composição, reações comuns e quem deve conversar com um profissional antes), para me informar',
          'E4', S, 'PE1, PE2, PE3', 'RF03, RF07; RNF10',
          ['Cada vacina do calendário tem uma ficha com tipo, composição, reações comuns, contraindicações e precauções, com fonte (bula ou manual do Ministério) e data.', 'A ficha aparece em "Sobre esta vacina" com o aviso de que não substitui o profissional.', 'O app não cruza alergias cadastradas com a bula para dizer se a pessoa pode ou não tomar (isso seria orientação médica individual).', 'O chatbot responde sobre reações comuns com respostas curadas, e o F1 é reavaliado.'],
-         AF, None, '', 'Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.'),
+         EA, None, '', 'Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.'),
     # ---------------- E3 futuros
     item('B48', None, 'Como usuária, quero confirmar meu e-mail ao me cadastrar, para ninguém usar o meu endereço',
          'E3', W, 'PE1', 'RNF02', ['O cadastro só vale depois de clicar no link do e-mail.'],
