@@ -9,7 +9,7 @@ ALTER TABLE member ADD kind VARCHAR(10) NOT NULL
 ALTER TABLE member ADD species VARCHAR(10) NULL
   CONSTRAINT ck_member_species CHECK (species IN ('DOG', 'CAT', 'OTHER'));
 
--- Só animal tem espécie, e todo animal tem espécie.
-ALTER TABLE member ADD CONSTRAINT ck_member_pet_species CHECK (
-  (kind = 'PET' AND species IS NOT NULL) OR (kind = 'PERSON' AND species IS NULL)
-);
+-- Só animal tem espécie, e todo animal tem espécie. EXEC: a coluna `species` acaba de ser criada
+-- neste mesmo lote, e o SQL Server só enxerga a coluna nova em outro lote.
+EXEC('ALTER TABLE member ADD CONSTRAINT ck_member_pet_species CHECK (
+  (kind = ''PET'' AND species IS NOT NULL) OR (kind = ''PERSON'' AND species IS NULL))');
