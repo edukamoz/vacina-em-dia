@@ -60,6 +60,7 @@ function Rotas() {
           <Stack.Screen name="membro/novo" options={JANELA} />
           <Stack.Screen name="responsaveis/entrar" options={JANELA} />
           <Stack.Screen name="apoiar" options={JANELA} />
+          <Stack.Screen name="viagem" options={JANELA} />
           <Stack.Screen name="painel" />
         </Stack.Protected>
         <Stack.Protected guard={!entrou}>
