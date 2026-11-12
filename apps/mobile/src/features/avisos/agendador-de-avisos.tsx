@@ -32,7 +32,13 @@ export function AgendadorDeAvisos() {
   const doses = consultas.flatMap((consulta) => consulta.data?.items ?? []);
   const carregadas = membros.isSuccess && consultas.every((consulta) => consulta.isSuccess);
   const chave = JSON.stringify(
-    doses.map((d) => [d.status, d.dueDate, d.scheduledDate, d.remindDaysBefore ?? null, d.remindDays ?? null]),
+    doses.map((d) => [
+      d.status,
+      d.dueDate,
+      d.scheduledDate,
+      d.remindDaysBefore ?? null,
+      d.remindDays ?? null,
+    ]),
   );
 
   // Prepara o sistema uma vez e relê a permissão quando a pessoa liga ou desliga os avisos.
