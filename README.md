@@ -34,7 +34,7 @@ npm run dev:mobile     # app Expo (celular e web)
 npm run dev:api        # API local (Azure Functions Core Tools)
 ```
 
-Para a API local, copie `apps/api/local.settings.example.json` para `apps/api/local.settings.json`.
+Para a API local, copie `apps/api/local.settings.example.json` para `apps/api/local.settings.json`. O exemplo já traz uma chave de login só para desenvolvimento (`AUTH_TOKEN_SECRET`); sem ela, cadastro e login respondem 503. O CORS libera as portas 8081 a 8083 e 19006: se outro programa ocupar a 8081, o Expo usa a seguinte e o login continua funcionando. Os avisos do Azurite (lembretes e vigia) não impedem o login; para silenciá-los, `docker compose up -d azurite`.
 
 ### Tudo em contêineres (um comando)
 

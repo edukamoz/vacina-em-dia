@@ -3,10 +3,11 @@
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "DOCS_ENABLED": "true"
+    "DOCS_ENABLED": "true",
+    "AUTH_TOKEN_SECRET": "chave-local-do-login-somente-para-desenvolvimento-0123456789"
   },
   "Host": {
-    "CORS": "http://localhost:8081",
+    "CORS": "http://localhost:8081,http://localhost:8082,http://localhost:8083,http://localhost:19006",
     "LocalHttpPort": 7071
   }
 }
