@@ -141,6 +141,8 @@ export const MEMBER: MemberResponse = {
   birthDate: '2025-05-20',
   isPregnant: false,
   relationship: 'DAUGHTER',
+  kind: 'PERSON',
+  species: null,
   ageGroup: 'CHILD',
 };
 
@@ -150,6 +152,8 @@ export const OTHER_MEMBER: MemberResponse = {
   birthDate: '1990-01-10',
   isPregnant: false,
   relationship: null,
+  kind: 'PERSON',
+  species: null,
   ageGroup: 'ADULT',
 };
 

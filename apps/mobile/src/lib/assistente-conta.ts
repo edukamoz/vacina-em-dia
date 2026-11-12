@@ -4,7 +4,7 @@ import {
   type AssistantReply,
   type CivilDate,
   type DoseResponse,
-  type MemberInput,
+  type MemberBody,
   type MemberResponse,
   type ReminderItem,
 } from '@vacina/shared';
@@ -48,7 +48,7 @@ export interface FonteDeDados {
 
 /** O que o assistente pode fazer (e só isto). */
 export interface Efeitos {
-  criarPessoa(input: MemberInput): Promise<MemberResponse>;
+  criarPessoa(input: MemberBody): Promise<MemberResponse>;
   aplicarDose(doseId: string, data: CivilDate): Promise<void>;
   agendarDose(doseId: string, data: CivilDate): Promise<void>;
   /** Abre uma tela do app; com `memberId`, seleciona antes essa pessoa. */

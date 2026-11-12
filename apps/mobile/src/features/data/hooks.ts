@@ -5,7 +5,7 @@ import type {
   CustomDoseInput,
   DoseEventInput,
   JoinInput,
-  MemberInput,
+  MemberBody,
   ProfilePhoto,
   TransferInput,
 } from '@vacina/shared';
@@ -52,7 +52,7 @@ export function useCreateMember() {
   const { api } = useSession();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (input: MemberInput) => endpoints.createMember(api, input),
+    mutationFn: (input: MemberBody) => endpoints.createMember(api, input),
     onSuccess: () => client.invalidateQueries({ queryKey: ['members'] }),
   });
 }
@@ -75,7 +75,7 @@ export function useUpdateMember(id: string) {
   const { api } = useSession();
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (input: MemberInput) => endpoints.updateMember(api, id, input),
+    mutationFn: (input: MemberBody) => endpoints.updateMember(api, id, input),
     onSuccess: async () => {
       await client.invalidateQueries({ queryKey: ['members'] });
       await client.invalidateQueries({ queryKey: ['member-doses', id] });

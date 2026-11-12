@@ -7,6 +7,8 @@ const member = (id: string): StoredMember => ({
   birthDate: '1990-05-20',
   isPregnant: false,
   relationship: null,
+  kind: 'PERSON',
+  species: null,
 });
 const dose = (id: string, memberId: string): StoredDose => ({
   id,

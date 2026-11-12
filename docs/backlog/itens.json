@@ -1401,7 +1401,7 @@
     "As vacinas são digitadas pela pessoa (dose avulsa com recorrência); só entra modelo pronto (por exemplo, antirrábica) com fonte citada.",
     "O app deixa claro que o calendário de animais é definido pelo veterinário."
    ],
-   "estado": "A fazer",
+   "estado": "Em andamento",
    "sprint": null,
    "evidencia": "",
    "nota": "Fora do escopo original (CLAUDE.md §3); aprovado pelo autor em 10/11/2026 para quando for possível. Não achei calendário oficial nacional para animais: só a antirrábica aparece como obrigatória, em fontes estaduais e municipais. Depende do B69.",

@@ -308,7 +308,7 @@ ITENS = [
     item('B73', None, 'Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar',
          'E4', C, 'PE1, PE3', 'RF02, RF04',
          ['Há um tipo de membro "animal" (espécie e nascimento aproximado), sem gestação, parentesco humano nem calendário do PNI.', 'As vacinas são digitadas pela pessoa (dose avulsa com recorrência); só entra modelo pronto (por exemplo, antirrábica) com fonte citada.', 'O app deixa claro que o calendário de animais é definido pelo veterinário.'],
-         AF, None, '', 'Fora do escopo original (CLAUDE.md §3); aprovado pelo autor em 10/11/2026 para quando for possível. Não achei calendário oficial nacional para animais: só a antirrábica aparece como obrigatória, em fontes estaduais e municipais. Depende do B69.'),
+         EA, None, '', 'Fora do escopo original (CLAUDE.md §3); aprovado pelo autor em 10/11/2026 para quando for possível. Não achei calendário oficial nacional para animais: só a antirrábica aparece como obrigatória, em fontes estaduais e municipais. Depende do B69.'),
     item('B74', None, 'Como viajante, quero saber que vacinas considerar para o meu destino e a data da viagem, e ver o que já tenho no histórico, para me preparar com antecedência',
          'E4', C, 'PE1, PE3', 'RF03; RNF10',
          ['A pessoa informa destino (no Brasil ou no exterior) e mês; o app mostra o que o histórico dela já tem e as recomendações cadastradas, com fonte e data.', 'É um checklist, não um oráculo: sempre manda procurar um serviço de saúde do viajante e linka as fontes oficiais.', 'A tabela de recomendações é preenchida pelo autor a partir de fonte oficial, versionada, com fonte e data.', 'Sem orientação médica individual.'],

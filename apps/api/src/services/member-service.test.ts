@@ -328,4 +328,88 @@ describe('serviço de membros da família (RF02)', () => {
       });
     });
   });
+
+  describe('animais de estimação (B73)', () => {
+    const PET = {
+      name: 'Rex',
+      birthDate: '2022-03-10',
+      isPregnant: false,
+      kind: 'PET',
+      species: 'DOG',
+    } as const;
+
+    test('CT-PET-01: o animal é cadastrado sem calendário oficial e sem faixa etária', async () => {
+      const app = buildApp();
+      await app.consent(OWNER, false);
+      const created = await app.members.create(OWNER, PET);
+      if (!created.ok) throw new Error('falhou');
+      expect(created.value).toMatchObject({
+        kind: 'PET',
+        species: 'DOG',
+        ageGroup: null,
+        isPregnant: false,
+        relationship: null,
+      });
+      const calendar = await dosesOf(app, created.value.id);
+      expect(calendar.items).toEqual([]);
+    });
+
+    test('CT-PET-02: animal filhote não exige a declaração de responsável (isso é para menores de idade)', async () => {
+      const app = buildApp();
+      await app.consent(OWNER, false);
+      const filhote = await app.members.create(OWNER, { ...PET, birthDate: '2026-09-01' });
+      expect(filhote.ok).toBe(true);
+      // A pessoa menor de idade continua exigindo.
+      const bebe = await app.members.create(OWNER, BABY);
+      expect(bebe).toEqual({ ok: false, error: { code: 'GUARDIAN_DECLARATION_REQUIRED' } });
+    });
+
+    test('CT-PET-03: parentesco e gestação enviados para um animal são ignorados', async () => {
+      const app = buildApp();
+      await app.consent(OWNER, false);
+      const created = await app.members.create(OWNER, {
+        ...PET,
+        isPregnant: true,
+        relationship: 'DAUGHTER',
+      });
+      if (!created.ok) throw new Error('falhou');
+      expect(created.value).toMatchObject({ isPregnant: false, relationship: null });
+    });
+
+    test('CT-PET-04: a vacina do animal é digitada (dose avulsa) e se repete todo ano', async () => {
+      const app = buildApp();
+      await app.consent(OWNER, false);
+      const created = await app.members.create(OWNER, PET);
+      if (!created.ok) throw new Error('falhou');
+      const dose = await app.members.addCustomDose(OWNER, created.value.id, {
+        vaccine: 'Antirrábica',
+        doseLabel: 'Anual',
+        dueDate: '2026-11-20',
+        recurrence: { unit: 'YEAR', every: 1, anchor: 'APPLICATION' },
+      });
+      if (!dose.ok) throw new Error('não criou');
+      const aplicada = await app.doses.applyEvent(OWNER, dose.value.id, {
+        type: 'APPLY',
+        date: '2026-10-06',
+      });
+      expect(aplicada.ok).toBe(true);
+      const calendar = await dosesOf(app, created.value.id);
+      expect(calendar.items.map((d) => [d.status, d.dueDate])).toEqual([
+        ['APPLIED', '2026-11-20'],
+        ['PENDING', '2027-10-06'],
+      ]);
+    });
+
+    test('CT-PET-05: ao editar, o tipo e a espécie valem os do pedido; a lista traz os dois tipos', async () => {
+      const app = buildApp();
+      await app.consent(OWNER, false);
+      const pet = await app.members.create(OWNER, PET);
+      const pessoa = await app.members.create(OWNER, ADULT);
+      if (!pet.ok || !pessoa.ok) throw new Error('falhou');
+      const editado = await app.members.update(OWNER, pet.value.id, { ...PET, species: 'CAT' });
+      expect(editado).toMatchObject({ ok: true, value: { kind: 'PET', species: 'CAT' } });
+      const lista = await app.members.list(OWNER);
+      expect(lista.map((m) => m.kind).sort()).toEqual(['PERSON', 'PET']);
+    });
+  });
 });

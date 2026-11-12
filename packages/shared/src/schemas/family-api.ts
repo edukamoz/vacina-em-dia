@@ -38,6 +38,31 @@ export const relationshipSchema = z.enum(RELATIONSHIPS).meta({
     'Parentesco com o dono da conta: SELF (a própria pessoa), MOTHER, FATHER, SON, DAUGHTER, GRANDMOTHER, GRANDFATHER, SISTER, BROTHER, SPOUSE ou OTHER.',
 });
 
+/** Tipos de membro: uma pessoa da família ou um animal de estimação (B73, ADR-031). */
+export const MEMBER_KINDS = ['PERSON', 'PET'] as const;
+
+/** Tipo do membro. */
+export const memberKindSchema = z.enum(MEMBER_KINDS).meta({
+  id: 'MemberKind',
+  description:
+    'PERSON (pessoa, com o calendário nacional de vacinação) ou PET (animal de estimação, sem calendário oficial: as vacinas são digitadas).',
+});
+
+/** Tipo do membro. */
+export type MemberKind = z.infer<typeof memberKindSchema>;
+
+/** Espécies de animal de estimação oferecidas. */
+export const SPECIES = ['DOG', 'CAT', 'OTHER'] as const;
+
+/** Espécie do animal. */
+export const speciesSchema = z.enum(SPECIES).meta({
+  id: 'Species',
+  description: 'Espécie do animal de estimação: DOG (cachorro), CAT (gato) ou OTHER (outro).',
+});
+
+/** Espécie do animal. */
+export type Species = z.infer<typeof speciesSchema>;
+
 /** Parentescos que indicam uma pessoa do sexo masculino: nesses, o grupo gestante não se aplica. */
 export const MALE_RELATIONSHIPS: readonly Relationship[] = [
   'FATHER',
@@ -82,6 +107,18 @@ export const memberInputSchema = z
       .nullable()
       .default(null)
       .meta({ description: 'Parentesco com o dono da conta. Opcional; vazio se não informado.' }),
+    kind: memberKindSchema.default('PERSON'),
+    species: speciesSchema.nullable().default(null).meta({
+      description: 'Espécie. Obrigatória para PET; deve ser nula para PERSON.',
+    }),
+  })
+  .superRefine((input, ctx) => {
+    if (input.kind === 'PET' && input.species === null) {
+      ctx.addIssue({ code: 'custom', path: ['species'], message: 'Informe a espécie do animal.' });
+    }
+    if (input.kind === 'PERSON' && input.species !== null) {
+      ctx.addIssue({ code: 'custom', path: ['species'], message: 'Só animais têm espécie.' });
+    }
   })
   .meta({ id: 'MemberInput' });
 
@@ -93,7 +130,12 @@ export const memberResponseSchema = z
     birthDate: civilDateSchema,
     isPregnant: z.boolean(),
     relationship: relationshipSchema.nullable(),
-    ageGroup: ageGroupSchema,
+    kind: memberKindSchema,
+    species: speciesSchema.nullable(),
+    ageGroup: ageGroupSchema.nullable().meta({
+      description:
+        'Faixa etária do calendário nacional; nula para animais, que não têm calendário.',
+    }),
   })
   .meta({ id: 'Member' });
 
@@ -144,6 +186,11 @@ export const consentResponseSchema = z
 
 /** Dados de um membro enviados pelo cliente. */
 export type MemberInput = z.infer<typeof memberInputSchema>;
+/**
+ * Corpo que o cliente envia ao cadastrar ou editar um membro: o que a API aceita, com os campos de
+ * padrão (gestante, parentesco, tipo e espécie) opcionais.
+ */
+export type MemberBody = z.input<typeof memberInputSchema>;
 /** Membro devolvido pela API. */
 export type MemberResponse = z.infer<typeof memberResponseSchema>;
 /** Calendário de um membro devolvido pela API. */

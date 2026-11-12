@@ -1,4 +1,11 @@
-import type { CivilDate, DoseSnapshot, RecurrenceRule, Relationship } from '@vacina/shared';
+import type {
+  CivilDate,
+  DoseSnapshot,
+  MemberKind,
+  RecurrenceRule,
+  Relationship,
+  Species,
+} from '@vacina/shared';
 
 /** Membro guardado pelo repositório. */
 export interface StoredMember {
@@ -8,6 +15,10 @@ export interface StoredMember {
   readonly isPregnant: boolean;
   /** Parentesco com o dono da conta; `null` se não foi informado. */
   readonly relationship: Relationship | null;
+  /** Pessoa ou animal de estimação (B73). */
+  readonly kind: MemberKind;
+  /** Espécie do animal; `null` para pessoa. */
+  readonly species: Species | null;
 }
 
 /** Dose guardada: a linha do calendário mais o estado da máquina de estados. */

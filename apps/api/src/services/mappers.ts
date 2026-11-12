@@ -25,7 +25,10 @@ export function toMemberResponse(member: StoredMember, today: CivilDate): Member
     birthDate: member.birthDate,
     isPregnant: member.isPregnant,
     relationship: member.relationship,
-    ageGroup: ageGroupOf(member.birthDate, today),
+    kind: member.kind,
+    species: member.species,
+    // Animal não tem calendário nacional, então não tem faixa etária dele.
+    ageGroup: member.kind === 'PET' ? null : ageGroupOf(member.birthDate, today),
   };
 }
 

@@ -8,6 +8,7 @@ import {
   type RecurrenceRule,
   type RecurrenceUnit,
   type Relationship,
+  type Species,
 } from '@vacina/shared';
 import type {
   AccountRepository,
@@ -68,7 +69,8 @@ const nullableInt = (value: number | null) => ({ type: 'int', value }) as const;
 /** Instante ISO 8601 (UTC) como parâmetro; o banco converte para DATETIME2 com o estilo 127. */
 const when = (value: string) => str(value, 30);
 
-const MEMBER_COLUMNS = `m.id, m.display_name, CONVERT(char(10), m.birth_date, 23) AS birth_date, m.is_pregnant, m.relationship`;
+const MEMBER_COLUMNS = `m.id, m.display_name, CONVERT(char(10), m.birth_date, 23) AS birth_date, m.is_pregnant, m.relationship,
+  m.kind, m.species`;
 
 /** Junção que dá a uma conta o acesso às pessoas da família dela (ADR-029). */
 const FAMILY_ACCESS = 'JOIN family_membership fm ON fm.family_id = m.family_id';
@@ -79,6 +81,12 @@ function relationshipOf(row: SqlRow): Relationship | null {
   return typeof value === 'string' ? (value as Relationship) : null;
 }
 
+/** Espécie guardada; `null` para pessoa. O banco só aceita os códigos conhecidos. */
+function speciesOf(row: SqlRow): Species | null {
+  const value = row['species'];
+  return typeof value === 'string' ? (value as Species) : null;
+}
+
 function toMember(row: SqlRow): StoredMember {
   return {
     id: text(row, 'id'),
@@ -86,6 +94,8 @@ function toMember(row: SqlRow): StoredMember {
     birthDate: text(row, 'birth_date'),
     isPregnant: flag(row, 'is_pregnant'),
     relationship: relationshipOf(row),
+    kind: row['kind'] === 'PET' ? 'PET' : 'PERSON',
+    species: speciesOf(row),
   };
 }
 
@@ -200,14 +210,14 @@ export function createSqlRepositories(
     async save(ownerId, member) {
       await db.run(
         `UPDATE m SET display_name = @name, birth_date = CONVERT(date, @birth, 23),
-           is_pregnant = @pregnant, relationship = @relationship
+           is_pregnant = @pregnant, relationship = @relationship, kind = @kind, species = @species
          FROM member m ${FAMILY_ACCESS}
          WHERE m.id = @id AND fm.account_id = @owner;
          IF @@ROWCOUNT = 0
            INSERT INTO member (id, account_id, family_id, display_name, birth_date, is_pregnant,
-             relationship)
+             relationship, kind, species)
            SELECT @id, @owner, fm.family_id, @name, CONVERT(date, @birth, 23), @pregnant,
-             @relationship
+             @relationship, @kind, @species
            FROM family_membership fm WHERE fm.account_id = @owner;`,
         {
           id: str(member.id),
@@ -216,6 +226,8 @@ export function createSqlRepositories(
           birth: str(member.birthDate, 10),
           pregnant: { type: 'bit', value: member.isPregnant },
           relationship: { type: 'varchar', value: member.relationship, length: 20 },
+          kind: str(member.kind),
+          species: { type: 'varchar', value: member.species, length: 10 },
         },
       );
     },

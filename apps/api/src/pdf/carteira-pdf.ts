@@ -18,6 +18,12 @@ const ROTULO_DA_FAIXA: Readonly<Record<string, string>> = {
   ELDERLY: 'Pessoa idosa',
 };
 
+const ROTULO_DA_ESPECIE: Readonly<Record<string, string>> = {
+  DOG: 'cachorro',
+  CAT: 'gato',
+  OTHER: 'outra espécie',
+};
+
 const ROTULO_DO_PARENTESCO: Readonly<Record<string, string>> = {
   SELF: 'Você mesmo',
   MOTHER: 'Mãe',
@@ -168,7 +174,11 @@ export function renderCarteiraPdf(
     doc.fillColor(TEXTO).font('Helvetica-Bold').fontSize(18).text(member.name, MARGEM);
     const detalhes = [
       `Nascimento: ${formatCivilDate(member.birthDate)} (${describeAge(member.birthDate, options.today)})`,
-      `Faixa do calendário: ${ROTULO_DA_FAIXA[member.ageGroup] ?? member.ageGroup}`,
+      ...(member.kind === 'PET'
+        ? [`Animal de estimação: ${ROTULO_DA_ESPECIE[member.species ?? 'OTHER']}`]
+        : [
+            `Faixa do calendário: ${ROTULO_DA_FAIXA[member.ageGroup ?? ''] ?? member.ageGroup ?? ''}`,
+          ]),
       ...(member.relationship
         ? [`Parentesco: ${ROTULO_DO_PARENTESCO[member.relationship] ?? member.relationship}`]
         : []),

@@ -176,6 +176,8 @@ describe('combinação por pares: corpo de criação de membro (RF02)', () => {
       birthDate: '2024-05-20',
       isPregnant: false,
       relationship: null,
+      kind: 'PERSON',
+      species: null,
     });
   });
 });
