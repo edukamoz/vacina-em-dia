@@ -11,7 +11,7 @@ Criada em **06/10/2026** com o Azure CLI, na assinatura **Azure for Students**, 
 | Banco de dados | `sqldb-vacinaemdia` | Serverless GP_S_Gen5, oferta gratuita | Ao esgotar a franquia gratuita: **pausa automática** (sem cobrança) |
 | Key Vault | `kv-vedia6398` | Standard | Acesso por RBAC; a identidade da Function recebe "Key Vault Secrets User" |
 | Application Insights | `appi-vacinaemdia` | Por uso | Ligado ao workspace `log-vacinaemdia` (retenção de 30 dias, teto diário de 0,1 GB) |
-| Function App (PLN) | `func-nlp-vacinaemdia-vedia6398` | Flex Consumption (Linux, Python 3.13, 512 MB, 1 instância sempre pronta, paralelismo HTTP 8) | Chatbot e busca; `/chat` e `/search` exigem a chave da função |
+| Function App (PLN) | `func-nlp-vacinaemdia-vedia6398` | Flex Consumption (Linux, Python 3.13, 512 MB, paralelismo HTTP 8; instância sempre pronta **desligada em 12/11/2026**, ver `docs/16`) | Chatbot e busca; `/chat` e `/search` exigem a chave da função |
 | Azure AI Speech | `spch-vacinaemdia-vedia6398` | F0 (gratuito), Brazil South, subdomínio próprio | Reconhecimento de fala pt-BR; 5 horas de áudio por mês na camada gratuita (ADR-003) |
 | Armazenamento | `stvedia6398` | Standard LRS | Exigido pelas Functions; acesso público a blobs desligado; contêiner privado `fotos-de-perfil` para a foto de perfil (ADR-020) |
 
