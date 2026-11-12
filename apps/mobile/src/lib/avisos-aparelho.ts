@@ -1,12 +1,10 @@
+// Variante do celular (Android e iOS). A web usa `avisos-aparelho.web.ts`, sem `expo-notifications`.
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import type { AvisoPlanejado } from './avisos';
+import { CANAL_DE_AVISOS, quandoAgendar, type PermissaoDeAvisos } from './avisos-aparelho-comum';
 
-/** Canal das notificações no Android (a pessoa pode ajustá-lo nas configurações do aparelho). */
-export const CANAL_DE_AVISOS = 'lembretes-de-vacina';
-
-/** Situação da permissão do sistema para mostrar notificações. */
-export type PermissaoDeAvisos = 'concedida' | 'negada' | 'indefinida';
+export { CANAL_DE_AVISOS, quandoAgendar, type PermissaoDeAvisos };
 
 /**
  * Diz se este aparelho agenda avisos: só o aplicativo de Android e de iOS. Na web não há aviso
@@ -53,16 +51,6 @@ export async function prepararAvisos(): Promise<void> {
       importance: Notifications.AndroidImportance.DEFAULT,
     });
   }
-}
-
-/**
- * Momento exato de um aviso, na hora local do aparelho.
- *
- * @param aviso - Aviso planejado (dia civil e hora cheia).
- */
-export function quandoAgendar(aviso: Pick<AvisoPlanejado, 'data' | 'hora'>): Date {
-  const [ano = 0, mes = 1, dia = 1] = aviso.data.split('-').map(Number);
-  return new Date(ano, mes - 1, dia, aviso.hora, 0, 0, 0);
 }
 
 /** Cancela todos os avisos agendados por este aplicativo. */

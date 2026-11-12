@@ -1,20 +1,12 @@
+// Variante do celular (Android e iOS). A web usa `ler-documento.web.ts`, sem expo-text-extractor,
+// expo-image-picker nem expo-file-system.
 import { File } from 'expo-file-system';
 import type * as LeitorDeTexto from 'expo-text-extractor';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
+import type { DocumentoLido, OrigemDoDocumento } from './ler-documento-tipos';
 
-/** De onde vem a foto do documento. */
-export type OrigemDoDocumento = 'camera' | 'galeria';
-
-/**
- * Resultado de ler um documento: as linhas de texto, `cancelado`, `negado` (sem permissão) ou
- * `indisponivel` (o leitor de texto não existe neste aparelho ou neste build do app).
- */
-export type DocumentoLido =
-  | { readonly tipo: 'texto'; readonly linhas: readonly string[] }
-  | { readonly tipo: 'cancelado' }
-  | { readonly tipo: 'negado' }
-  | { readonly tipo: 'indisponivel' };
+export type { DocumentoLido, OrigemDoDocumento };
 
 /** A leitura de documento só existe no app instalado (Android e iOS); na web o recurso não aparece. */
 export const podeLerDocumento = Platform.OS !== 'web';
