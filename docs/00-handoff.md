@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 24/10/2026 (**leia a seção 0.14 primeiro**, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 12/11/2026 (**leia a seção 0.15 primeiro**, que atualiza a 0.14; a 0.14 guarda o estado de 24/10/2026, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,48 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.15 Estado em 12/11/2026: do B69 ao B75, custo da Azure e o que fazer antes da apresentação
+
+Atualiza a 0.14. `main` no commit do PR #259; **nenhum PR aberto**. A numeração das seções 0.x é histórica (a 0.15 vem antes da 0.14 no arquivo de propósito, por ser a primeira a ler).
+
+**O que entrou desde 24/10/2026** (cada item tem ADR ou documento próprio):
+
+| Assunto | Onde ler |
+|---|---|
+| Vacina que se repete e aviso antecipado por dose (B69); agora com **vários avisos por dose** (`remindDays`) | ADR-027 (e a atualização de 12/11/2026) |
+| Avisos no aparelho, só no app instalado (B70) | ADR-028 |
+| Família com vários responsáveis: convite por código, dono e responsável (B15) | ADR-029 |
+| Vigia do calendário oficial: confere os 5 PDFs do gov.br toda segunda e avisa por e-mail (B72) | ADR-030 |
+| Animais de estimação como tipo de membro (B73) | ADR-031 |
+| Roteiro de vacinas para viagem, sem tabela de países (B74) | ADR-032 |
+| Fichas "Sobre esta vacina" e assistente que aponta o quadro de reações (B75, em andamento) | ADR-033, `docs/11-assistente-pln.md` |
+| Código de celular e de web em arquivos separados, com regra de lint | ADR-034 |
+| Texto legal com animais, vários responsáveis e avisos múltiplos (**rascunho a validar, B39**) | `docs/18-termos-e-privacidade.md` |
+
+Itens "Em andamento" que **não** foram marcados como concluídos: B72, B73, B74, B75 (decisão do autor: só o autor conclui).
+
+**Azure em 12/11/2026 (conferido nesta data):**
+- Migrações `001` a `009` aplicadas no `sqldb-vacinaemdia` (a `008` precisou de correção no arquivo; ver `docs/15-persistencia-sql.md`). Os 62 testes de contrato passaram no banco real. O deploy **não** aplica migrações: aplicar com `node scripts/db-migrate.mjs --server sql-vacinaemdia-vedia6398.database.windows.net --database sqldb-vacinaemdia`, com uma regra temporária de firewall para o seu IP (criar e remover depois).
+- O banco havia esgotado a franquia gratuita e estava pausado. Para religá-lo foi preciso passar a franquia esgotada para `BillOverUsage`; **o Azure não deixa voltar para `AutoPause`**. A pausa automática foi reduzida para **15 minutos**. O custo real deve ser conferido em Cost Management; ver `docs/16-custos-azure.md`.
+- A **instância sempre pronta** foi desligada nas duas Function Apps (API e PLN) para cortar custo (o orçamento `vacinaemdia-orcamento`, R$ 100 por ano, previu R$ 604 com ela ligada). Sem ela, a primeira pergunta ao assistente pode levar cerca de 50 s e passar do limite de 15 s da API.
+- Há uma tarefa agendada no Claude, `ligar-instancias-apresentacao`, para 29/11/2026 às 08:00 (horário de Brasília), que religa as duas instâncias. Só roda com o app do Claude aberto. **A tarefa de desligar depois da apresentação não foi criada** (foi negada pelo sistema de permissões): desligar à mão com `az functionapp scale config always-ready set --name <app> --resource-group rg-vacinaemdia --settings http=0` nas duas apps (`func-vacinaemdia-vedia6398` e `func-nlp-vacinaemdia-vedia6398`).
+- A apresentação é entre 30/11 e 02/12/2026, por volta das 19h. Religar a instância **antes** e conferir `GET /api/health` e `GET /api/warmup`.
+- Sobraram **duas linhas vazias na tabela `family`** do banco real (restos do teste de contrato de 12/11, sem pessoas nem vínculos). Não afetam nada; podem ser apagadas.
+
+**Como rodar localmente (o que mudou):**
+- `cp apps/api/local.settings.example.json apps/api/local.settings.json`: o exemplo agora traz `AUTH_TOKEN_SECRET` de desenvolvimento (sem ele, login e cadastro respondem 503) e libera as portas 8081 a 8083 e 19006 no CORS. Se a 8081 estiver ocupada por outro projeto, o Expo usa a seguinte.
+- `npm run dev:api` e `npm run dev:mobile`. Os avisos do Azurite no terminal só afetam os timers (lembretes e vigia).
+- A API local usa memória, sem tocar no banco real.
+
+**Testes:** `jest` do app com limite de 20 s por teste (o padrão de 5 s estourava no CI). E2E: `cd apps/mobile && E2E_CANAL=chrome npm run e2e` (15 cenários, passaram em 12/11/2026). Para conferir telas pelo Chrome, o Claude precisa da extensão conectada.
+
+**Pendências que dependem do autor:**
+- Revisar o texto legal e o dataset do chatbot com outra pessoa (B39) e decidir se o termo de consentimento ganha uma frase sobre responsáveis (exigiria novo aceite de todos; `TERMS_VERSION` não mudou).
+- Reações comuns copiadas dos quadros do manual e fichas de pneumocócica 20-valente, covid-19, dengue e VSR (B75): exigem fonte oficial confirmada e a sua conferência.
+- Testes em celulares reais e com leitor de tela (B40), incluindo o botão do assistente que se recolhe ao rolar.
+- Decidir sobre o custo do banco depois de ver Cost Management (recriar o banco só se ficar alto).
+- Fechar as documentações em Word (B31 a B36) e o roteiro da apresentação.
 
 ### 0.14 Estado em 24/10/2026: acessibilidade do design system
 
