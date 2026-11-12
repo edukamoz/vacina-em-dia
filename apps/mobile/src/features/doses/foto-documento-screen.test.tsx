@@ -46,8 +46,15 @@ const abrir = async (extra?: Parameters<typeof createFakeFetch>[0]) => {
   return fake;
 };
 
+/**
+ * Aperta o botão de fotografar. Os botões ficam desativados enquanto as doses carregam e o
+ * `findByRole` acha o botão mesmo desativado; um `press` nesse momento é ignorado e `ler` nunca é
+ * chamado. Por isso espera o botão ficar ativo antes de apertar.
+ */
 const fotografar = async (botao: string) => {
-  await fireEvent.press(await screen.findByRole('button', { name: botao }));
+  const alvo = await screen.findByRole('button', { name: botao });
+  await waitFor(() => expect(alvo).toBeEnabled());
+  await fireEvent.press(alvo);
 };
 
 describe('Ler caderneta por foto', () => {
@@ -146,7 +153,14 @@ describe('Ler caderneta por foto', () => {
     ler.mockResolvedValue({ tipo: 'cancelado' });
     await abrir();
     await fotografar('Tirar foto');
-    await waitFor(() => expect(ler).toHaveBeenCalled());
+    expect(ler).toHaveBeenCalledWith('camera');
+    // Espera a leitura terminar de verdade (o indicador "Lendo a foto" some e o botão volta a
+    // ficar ativo). Só ver que `ler` foi chamado deixaria as asserções abaixo rodarem antes do
+    // resultado `cancelado` ser tratado, o que as tornaria vazias e dependentes de tempo.
+    await waitFor(() =>
+      expect(screen.queryByRole('progressbar', { name: 'Lendo a foto' })).not.toBeOnTheScreen(),
+    );
+    expect(screen.getByRole('button', { name: 'Tirar foto' })).toBeEnabled();
     expect(screen.queryByRole('alert')).not.toBeOnTheScreen();
     expect(screen.queryByText('Doses encontradas')).not.toBeOnTheScreen();
   });
