@@ -27,6 +27,11 @@ describe('avisos no aparelho: o que agendar', () => {
     expect(MAXIMO_DE_AVISOS).toBeLessThanOrEqual(64);
   });
 
+  test('CT-AVISO-02b: vários avisos geram um para cada antecedência, mais o do dia', () => {
+    const avisos = planejarAvisos([dose({ remindDays: [7, 3, 0] })], MANHA, 8);
+    expect(avisos.map((a) => a.data)).toEqual(['2026-10-13', '2026-10-17', '2026-10-20']);
+  });
+
   test('CT-AVISO-02: sem doses, não há o que agendar', () => {
     expect(planejarAvisos([], MANHA, 8)).toEqual([]);
   });

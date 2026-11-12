@@ -199,6 +199,21 @@ describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) =
       expect((await repos.doses.listByMember(owner, m)).map((d) => d.occurrence)).toEqual([1, 2]);
     });
 
+    test('CT-REC-131: vários avisos gravam e leem na mesma ordem', async () => {
+      const owner = await newOwner();
+      const m = randomUUID();
+      await repos.members.save(owner, member(m));
+      const id = randomUUID();
+      const varios: StoredDose = {
+        ...dose(id, m, { ruleId: null }),
+        custom: { vaccine: 'Raiva', doseLabel: '1ª' },
+        remindDaysBefore: 7,
+        remindDays: [7, 3, 0],
+      };
+      await repos.doses.saveMany(owner, [varios]);
+      expect(await repos.doses.get(owner, id)).toEqual(varios);
+    });
+
     test('CT-OFIC-40: dose oficial de uma série grava série e número, sem guardar a regra', async () => {
       const owner = await newOwner();
       const m = randomUUID();

@@ -9,7 +9,7 @@ import { formatCivilDate } from './format-date';
 import {
   primeiroDiaDoFim,
   type ErrosDeRepeticao,
-  type EscolhaDeAviso,
+  type OpcaoDeAviso,
   type FormaDeRepetir,
   type Termino,
 } from './repeticao';
@@ -32,10 +32,11 @@ const TERMINO: readonly OpcaoDeRadio<Termino>[] = [
   { valor: 'DOSES', rotulo: 'Depois de um número de doses' },
 ];
 
-const AVISO: readonly OpcaoDeRadio<EscolhaDeAviso>[] = [
-  { valor: 'PADRAO', rotulo: 'Padrão: 7 dias antes' },
+const AVISO: readonly { valor: OpcaoDeAviso; rotulo: string }[] = [
   { valor: '0', rotulo: 'No próprio dia' },
+  { valor: '1', rotulo: '1 dia antes' },
   { valor: '3', rotulo: '3 dias antes' },
+  { valor: '7', rotulo: '7 dias antes' },
   { valor: '14', rotulo: '14 dias antes' },
   { valor: '30', rotulo: '30 dias antes' },
 ];
@@ -150,11 +151,31 @@ export function CamposDeRepeticao({
 
       <View className="gap-sm">
         <Texto variante="rotulo">Avisar antes</Texto>
-        <GrupoDeRadios
-          rotulo="Avisar antes"
-          valor={forma.avisar}
-          opcoes={AVISO}
-          aoEscolher={(avisar) => aoMudar({ avisar })}
+        <Texto variante="apoio" className="text-textoSecundario">
+          Marque quantos avisos quiser. Sem marcar nada, avisamos 7 dias antes.
+        </Texto>
+        {AVISO.map((opcao) => (
+          <Alternar
+            key={opcao.valor}
+            rotulo={opcao.rotulo}
+            marcado={forma.avisar.includes(opcao.valor)}
+            aoAlterar={(marcado) =>
+              aoMudar({
+                avisar: marcado
+                  ? [...forma.avisar, opcao.valor]
+                  : forma.avisar.filter((v) => v !== opcao.valor),
+              })
+            }
+          />
+        ))}
+        <CampoTexto
+          rotulo="Outro aviso, em dias antes (opcional)"
+          value={forma.avisarOutro}
+          onChangeText={(texto) => aoMudar({ avisarOutro: texto.replace(/\D/g, '') })}
+          keyboardType="number-pad"
+          maxLength={2}
+          autoComplete="off"
+          erro={erros.avisarOutro}
         />
         <Texto variante="apoio" className="text-textoSecundario">
           O aviso aparece no aplicativo e no e-mail diário, só com a quantidade de vacinas.

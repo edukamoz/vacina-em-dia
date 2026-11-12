@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   MAX_REMIND_DAYS_BEFORE,
+  MAX_REMIND_DAYS_LIST,
   MAX_SERIES_DOSES,
   RECURRENCE_ANCHORS,
   RECURRENCE_MAX_EVERY,
@@ -78,6 +79,18 @@ export const remindDaysBeforeSchema = z.number().int().min(0).max(MAX_REMIND_DAY
   description: 'Quantos dias antes da data o aviso aparece (de 0 a 60). Vazio usa o padrão de 7.',
 });
 
+/** Esquema dos avisos antecipados de uma dose: de 1 a 8 antecedências diferentes. */
+export const remindDaysSchema = z
+  .array(remindDaysBeforeSchema)
+  .min(1)
+  .max(MAX_REMIND_DAYS_LIST)
+  .refine((lista) => new Set(lista).size === lista.length, 'Não repita a mesma antecedência.')
+  .meta({
+    example: [7, 3, 0],
+    description:
+      'Antecedências em dias, uma por aviso (de 0 a 60, até 8, sem repetir). Vale no lugar de remindDaysBefore.',
+  });
+
 /**
  * Esquema do corpo para cadastrar uma dose avulsa (RF04): vacina que não aparece no calendário
  * oficial, mas que a pessoa precisa acompanhar (por exemplo, por indicação médica). O nome é texto
@@ -110,6 +123,7 @@ export const customDoseInputSchema = z
         'Se a vacina se repete. Ao aplicar a dose, a próxima é criada sozinha como Pendente.',
     }),
     remindDaysBefore: remindDaysBeforeSchema.nullable().optional(),
+    remindDays: remindDaysSchema.optional(),
   })
   .superRefine((value, ctx) => {
     const end = value.recurrence?.endDate;
@@ -157,6 +171,7 @@ export const doseResponseSchema = z
       description: 'Número desta dose na série que se repete (1 é a primeira).',
     }),
     remindDaysBefore: remindDaysBeforeSchema.nullable().optional(),
+    remindDays: remindDaysSchema.nullable().optional(),
   })
   .meta({ id: 'Dose' });
 

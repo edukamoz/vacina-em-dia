@@ -1,6 +1,7 @@
 import {
   ESTADO_INICIAL_REPETICAO,
   descreverAviso,
+  descreverAvisos,
   descreverRepeticao,
   montarRepeticao,
   type FormaDeRepetir,
@@ -97,15 +98,32 @@ describe('formulário de repetição: montar o que vai para a API', () => {
   });
 
   test('CT-APP-REP18: o aviso antecipado vale com ou sem repetição', () => {
-    expect(montarRepeticao(forma({ avisar: '14' }), DATA)).toEqual({
+    expect(montarRepeticao(forma({ avisar: ['14'] }), DATA)).toEqual({
       ok: true,
       extras: { remindDaysBefore: 14 },
     });
-    expect(montarRepeticao(forma({ avisar: '0' }), DATA)).toEqual({
+    expect(montarRepeticao(forma({ avisar: ['0'] }), DATA)).toEqual({
       ok: true,
       extras: { remindDaysBefore: 0 },
     });
-    expect(montarRepeticao(forma({ avisar: 'PADRAO' }), DATA)).toEqual({ ok: true, extras: {} });
+    expect(montarRepeticao(forma({ avisar: [] }), DATA)).toEqual({ ok: true, extras: {} });
+  });
+
+  test('CT-APP-REP18b: vários avisos vão na lista, do maior para o menor, sem repetir', () => {
+    expect(montarRepeticao(forma({ avisar: ['0', '7', '3'], avisarOutro: '7' }), DATA)).toEqual({
+      ok: true,
+      extras: { remindDays: [7, 3, 0] },
+    });
+    expect(montarRepeticao(forma({ avisar: ['3'], avisarOutro: '20' }), DATA)).toEqual({
+      ok: true,
+      extras: { remindDays: [20, 3] },
+    });
+  });
+
+  test.each([['61'], ['99']])('CT-APP-REP18c: outro aviso %s é recusado', (avisarOutro) => {
+    const r = montarRepeticao(forma({ avisarOutro }), DATA);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.erros.avisarOutro).toBe('Informe um número de 0 a 60.');
   });
 
   test('CT-APP-REP19: com "não repete", erros de repetição são ignorados', () => {
@@ -161,5 +179,12 @@ describe('formulário de repetição: textos para a pessoa', () => {
     ['CT-APP-REP33', 30, '30 dias antes'],
   ] as const)('%s: aviso %j', (_id, dias, esperado) => {
     expect(descreverAviso(dias)).toBe(esperado);
+  });
+
+  test('CT-APP-REP34: descreve vários avisos em uma frase', () => {
+    expect(descreverAvisos({ remindDays: [7, 3, 0], remindDaysBefore: 7 })).toBe(
+      '7 dias antes, 3 dias antes e no próprio dia',
+    );
+    expect(descreverAvisos({ remindDays: null, remindDaysBefore: 14 })).toBe('14 dias antes');
   });
 });

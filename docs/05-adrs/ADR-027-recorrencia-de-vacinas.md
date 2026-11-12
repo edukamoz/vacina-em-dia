@@ -65,3 +65,7 @@ O passo seguinte do item 7 foi dado. Uma linha oficial só se repete quando o **
 
 - Regra e casos de teste: `packages/shared/src/domain/recurrence.test.ts` (CT-REC-01 a 27 e 30 a 41), `packages/shared/src/schemas/recorrencia.test.ts` (CT-REC-50 a 86), `apps/api/src/services/recorrencia.test.ts` (CT-REC-90 a 106), `apps/api/src/services/reminder-service.test.ts` (CT-REC-110 a 113) e `apps/api/src/repositories` (CT-REC-120 a 125 e 130).
 - A periodicidade das linhas oficiais (influenza "1 dose anual a cada temporada", covid de idosos "1 dose semestral", dT "reforços periódicos") está no texto do calendário em `packages/shared/src/calendar/pni-2026.ts`; nada foi acrescentado de memória.
+
+## Atualização de 12/11/2026: vários avisos por dose
+
+A pessoa pode marcar mais de uma antecedência (por exemplo 7 dias antes, 3 dias antes e no próprio dia; até 8 valores de 0 a 60, sem repetir). A API ganhou `remindDays` (lista, do maior para o menor) na dose e na dose avulsa; `remindDaysBefore` continua existindo e guarda o maior valor, e o app antigo segue funcionando. No banco, a migração 009 acrescenta `dose.remind_days` (texto com vírgulas). O e-mail diário cita a dose em cada antecedência escolhida e no próprio dia; os avisos do aparelho agendam um por antecedência. Sem lista, vale o aviso único, e sem ele o padrão de 7 dias. Casos `CT-LEM-50` a `56`, `CT-REC-91b`, `CT-REC-131`, `CT-APP-REP18b` a `34`, `CT-AVISO-02b`.

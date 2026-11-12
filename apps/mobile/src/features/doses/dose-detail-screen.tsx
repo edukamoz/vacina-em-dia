@@ -13,7 +13,7 @@ import { todayCivil } from '../../lib/dates';
 import { useDose, useDoseEvent, useMemberDoses, useMembers } from '../data/hooks';
 import { doseDateRow, doseHint } from './dose-card';
 import { formatCivilDate } from './format-date';
-import { descreverAviso, descreverRepeticao } from './repeticao';
+import { descreverAvisos, descreverRepeticao } from './repeticao';
 import { SobreAVacina } from './sobre-a-vacina';
 
 /** O que a pessoa está fazendo agora na tela: escolhendo a data de uma ação ou confirmando o cancelamento. */
@@ -256,8 +256,12 @@ export function DoseDetailScreen({ id }: { id: string }) {
             ) : null}
           </>
         ) : null}
-        {dose.remindDaysBefore !== null && dose.remindDaysBefore !== undefined ? (
-          <Linha rotulo="Aviso" valor={descreverAviso(dose.remindDaysBefore)} />
+        {(dose.remindDaysBefore !== null && dose.remindDaysBefore !== undefined) ||
+        (dose.remindDays && dose.remindDays.length > 0) ? (
+          <Linha
+            rotulo={dose.remindDays && dose.remindDays.length > 1 ? 'Avisos' : 'Aviso'}
+            valor={descreverAvisos(dose)}
+          />
         ) : null}
         {dose.origin === 'CUSTOM' ? (
           <Texto className="text-textoSecundario">

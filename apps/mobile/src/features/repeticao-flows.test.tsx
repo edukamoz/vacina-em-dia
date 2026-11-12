@@ -54,7 +54,8 @@ describe('formulário da dose: repetir a vacina (B69)', () => {
     const caixa = await screen.findByRole('checkbox', { name: 'Esta vacina se repete' });
     expect(screen.queryByLabelText('A cada quanto tempo')).not.toBeOnTheScreen();
     // O aviso antecipado vale para qualquer dose, repetida ou não.
-    expect(screen.getByRole('radio', { name: 'Padrão: 7 dias antes' })).toBeOnTheScreen();
+    expect(screen.getByRole('checkbox', { name: '7 dias antes' })).toBeOnTheScreen();
+    expect(screen.getByText(/Sem marcar nada, avisamos 7 dias antes/)).toBeOnTheScreen();
     await fireEvent.press(caixa);
     expect(screen.getByLabelText('A cada quanto tempo')).toBeOnTheScreen();
     expect(screen.getByRole('radio', { name: 'Anos' })).toBeOnTheScreen();
@@ -76,7 +77,7 @@ describe('formulário da dose: repetir a vacina (B69)', () => {
     await fireEvent.press(
       screen.getByRole('radio', { name: 'Em datas fixas (por exemplo, todo ano em março)' }),
     );
-    await fireEvent.press(screen.getByRole('radio', { name: '14 dias antes' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: '14 dias antes' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Adicionar dose' }));
     await waitFor(() =>
       expect(mockReplace).toHaveBeenCalledWith({
@@ -90,6 +91,23 @@ describe('formulário da dose: repetir a vacina (B69)', () => {
       dueDate: '2026-10-06',
       recurrence: { unit: 'YEAR', every: 1, anchor: 'SCHEDULE' },
       remindDaysBefore: 14,
+    });
+  });
+
+  test('CT-APP-REP41b: vários avisos marcados vão como lista, do maior para o menor', async () => {
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'POST /members/m-1/doses': { status: 201, body: GRIPE({ id: 'd-novo' }) },
+    });
+    await renderScreen(<NewDoseScreen />, fake.fetchFn);
+    await preencherBasico();
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'No próprio dia' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: '3 dias antes' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: '7 dias antes' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Adicionar dose' }));
+    await waitFor(() => expect(mockReplace).toHaveBeenCalled());
+    expect(fake.calls.find((c) => c.key === 'POST /members/m-1/doses')?.body).toMatchObject({
+      remindDays: [7, 3, 0],
     });
   });
 

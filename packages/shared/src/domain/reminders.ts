@@ -7,6 +7,12 @@ export const REMINDER_LEAD_DAYS = 7;
 /** Maior antecedência que a pessoa pode pedir para o aviso de uma dose. */
 export const MAX_REMIND_DAYS_BEFORE = 60;
 
+/** Quantos avisos antecipados diferentes a pessoa pode pedir para uma mesma dose. */
+export const MAX_REMIND_DAYS_LIST = 8;
+
+/** A parte da dose que diz quando avisar. */
+export type AvisosDaDose = Pick<DoseSnapshot, 'remindDays' | 'remindDaysBefore'>;
+
 /** Tipo de lembrete: dose próxima, dose para hoje ou dose atrasada. */
 export type ReminderKind = 'UPCOMING' | 'TODAY' | 'OVERDUE';
 
@@ -16,8 +22,20 @@ export type ReminderKind = 'UPCOMING' | 'TODAY' | 'OVERDUE';
  *
  * @param dose - Dose a avaliar.
  */
-export function leadDaysOf(dose: DoseSnapshot): number {
-  return dose.remindDaysBefore ?? REMINDER_LEAD_DAYS;
+export function leadDaysOf(dose: AvisosDaDose): number {
+  return Math.max(...leadDaysListOf(dose));
+}
+
+/**
+ * Todas as antecedências escolhidas para a dose, da maior para a menor, sem repetir. Sem lista, vale
+ * o aviso único (`remindDaysBefore`) e, sem ele, o padrão de {@link REMINDER_LEAD_DAYS}.
+ *
+ * @param dose - Dose a avaliar.
+ */
+export function leadDaysListOf(dose: AvisosDaDose): readonly number[] {
+  const lista = dose.remindDays;
+  const base = lista && lista.length > 0 ? lista : [dose.remindDaysBefore ?? REMINDER_LEAD_DAYS];
+  return [...new Set(base)].sort((a, b) => b - a);
 }
 
 /**
@@ -52,8 +70,8 @@ export function reminderKind(dose: DoseSnapshot, today: CivilDate): ReminderKind
 
 /**
  * Diz se o e-mail de lembrete deve citar esta dose hoje: Pendente ou Agendada, com data de hoje ou
- * daqui a exatamente {@link leadDaysOf} dias (7 por padrão). Assim cada dose gera no máximo dois
- * e-mails (a antecedência escolhida e o próprio dia), em vez de um por dia.
+ * daqui a exatamente uma das antecedências escolhidas (7 dias por padrão). Assim cada dose gera um
+ * e-mail por aviso escolhido e mais um no próprio dia, em vez de um por dia.
  *
  * @param dose - Dose a avaliar.
  * @param today - Data de hoje.
@@ -61,5 +79,5 @@ export function reminderKind(dose: DoseSnapshot, today: CivilDate): ReminderKind
 export function isEmailReminderDay(dose: DoseSnapshot, today: CivilDate): boolean {
   if (dose.status !== 'PENDING' && dose.status !== 'SCHEDULED') return false;
   const date = reminderDate(dose);
-  return date === today || date === addDays(today, leadDaysOf(dose));
+  return date === today || leadDaysListOf(dose).some((dias) => date === addDays(today, dias));
 }

@@ -338,13 +338,19 @@ describe('repositórios SQL: dose que se repete (B69)', () => {
         scheduled_date: null,
         applied_date: null,
         remind_days_before: 3,
+        remind_days: '3,0',
       },
     ]);
     const found = await createSqlRepositories(executor).reminders.listEmailCandidates('2026-10-06');
-    expect(found[0]?.dose).toMatchObject({ remindDaysBefore: 3, dueDate: '2026-10-09' });
+    expect(found[0]?.dose).toMatchObject({
+      remindDaysBefore: 3,
+      remindDays: [3, 0],
+      dueDate: '2026-10-09',
+    });
     const call = calls[0];
-    expect(call?.text).toContain('COALESCE(d.remind_days_before, @lead)');
-    expect(call?.params['lead']).toEqual({ type: 'int', value: 7 });
+    // A consulta traz as doses da janela; quem decide o dia de cada aviso é a regra do domínio.
+    expect(call?.text).toContain('BETWEEN CONVERT(date, @today, 23)');
+    expect(call?.params['maxLead']).toEqual({ type: 'int', value: 60 });
   });
 });
 

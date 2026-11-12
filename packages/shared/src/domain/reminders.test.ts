@@ -1,5 +1,5 @@
 import type { DoseSnapshot } from './dose-state';
-import { isEmailReminderDay, reminderKind } from './reminders';
+import { isEmailReminderDay, leadDaysListOf, reminderKind } from './reminders';
 
 const HOJE = '2026-10-06';
 const dose = (patch: Partial<DoseSnapshot>): DoseSnapshot => ({
@@ -70,5 +70,31 @@ describe('lembretes: aviso antecipado escolhido para a dose', () => {
     ['CT-REC-41', dose({ dueDate: '2026-10-06', remindDaysBefore: 0 }), true],
   ] as const)('%s: dia de e-mail', (_id, snapshot, esperado) => {
     expect(isEmailReminderDay(snapshot, HOJE)).toBe(esperado);
+  });
+});
+
+describe('lembretes: vários avisos para a mesma dose', () => {
+  const varios = { remindDays: [7, 3, 0] };
+  test.each([
+    ['CT-LEM-50', dose({ dueDate: '2026-10-13', ...varios }), true],
+    ['CT-LEM-51', dose({ dueDate: '2026-10-09', ...varios }), true],
+    ['CT-LEM-52', dose({ dueDate: '2026-10-06', ...varios }), true],
+    ['CT-LEM-53', dose({ dueDate: '2026-10-11', ...varios }), false],
+    ['CT-LEM-54', dose({ dueDate: '2026-10-13', remindDays: [3, 3], remindDaysBefore: 7 }), false],
+  ] as const)('%s: dia de e-mail com vários avisos', (_id, snapshot, esperado) => {
+    expect(isEmailReminderDay(snapshot, HOJE)).toBe(esperado);
+  });
+
+  test('CT-LEM-55: o lembrete no app vale a partir do maior aviso', () => {
+    expect(reminderKind(dose({ dueDate: '2026-10-20', remindDays: [14, 3] }), HOJE)).toBe(
+      'UPCOMING',
+    );
+    expect(reminderKind(dose({ dueDate: '2026-10-21', remindDays: [14, 3] }), HOJE)).toBeNull();
+  });
+
+  test('CT-LEM-56: a lista vem da maior para a menor, sem repetir; sem lista vale o aviso único', () => {
+    expect(leadDaysListOf({ remindDays: [0, 7, 3, 7] })).toEqual([7, 3, 0]);
+    expect(leadDaysListOf({ remindDaysBefore: 14 })).toEqual([14]);
+    expect(leadDaysListOf({})).toEqual([7]);
   });
 });

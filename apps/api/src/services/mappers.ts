@@ -118,6 +118,7 @@ export function toCustomDoseResponse(dose: StoredDose): DoseResponse | undefined
       : null,
     occurrence: dose.occurrence ?? null,
     remindDaysBefore: dose.remindDaysBefore ?? null,
+    remindDays: dose.remindDays ? [...dose.remindDays] : null,
   };
 }
 

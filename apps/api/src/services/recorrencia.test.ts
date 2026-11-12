@@ -50,6 +50,17 @@ describe('dose avulsa que se repete: cadastro', () => {
     expect(dose).toMatchObject({ recurrence: null, occurrence: null, remindDaysBefore: null });
   });
 
+  test('CT-REC-91b: vários avisos voltam em ordem, e o aviso único guarda o maior', async () => {
+    const { criar } = await setup();
+    const dose = await criar({
+      vaccine: 'Raiva',
+      doseLabel: '1ª',
+      dueDate: '2026-11-04',
+      remindDays: [0, 7, 3],
+    });
+    expect(dose).toMatchObject({ remindDays: [7, 3, 0], remindDaysBefore: 7 });
+  });
+
   test('CT-REC-92: a série conta como uma só no limite de doses avulsas', async () => {
     const { app, memberId, criar, aplicar } = await setup();
     const primeira = await criar();

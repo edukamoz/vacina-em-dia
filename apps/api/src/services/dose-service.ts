@@ -158,6 +158,7 @@ export function createDoseService({
       ...(done.ruleId === null ? { custom: done.custom ?? null, recurrence: rule } : {}),
       ...createDose(dueDate),
       remindDaysBefore: done.remindDaysBefore ?? null,
+      ...(done.remindDays ? { remindDays: done.remindDays } : {}),
       seriesId,
       occurrence: occurrence + 1,
     };
