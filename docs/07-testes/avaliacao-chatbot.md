@@ -1,24 +1,24 @@
 # Avaliação do chatbot (classificador de intenções)
 
-Gerado em 21/10/2026 por `python -m vacina_nlp.evaluate --write-report`. Não edite à mão: rode o comando de novo. Os mesmos números, em gráficos, estão no painel `painel-pln.html` (mesma pasta), gerado com `--write-dashboard`.
+Gerado em 12/11/2026 por `python -m vacina_nlp.evaluate --write-report`. Não edite à mão: rode o comando de novo. Os mesmos números, em gráficos, estão no painel `painel-pln.html` (mesma pasta), gerado com `--write-dashboard`.
 
 ## Método
 
 - **Modelo:** TF-IDF (palavras de 1 e 2 termos + trechos de 3 a 5 letras) e SVM linear (scikit-learn 1.9.1), com probabilidades calibradas (Platt).
-- **Treino:** 1060 frases em 39 intenções, escritas e revisadas à mão (`vacina_nlp/data/intents.json`), sem dados pessoais.
-- **Teste:** 195 frases **separadas** do treino (`data/test_set.json`); o script recusa o teste se alguma frase estiver nos dois conjuntos.
+- **Treino:** 1084 frases em 40 intenções, escritas e revisadas à mão (`vacina_nlp/data/intents.json`), sem dados pessoais.
+- **Teste:** 205 frases **separadas** do treino (`data/test_set.json`); o script recusa o teste se alguma frase estiver nos dois conjuntos.
 - **Semente fixa** (42): o resultado é reprodutível.
 
 ## Resultado no conjunto de teste
 
 | Métrica | Valor |
 |---|---|
-| Acurácia | 90,8% |
-| F1 macro | 0,901 |
-| F1 ponderado | 0,901 |
+| Acurácia | 89,8% |
+| F1 macro | 0,890 |
+| F1 ponderado | 0,891 |
 | Meta de F1 macro (a validar com o professor) | 0,850: **atingida** |
-| Validação cruzada (5 partes, só no treino): acurácia | 71,1% |
-| Validação cruzada (5 partes, só no treino): F1 macro | 0,702 |
+| Validação cruzada (5 partes, só no treino): acurácia | 72,0% |
+| Validação cruzada (5 partes, só no treino): F1 macro | 0,711 |
 
 ### Por intenção
 
@@ -46,46 +46,50 @@ Gerado em 21/10/2026 por `python -m vacina_nlp.evaluate --write-report`. Não ed
 | `como_ver_novidades` | 0,833 | 1,000 | 0,909 | 5 |
 | `como_ver_postos` | 0,833 | 1,000 | 0,909 | 5 |
 | `conta_doses_atrasadas` | 1,000 | 1,000 | 1,000 | 5 |
-| `conta_email` | 1,000 | 0,800 | 0,889 | 5 |
+| `conta_email` | 1,000 | 0,600 | 0,750 | 5 |
 | `conta_meus_lembretes` | 1,000 | 0,600 | 0,750 | 5 |
 | `conta_proxima_dose` | 0,833 | 1,000 | 0,909 | 5 |
-| `conta_quem_na_familia` | 1,000 | 1,000 | 1,000 | 5 |
+| `conta_quem_na_familia` | 0,833 | 1,000 | 0,909 | 5 |
 | `conta_resumo_vacinacao` | 1,000 | 0,800 | 0,889 | 5 |
 | `despedida_agradecimento` | 1,000 | 1,000 | 1,000 | 5 |
 | `fonte_calendario` | 1,000 | 0,600 | 0,750 | 5 |
 | `fora_do_escopo` | 1,000 | 0,800 | 0,889 | 5 |
 | `lembretes` | 0,833 | 1,000 | 0,909 | 5 |
-| `orientacao_medica` | 1,000 | 1,000 | 1,000 | 5 |
+| `orientacao_medica` | 1,000 | 0,800 | 0,889 | 5 |
 | `privacidade_dados` | 1,000 | 0,600 | 0,750 | 5 |
 | `saudacao` | 0,833 | 1,000 | 0,909 | 5 |
 | `significado_atrasada` | 1,000 | 1,000 | 1,000 | 5 |
 | `significado_estados` | 1,000 | 1,000 | 1,000 | 5 |
 | `vacina_para_que_serve` | 1,000 | 1,000 | 1,000 | 5 |
-| `vacina_quando` | 1,000 | 1,000 | 1,000 | 5 |
+| `vacina_quando` | 1,000 | 0,800 | 0,889 | 5 |
+| `vacina_reacoes` | 0,833 | 1,000 | 0,909 | 10 |
 | `vacinas_do_grupo` | 1,000 | 1,000 | 1,000 | 5 |
 
 ### Erros no teste
 
 | Frase | Esperada | Prevista | Confiança |
 |---|---|---|---|
-| em que você pode me ajudar hoje | `ajuda_o_que_faz` | `saudacao` | 0,396 |
-| quais perguntas posso fazer a você | `ajuda_o_que_faz` | `como_usar_voz` | 0,501 |
-| como esse assistente funciona | `ajuda_o_que_faz` | `como_usar_voz` | 0,306 |
+| em que você pode me ajudar hoje | `ajuda_o_que_faz` | `saudacao` | 0,393 |
+| quais perguntas posso fazer a você | `ajuda_o_que_faz` | `como_usar_voz` | 0,491 |
+| como esse assistente funciona | `ajuda_o_que_faz` | `como_usar_voz` | 0,303 |
 | o que esse aplicativo faz | `ajuda_o_que_faz` | `como_instalar_app` | 0,501 |
-| mostra a carteirinha com as doses aplicadas | `como_ver_historico` | `acao_abrir_tela` | 0,329 |
-| que dados pessoais vocês guardam de mim | `privacidade_dados` | `como_excluir_dados` | 0,357 |
-| vocês passam meus dados para outras empresas | `privacidade_dados` | `como_excluir_dados` | 0,399 |
-| esse calendário é do ministério da saúde | `fonte_calendario` | `como_ver_novidades` | 0,417 |
-| posso deixar a caderneta de papel de lado e usar só o app | `fonte_calendario` | `como_ler_caderneta` | 0,527 |
-| como instalar um programa no computador | `fora_do_escopo` | `como_instalar_app` | 0,564 |
-| me diz quanto falta tomar | `conta_resumo_vacinacao` | `conta_proxima_dose` | 0,475 |
-| tenho algum lembrete | `conta_meus_lembretes` | `lembretes` | 0,399 |
-| tem vacina para amanhã | `conta_meus_lembretes` | `acao_agendar_dose` | 0,509 |
-| mostra meu perfil | `conta_email` | `como_trocar_foto` | 0,331 |
-| ir para os postos | `acao_abrir_tela` | `como_ver_postos` | 0,479 |
-| o aplicativo é pago | `como_apoiar_pix` | `como_instalar_app` | 0,529 |
-| como funciona ler a caderneta por foto | `como_ler_caderneta` | `como_trocar_foto` | 0,410 |
-| a foto da caderneta sai do meu celular | `como_ler_caderneta` | `como_trocar_foto` | 0,433 |
+| mostra a carteirinha com as doses aplicadas | `como_ver_historico` | `acao_abrir_tela` | 0,334 |
+| que dados pessoais vocês guardam de mim | `privacidade_dados` | `como_excluir_dados` | 0,360 |
+| vocês passam meus dados para outras empresas | `privacidade_dados` | `como_excluir_dados` | 0,404 |
+| esse calendário é do ministério da saúde | `fonte_calendario` | `como_ver_novidades` | 0,422 |
+| posso deixar a caderneta de papel de lado e usar só o app | `fonte_calendario` | `como_ler_caderneta` | 0,529 |
+| quando é a vacina da febre amarela | `vacina_quando` | `vacina_reacoes` | 0,336 |
+| o que fazer se der reação depois da vacina | `orientacao_medica` | `vacina_reacoes` | 0,445 |
+| como instalar um programa no computador | `fora_do_escopo` | `como_instalar_app` | 0,563 |
+| me diz quanto falta tomar | `conta_resumo_vacinacao` | `conta_proxima_dose` | 0,491 |
+| tenho algum lembrete | `conta_meus_lembretes` | `lembretes` | 0,398 |
+| tem vacina para amanhã | `conta_meus_lembretes` | `acao_agendar_dose` | 0,518 |
+| qual e-mail eu cadastrei | `conta_email` | `conta_quem_na_familia` | 0,370 |
+| mostra meu perfil | `conta_email` | `como_trocar_foto` | 0,329 |
+| ir para os postos | `acao_abrir_tela` | `como_ver_postos` | 0,480 |
+| o aplicativo é pago | `como_apoiar_pix` | `como_instalar_app` | 0,528 |
+| como funciona ler a caderneta por foto | `como_ler_caderneta` | `como_trocar_foto` | 0,409 |
+| a foto da caderneta sai do meu celular | `como_ler_caderneta` | `como_trocar_foto` | 0,435 |
 
 ## Limiar de confiança
 
@@ -93,15 +97,15 @@ Abaixo do limiar, o assistente não responde a intenção: devolve a resposta pa
 
 | Limiar | Cobertura | Acerto entre as aceitas |
 |---|---|---|
-| 0,200 | 100,0% | 90,8% |
-| 0,250 | 100,0% | 90,8% |
-| 0,300 (em uso) | 99,0% | 90,7% |
-| 0,350 | 90,8% | 91,5% |
-| 0,400 | 70,8% | 92,0% |
-| 0,500 | 39,5% | 92,2% |
-| 0,600 | 13,3% | 100,0% |
+| 0,200 | 100,0% | 89,8% |
+| 0,250 | 100,0% | 89,8% |
+| 0,300 (em uso) | 98,5% | 89,6% |
+| 0,350 | 90,2% | 90,8% |
+| 0,400 | 71,2% | 91,1% |
+| 0,500 | 40,5% | 94,0% |
+| 0,600 | 14,6% | 100,0% |
 
-Com o limiar em uso (0,300), 10 de 10 entradas sem sentido (por exemplo "asdf" e "????") caem na resposta padrão ou na de "fora do escopo".
+Com o limiar em uso (0,300), 9 de 10 entradas sem sentido (por exemplo "asdf" e "????") caem na resposta padrão ou na de "fora do escopo".
 
 ## Limitações
 

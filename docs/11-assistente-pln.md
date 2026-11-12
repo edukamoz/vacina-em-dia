@@ -6,7 +6,7 @@ Serviço em `apps/nlp` (Azure Function em Python, ADR-002). **Sem IA generativa*
 
 1. **Texto vazio** ou sem letras: pede para repetir.
 2. **Regras de segurança** (`vacina_nlp/safety.py`): sintoma, reação, remédio, "posso tomar...", emergência. A pergunta **não passa pelo modelo**: o assistente diz que não dá orientação médica, manda procurar um profissional ou a unidade de saúde e cita o SAMU (192). O nome "febre amarela" não dispara a regra de febre.
-3. **Classificador de intenções** (TF-IDF + SVM): 39 intenções. Confiança abaixo do limiar (0,30) devolve a **resposta padrão**, que orienta procurar um profissional ou uma unidade de saúde. Se a pergunta cita uma vacina, o assistente explica a vacina em vez de dizer que não entendeu.
+3. **Classificador de intenções** (TF-IDF + SVM): 40 intenções (a 40ª, `vacina_reacoes`, entrou no B75: ver abaixo). Confiança abaixo do limiar (0,30) devolve a **resposta padrão**, que orienta procurar um profissional ou uma unidade de saúde. Se a pergunta cita uma vacina, o assistente explica a vacina em vez de dizer que não entendeu.
 4. **Resposta**: curada. Para "para que serve", "quando toma" e "vacinas do grupo", o texto é montado a partir das linhas do calendário oficial (doenças evitadas, dose e momento) e **sempre cita a fonte e a versão**.
 
 **Árvore de decisão (atividade da aula "ChatBot I"):** o desenho completo, com o mapa para o código, está em `docs/03-uml/arvore-decisao-chatbot.md` (imagem: `arvore-decisao-chatbot.png`).
@@ -46,6 +46,8 @@ Além de explicar o app e o calendário, o assistente responde com os **dados de
 | Ajuda da plataforma | `como_ver_graficos`, `como_ver_novidades`, `como_apoiar_pix`, `como_ler_caderneta`, `como_trocar_foto`, `como_mudar_aparencia`, `como_instalar_app`, `como_sair_conta`, `como_ver_postos` | Respostas curadas sobre cada recurso. |
 
 **O que o assistente NÃO faz (de propósito):** excluir pessoa, dose ou conta; cancelar dose; trocar e-mail ou senha; dar orientação médica (a regra de segurança vem antes de tudo: "registrar que a Maria tomou a vacina e teve febre" vai para um profissional); gravar sem confirmação; inventar vacina, dose ou data.
+
+**Perguntas gerais sobre reações das vacinas (B75, ADR-033):** "quais as reações da vacina X?" já não cai na regra de segurança (`safety.is_general_reaction_question`: pergunta geral, sem relato de caso e sem sintoma, remédio, "perigoso" ou "grave"). O assistente **aponta** o quadro e a página do *Manual de Vigilância Epidemiológica de Eventos Adversos Pós-Vacinação* (4ª ed. atualizada, 2021) para a vacina citada, sem copiar a tabela, e diz que não avalia o caso de ninguém (192 em emergência). Quem relata um caso ("tive reação", "minha filha ficou inchada", "estou com febre") continua indo a um profissional. Os ponteiros vêm de `data/vaccine-info.json`, gerado do `@vacina/shared` por `npm run export:calendar`. O F1 macro foi de 0,901 para 0,890 (acurácia 90,8% para 89,8%) com a nova intenção e 10 frases novas no teste; a meta de 0,85 segue atingida e o relatório foi regenerado.
 
 **Como o serviço separa "como faço" de "faça":** `Chatbot._command_or_howto`. Pergunta (como, onde, posso...) fica com a explicação; fora disso, o que a frase traz (nome, data, vacina) mostra que é um comando. As entidades (`vaccines`, `names`, `dates` com `--MM-DD` quando sem ano, `relativeDay`, `screen`) saem de regras em `entities.py`. O limiar de confiança caiu de 0,40 para 0,30 porque, com 39 intenções, as probabilidades calibradas se espalham mais (relatório: `avaliacao-chatbot.md`).
 

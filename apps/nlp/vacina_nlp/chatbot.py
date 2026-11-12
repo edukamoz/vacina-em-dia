@@ -30,7 +30,8 @@ from .entities import (
     extract_vaccines,
 )
 from .preprocess import normalize
-from .safety import needs_professional
+from .safety import is_general_reaction_question, needs_professional
+from .vaccine_info import VaccineInfo, load_vaccine_info
 
 # Abaixo disto, a pergunta é tratada como "não entendi" (definido na avaliação, ver
 # docs/07-testes/avaliacao-chatbot.md). Era 0,40 com 20 intenções; com 39 as probabilidades
@@ -108,7 +109,9 @@ class Chatbot:
         calendar: Calendar,
         responses: dict[str, Any],
         threshold: float = CONFIDENCE_THRESHOLD,
+        vaccine_info: VaccineInfo | None = None,
     ) -> None:
+        self._vaccine_info = vaccine_info or load_vaccine_info()
         self._classifier = classifier
         self._calendar = calendar
         self._responses = responses
@@ -161,6 +164,10 @@ class Chatbot:
         if needs_professional(text):
             return self._curated("orientacao_medica", "orientacao_medica", 1.0, safety=True)
 
+        # Pergunta geral sobre reações de uma vacina: aponta o manual oficial (não é caso pessoal).
+        if is_general_reaction_question(text):
+            return self._reactions(text, 1.0)
+
         prediction = self._classifier.predict(text)
         if prediction.confidence < self._threshold:
             # Pergunta curta que cita uma vacina ("febre amarela é para que"): explica a vacina.
@@ -178,6 +185,8 @@ class Chatbot:
             return self._when_vaccine(text, confidence)
         if intent == "vacinas_do_grupo":
             return self._group_vaccines(text, confidence)
+        if intent == "vacina_reacoes":
+            return self._reactions(text, confidence)
         return self._curated(intent, intent, confidence, safety=intent == "orientacao_medica")
 
     # -- comandos e perguntas sobre a conta (o app responde com os dados da pessoa) -----------
@@ -245,6 +254,39 @@ class Chatbot:
             " ".join(partes) + CLOSING,
             confidence,
             [f"Quando toma a vacina {names[0]}?", "Quais vacinas a criança deve tomar?"],
+        )
+
+    def _reactions(self, text: str, confidence: float) -> Reply:
+        """Reações de uma vacina: não copia a tabela, aponta o quadro e a página do manual oficial.
+
+        Nunca avalia o caso de uma pessoa: quem teve uma reação é encaminhado a um serviço de saúde.
+        """
+        names = extract_vaccines(text, self._calendar)[:MAX_VACCINES_PER_ANSWER]
+        if not names:
+            return self._curated("vacina_reacoes", "vacina_reacoes", confidence)
+        source = self._vaccine_info.source
+        partes = []
+        for name in names:
+            pointer = self._vaccine_info.pointer_for(name)
+            if pointer is None:
+                partes.append(f"{name}: ainda não tenho o quadro de reações desta vacina.")
+            else:
+                partes.append(f"{name}: {pointer.quadro}, página {pointer.page}.")
+        answer = (
+            "As reações esperadas de cada vacina estão no "
+            f"{source.name} ({source.edition}), do {source.publisher}. "
+            + " ".join(partes)
+            + " No aplicativo, abra a dose e toque em Sobre esta vacina."
+            " Não posso avaliar o caso de ninguém: se houve uma reação, procure um serviço de saúde;"
+            " em emergência, ligue 192 (SAMU)."
+        )
+        return Reply(
+            intent="vacina_reacoes",
+            text=answer,
+            confidence=confidence,
+            source={"name": f"{source.name}, {source.publisher}", "url": source.url, "version": source.edition},
+            suggestions=(f"Para que serve a vacina {names[0]}?", "O que você faz?"),
+            entities={"vaccines": names},
         )
 
     @staticmethod
