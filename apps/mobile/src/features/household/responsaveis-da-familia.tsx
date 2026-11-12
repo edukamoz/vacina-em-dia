@@ -63,8 +63,8 @@ function Linha({ responsavel }: { responsavel: GuardianResponse }) {
 }
 
 /**
- * Cada responsável é um item da lista; o dono vê, dentro do item de quem não é ele, as duas ações
- * possíveis lado a lado. Assim a lista cresce uma linha por pessoa, não dois botões largos.
+ * Cada responsável é um cartão da lista, todos iguais; o dono vê, dentro do cartão de quem não é
+ * ele, as duas ações possíveis lado a lado. Assim a lista cresce uma linha por pessoa, não dois botões largos.
  */
 function ItemDoResponsavel({
   responsavel,
@@ -77,10 +77,7 @@ function ItemDoResponsavel({
 }) {
   const acoes = aoPassar && aoRemover;
   return (
-    <View
-      role="listitem"
-      className={acoes ? 'gap-sm rounded-cartao border-padrao border-borda p-md' : ''}
-    >
+    <View role="listitem" className="gap-sm rounded-cartao border-padrao border-borda p-md">
       <Linha responsavel={responsavel} />
       {acoes ? (
         <View className="flex-row gap-sm">
