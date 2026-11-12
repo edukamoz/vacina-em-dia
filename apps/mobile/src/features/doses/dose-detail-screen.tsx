@@ -14,6 +14,7 @@ import { useDose, useDoseEvent, useMemberDoses, useMembers } from '../data/hooks
 import { doseDateRow, doseHint } from './dose-card';
 import { formatCivilDate } from './format-date';
 import { descreverAviso, descreverRepeticao } from './repeticao';
+import { SobreAVacina } from './sobre-a-vacina';
 
 /** O que a pessoa está fazendo agora na tela: escolhendo a data de uma ação ou confirmando o cancelamento. */
 type Acao = 'APPLY' | 'SCHEDULE' | 'CANCEL';
@@ -289,6 +290,8 @@ export function DoseDetailScreen({ id }: { id: string }) {
           ))}
         </View>
       ) : null}
+
+      {dose.origin === 'OFFICIAL' ? <SobreAVacina vacina={dose.vaccine} /> : null}
 
       <DoseActions key={dose.status} dose={dose} />
       <Texto variante="apoio" className="text-textoSecundario">
