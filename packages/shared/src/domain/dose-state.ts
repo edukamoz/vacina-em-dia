@@ -55,6 +55,11 @@ export interface DoseSnapshot {
    * `null` usa o padrão do app (7 dias). Não participa da máquina de estados.
    */
   readonly remindDaysBefore?: number | null | undefined;
+  /**
+   * Todas as antecedências escolhidas (por exemplo 7, 3 e 0). Quando existe, vale no lugar de
+   * `remindDaysBefore`.
+   */
+  readonly remindDays?: readonly number[] | null | undefined;
 }
 
 /** Contexto de uma tentativa de transição. */

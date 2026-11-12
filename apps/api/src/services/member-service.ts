@@ -222,7 +222,12 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
       if (customSlots.length >= MAX_CUSTOM_DOSES) {
         return failure({ code: 'LIMIT_REACHED', scope: 'customDoses' });
       }
-      const { recurrence, remindDaysBefore } = input;
+      const { recurrence } = input;
+      // Vários avisos: a lista vale no lugar do aviso único; `remindDaysBefore` guarda o maior.
+      const remindDays = input.remindDays
+        ? [...new Set(input.remindDays)].sort((a, b) => b - a)
+        : undefined;
+      const remindDaysBefore = remindDays ? remindDays[0] : input.remindDaysBefore;
       const dose: StoredDose = {
         id: newId(),
         memberId,
@@ -230,6 +235,7 @@ export function createMemberService(deps: MemberServiceDeps): MemberService {
         custom: { vaccine: input.vaccine, doseLabel: input.doseLabel },
         ...createDose(input.dueDate),
         ...(remindDaysBefore == null ? {} : { remindDaysBefore }),
+        ...(remindDays ? { remindDays } : {}),
         ...(recurrence
           ? {
               recurrence: {

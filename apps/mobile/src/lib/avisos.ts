@@ -1,5 +1,5 @@
 import {
-  REMINDER_LEAD_DAYS,
+  leadDaysListOf,
   addDays,
   compareCivilDates,
   type CivilDate,
@@ -25,6 +25,8 @@ export interface DoseParaAviso {
   readonly scheduledDate: CivilDate | null;
   /** Antecedência escolhida para esta dose; vazio usa o padrão (7 dias). */
   readonly remindDaysBefore?: number | null | undefined;
+  /** Todas as antecedências escolhidas; quando existe, vale no lugar de `remindDaysBefore`. */
+  readonly remindDays?: readonly number[] | null | undefined;
 }
 
 /** "Agora" no aparelho, recebido de fora para a regra ficar pura. */
@@ -111,8 +113,9 @@ export function planejarAvisos(
       dose.status === 'SCHEDULED' && dose.scheduledDate ? dose.scheduledDate : dose.dueDate;
     if (compareCivilDates(data, agora.hoje) >= 0) {
       somar(data, 'naData');
-      const antecedencia = dose.remindDaysBefore ?? REMINDER_LEAD_DAYS;
-      if (antecedencia > 0) somar(addDays(data, -antecedencia), 'antecipado');
+      for (const antecedencia of leadDaysListOf(dose)) {
+        if (antecedencia > 0) somar(addDays(data, -antecedencia), 'antecipado');
+      }
     } else {
       somar(addDays(data, 1), 'atrasada');
     }

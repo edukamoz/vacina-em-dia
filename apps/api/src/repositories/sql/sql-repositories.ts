@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import {
   RECURRENCE_ANCHORS,
   RECURRENCE_UNITS,
-  REMINDER_LEAD_DAYS,
+  MAX_REMIND_DAYS_BEFORE,
   type DoseStatus,
   type RecurrenceAnchor,
   type RecurrenceRule,
@@ -100,7 +100,7 @@ function toMember(row: SqlRow): StoredMember {
 }
 
 const DOSE_COLUMNS = `d.id, d.member_id, d.rule_id, d.custom_vaccine, d.custom_dose_label, d.status,
-  d.remind_days_before, d.series_id, d.occurrence, d.recur_unit, d.recur_every, d.recur_anchor,
+  d.remind_days_before, d.remind_days, d.series_id, d.occurrence, d.recur_unit, d.recur_every, d.recur_anchor,
   d.recur_max_doses,
   CONVERT(char(10), d.due_date, 23) AS due_date,
   CONVERT(char(10), d.scheduled_date, 23) AS scheduled_date,
@@ -131,12 +131,20 @@ function recurrenceOf(row: SqlRow): RecurrenceRule | null {
   };
 }
 
+/** Lê as antecedências guardadas como texto ('7,3,0'); texto vazio ou inválido vira `null`. */
+function parseRemindDays(value: string | null): number[] | null {
+  if (!value) return null;
+  const lista = value.split(',').map(Number);
+  return lista.every((n) => Number.isInteger(n) && n >= 0) ? lista : null;
+}
+
 function toDose(row: SqlRow): StoredDose {
   const status = text(row, 'status');
   if (!DOSE_STATUSES.includes(status)) throw new Error('Estado de dose inesperado.');
   const ruleId = nullableText(row, 'rule_id');
   const customVaccine = nullableText(row, 'custom_vaccine');
   const remindDaysBefore = nullableNumber(row, 'remind_days_before');
+  const remindDays = parseRemindDays(nullableText(row, 'remind_days'));
   const seriesId = nullableText(row, 'series_id');
   const recurrence = recurrenceOf(row);
   return {
@@ -152,6 +160,7 @@ function toDose(row: SqlRow): StoredDose {
     scheduledDate: nullableText(row, 'scheduled_date'),
     appliedDate: nullableText(row, 'applied_date'),
     ...(remindDaysBefore === null ? {} : { remindDaysBefore }),
+    ...(remindDays === null ? {} : { remindDays }),
     ...(seriesId === null ? {} : { seriesId, occurrence: nullableNumber(row, 'occurrence') }),
     ...(recurrence === null ? {} : { recurrence }),
   };
@@ -264,7 +273,7 @@ export function createSqlRepositories(
           await tx.run(
             `UPDATE d SET status = @status, due_date = CONVERT(date, @due, 23),
                scheduled_date = CONVERT(date, @scheduled, 23), applied_date = CONVERT(date, @applied, 23),
-               remind_days_before = @remind, series_id = @series, occurrence = @occurrence,
+               remind_days_before = @remind, remind_days = @remindDays, series_id = @series, occurrence = @occurrence,
                recur_unit = @unit, recur_every = @every, recur_anchor = @anchor,
                recur_anchor_date = CONVERT(date, @anchorDate, 23),
                recur_end_date = CONVERT(date, @endDate, 23), recur_max_doses = @maxDoses
@@ -272,11 +281,11 @@ export function createSqlRepositories(
              WHERE d.id = @id AND fm.account_id = @owner;
              IF @@ROWCOUNT = 0
                INSERT INTO dose (id, member_id, rule_id, custom_vaccine, custom_dose_label, status,
-                 due_date, scheduled_date, applied_date, remind_days_before, series_id, occurrence,
+                 due_date, scheduled_date, applied_date, remind_days_before, remind_days, series_id, occurrence,
                  recur_unit, recur_every, recur_anchor, recur_anchor_date, recur_end_date,
                  recur_max_doses)
                SELECT @id, m.id, @rule, @customVaccine, @customDoseLabel, @status, CONVERT(date, @due, 23),
-                 CONVERT(date, @scheduled, 23), CONVERT(date, @applied, 23), @remind, @series,
+                 CONVERT(date, @scheduled, 23), CONVERT(date, @applied, 23), @remind, @remindDays, @series,
                  @occurrence, @unit, @every, @anchor, CONVERT(date, @anchorDate, 23),
                  CONVERT(date, @endDate, 23), @maxDoses
                FROM member m ${FAMILY_ACCESS} WHERE m.id = @member AND fm.account_id = @owner;`,
@@ -292,6 +301,7 @@ export function createSqlRepositories(
               scheduled: nullableStr(dose.scheduledDate, 10),
               applied: nullableStr(dose.appliedDate, 10),
               remind: nullableInt(dose.remindDaysBefore ?? null),
+              remindDays: nullableStr(dose.remindDays?.join(',') ?? null, 40),
               series: nullableStr(dose.seriesId ?? null, 64),
               occurrence: nullableInt(dose.occurrence ?? null),
               unit: nullableStr(recurrence?.unit ?? null, 5),
@@ -394,7 +404,7 @@ export function createSqlRepositories(
     },
     async listEmailCandidates(today) {
       const result = await db.run(
-        `SELECT a.id AS account_id, a.email, d.status, d.remind_days_before,
+        `SELECT a.id AS account_id, a.email, d.status, d.remind_days_before, d.remind_days,
            CONVERT(char(10), d.due_date, 23) AS due_date,
            CONVERT(char(10), d.scheduled_date, 23) AS scheduled_date,
            CONVERT(char(10), d.applied_date, 23) AS applied_date
@@ -406,15 +416,12 @@ export function createSqlRepositories(
          WHERE a.reminders_enabled = 1
            AND d.status IN ('PENDING', 'SCHEDULED')
            AND COALESCE(CASE WHEN d.status = 'SCHEDULED' THEN d.scheduled_date END, d.due_date)
-             IN (
-               CONVERT(date, @today, 23),
-               DATEADD(day, COALESCE(d.remind_days_before, @lead), CONVERT(date, @today, 23))
-             )
+             BETWEEN CONVERT(date, @today, 23) AND DATEADD(day, @maxLead, CONVERT(date, @today, 23))
            AND NOT EXISTS (
              SELECT 1 FROM reminder_log r WHERE r.account_id = a.id AND r.sent_on = CONVERT(date, @today, 23)
            )
          ORDER BY a.id`,
-        { today: str(today, 10), lead: nullableInt(REMINDER_LEAD_DAYS) },
+        { today: str(today, 10), maxLead: nullableInt(MAX_REMIND_DAYS_BEFORE) },
       );
       return result.rows.map((row) => ({
         accountId: text(row, 'account_id'),
@@ -427,6 +434,9 @@ export function createSqlRepositories(
           ...(nullableNumber(row, 'remind_days_before') === null
             ? {}
             : { remindDaysBefore: nullableNumber(row, 'remind_days_before') }),
+          ...(parseRemindDays(nullableText(row, 'remind_days')) === null
+            ? {}
+            : { remindDays: parseRemindDays(nullableText(row, 'remind_days')) }),
         },
       }));
     },

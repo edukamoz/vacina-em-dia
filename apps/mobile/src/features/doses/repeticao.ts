@@ -1,6 +1,8 @@
 import {
   MAX_SERIES_DOSES,
   MAX_REMIND_DAYS_BEFORE,
+  MAX_REMIND_DAYS_LIST,
+  leadDaysListOf,
   RECURRENCE_MAX_EVERY,
   compareCivilDates,
   addDays,
@@ -15,8 +17,8 @@ import { formatCivilDate } from './format-date';
 /** Como termina uma repetição: nunca, em uma data ou depois de certo número de doses. */
 export type Termino = 'NUNCA' | 'DATA' | 'DOSES';
 
-/** Antecedência do aviso: o padrão do app ou um número de dias escolhido (como texto). */
-export type EscolhaDeAviso = 'PADRAO' | '0' | '3' | '14' | '30';
+/** Antecedências prontas do aviso (em dias, como texto); a pessoa marca quantas quiser. */
+export type OpcaoDeAviso = '0' | '1' | '3' | '7' | '14' | '30';
 
 /** Estado do formulário de repetição e de aviso da dose avulsa (tudo como a pessoa digita). */
 export interface FormaDeRepetir {
@@ -27,7 +29,10 @@ export interface FormaDeRepetir {
   readonly termina: Termino;
   readonly dataFinal: CivilDate;
   readonly totalDoses: string;
-  readonly avisar: EscolhaDeAviso;
+  /** Antecedências marcadas; vazio usa o padrão do app (7 dias). */
+  readonly avisar: readonly OpcaoDeAviso[];
+  /** Outra antecedência, em dias, digitada pela pessoa (vazio: nenhuma). */
+  readonly avisarOutro: string;
 }
 
 /** Formulário de partida: a dose não se repete e o aviso segue o padrão do app. */
@@ -39,17 +44,19 @@ export const ESTADO_INICIAL_REPETICAO: FormaDeRepetir = {
   termina: 'NUNCA',
   dataFinal: '',
   totalDoses: '5',
-  avisar: 'PADRAO',
+  avisar: [],
+  avisarOutro: '',
 };
 
 /** Campos extras da dose avulsa que o formulário pode acrescentar. */
-export type ExtrasDaDose = Pick<CustomDoseInput, 'recurrence' | 'remindDaysBefore'>;
+export type ExtrasDaDose = Pick<CustomDoseInput, 'recurrence' | 'remindDaysBefore' | 'remindDays'>;
 
 /** Mensagens de erro por campo do formulário. */
 export interface ErrosDeRepeticao {
   cada?: string;
   totalDoses?: string;
   dataFinal?: string;
+  avisarOutro?: string;
 }
 
 /** Resultado de {@link montarRepeticao}. */
@@ -70,9 +77,23 @@ export function montarRepeticao(forma: FormaDeRepetir, primeiraData: CivilDate):
   const erros: ErrosDeRepeticao = {};
   const extras: { -readonly [K in keyof ExtrasDaDose]: ExtrasDaDose[K] } = {};
 
-  if (forma.avisar !== 'PADRAO') {
-    extras.remindDaysBefore = Math.min(Number(forma.avisar), MAX_REMIND_DAYS_BEFORE);
+  const avisos = new Set<number>(forma.avisar.map(Number));
+  const outro = forma.avisarOutro.trim();
+  if (outro !== '') {
+    const dias = INTEIRO.test(outro) ? Number(outro) : Number.NaN;
+    if (!(dias >= 0 && dias <= MAX_REMIND_DAYS_BEFORE)) {
+      erros.avisarOutro = `Informe um número de 0 a ${MAX_REMIND_DAYS_BEFORE}.`;
+    } else {
+      avisos.add(dias);
+    }
   }
+  if (avisos.size > MAX_REMIND_DAYS_LIST) {
+    erros.avisarOutro = `Escolha no máximo ${MAX_REMIND_DAYS_LIST} avisos.`;
+  }
+  const lista = [...avisos].sort((a, b) => b - a);
+  // Um aviso só segue o contrato antigo; dois ou mais vão na lista.
+  if (lista.length === 1) extras.remindDaysBefore = lista[0] as number;
+  if (lista.length > 1) extras.remindDays = lista;
 
   if (forma.repete) {
     const maximo = RECURRENCE_MAX_EVERY[forma.unidade];
@@ -142,6 +163,24 @@ export function descreverAviso(dias: number | null | undefined): string {
   if (dias === null || dias === undefined) return 'Padrão: 7 dias antes';
   if (dias === 0) return 'No próprio dia';
   return dias === 1 ? '1 dia antes' : `${dias} dias antes`;
+}
+
+/**
+ * Descreve todos os avisos de uma dose, por exemplo "7 dias antes, 3 dias antes e no próprio dia".
+ *
+ * @param dose - Dose devolvida pela API (lista de avisos ou aviso único).
+ */
+export function descreverAvisos(
+  dose: Pick<DoseResponse, 'remindDays' | 'remindDaysBefore'>,
+): string {
+  if (!dose.remindDays || dose.remindDays.length === 0)
+    return descreverAviso(dose.remindDaysBefore);
+  const partes = leadDaysListOf(dose).map((dias) =>
+    descreverAviso(dias).replace('No próprio dia', 'no próprio dia'),
+  );
+  const ultima = partes.pop() as string;
+  const texto = partes.length > 0 ? `${partes.join(', ')} e ${ultima}` : ultima;
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
 /**
