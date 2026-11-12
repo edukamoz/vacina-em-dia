@@ -23,7 +23,7 @@ def test_ct_nlp_120_f1_macro_no_conjunto_de_teste_separado_atinge_a_meta(resulta
     assert resultado.macro_f1 >= F1_TARGET
     assert resultado.accuracy >= F1_TARGET
     assert resultado.test_size >= 100
-    assert resultado.intents == 39
+    assert resultado.intents == 40
 
 
 def test_ct_nlp_121_toda_intencao_tem_frases_de_teste(resultado):

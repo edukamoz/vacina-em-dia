@@ -2,8 +2,8 @@
 
 > **Arquivo gerado** por `python -m vacina_nlp.comparacao --write-report ...` (dentro de `apps/nlp`). Não edite à mão.
 
-- **Data:** 2026-10-21
-- **Chatbot:** 1060 frases de treino e 195 de teste, separadas (o script recusa vazamento); 20 intenções.
+- **Data:** 2026-11-12
+- **Chatbot:** 1084 frases de treino e 205 de teste, separadas (o script recusa vazamento); 20 intenções.
 - **Busca:** 63 consultas sobre as vacinas do calendário.
 - **Bibliotecas:** scikit-learn 1.9.1, numpy 2.5.3. Semente fixa (42).
 
@@ -15,12 +15,12 @@ Todos usam as mesmas palavras (1 e 2 termos) para isolar o efeito do algoritmo; 
 
 | Configuração | Acurácia (teste) | F1 macro (teste) | Acurácia (validação cruzada) | F1 macro (validação cruzada) |
 |---|---|---|---|---|
-| Bag-of-Words + Naive Bayes | 85.6% | 0.856 | 62.2% | 0.610 |
-| TF-IDF + Naive Bayes | 93.3% | 0.932 | 64.9% | 0.644 |
-| TF-IDF + KNN (k = 3, cosseno) | 71.3% | 0.696 | 49.0% | 0.489 |
-| TF-IDF + Regressão Logística | 84.1% | 0.844 | 60.8% | 0.617 |
-| TF-IDF + SVM linear | 90.3% | 0.901 | 67.3% | 0.674 |
-| Produção: TF-IDF (palavras e letras) + SVM calibrado | 90.8% | 0.901 | 71.1% | 0.702 |
+| Bag-of-Words + Naive Bayes | 86.3% | 0.860 | 61.7% | 0.606 |
+| TF-IDF + Naive Bayes | 93.7% | 0.934 | 64.7% | 0.643 |
+| TF-IDF + KNN (k = 3, cosseno) | 71.2% | 0.697 | 49.7% | 0.496 |
+| TF-IDF + Regressão Logística | 84.4% | 0.844 | 60.5% | 0.614 |
+| TF-IDF + SVM linear | 91.2% | 0.908 | 67.3% | 0.675 |
+| Produção: TF-IDF (palavras e letras) + SVM calibrado | 89.8% | 0.890 | 72.0% | 0.711 |
 
 ## 2. Chatbot: pré-processamento (stopwords e radical)
 
@@ -28,10 +28,10 @@ Mesmo modelo de produção; só muda o tratamento do texto antes da vetorizaçã
 
 | Configuração | Acurácia (teste) | F1 macro (teste) | Acurácia (validação cruzada) | F1 macro (validação cruzada) |
 |---|---|---|---|---|
-| Normalização (o que o projeto usa) | 90.8% | 0.901 | 71.1% | 0.702 |
-| + remover stopwords | 79.0% | 0.779 | 64.8% | 0.632 |
-| + radical (stemming rudimentar) | 87.7% | 0.864 | 69.8% | 0.680 |
-| + stopwords e radical | 79.5% | 0.777 | 60.7% | 0.582 |
+| Normalização (o que o projeto usa) | 89.8% | 0.890 | 72.0% | 0.711 |
+| + remover stopwords | 79.5% | 0.783 | 64.2% | 0.626 |
+| + radical (stemming rudimentar) | 87.3% | 0.860 | 70.4% | 0.686 |
+| + stopwords e radical | 80.5% | 0.786 | 61.3% | 0.588 |
 
 ## 3. Busca: vetorização e pré-processamento
 
@@ -39,14 +39,14 @@ Acerto na 1ª posição, entre as 3 primeiras e MRR nas consultas de vacinas (me
 
 | Configuração | Acerto na 1ª | Acerto nas 3 primeiras | MRR |
 |---|---|---|---|
-| Bag-of-Words (contagem de palavras), documento enriquecido | 57.1% | 74.6% | 0.679 |
-| TF-IDF de palavras (configuração B) | 74.6% | 85.7% | 0.816 |
-| TF-IDF de palavras sem stopwords | 74.6% | 87.3% | 0.814 |
-| TF-IDF de palavras com radical | 69.8% | 87.3% | 0.793 |
-| TF-IDF de palavras sem stopwords e com radical | 71.4% | 85.7% | 0.795 |
-| TF-IDF de caracteres (configuração C) | 88.9% | 95.2% | 0.926 |
-| TF-IDF de caracteres com radical | 90.5% | 95.2% | 0.933 |
-| Padrão do projeto: caracteres + LSA (configuração F) | 88.9% | 95.2% | 0.928 |
+| Bag-of-Words (contagem de palavras), documento enriquecido | 55.6% | 73.0% | 0.677 |
+| TF-IDF de palavras (configuração B) | 68.3% | 84.1% | 0.782 |
+| TF-IDF de palavras sem stopwords | 68.3% | 85.7% | 0.781 |
+| TF-IDF de palavras com radical | 66.7% | 87.3% | 0.778 |
+| TF-IDF de palavras sem stopwords e com radical | 61.9% | 88.9% | 0.756 |
+| TF-IDF de caracteres (configuração C) | 84.1% | 95.2% | 0.902 |
+| TF-IDF de caracteres com radical | 84.1% | 95.2% | 0.901 |
+| Padrão do projeto: caracteres + LSA (configuração F) | 84.1% | 95.2% | 0.903 |
 
 ## Como interpretar
 

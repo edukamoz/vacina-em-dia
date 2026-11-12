@@ -793,6 +793,46 @@
     {
       "text": "tem mapa de unidades de saúde",
       "intent": "como_ver_postos"
+    },
+    {
+      "text": "quais são as reações da vacina bcg depois de aplicada",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "a vacina contra febre amarela pode dar reação",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "que efeitos colaterais a vacina da gripe costuma ter",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "onde acho as reações esperadas da vacina hepatite b",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "quais os eventos adversos da vacina tríplice viral",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "a vacina dtpa tem efeito colateral",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "reações comuns da vacina contra varicela",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "o que são eventos adversos pós vacinação",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "quais reações a vacina penta pode causar",
+      "intent": "vacina_reacoes"
+    },
+    {
+      "text": "a vacina hpv dá efeito colateral",
+      "intent": "vacina_reacoes"
     }
   ]
 }

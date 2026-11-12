@@ -131,3 +131,56 @@ def test_ct_nlp_69_resposta_serializa_para_json(service):
         "entities",
     }
     json.dumps(corpo, ensure_ascii=False)
+
+
+@pytest.mark.parametrize(
+    ("pergunta", "vacina", "quadro", "pagina"),
+    [
+        ("quais as reações da vacina bcg", "BCG", "Quadros 11 e 12", 129),
+        ("a vacina da febre amarela dá reação?", "febre amarela", "Quadro 20", 159),
+        ("quais os efeitos colaterais da vacina hepatite b", "hepatite B", "Quadro 26", 171),
+    ],
+)
+def test_ct_nlp_140_reacoes_apontam_o_quadro_do_manual_oficial(service, pergunta, vacina, quadro, pagina):
+    resposta = service.chatbot.reply(pergunta)
+    assert resposta.intent == "vacina_reacoes"
+    assert resposta.safety is False
+    assert f"{quadro}, página {pagina}" in resposta.text
+    assert "Manual de Vigilância Epidemiológica de Eventos Adversos Pós-Vacinação" in resposta.text
+    assert "192" in resposta.text and "serviço de saúde" in resposta.text
+    assert resposta.entities == {"vaccines": [vacina]}
+    assert resposta.source["url"].startswith("https://www.gov.br/saude/")
+
+
+def test_ct_nlp_141_sem_citar_a_vacina_orienta_a_dizer_qual_e_aponta_o_aplicativo(service):
+    resposta = service.chatbot.reply("quais são as reações comuns das vacinas")
+    assert resposta.intent == "vacina_reacoes"
+    assert "Sobre esta vacina" in resposta.text
+    assert "192" in resposta.text
+
+
+def test_ct_nlp_142_vacina_sem_ficha_diz_que_ainda_nao_tem_o_quadro(service):
+    resposta = service.chatbot.reply("quais as reações da vacina covid")
+    assert resposta.intent == "vacina_reacoes"
+    assert "covid-19: ainda não tenho o quadro de reações desta vacina" in resposta.text
+
+
+@pytest.mark.parametrize(
+    "pergunta",
+    [
+        "tive reação à vacina bcg o que faço",
+        "minha filha ficou com o braço inchado depois da vacina",
+        "estou com febre depois da vacina da gripe, quais as reações",
+    ],
+)
+def test_ct_nlp_143_caso_pessoal_nunca_recebe_a_resposta_de_reacoes(service, pergunta):
+    resposta = service.chatbot.reply(pergunta)
+    assert resposta.intent == "orientacao_medica"
+    assert resposta.safety is True
+
+
+def test_ct_nlp_144_a_resposta_de_reacoes_nao_traz_dose_nem_remedio(service):
+    resposta = service.chatbot.reply("quais as reações da vacina hpv")
+    texto = resposta.text.lower()
+    for proibida in ["paracetamol", "dipirona", " mg", "tome "]:
+        assert proibida not in texto

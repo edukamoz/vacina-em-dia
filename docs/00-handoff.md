@@ -32,7 +32,7 @@ cp apps/api/local.settings.example.json apps/api/local.settings.json   # arquivo
 | `packages/shared` | Máquina de estados da dose, datas civis, **Calendário Nacional de Vacinação 2026** (5 PDFs oficiais, `docs/10-calendario-vacinal.md`), esquemas Zod (família, doses, consentimento, assistente) |
 | `apps/api` | Azure Functions: membros, calendário por pessoa, doses (ciclo de vida), consentimento, exclusão de conta, **assistente (texto e voz)**, Swagger. Dados **em memória**; sessão de demonstração por cabeçalho (ADR-013), sem login |
 | `apps/mobile` | Expo (Android, iOS e web): consentimento, família, calendário, detalhe da dose, histórico, **assistente (chat e voz na web)**, conta; layout de computador (barra lateral). Voz no celular ainda não |
-| `apps/nlp` | Function Python: chatbot TF-IDF + SVM (39 intenções, F1 macro 0,90 no teste separado de 195 frases) e busca (n-gramas de caracteres + LSA); ver `docs/11-assistente-pln.md`, `docs/07-testes/avaliacao-chatbot.md` e `avaliacao-busca-semantica.md` |
+| `apps/nlp` | Function Python: chatbot TF-IDF + SVM (40 intenções, F1 macro 0,89 no teste separado de 205 frases) e busca (n-gramas de caracteres + LSA); ver `docs/11-assistente-pln.md`, `docs/07-testes/avaliacao-chatbot.md` e `avaliacao-busca-semantica.md` |
 | Docker | `docker compose up --build`: Azurite, API, PLN (porta 7072) e app web |
 | CI (GitHub Actions) | qualidade, **pytest do PLN**, segurança, Docker; deploy (`deploy.yml`) da API, do PLN e do app web por OIDC |
 | Azure | **Criado** (`rg-vacinaemdia`, Brazil South): Function App da API, Function App do PLN (1 instância sempre pronta), Static Web Apps, SQL gratuito (vazio), Key Vault, Application Insights, Azure AI Speech F0. Ver `docs/08-infraestrutura-azure.md` |

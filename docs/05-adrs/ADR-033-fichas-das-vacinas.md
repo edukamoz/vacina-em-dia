@@ -27,6 +27,7 @@ O autor pediu mais informação sobre cada vacina. Não há API oficial do bulá
 
 ## Consequências
 
-- **Faltam do critério do B75:** as reações comuns copiadas (hoje só apontadas), as fichas das vacinas novas e as respostas curadas do chatbot sobre reações (com o F1 reavaliado). Ficam no backlog.
+- **Chatbot (feito em 12/11/2026):** a nova intenção `vacina_reacoes` responde a perguntas **gerais** sobre reações apontando o quadro e a página do manual de eventos adversos (os mesmos da ficha, exportados para o serviço de PLN); relato de caso continua indo a um profissional. F1 macro 0,901 para 0,890, meta de 0,85 mantida.
+- **Faltam do critério do B75:** as reações comuns copiadas (hoje só apontadas) e as fichas das vacinas novas. Ficam no backlog.
 - Os manuais mudam com o tempo; a conferência é manual (o vigia, ADR-030, só cobre os PDFs do calendário).
 - O texto "Contraindicações comuns a todos os imunobiológicos" vem da seção 10.1.4.1 do manual de 2024.

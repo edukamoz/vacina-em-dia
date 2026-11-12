@@ -1,6 +1,11 @@
 {
   "_comentario": "Respostas curadas do assistente: escritas à mão, sem IA generativa, em linguagem simples. Origem 'app' = ajuda do aplicativo; 'calendario' = Calendário Nacional de Vacinação (citado com fonte). Nenhuma resposta dá orientação médica individual. Revisão do autor pendente antes da apresentação.",
   "responses": {
+    "vacina_reacoes": {
+      "origin": "app",
+      "text": "Cada vacina tem reações esperadas, descritas pelo Ministério da Saúde no Manual de Vigilância Epidemiológica de Eventos Adversos Pós-Vacinação. Diga o nome da vacina (por exemplo, hepatite B) e eu indico o quadro e a página; no aplicativo, abra a dose e toque em Sobre esta vacina. Não posso avaliar o caso de ninguém: se houve uma reação, procure um serviço de saúde; em emergência, ligue 192 (SAMU).",
+      "suggestions": ["Quais as reações da vacina hepatite B?", "Para que serve a BCG?"]
+    },
     "saudacao": {
       "origin": "app",
       "text": "Olá! Eu sou o assistente do Vacina em Dia. Posso explicar como usar o aplicativo e contar o que diz o Calendário Nacional de Vacinação, por exemplo: para que serve uma vacina e em que idade ela é indicada.",

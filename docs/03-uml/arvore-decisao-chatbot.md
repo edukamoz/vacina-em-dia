@@ -12,7 +12,7 @@ flowchart TD
     B -- não --> R1["Pede para repetir"]
     B -- sim --> C{"Regra de segurança:<br/>sintoma, reação, remédio<br/>ou emergência?"}
     C -- sim --> R2["Não dá orientação médica.<br/>Manda procurar um profissional<br/>ou a unidade de saúde (SAMU 192)"]
-    C -- não --> D["Classificador de intenções<br/>TF-IDF + SVM (39 intenções)"]
+    C -- não --> D["Classificador de intenções<br/>TF-IDF + SVM (40 intenções)"]
     D --> E{"Confiança<br/>de pelo menos 0,30?"}
     E -- não --> F{"A pergunta cita<br/>uma vacina?"}
     F -- sim --> R3["Explica a vacina com os dados<br/>do calendário oficial (PNI)"]
