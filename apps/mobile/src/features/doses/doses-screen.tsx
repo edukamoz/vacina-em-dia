@@ -152,6 +152,28 @@ export function DosesScreen() {
       {doses.data && <BaixarCarteira memberId={selected.id} nome={primeiroNome} />}
       <Pressable
         accessibilityRole="link"
+        accessibilityLabel="Vou viajar. Monte um roteiro de vacinas para a viagem."
+        onPress={() => router.push('/viagem')}
+        className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
+      >
+        <View
+          aria-hidden
+          className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
+        >
+          <Icone nome="local" cor={cores.primaria} />
+        </View>
+        <View className="flex-1">
+          <Texto variante="titulo3" importantForAccessibility="no">
+            Vou viajar
+          </Texto>
+          <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
+            Veja o que conferir antes da viagem.
+          </Texto>
+        </View>
+        <Icone nome="seta" cor={cores.textoSecundario} />
+      </Pressable>
+      <Pressable
+        accessibilityRole="link"
         accessibilityLabel="Postos de saúde perto de você. Veja no mapa onde tomar as doses."
         onPress={() => router.push('/postos')}
         className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"

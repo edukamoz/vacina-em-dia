@@ -29,7 +29,7 @@ O fluxo `.github/workflows/deploy.yml` publica a API e o app web ao integrar na 
 - Login próprio (ADR-014, SCRUM-13): a chave de assinatura do token vai para o Key Vault. O tenant do Entra foi descartado.
 - O plano Linux Consumo (Y1) foi descartado em 06/10/2026: o app ficou preso em erro 503, inclusive no Kudu. Trocado por Flex Consumption (sucessor recomendado pelo Azure). O Flex não aceita perfil de publicação, por isso o deploy usa OIDC.
 - Custos: confirmar na calculadora oficial (SCRUM-26). Custo esperado hoje: zero ou perto disso.
-- Recursos antigos do DelBicos (`rg-delbicos`) continuam intocados.
+- O `rg-delbicos` e o orçamento do DelBicos não existem mais na assinatura (conferido em 12/11/2026); o alerta de custo agora é o orçamento `vacinaemdia-orcamento`.
 
 ## Estado do deploy (06/10/2026)
 

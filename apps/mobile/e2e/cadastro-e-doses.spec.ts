@@ -139,3 +139,34 @@ test.describe('Formulário de pessoa: parentesco e gestação (RF02)', () => {
     await expect(gestacao).toBeVisible();
   });
 });
+
+test.describe('Preparar viagem (B74)', () => {
+  test('CT-E2E-08: monta o roteiro de viagem com a fonte oficial e o aviso', async ({
+    page,
+    api,
+  }) => {
+    api.consentimentoAceito = true;
+    await page.goto('/entrar');
+    await page.getByLabel('E-mail').fill('mariana@exemplo.com.br');
+    await page.getByLabel('Senha', { exact: true }).fill(SENHA);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('button', { name: 'Adicionar pessoa' }).click();
+    await page.getByLabel('Nome ou apelido').fill('Ana');
+    await page.getByLabel('Data de nascimento').fill('20051990');
+    await page.getByRole('button', { name: 'Salvar e ver as vacinas' }).click();
+    await expect(page.getByRole('heading', { name: 'Doses de Ana' })).toBeVisible();
+
+    await page.getByRole('link', { name: /Vou viajar/ }).click();
+    await page.getByRole('button', { name: 'Ver o roteiro' }).click();
+    await expect(page.getByRole('heading', { name: 'Febre amarela' })).toBeVisible();
+    await expect(
+      page
+        .getByText(/não substitui o serviço de saúde/)
+        .filter({ visible: true })
+        .first(),
+    ).toBeVisible();
+    await page.getByRole('radio', { name: 'Para o exterior' }).click();
+    await page.getByRole('button', { name: 'Ver o roteiro' }).click();
+    await expect(page.getByRole('heading', { name: /Certificado Internacional/ })).toBeVisible();
+  });
+});
