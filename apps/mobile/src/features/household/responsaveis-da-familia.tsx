@@ -41,12 +41,16 @@ function Linha({ responsavel }: { responsavel: GuardianResponse }) {
   const papel = ROTULO_DO_PAPEL[responsavel.role];
   return (
     <View
-      role="listitem"
       accessible
       accessibilityLabel={`${responsavel.emailHint}${responsavel.isYou ? ', você' : ''}, ${papel}`}
-      className="flex-row flex-wrap items-center justify-between gap-sm"
+      className="flex-row items-center justify-between gap-sm"
     >
-      <Texto variante="corpoNegrito" importantForAccessibility="no">
+      <Texto
+        variante="corpoNegrito"
+        importantForAccessibility="no"
+        className="shrink"
+        numberOfLines={1}
+      >
         {responsavel.isYou ? `${responsavel.emailHint} (você)` : responsavel.emailHint}
       </Texto>
       <View className="rounded-selo border-padrao border-borda px-md py-xs">
@@ -54,6 +58,50 @@ function Linha({ responsavel }: { responsavel: GuardianResponse }) {
           {papel}
         </Texto>
       </View>
+    </View>
+  );
+}
+
+/**
+ * Cada responsável é um item da lista; o dono vê, dentro do item de quem não é ele, as duas ações
+ * possíveis lado a lado. Assim a lista cresce uma linha por pessoa, não dois botões largos.
+ */
+function ItemDoResponsavel({
+  responsavel,
+  aoPassar,
+  aoRemover,
+}: {
+  responsavel: GuardianResponse;
+  aoPassar?: () => void;
+  aoRemover?: () => void;
+}) {
+  const acoes = aoPassar && aoRemover;
+  return (
+    <View
+      role="listitem"
+      className={acoes ? 'gap-sm rounded-cartao border-padrao border-borda p-md' : ''}
+    >
+      <Linha responsavel={responsavel} />
+      {acoes ? (
+        <View className="flex-row gap-sm">
+          <View className="flex-1">
+            <Botao
+              titulo="Passar a propriedade"
+              variante="secundario"
+              accessibilityLabel={`Passar a propriedade para ${responsavel.emailHint}`}
+              onPress={aoPassar}
+            />
+          </View>
+          <View className="flex-1">
+            <Botao
+              titulo="Remover"
+              variante="perigo"
+              accessibilityLabel={`Remover ${responsavel.emailHint}`}
+              onPress={aoRemover}
+            />
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -136,7 +184,6 @@ export function ResponsaveisDaFamilia() {
   const { role, guardians, activeInvites } = familia.data;
   const dono = role === 'OWNER';
   const sozinho = guardians.length === 1;
-  const outros = guardians.filter((g) => !g.isYou);
   const fechar = () => setPainel(null);
 
   return (
@@ -152,9 +199,18 @@ export function ResponsaveisDaFamilia() {
         accessibilityRole="list"
         accessibilityLabel="Responsáveis da família"
       >
-        {guardians.map((responsavel) => (
-          <Linha key={responsavel.id} responsavel={responsavel} />
-        ))}
+        {guardians.map((responsavel) =>
+          dono && !responsavel.isYou ? (
+            <ItemDoResponsavel
+              key={responsavel.id}
+              responsavel={responsavel}
+              aoPassar={() => setPainel({ tipo: 'PASSAR', guardian: responsavel })}
+              aoRemover={() => setPainel({ tipo: 'REMOVER', guardian: responsavel })}
+            />
+          ) : (
+            <ItemDoResponsavel key={responsavel.id} responsavel={responsavel} />
+          ),
+        )}
       </View>
 
       {painel?.tipo === 'CONVIDAR' ? <PainelDeConvite aoFechar={fechar} /> : null}
@@ -237,20 +293,6 @@ export function ResponsaveisDaFamilia() {
                   />
                 </View>
               ) : null}
-              {outros.map((responsavel) => (
-                <View key={responsavel.id} className="gap-sm">
-                  <Botao
-                    titulo={`Passar a propriedade para ${responsavel.emailHint}`}
-                    variante="secundario"
-                    onPress={() => setPainel({ tipo: 'PASSAR', guardian: responsavel })}
-                  />
-                  <Botao
-                    titulo={`Remover ${responsavel.emailHint}`}
-                    variante="perigo"
-                    onPress={() => setPainel({ tipo: 'REMOVER', guardian: responsavel })}
-                  />
-                </View>
-              ))}
               {!sozinho ? (
                 <Texto variante="apoio" className="text-textoSecundario">
                   Para sair da família, passe a propriedade a outro responsável antes.
