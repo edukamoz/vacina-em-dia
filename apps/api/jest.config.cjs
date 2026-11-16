@@ -7,6 +7,8 @@ module.exports = {
   moduleNameMapper: { '^@vacina/shared$': '<rootDir>/../../packages/shared/src/index.ts' },
   testMatch: ['**/*.test.ts'],
   // mssql-executor.ts precisa de um Azure SQL real; é exercitado pelo teste de contrato (SQL_TEST_*).
+  // O Firestore (repositórios e arquivos) só roda com o emulador: é coberto pelo job "Contrato do
+  // Firestore" do CI (ADR-035), e não pela cobertura deste job, que roda sem emulador.
   // As funções em src/functions só registram o handler no SDK; a regra está em src/handlers.
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -14,6 +16,8 @@ module.exports = {
     '!src/index.ts',
     '!src/functions/**',
     '!src/repositories/sql/mssql-executor.ts',
+    '!src/repositories/firestore/**',
+    '!src/storage/firestore-file-storage.ts',
   ],
   coverageThreshold: {
     global: { branches: 80, functions: 80, lines: 80, statements: 80 },

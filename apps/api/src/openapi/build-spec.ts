@@ -173,6 +173,28 @@ export function buildOpenApiDocument(): object {
   });
 
   registry.registerPath({
+    method: 'post',
+    path: '/jobs/daily-reminders',
+    tags: ['Sistema'],
+    summary: 'Rodar a rotina diária de lembretes agora',
+    description:
+      'Roda a mesma rotina do relógio diário (e-mail de lembrete às contas com vacinas próximas), chamada por HTTP. Existe para o plano de contingência no Google Cloud (ADR-035), onde o Cloud Scheduler chama esta rota. Exige a chave da função (`x-functions-key`), não o login do app. Cada conta recebe no máximo um e-mail por dia.',
+    responses: {
+      200: {
+        description: 'Resumo da rotina: só contagens.',
+        content: jsonContent(
+          z.object({
+            recipients: z.number().int().meta({ example: 3 }),
+            sent: z.number().int().meta({ example: 3 }),
+            failed: z.number().int().meta({ example: 0 }),
+          }),
+        ),
+      },
+      401: { description: 'Chave da função ausente ou inválida.' },
+    },
+  });
+
+  registry.registerPath({
     method: 'get',
     path: '/openapi.json',
     tags: ['Sistema'],

@@ -2,14 +2,16 @@ import { randomUUID } from 'node:crypto';
 import type { StoredDose, StoredMember } from './repositories';
 import { createInMemoryAuthRepository } from './in-memory-auth';
 import { createInMemoryStore } from './in-memory-store';
+import { createFirestoreClient } from './firestore/firestore-client';
+import { createFirestoreRepositories } from './firestore/firestore-repositories';
 import { createMssqlExecutor } from './sql/mssql-executor';
 import { createSqlRepositories } from './sql/sql-repositories';
 import type { AuthRepository } from './repositories';
 
 /**
- * Testes de contrato: a mesma bateria roda nos repositórios em memória (sempre) e no Azure SQL
- * (só quando `SQL_TEST_SERVER` e `SQL_TEST_DATABASE` estão definidos, com `az login` ativo). Assim,
- * as duas implementações garantem o mesmo comportamento, inclusive o isolamento entre donos.
+ * Testes de contrato: a mesma bateria roda nos repositórios em memória (sempre), no Azure SQL
+ * (só quando `SQL_TEST_SERVER` e `SQL_TEST_DATABASE` estão definidos, com `az login` ativo) e no
+ * Firestore (só com o emulador: `FIRESTORE_EMULATOR_HOST`). Assim, as implementações garantem o mesmo comportamento, inclusive o isolamento entre donos.
  */
 function inMemory() {
   const store = createInMemoryStore();
@@ -28,11 +30,20 @@ function azureSql() {
   return { ...createSqlRepositories(executor), close: () => executor.close() };
 }
 
+function firestore() {
+  const db = createFirestoreClient('demo-vacina');
+  // Prefixo único por execução: nada de uma rodada anterior aparece na seguinte.
+  const repos = createFirestoreRepositories(db, { prefix: `t${Date.now()}_` });
+  return { ...repos, close: () => db.terminate() };
+}
+
+const firestoreConfigured = Boolean(process.env['FIRESTORE_EMULATOR_HOST']);
 const sqlConfigured = Boolean(process.env['SQL_TEST_SERVER'] && process.env['SQL_TEST_DATABASE']);
 
 const implementations: [string, () => ReturnType<typeof inMemory>, boolean][] = [
   ['memória', inMemory, true],
   ['Azure SQL', azureSql, sqlConfigured],
+  ['Firestore', firestore, firestoreConfigured],
 ];
 
 describe.each(implementations)('repositórios (%s)', (_name, factory, enabled) => {

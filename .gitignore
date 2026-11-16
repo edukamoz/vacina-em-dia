@@ -107,3 +107,7 @@ scripts/gerar-execucao-estados.mjs
 scripts/carga-leve.mjs
 scripts/postman/
 scripts/documentos/
+
+# Registro do emulador do Firestore
+firestore-debug.log
+*-debug.log
