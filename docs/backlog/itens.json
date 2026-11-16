@@ -1385,7 +1385,7 @@
    "estado": "Em andamento",
    "sprint": null,
    "evidencia": "",
-   "nota": "Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. A confirmar: se o gov.br aceita leitura automática pela Function (o Butantan bloqueou, ADR-024).",
+   "nota": "Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. Acesso de rede a partir do Brasil confirmado em 10/11/2026 (docs/28); a partir da Azure confirmado em 12/11/2026 com o POST /api/calendar/watch/check (5 arquivos iguais, 0 falhas; o Butantan, ao contrário, bloqueou a Function, ADR-024). Decisão no ADR-030. O app mostra a data da última verificação no rodapé da fonte.",
    "curto": "Vigia do calendário oficial"
   },
   {
@@ -1446,6 +1446,26 @@
    "evidencia": "",
    "nota": "Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.",
    "curto": "Informações sobre cada vacina"
+  },
+  {
+   "id": "B76",
+   "jira": null,
+   "titulo": "Como equipe, quero um ambiente reserva no Google Cloud, pronto e sem custo, para a apresentação não depender só da Azure",
+   "epico": "E2",
+   "prioridade": "Should",
+   "personas": "todas",
+   "requisitos": "",
+   "criterios": [
+    "O app web, a API e o PLN rodam no Cloud Run, com os dados no Firestore, a partir das mesmas imagens da Azure.",
+    "O custo fica em zero (teste gratuito de US$ 300 e cotas gratuitas), com no máximo 2 instâncias por serviço e alerta de orçamento.",
+    "Há scripts para implantar, ligar, desligar e conferir o ambiente sem senha, e um roteiro em docs/26.",
+    "O Firestore passa nos mesmos testes de contrato dos outros bancos, no CI."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "ADR-035; docs/26-contingencia-google-cloud.md; PRs #261 a #265; CT-GCP-*",
+   "nota": "Implantado em 16/11/2026 e dormindo (0 instâncias). Falta a autora entrar com a conta de demonstração e ensaiar ligar e desligar. Os dados do Google começam vazios (não copia o Azure SQL) e a voz não é replicada.",
+   "curto": "Contingência no Google Cloud"
   },
   {
    "id": "B48",
