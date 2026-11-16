@@ -107,6 +107,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B22 | novo | Como usuária, quero que o primeiro login depois de um tempo sem uso não demore, para não achar que o app travou | Should | Em análise | Sprint 6 |
 | B23 | novo | Como autora, quero o repositório público com proteção ativada, para usar o GitHub Actions sem limite de minutos e sem expor segredos | Should | Em análise | Sprint 6 |
 | B62 | novo | Como equipe, quero um endereço mais bonito para o site, sem pagar nada, para apresentar e divulgar o app com um link fácil de lembrar | Should | A fazer | Sprint 3 |
+| B76 | novo | Como equipe, quero um ambiente reserva no Google Cloud, pronto e sem custo, para a apresentação não depender só da Azure | Should | Em andamento | Sprint 6 |
 
 **B16** (todas; requisitos: RNF02, RNF05, RNF09)
 
@@ -165,6 +166,15 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - CORS, e-mail de redefinição de senha, mapa, QR e documentos usam o novo endereço; o antigo continua funcionando.
 - Evidência: docs/27-dominio-proprio.md
 - Atenção: Pesquisado; falta o autor conseguir o domínio (conta no GitHub Education ou PR no is-a.dev, que pede texto escrito por pessoa).
+
+**B76** (todas; requisitos: -)
+
+- O app web, a API e o PLN rodam no Cloud Run, com os dados no Firestore, a partir das mesmas imagens da Azure.
+- O custo fica em zero (teste gratuito de US$ 300 e cotas gratuitas), com no máximo 2 instâncias por serviço e alerta de orçamento.
+- Há scripts para implantar, ligar, desligar e conferir o ambiente sem senha, e um roteiro em docs/26.
+- O Firestore passa nos mesmos testes de contrato dos outros bancos, no CI.
+- Evidência: ADR-035; docs/26-contingencia-google-cloud.md; PRs #261 a #265; CT-GCP-*
+- Atenção: Implantado em 16/11/2026 e dormindo (0 instâncias). Falta a autora entrar com a conta de demonstração e ensaiar ligar e desligar. Os dados do Google começam vazios (não copia o Azure SQL) e a voz não é replicada.
 
 ## E3 Conta e privacidade (SCRUM-7)
 
@@ -243,7 +253,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Quando mudar, a equipe recebe um aviso; a transcrição continua em PR, com revisão (nada de dado vacinal publicado sem conferência).
 - O app mostra a versão do calendário e a data da última verificação.
 - Nada do usuário vai às fontes oficiais.
-- Atenção: Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. A confirmar: se o gov.br aceita leitura automática pela Function (o Butantan bloqueou, ADR-024).
+- Atenção: Não há API nem dado aberto estruturado do calendário; o oficial é PDF e página do PNI. Acesso de rede a partir do Brasil confirmado em 10/11/2026 (docs/28); a partir da Azure confirmado em 12/11/2026 com o POST /api/calendar/watch/check (5 arquivos iguais, 0 falhas; o Butantan, ao contrário, bloqueou a Function, ADR-024). Decisão no ADR-030. O app mostra a data da última verificação no rodapé da fonte.
 
 **B73** (PE1, PE3; requisitos: RF02, RF04)
 
