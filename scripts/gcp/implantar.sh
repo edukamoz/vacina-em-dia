@@ -96,7 +96,7 @@ SEGREDOS_API="AUTH_TOKEN_SECRET=vacina-auth-token:latest"
 gcloud secrets describe vacina-brevo >/dev/null 2>&1 && SEGREDOS_API="${SEGREDOS_API},BREVO_API_KEY=vacina-brevo:latest"
 gcloud run deploy vacina-api --image="${REPO}/api:latest" --port=80 --memory=1Gi --cpu=1 --timeout=60 \
   "${COMUM[@]}" --set-env-vars="${ENV_API},AzureWebJobsSecretStorageType=files,AzureWebJobs.sendDailyReminders.Disabled=true,AzureWebJobs.runCalendarWatch.Disabled=true" \
-  --set-secrets="${SEGREDOS_API},/azure-functions-host/Secrets/host.json=vacina-host-secrets:latest"
+  --set-secrets="${SEGREDOS_API},/segredos/host.json=vacina-host-secrets:latest"
 URL_API="$(gcloud run services describe vacina-api --region="${REGIAO}" --format='value(status.url)')"
 
 gcloud run deploy vacina-web --image="${REPO}/web:latest" --memory=256Mi --cpu=1 --max-instances=2 \

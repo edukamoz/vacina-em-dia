@@ -40,3 +40,7 @@ COPY --from=build /app/packages/shared/dist ./packages/shared/dist
 COPY --from=build /app/apps/api/package.json ./apps/api/package.json
 COPY --from=build /app/apps/api/host.json ./apps/api/host.json
 COPY --from=build /app/apps/api/dist ./apps/api/dist
+# O host grava na pasta de segredos; o Cloud Run a monta somente leitura, então o script copia
+# as chaves de /segredos para uma pasta gravável antes de iniciar o host (ADR-035).
+COPY --chmod=755 apps/api/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
