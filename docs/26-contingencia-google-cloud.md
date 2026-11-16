@@ -21,7 +21,7 @@ O Google exige cartão para verificar a identidade; **só o autor pode fazer iss
 1. Entre em <https://console.cloud.google.com> com a conta Google que será usada.
 2. Aceite o **teste gratuito** ("Free trial", US$ 300 por 90 dias). Ele **não cobra sozinho**: ao fim do teste os recursos param, a não ser que você faça "Ativar conta completa". Só vale para quem ainda não usou o teste.
 3. Crie um projeto (por exemplo, `vacina-em-dia-reserva`) e anote o **ID do projeto**.
-4. (Recomendado) Em Faturamento > Orçamentos e alertas, crie um orçamento de R$ 5 com alerta a 50% e 100%, só para ser avisada de qualquer cobrança inesperada.
+4. (Recomendado) Em Faturamento > Orçamentos e alertas, crie um orçamento de R$ 5 com alerta a 50% e 100%, só para ser avisada de qualquer cobrança inesperada. **Feito em 16/11/2026:** orçamento `vacinaemdia-gcp-reserva`, mensal, R$ 5, só alertas (não bloqueia nada), avisos por e-mail a 50% (R$ 2,50), 90% (R$ 4,50) e 100% (R$ 5) aos administradores do faturamento. O Google leva até 24 horas para registrar os custos, então o alerta não é instantâneo.
 
 ## 2. Implantar (Cloud Shell, cerca de 15 minutos)
 
