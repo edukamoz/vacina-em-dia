@@ -37,6 +37,12 @@ scripts/gcp/implantar.sh
 
 O script é idempotente (pode rodar de novo para atualizar), liga as APIs, cria o Firestore, a conta de serviço, os segredos, constrói as três imagens no Cloud Build, publica os três serviços e agenda as duas rotinas. No fim, mostra o endereço do app.
 
+Para conferir o que não depende de senha (rotinas exigem a chave, agendador e Firestore de pé):
+
+```bash
+scripts/gcp/verificar.sh
+```
+
 ## 3. Criar a conta de demonstração
 
 ```bash
