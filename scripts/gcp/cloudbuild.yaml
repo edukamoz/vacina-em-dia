@@ -2,15 +2,20 @@
 # Uso (a partir da raiz do repositório): gcloud builds submit --config scripts/gcp/cloudbuild.yaml \
 #   --substitutions _REPO=<regiao>-docker.pkg.dev/<projeto>/vacina .
 # O Cloud Build tem 120 minutos gratuitos por dia; cada imagem leva alguns minutos.
+# O Dockerfile usa `$BUILDPLATFORM` (BuildKit); o construtor padrão do Cloud Build não o conhece,
+# por isso cada passo liga o BuildKit.
 steps:
   - name: gcr.io/cloud-builders/docker
     id: api
+    env: ['DOCKER_BUILDKIT=1']
     args: ['build', '-f', 'apps/api/Dockerfile', '-t', '${_REPO}/api:latest', '.']
   - name: gcr.io/cloud-builders/docker
     id: nlp
+    env: ['DOCKER_BUILDKIT=1']
     args: ['build', '-f', 'apps/nlp/Dockerfile', '-t', '${_REPO}/nlp:latest', 'apps/nlp']
   - name: gcr.io/cloud-builders/docker
     id: web
+    env: ['DOCKER_BUILDKIT=1']
     args:
       - build
       - -f

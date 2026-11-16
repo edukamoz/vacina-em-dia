@@ -18,13 +18,26 @@ REPO="${REGIAO}-docker.pkg.dev/${PROJETO}/vacina"
 SA="vacina-run@${PROJETO}.iam.gserviceaccount.com"
 echo ">> Projeto: ${PROJETO}  Região: ${REGIAO}"
 
+# Depois de ativar uma API, o Google leva alguns minutos para propagá-la, e o primeiro comando que a
+# usa falha com "SERVICE_DISABLED". Por isso estes passos tentam de novo, por até uns 4 minutos.
+tentar() {
+  local n
+  for n in $(seq 1 16); do
+    "$@" && return 0
+    echo "   (tentativa ${n}/16 falhou; a API ainda deve estar propagando, nova tentativa em 15 s)"
+    sleep 15
+  done
+  return 1
+}
+
 echo ">> 1/7 Ativando as APIs"
 gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com \
   firestore.googleapis.com secretmanager.googleapis.com cloudscheduler.googleapis.com --quiet
 
 echo ">> 2/7 Firestore (modo nativo)"
 gcloud firestore databases describe --database='(default)' >/dev/null 2>&1 ||
-  gcloud firestore databases create --database='(default)' --location="${REGIAO}" --type=firestore-native --quiet
+  tentar gcloud firestore databases create --database='(default)' --location="${REGIAO}" \
+    --type=firestore-native --quiet
 
 echo ">> 3/7 Conta de serviço e Artifact Registry"
 gcloud iam service-accounts describe "${SA}" >/dev/null 2>&1 ||
@@ -32,7 +45,7 @@ gcloud iam service-accounts describe "${SA}" >/dev/null 2>&1 ||
 gcloud projects add-iam-policy-binding "${PROJETO}" --member="serviceAccount:${SA}" \
   --role=roles/datastore.user --condition=None --quiet >/dev/null
 gcloud artifacts repositories describe vacina --location="${REGIAO}" >/dev/null 2>&1 ||
-  gcloud artifacts repositories create vacina --repository-format=docker --location="${REGIAO}"
+  tentar gcloud artifacts repositories create vacina --repository-format=docker --location="${REGIAO}"
 
 echo ">> 4/7 Segredos (gerados aqui; nunca vão para o Git)"
 criar_segredo() { # nome, conteúdo (stdin)
