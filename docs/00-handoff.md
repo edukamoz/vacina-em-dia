@@ -135,6 +135,8 @@ Itens "Em andamento" que **não** foram marcados como concluídos: B72, B73, B74
 
 **Testes:** `jest` do app com limite de 20 s por teste (o padrão de 5 s estourava no CI). E2E: `cd apps/mobile && E2E_CANAL=chrome npm run e2e` (15 cenários, passaram em 12/11/2026). Para conferir telas pelo Chrome, o Claude precisa da extensão conectada.
 
+**Contingência no Google Cloud (16/11/2026, ADR-035):** reserva para a apresentação caso a Azure falhe. App web, API e PLN no Cloud Run, dados no Firestore, rotinas no Cloud Scheduler, projeto `upheld-now-478722-h8` (teste gratuito de US$ 300). Já implantada e respondendo; está **dormindo** (0 instâncias). Roteiro completo, com ligar e desligar, em `docs/26-contingencia-google-cloud.md`; scripts em `scripts/gcp/`. Para a apresentação: `scripts/gcp/apresentacao.sh ligar` cerca de 30 minutos antes e `desligar` depois. O Firestore começa vazio (não copia o Azure SQL): criar a conta de demonstração com `scripts/gcp/semear.sh`.
+
 **Pendências que dependem do autor:**
 - Revisar o texto legal e o dataset do chatbot com outra pessoa (B39) e decidir se o termo de consentimento ganha uma frase sobre responsáveis (exigiria novo aceite de todos; `TERMS_VERSION` não mudou).
 - Reações comuns copiadas dos quadros do manual e fichas de pneumocócica 20-valente, covid-19, dengue e VSR (B75): exigem fonte oficial confirmada e a sua conferência.
