@@ -1,0 +1,29 @@
+# Constrói as três imagens no Cloud Build (amd64, como o Cloud Run) e as envia ao Artifact Registry.
+# Uso (a partir da raiz do repositório): gcloud builds submit --config scripts/gcp/cloudbuild.yaml \
+#   --substitutions _REPO=<regiao>-docker.pkg.dev/<projeto>/vacina .
+# O Cloud Build tem 120 minutos gratuitos por dia; cada imagem leva alguns minutos.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: api
+    args: ['build', '-f', 'apps/api/Dockerfile', '-t', '${_REPO}/api:latest', '.']
+  - name: gcr.io/cloud-builders/docker
+    id: nlp
+    args: ['build', '-f', 'apps/nlp/Dockerfile', '-t', '${_REPO}/nlp:latest', 'apps/nlp']
+  - name: gcr.io/cloud-builders/docker
+    id: web
+    args:
+      - build
+      - -f
+      - apps/mobile/Dockerfile
+      - --target
+      - cloudrun
+      - -t
+      - ${_REPO}/web:latest
+      - .
+images:
+  - ${_REPO}/api:latest
+  - ${_REPO}/nlp:latest
+  - ${_REPO}/web:latest
+options:
+  # A máquina padrão (e2-standard-2) é a que tem os 120 minutos gratuitos por dia.
+  logging: CLOUD_LOGGING_ONLY

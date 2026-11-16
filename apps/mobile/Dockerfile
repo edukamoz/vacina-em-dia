@@ -29,6 +29,14 @@ ENV EXPO_PUBLIC_PIX_KEY=$EXPO_PUBLIC_PIX_KEY \
     EXPO_PUBLIC_PIX_CITY=$EXPO_PUBLIC_PIX_CITY
 RUN npm run build -w @vacina/mobile
 
+# Versão para o Cloud Run (ADR-035): `docker build --target cloudrun`. O `nginx` troca as variáveis
+# do modelo ao subir (PORT, API_URL, API_HOST), então nada fica fixo na imagem.
+FROM nginx:1.31.6-alpine AS cloudrun
+ENV DNS_RESOLVER=8.8.8.8
+COPY apps/mobile/nginx.cloudrun.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build /app/apps/mobile/dist /usr/share/nginx/html
+
+# Imagem padrão (a última etapa): a do `docker compose`.
 FROM nginx:1.31.6-alpine
 COPY apps/mobile/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/apps/mobile/dist /usr/share/nginx/html

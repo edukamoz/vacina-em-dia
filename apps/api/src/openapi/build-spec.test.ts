@@ -114,6 +114,8 @@ describe('especificação OpenAPI', () => {
       // Vigia do calendário: a leitura é pública e a conferência manual usa a chave da função.
       '/calendar/watch',
       '/calendar/watch/check',
+      // Rotina diária por HTTP (contingência no Google Cloud): usa a chave da função.
+      '/jobs/daily-reminders',
       '/openapi.json',
       '/auth/register',
       '/auth/login',

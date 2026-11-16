@@ -1,6 +1,6 @@
 import { app } from '@azure/functions';
 import type { HttpRequest, HttpResponseInit, InvocationContext, Timer } from '@azure/functions';
-import { authenticated, reminderHandlers, reminderService } from './composition';
+import { authenticated, guarded, reminderHandlers, reminderService } from './composition';
 
 /** `GET /api/reminders`: lembretes do usuário para hoje. */
 export async function getReminders(
@@ -47,6 +47,28 @@ app.http('setReminderPreferences', {
   authLevel: 'anonymous',
   route: 'reminders/preferences',
   handler: setReminderPreferences,
+});
+
+/**
+ * `POST /api/jobs/daily-reminders`: a mesma rotina do relógio, chamada por HTTP. No Google Cloud
+ * (ADR-035) o contêiner dorme e não tem relógio; o Cloud Scheduler chama esta rota com a chave da
+ * função. Na Azure o relógio abaixo continua valendo.
+ */
+export async function runDailyRemindersByHttp(
+  _request: HttpRequest,
+  context: InvocationContext,
+): Promise<HttpResponseInit> {
+  return guarded(context, async () => {
+    const summary = await reminderService.runDailyEmails();
+    return { status: 200, jsonBody: summary };
+  });
+}
+
+app.http('runDailyRemindersByHttp', {
+  methods: ['POST'],
+  authLevel: 'function',
+  route: 'jobs/daily-reminders',
+  handler: runDailyRemindersByHttp,
 });
 
 /** 11h UTC são 8h em Brasília (UTC-3, sem horário de verão). */

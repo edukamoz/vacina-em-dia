@@ -35,7 +35,10 @@ import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-m
 import { createInMemoryStore } from '../repositories/in-memory-store';
 import { createBlobFileStorage } from '../storage/blob-file-storage';
 import { createInMemoryFileStorage } from '../storage/file-storage';
+import { createFirestoreFileStorage } from '../storage/firestore-file-storage';
 import { createProfilePhotoService } from '../services/profile-photo-service';
+import { createFirestoreClient } from '../repositories/firestore/firestore-client';
+import { createFirestoreRepositories } from '../repositories/firestore/firestore-repositories';
 import { createMssqlExecutor } from '../repositories/sql/mssql-executor';
 import { createSqlRepositories } from '../repositories/sql/sql-repositories';
 import { createAccountService } from '../services/account-service';
@@ -71,8 +74,15 @@ const sql =
   sqlServer && sqlDatabase
     ? createSqlRepositories(createMssqlExecutor({ server: sqlServer, database: sqlDatabase }))
     : undefined;
-const memory = sql ? undefined : createInMemoryStore();
-const store = sql ?? (memory as ReturnType<typeof createInMemoryStore>);
+// Plano de contingência (ADR-035): com `FIRESTORE_PROJECT` (e sem `SQL_SERVER`), tudo vai para o
+// Firestore, no Google Cloud. A conta de serviço do Cloud Run dá o acesso, sem senha nem chave.
+const firestoreProject = process.env['FIRESTORE_PROJECT'];
+const firestoreClient =
+  !sql && firestoreProject ? createFirestoreClient(firestoreProject) : undefined;
+const firestore = firestoreClient ? createFirestoreRepositories(firestoreClient) : undefined;
+const persistent = sql ?? firestore;
+const memory = persistent ? undefined : createInMemoryStore();
+const store = persistent ?? (memory as ReturnType<typeof createInMemoryStore>);
 const calendar = PNI_2026;
 
 const doseService = createDoseService({
@@ -99,8 +109,9 @@ export const doseHandlers = createDoseHandlers(doseService);
 export const consentHandlers = createConsentHandlers(
   createConsentService({ consents: store.consents, clock }),
 );
-const memoryAuth = sql ? undefined : createInMemoryAuthRepository();
-const authRepository = sql?.auth ?? (memoryAuth as ReturnType<typeof createInMemoryAuthRepository>);
+const memoryAuth = persistent ? undefined : createInMemoryAuthRepository();
+const authRepository =
+  persistent?.auth ?? (memoryAuth as ReturnType<typeof createInMemoryAuthRepository>);
 
 /**
  * Foto de perfil: o arquivo vai para um contêiner privado do Azure Blob Storage, na mesma conta de
@@ -108,9 +119,11 @@ const authRepository = sql?.auth ?? (memoryAuth as ReturnType<typeof createInMem
  * variável, fica em memória (testes e desenvolvimento sem armazenamento).
  */
 const storageConnection = process.env['AzureWebJobsStorage'];
-const fileStorage = storageConnection
-  ? createBlobFileStorage({ connectionString: storageConnection, container: 'fotos-de-perfil' })
-  : createInMemoryFileStorage();
+const fileStorage = firestoreClient
+  ? createFirestoreFileStorage(firestoreClient, 'fotos-de-perfil')
+  : storageConnection
+    ? createBlobFileStorage({ connectionString: storageConnection, container: 'fotos-de-perfil' })
+    : createInMemoryFileStorage();
 const profilePhotoService = createProfilePhotoService({
   storage: fileStorage,
   limiter: createFixedWindowLimiter(clock),
@@ -289,24 +302,26 @@ export async function authenticated(
  */
 export const warmupHandler = createWarmupHandler(
   createWarmupService({
-    ping: sql ? sql.ping : async () => undefined,
+    ping: persistent ? persistent.ping : async () => undefined,
     clock: () => Date.now(),
   }),
 );
 
 /**
  * Vigia do calendário oficial (B72): confere uma vez por semana se os cinco PDFs do Ministério da
- * Saúde continuam iguais aos que o projeto transcreveu. O estado fica no Blob Storage; o aviso vai
+ * Saúde continuam iguais aos que o projeto transcreveu. O estado fica no Blob Storage (ou no Firestore, no plano de contingência); o aviso vai
  * por e-mail para `CALENDAR_WATCH_ALERT_EMAIL` (sem ele, a mudança só fica registrada).
  */
 export const calendarWatchService = createCalendarWatchService({
   fetchBytes: createCalendarFileFetcher(),
-  storage: storageConnection
-    ? createBlobFileStorage({
-        connectionString: storageConnection,
-        container: 'vigia-do-calendario',
-      })
-    : createInMemoryFileStorage(),
+  storage: firestoreClient
+    ? createFirestoreFileStorage(firestoreClient, 'vigia-do-calendario')
+    : storageConnection
+      ? createBlobFileStorage({
+          connectionString: storageConnection,
+          container: 'vigia-do-calendario',
+        })
+      : createInMemoryFileStorage(),
   email,
   alertTo: process.env['CALENDAR_WATCH_ALERT_EMAIL'],
   clock,
