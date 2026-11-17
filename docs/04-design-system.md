@@ -370,7 +370,7 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 | 3 | Doses e detalhe da dose; ação rápida | em análise |
 | 4 | Família, formulários, janelas e confirmações | em análise |
 | 5 | Histórico, Painel de gráficos e Conta (atalhos, azulejo da marca, chips, caixas de exclusão) | em análise |
-| 6 | Postos, Viagem e Novidades | a fazer |
+| 6 | Postos, Viagem e Novidades (azulejo da marca, distância em selo, destino da viagem em segmentado, títulos sem corte) | em análise |
 | 7 | Acesso: landing, abertura, Entrar, Criar conta, Consentimento | a fazer |
 | 8 | Movimento e app instalável | a fazer |
 | 9 | Fechamento: acessibilidade, capturas e documentos | a fazer |

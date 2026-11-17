@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { Dimensions, Linking } from 'react-native';
 import { createFakeFetch, renderScreen } from '../../test-utils';
 import { LocationError } from './location';
 import { RESPONSE } from './test-fixtures';
@@ -58,6 +58,23 @@ describe('tela de postos de saúde (RF10)', () => {
     await waitFor(async () => expect(await AsyncStorage.getItem(KEY)).not.toBeNull());
     // A posição vai para a API arredondada (cerca de 110 m).
     expect(fake.calls[0]?.key).toBe(URL_BUSCA);
+  });
+
+  test('CT-UNI-APP-50: o cartão mostra a distância em selo, o nome inteiro e o endereço em até 2 linhas', async () => {
+    // Fonte do aparelho normal: com a ampliação do mock (200%) o truncamento ficaria desligado.
+    Dimensions.set({ window: { ...Dimensions.get('window'), fontScale: 1 } });
+    const fake = createFakeFetch({ [URL_BUSCA]: { status: 200, body: RESPONSE } });
+    await renderScreen(<UnitsScreen />, fake.fetchFn);
+    await fireEvent.press(screen.getByRole('button', { name: 'Usar minha localização' }));
+    const nome = await screen.findByText('Unidade Básica de Saúde Rio Acima', {
+      includeHiddenElements: true,
+    });
+    expect(nome.props.numberOfLines).toBeUndefined();
+    const endereco = screen.getByText('Avenida Otávio Augusto Rangel, 120, Rio Acima', {
+      includeHiddenElements: true,
+    });
+    expect(endereco.props.numberOfLines).toBe(2);
+    expect(screen.getByText(/^a \d/, { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   test('CT-UNI-APP-42: escolher uma unidade mostra "Ver rota" e "Ligar", e tocar de novo recolhe', async () => {
