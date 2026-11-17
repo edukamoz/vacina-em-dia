@@ -1,4 +1,6 @@
 import { Pressable, View, type PressableProps } from 'react-native';
+import { useThemeColors } from '../theme/theme-provider';
+import { Icone } from './icone';
 import { Texto } from './texto';
 
 /**
@@ -12,8 +14,9 @@ import { Texto } from './texto';
  * @param props.aviso - Mostra um ponto vermelho (por exemplo, pessoa com dose atrasada). O ponto é
  *   só decoração: quem usa o chip diz o motivo em `rotuloAcessivel`.
  * @param props.rotuloAcessivel - Rótulo completo para o leitor de tela; por padrão, o `rotulo`.
- * @param props.papel - `button` (padrão) ou `radio`, quando o chip faz parte de um grupo de escolha
- *   única (por exemplo, a faixa de pessoas).
+ * @param props.papel - `button` (padrão); `radio`, quando o chip faz parte de um grupo de escolha
+ *   única (por exemplo, a faixa de pessoas); ou `checkbox`, em escolha múltipla (por exemplo, os
+ *   avisos antes da dose), com um visto no chip ligado.
  */
 export function Chip({
   rotulo,
@@ -29,25 +32,30 @@ export function Chip({
   inicio?: React.ReactNode;
   aviso?: boolean;
   rotuloAcessivel?: string;
-  papel?: 'button' | 'radio';
+  papel?: 'button' | 'radio' | 'checkbox';
 }) {
+  const cores = useThemeColors();
   return (
     <Pressable
       accessibilityRole={papel}
       accessibilityLabel={rotuloAcessivel ?? rotulo}
       accessibilityState={
-        papel === 'radio'
-          ? { selected: selecionado, checked: selecionado }
-          : { selected: selecionado }
+        papel === 'button'
+          ? { selected: selecionado }
+          : { selected: selecionado, checked: selecionado }
       }
       // Na web, o estado só chega ao leitor de tela pela propriedade `aria-selected` ou `aria-checked`.
-      {...(papel === 'radio' ? { 'aria-checked': selecionado } : { 'aria-selected': selecionado })}
+      {...(papel === 'button' ? { 'aria-selected': selecionado } : { 'aria-checked': selecionado })}
       className={`min-h-principal flex-row items-center gap-md self-start rounded-selo border-padrao ${
         inicio ? 'pl-xs' : 'pl-lg'
       } pr-lg ${selecionado ? 'border-primaria bg-primariaSuave' : 'border-borda bg-superficie'}`}
       {...rest}
     >
       {inicio}
+      {/* Em escolha múltipla a marca (visto) mostra o que está ligado sem depender só da cor. */}
+      {papel === 'checkbox' && selecionado ? (
+        <Icone nome="aplicada" cor={cores.primaria} tamanho={20} />
+      ) : null}
       <Texto
         variante="corpoNegrito"
         truncar={1}
