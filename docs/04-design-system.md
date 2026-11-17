@@ -369,7 +369,7 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 | 2 | Barra inferior com microfone central; fim do balão | em análise |
 | 3 | Doses e detalhe da dose; ação rápida | em análise |
 | 4 | Família, formulários, janelas e confirmações | a fazer |
-| 5 | Histórico, Painel de gráficos e Conta | a fazer |
+| 5 | Histórico, Painel de gráficos e Conta (atalhos, azulejo da marca, chips, caixas de exclusão) | em análise |
 | 6 | Postos, Viagem e Novidades | a fazer |
 | 7 | Acesso: landing, abertura, Entrar, Criar conta, Consentimento | a fazer |
 | 8 | Movimento e app instalável | a fazer |

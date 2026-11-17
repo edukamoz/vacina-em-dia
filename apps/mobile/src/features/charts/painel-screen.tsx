@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
+import { Chip } from '../../components/chip';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
 import { Icone, type NomeDoIcone } from '../../components/icone';
 import { Tela } from '../../components/tela';
@@ -19,7 +20,7 @@ import {
   ROTULO_DO_ESTADO,
   totalDaContagem,
 } from '../../lib/estatisticas';
-import { useThemeColors } from '../../theme/theme-provider';
+import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import { useConferenciaDoCalendario, useDosesOfMembers, useMembers } from '../data/hooks';
 import { BarrasPorMes, BarrasPorPessoa, Rosca, useCoresDosEstados } from './graficos';
 
@@ -29,12 +30,15 @@ function Indicador({
   numero,
   rotulo,
   cor,
+  fundo,
 }: {
   icone: NomeDoIcone;
   numero: string;
   rotulo: string;
   cor: string;
+  fundo: string;
 }) {
+  const { altoContraste } = useVisual();
   return (
     <Cartao
       accessible
@@ -43,8 +47,8 @@ function Indicador({
     >
       <View
         aria-hidden
-        className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao"
-        style={{ borderColor: cor }}
+        className="h-[48px] w-[48px] items-center justify-center rounded-quadro border-padrao"
+        style={{ borderColor: altoContraste ? cor : 'transparent', backgroundColor: fundo }}
       >
         <Icone nome={icone} cor={cor} />
       </View>
@@ -159,31 +163,30 @@ export function PainelScreen({ hoje = todayCivil() }: { hoje?: string }) {
   const total = totalDaContagem(contagem);
   const previstas = previstasPorMes(doses, hoje, 6);
   const fonte = consultas.find((consulta) => consulta.data)?.data?.source;
-  const nomeDoEscopo = escolhida
-    ? (pessoas.find((pessoa) => pessoa.id === escolhida)?.name ?? '')
-    : 'a família';
+  // "da família" e "de João": a preposição muda com o escopo (antes saía "de a família").
+  const escopo = escolhida
+    ? `de ${pessoas.find((pessoa) => pessoa.id === escolhida)?.name ?? ''}`
+    : 'da família';
 
   return (
     <Tela
       voltar
       titulo="Painel de gráficos"
-      subtitulo={`A situação das vacinas de ${nomeDoEscopo}, em gráficos.`}
+      subtitulo={`A situação das vacinas ${escopo}, em gráficos.`}
     >
       {pessoas.length > 1 ? (
         <View className="gap-sm">
           <Texto variante="rotulo">Mostrar</Texto>
           <View className="flex-row flex-wrap gap-sm">
-            <Botao
-              titulo="Toda a família"
-              variante={escolhida === null ? 'principal' : 'secundario'}
+            <Chip
+              rotulo="Toda a família"
               selecionado={escolhida === null}
               onPress={() => setEscolhida(null)}
             />
             {pessoas.map((pessoa) => (
-              <Botao
+              <Chip
                 key={pessoa.id}
-                titulo={pessoa.name}
-                variante={escolhida === pessoa.id ? 'principal' : 'secundario'}
+                rotulo={pessoa.name}
                 selecionado={escolhida === pessoa.id}
                 onPress={() => setEscolhida(pessoa.id)}
               />
@@ -205,18 +208,21 @@ export function PainelScreen({ hoje = todayCivil() }: { hoje?: string }) {
               numero={`${cobertura(contagem)}%`}
               rotulo="das doses já aplicadas"
               cor={corDoEstado.APPLIED}
+              fundo={cores.aplicadaSuave}
             />
             <Indicador
               icone="atrasada"
               numero={String(contagem.OVERDUE)}
               rotulo={contagem.OVERDUE === 1 ? 'dose atrasada' : 'doses atrasadas'}
               cor={corDoEstado.OVERDUE}
+              fundo={cores.atrasadaSuave}
             />
             <Indicador
               icone="agendada"
               numero={String(previstas.meses[0]?.total ?? 0)}
               rotulo="previstas neste mês"
               cor={corDoEstado.SCHEDULED}
+              fundo={cores.agendadaSuave}
             />
           </View>
 

@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Dimensions } from 'react-native';
 import { ThemeProvider } from '../theme/theme-provider';
+import { Atalho } from './atalho';
+import { AzulejoDeMarca } from './azulejo-de-marca';
 import { BlocoResumo } from './bloco-resumo';
 import { Botao, classesDoBotao } from './botao';
 import { Cartao } from './cartao';
@@ -182,5 +184,50 @@ describe('Cartao e azulejo de estado', () => {
     );
     expect(screen.getByRole('header', { name: 'Nenhuma pessoa cadastrada' })).toBeOnTheScreen();
     expect(screen.getByText('Adicione alguém.')).toBeOnTheScreen();
+  });
+});
+
+describe('Atalho e azulejo da marca', () => {
+  test('CT-UI-23: o atalho é um link com rótulo completo e abre ao tocar', async () => {
+    const aoAbrir = jest.fn();
+    await render(
+      <Atalho
+        icone="local"
+        titulo="Vou viajar"
+        apoio="Veja o que conferir antes da viagem."
+        aoAbrir={aoAbrir}
+      />,
+    );
+    const link = screen.getByRole('link', {
+      name: 'Vou viajar. Veja o que conferir antes da viagem.',
+    });
+    await fireEvent.press(link);
+    expect(aoAbrir).toHaveBeenCalledTimes(1);
+  });
+
+  test('CT-UI-23b: o rótulo de acessibilidade pode ser trocado e o texto do atalho não é truncado', async () => {
+    await render(
+      <Atalho
+        icone="historico"
+        titulo="Painel de gráficos"
+        apoio="Veja a situação das vacinas da família em gráficos."
+        rotuloAcessivel="Painel de gráficos, abre os gráficos da família"
+        aoAbrir={jest.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole('link', { name: 'Painel de gráficos, abre os gráficos da família' }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText('Veja a situação das vacinas da família em gráficos.', {
+        includeHiddenElements: true,
+      }).props.numberOfLines,
+    ).toBeUndefined();
+  });
+
+  test('CT-UI-23c: o azulejo da marca é decorativo para o leitor de tela', async () => {
+    await render(<AzulejoDeMarca icone="familia" />);
+    expect(screen.queryByRole('image')).toBeNull();
+    expect(screen.queryByLabelText(/.+/)).toBeNull();
   });
 });

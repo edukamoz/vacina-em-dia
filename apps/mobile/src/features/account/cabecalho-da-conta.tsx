@@ -69,7 +69,10 @@ export function CabecalhoDaConta({ email }: { email: string }) {
           <Texto variante="titulo2" className="text-sobrePrimaria" accessibilityRole="header">
             Seus dados
           </Texto>
-          <Texto className="text-sobrePrimaria">{email}</Texto>
+          {/* E-mail muito longo: uma linha com reticências (ADR-036); o texto inteiro está na tela de privacidade e no login. */}
+          <Texto className="text-sobrePrimaria" truncar={1}>
+            {email}
+          </Texto>
         </View>
       </View>
       <View className="flex-row flex-wrap gap-md">
