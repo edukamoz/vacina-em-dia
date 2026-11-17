@@ -3,7 +3,7 @@
 #   docker build -f apps/api/Dockerfile .
 
 # ---- 1. Compila o domínio compartilhado e a API ----
-FROM --platform=$BUILDPLATFORM node:24.21.0-slim AS build
+FROM --platform=$BUILDPLATFORM node:26.13.1-slim AS build
 WORKDIR /app
 # Os manifestos primeiro, para o cache de dependências só quebrar quando elas mudarem.
 COPY package.json package-lock.json ./
@@ -17,7 +17,7 @@ COPY apps/api apps/api
 RUN npm run build -w @vacina/shared -w @vacina/api
 
 # ---- 2. Só as dependências de produção (sem ferramentas de desenvolvimento) ----
-FROM --platform=$BUILDPLATFORM node:24.21.0-slim AS deps
+FROM --platform=$BUILDPLATFORM node:26.13.1-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
