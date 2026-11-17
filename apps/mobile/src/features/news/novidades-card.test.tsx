@@ -53,6 +53,14 @@ describe('cartão Novidades de saúde', () => {
     expect(screen.getByText(/Não é orientação médica/)).toBeOnTheScreen();
   });
 
+  test('CT-APP-NEW09: a lista de notícias tem um item de lista para cada notícia (acessibilidade)', async () => {
+    const fake = createFakeFetch({ 'GET /news': resposta([noticia(1), noticia(2), noticia(3)]) });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    await screen.findByRole('header', { name: 'Novidades de saúde' });
+    // Cada notícia é um item (`role="listitem"`) da lista: sem isso o leitor de tela acusa lista vazia.
+    expect(screen.getAllByTestId('novidade', { includeHiddenElements: true })).toHaveLength(3);
+  });
+
   test('CT-APP-NEW02: tocar numa notícia abre a página original no site do Ministério', async () => {
     const abrir = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
     const fake = createFakeFetch({ 'GET /news': resposta([noticia(7)]) });

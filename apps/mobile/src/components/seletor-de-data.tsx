@@ -272,7 +272,7 @@ export function SeletorDeData({
           accessibilityRole="button"
           accessibilityLabel={`${monthLabel(mes)}. Tocar para escolher outro mês ou ano`}
           onPress={abrirAnos}
-          className="min-h-toque flex-row items-center justify-center gap-xs rounded-botao px-md hover:bg-superficieSuave"
+          className="min-h-toque min-w-0 shrink flex-row items-center justify-center gap-xs rounded-botao px-sm hover:bg-superficieSuave"
         >
           <Texto variante="corpoNegrito" accessibilityLiveRegion="polite">
             {monthLabel(mes)}

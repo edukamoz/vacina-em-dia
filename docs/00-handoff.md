@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 12/11/2026 (**leia a seção 0.15 primeiro**, que atualiza a 0.14; a 0.14 guarda o estado de 24/10/2026, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 17/11/2026 (**leia a seção 0.16 primeiro**, que atualiza a 0.15; a 0.15 guarda o estado de 12/11/2026, que atualiza a 0.14; a 0.14 guarda o estado de 24/10/2026, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,17 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.16 Redesenho visual v3 (17/11/2026)
+
+Atualiza a 0.15. O autor aprovou o protótipo de design em 16/11/2026 (quadro "Vacina em Dia: novo design", no Claude, privado) e mandou aplicar no app. Decisão e resultado: `docs/05-adrs/ADR-036-redesenho-visual-v3.md`; alvo, regras de consistência e de texto longo: `docs/04-design-system.md`, seção 10. Itens do backlog: **B77** (redesenho, Em andamento; só o autor conclui) e **B78** (foto por pessoa, fora do redesenho, A fazer).
+
+- **PRs (todos pequenos, na ordem):** #276 docs, #277 componentes base e lint, #278 barra com microfone central, #279 Doses, #280 Família e janelas, #281 Histórico, Painel e Conta, #282 Postos, Viagem e Novidades, #283 Entrar e Criar conta, #284 convite para instalar o app, e o PR de fechamento (acessibilidade, capturas e documentos). `tokens.json` está na versão 3.0.0 (mesmas cores).
+- **Mantém:** paleta, três temas, Atkinson Hyperlegible (a Next foi testada e descartada: mesmo zero cortado), alvos de 48 e 56 dp, contrastes.
+- **Novo no código:** `Chip`, `Segmentado`, `BlocoResumo`, `AzulejoDeEstado`, `AzulejoDeMarca`, `Atalho`; `Texto` com `truncar`; `Botao` com `texto`, `perigoTexto` e `compacto`; o ESLint reprova hexadecimal e `fontSize` avulsos no app.
+- **Testes:** `acessibilidade-logado.spec.ts` (axe nas telas de dentro do app nos três temas, mais reflow a 320 px). `npm run e2e` agora tem 19 cenários.
+- **Cuidados de Git:** o CI roda só em `push` (`ci.yml`), e `paths-ignore` ignora commit sem arquivo alterado: para re-executar um PR, faça um commit com mudança real. Ao apagar a branch base de um PR empilhado, o GitHub fecha o PR filho; troque a base para `main` antes de mesclar.
+- **Pendente (autor):** testar em celular real e com leitor de tela (B40); decidir B78 (foto por pessoa, LGPD); refazer as capturas das documentações (há um conjunto novo em `doctos/capturas-v3/`, local e ignorado pelo Git) e atualizar a Documentação Técnica e do Usuário e o roteiro da apresentação com o visual novo e com os números atuais (migrações 001 a 009, ADRs 001 a 036).
 
 ### 0.15 Estado em 12/11/2026: do B69 ao B75, custo da Azure e o que fazer antes da apresentação
 

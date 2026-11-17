@@ -697,7 +697,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Texto longo segue a regra do ADR-036: nome da vacina, estado, datas e erros quebram; e-mail, nome em ficha e endereço usam reticências, desligadas com texto Grande ou Maior.
 - Passa a checagem de acessibilidade nos três temas e a 200% de texto, sem rolagem horizontal.
 - Capturas e documentações atualizadas.
-- Evidência: ADR-036; docs/04-design-system.md seção 10; PR 0 a 9
+- Evidência: ADR-036; docs/04-design-system.md seção 10; PRs #276 a #284 e o de fechamento; CT-UI-16 a 23, CT-LAY-27 a 30, CT-APP-K13 a K19, CT-E2E-A11Y-L e CT-E2E-A11Y-R
 - Atenção: Protótipo aprovado em 16/11/2026 (quadro "Vacina em Dia: novo design", no Claude). Decisão do autor: começar já, antes da entrega de 19/11. As capturas das documentações precisam ser refeitas no PR 9.
 
 ## Não migrados do Jira

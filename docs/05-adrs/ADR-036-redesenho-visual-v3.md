@@ -61,3 +61,17 @@ O protótipo aprovado está no Claude (quadro "Vacina em Dia: novo design", priv
 
 - Revisão visual do app em 16/11/2026: build web atual (`expo export`), API falsa dos testes de ponta a ponta, janela de 390 por 844 px, com movimento reduzido.
 - WCAG 2.1: critérios 1.4.3 (contraste), 1.4.4 (redimensionar texto), 1.4.11 (contraste de não texto) e 2.5.5 (tamanho do alvo).
+
+## Resultado da implementação (17/11/2026)
+
+Os PRs 0 a 9 (#276 a #284 e o de fechamento) aplicaram a decisão:
+
+- **Componentes novos:** `Chip` (button, radio e checkbox), `Segmentado`, `BlocoResumo`, `AzulejoDeEstado`, `AzulejoDeMarca`, `Atalho`, `Texto` com `truncar` e `Botao` com `texto`, `perigoTexto` e `compacto`. Tokens 3.0.0 (raios, sombra e durações).
+- **Telas:** barra com microfone central e sem balão; Doses (chips, resumo, ação rápida "Aplicar" com confirmação da data de hoje, aplicadas recolhidas); detalhe da dose; Família; formulários e janelas; Histórico; Painel; Conta; Postos; Viagem; Novidades; Entrar e Criar conta; convite para instalar o app.
+- **Regras automáticas:** o ESLint reprova cor hexadecimal e `fontSize` avulsos (cinco exceções com o motivo escrito); `plataforma.test.ts` confere as variantes `.web`.
+- **Regra de texto longo:** `truncar` só em e-mail, nome de pessoa em ficha, endereço de posto e linhas de apoio; desligada com texto Grande, Maior ou fonte do aparelho acima de 130%.
+- **Fonte:** mantida a Atkinson Hyperlegible; a variante Next foi testada e descartada (mesmo zero cortado).
+
+**Acessibilidade verificada automaticamente (Playwright com axe e reflow):** as telas de dentro do app (Doses, Família, Histórico, Conta, Painel e Viagem) nos temas Claro, Escuro e Alto contraste (cores forçadas), mais o reflow a 320 px. A verificação achou e o PR de fechamento corrigiu dois problemas reais: a lista de notícias não tinha itens de lista (violação `aria-required-children`) e o botão "próximo mês" do calendário saía da tela a 320 px.
+
+**Ainda não verificado:** celular real (Android e iPhone), leitor de tela (TalkBack e VoiceOver) e o Alto contraste a olho; Postos e Novidades não foram vistos em captura (a API falsa não os simula). Itens do B40.
