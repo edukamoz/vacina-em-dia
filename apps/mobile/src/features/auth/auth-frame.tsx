@@ -20,8 +20,17 @@ import { Logo, Simbolo } from './logo';
  * marca no alto (`docs/04-design-system.md`, seção 2.5).
  *
  * @param props.titulo - Título da tela (cabeçalho para o leitor de tela).
+ * @param props.subtitulo - Frase de apoio abaixo do título (opcional).
  */
-export function AuthFrame({ titulo, children }: { titulo: string; children: ReactNode }) {
+export function AuthFrame({
+  titulo,
+  subtitulo,
+  children,
+}: {
+  titulo: string;
+  subtitulo?: string;
+  children: ReactNode;
+}) {
   const router = useRouter();
   const expandido = modoDeLayout(useWindowDimensions().width) === 'expandido';
   const { gradienteMarca, altoContraste } = useVisual();
@@ -35,9 +44,12 @@ export function AuthFrame({ titulo, children }: { titulo: string; children: Reac
         </Entrada>
       ) : null}
       <Entrada indice={1}>
-        <Texto variante="titulo1" accessibilityRole="header">
-          {titulo}
-        </Texto>
+        <View className="gap-xs">
+          <Texto variante="titulo1" accessibilityRole="header">
+            {titulo}
+          </Texto>
+          {subtitulo ? <Texto className="text-textoSecundario">{subtitulo}</Texto> : null}
+        </View>
       </Entrada>
       {Children.toArray(children).map((filho, indice) => (
         <Entrada key={indice} indice={indice + 2}>

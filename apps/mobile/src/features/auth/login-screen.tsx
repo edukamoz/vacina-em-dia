@@ -9,6 +9,7 @@ import { Texto } from '../../components/texto';
 import { useSession } from '../../session/session-provider';
 import { AuthFrame } from './auth-frame';
 import { CampoSenha } from './campo-senha';
+import { NotaDePrivacidade } from './nota-de-privacidade';
 import { validateCredentials, type FieldErrors } from './validate';
 
 /** Tela "Entrar" (RF01): e-mail e senha. */
@@ -43,7 +44,7 @@ export function LoginScreen() {
   }
 
   return (
-    <AuthFrame titulo="Entrar">
+    <AuthFrame titulo="Entrar" subtitulo="Entre para ver as vacinas da sua família.">
       <CampoTexto
         rotulo="E-mail"
         value={email}
@@ -78,6 +79,7 @@ export function LoginScreen() {
         <LinkTexto titulo="Esqueci minha senha" onPress={() => router.push('/esqueci-senha')} />
         <LinkTexto titulo="Criar conta" onPress={() => router.replace('/criar-conta')} />
       </View>
+      <NotaDePrivacidade />
     </AuthFrame>
   );
 }

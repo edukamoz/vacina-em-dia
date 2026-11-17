@@ -149,6 +149,15 @@ describe('primeira tela: um desenho para cada forma de uso', () => {
 });
 
 describe('tela "Entrar"', () => {
+  test('CT-APP-L09: a tela de entrada tem subtítulo e a nota de privacidade', async () => {
+    await renderScreen(<LoginScreen />, createFakeFetch({}).fetchFn);
+    expect(screen.getByRole('header', { name: 'Entrar' })).toBeOnTheScreen();
+    expect(screen.getByText('Entre para ver as vacinas da sua família.')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Seus dados de saúde são só seus. Você pode excluir a conta quando quiser.'),
+    ).toBeOnTheScreen();
+  });
+
   test('CT-APP-L10: entra com e-mail e senha corretos e vai ao app', async () => {
     const { store, box } = memorySessionStore();
     const fake = createFakeFetch({ 'POST /auth/login': { status: 200, body: SESSION_BODY } });
@@ -264,6 +273,13 @@ describe('tela "Entrar"', () => {
 });
 
 describe('tela "Criar conta"', () => {
+  test('CT-APP-L19: a tela de cadastro tem subtítulo simples, sem pedir CPF', async () => {
+    await renderScreen(<RegisterScreen />, createFakeFetch({}).fetchFn);
+    expect(screen.getByRole('header', { name: 'Criar conta' })).toBeOnTheScreen();
+    expect(screen.getByText('Só precisamos de e-mail e senha.')).toBeOnTheScreen();
+    expect(screen.getByText(/não pede CPF/)).toBeOnTheScreen();
+  });
+
   test('CT-APP-L20: cria a conta e vai ao app (onde o consentimento é pedido)', async () => {
     const { store, box } = memorySessionStore();
     const fake = createFakeFetch({ 'POST /auth/register': { status: 201, body: SESSION_BODY } });
