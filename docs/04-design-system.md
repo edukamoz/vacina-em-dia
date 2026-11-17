@@ -204,7 +204,7 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 | Entrar e criar conta | RF01 | Uma coluna, botão de largura total | Duas colunas: lateral de 560 com a marca e formulário de 440 (implementado em 07/10/2026, ver `docs/14-login-proprio.md`) |
 | Consentimento | RF09 | Texto em linguagem simples, botão "Aceito" | Mesmo, em coluna de leitura |
 | Início: pessoas da família | RF02 | Lista de cartões de membro | Grade de cartões ao lado da barra lateral |
-| Doses | RF03 e RF04 | Cartões de dose em três grupos ("Precisam de atenção", "Próximas", "Aplicadas", até 5 aplicadas), "Trocar pessoa" leva à Família | Duas colunas |
+| Doses | RF03 e RF04 | Faixa de pessoas (chips), bloco de resumo com anel, cartões de dose em "Precisam de atenção" (com o botão rápido **Aplicar**) e "Próximas"; as "Aplicadas" (até 5) ficam recolhidas atrás de um botão enquanto há o que resolver | Duas colunas |
 | Detalhe da dose | RF04 | Ações: agendar, registrar aplicação, cancelar | Painel ao lado da lista |
 | Histórico | RF08 | Doses aplicadas e canceladas da **família inteira**, agrupadas por ano; cada cartão mostra "Pessoa, data" | Tabela (Vacina, Pessoa, Data, Estado) |
 | Perguntar por voz | RF06 | Botão grande de voz e resultado | Mesmo, com atalho de teclado |
@@ -367,7 +367,7 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 | 0 | ADR-036, esta seção e o backlog (B77 e B78) | feito (#276) |
 | 1 | Tokens 3.0.0, componentes base (`Texto` com `truncar`, `Botao` com `texto` e `compacto`, `Chip`, `Segmentado`, `BlocoResumo`, `AzulejoDeEstado`), regras de lint | em análise |
 | 2 | Barra inferior com microfone central; fim do balão | em análise |
-| 3 | Doses e detalhe da dose; ação rápida | a fazer |
+| 3 | Doses e detalhe da dose; ação rápida | em análise |
 | 4 | Família, formulários, janelas e confirmações | a fazer |
 | 5 | Histórico, Painel de gráficos e Conta | a fazer |
 | 6 | Postos, Viagem e Novidades | a fazer |

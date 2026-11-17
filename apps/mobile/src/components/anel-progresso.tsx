@@ -13,8 +13,18 @@ const CIRCUNFERENCIA = 2 * Math.PI * RAIO;
  *
  * @param props.aplicadas - Doses aplicadas.
  * @param props.total - Total de doses consideradas (sem as canceladas).
+ * @param props.sobreMarca - Anel desenhado sobre o bloco de resumo (fundo da marca): traço e texto
+ *   na cor `sobrePrimaria`, com a trilha mais fraca.
  */
-export function AnelProgresso({ aplicadas, total }: { aplicadas: number; total: number }) {
+export function AnelProgresso({
+  aplicadas,
+  total,
+  sobreMarca = false,
+}: {
+  aplicadas: number;
+  total: number;
+  sobreMarca?: boolean;
+}) {
   const cores = useThemeColors();
   const fracaoFinal = total > 0 ? Math.min(aplicadas / total, 1) : 0;
   // O traço se desenha em 900 ms e o número sobe em 600 ms; com "Reduzir movimento" já chegam prontos.
@@ -28,13 +38,21 @@ export function AnelProgresso({ aplicadas, total }: { aplicadas: number; total: 
       className="h-[112px] w-[112px] items-center justify-center"
     >
       <Svg width={112} height={112} viewBox="0 0 112 112" style={{ position: 'absolute' }}>
-        <Circle cx={56} cy={56} r={RAIO} fill="none" stroke={cores.bordaSuave} strokeWidth={12} />
         <Circle
           cx={56}
           cy={56}
           r={RAIO}
           fill="none"
-          stroke={cores.primaria}
+          stroke={sobreMarca ? cores.sobrePrimaria : cores.bordaSuave}
+          strokeOpacity={sobreMarca ? 0.3 : 1}
+          strokeWidth={12}
+        />
+        <Circle
+          cx={56}
+          cy={56}
+          r={RAIO}
+          fill="none"
+          stroke={sobreMarca ? cores.sobrePrimaria : cores.primaria}
           strokeWidth={12}
           strokeLinecap="round"
           strokeDasharray={CIRCUNFERENCIA}
@@ -42,10 +60,18 @@ export function AnelProgresso({ aplicadas, total }: { aplicadas: number; total: 
           transform="rotate(-90 56 56)"
         />
       </Svg>
-      <Texto variante="titulo2" importantForAccessibility="no">
+      <Texto
+        variante="titulo2"
+        className={sobreMarca ? 'text-sobrePrimaria' : ''}
+        importantForAccessibility="no"
+      >
         {String(contagem)}
       </Texto>
-      <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
+      <Texto
+        variante="apoio"
+        className={sobreMarca ? 'text-sobrePrimaria' : 'text-textoSecundario'}
+        importantForAccessibility="no"
+      >
         {`de ${total}`}
       </Texto>
     </View>

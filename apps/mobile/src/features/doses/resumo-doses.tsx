@@ -1,7 +1,7 @@
 import { addDays, compareCivilDates, REMINDER_LEAD_DAYS, type DoseResponse } from '@vacina/shared';
 import { View } from 'react-native';
 import { AnelProgresso } from '../../components/anel-progresso';
-import { Cartao } from '../../components/cartao';
+import { BlocoResumo } from '../../components/bloco-resumo';
 import { Icone, type NomeDoIcone } from '../../components/icone';
 import { Texto } from '../../components/texto';
 import { useThemeColors } from '../../theme/theme-provider';
@@ -75,8 +75,21 @@ function Contador({
 }
 
 /**
- * Cartão de resumo da pessoa na aba Doses: anel de doses aplicadas, a frase que diz o mesmo em
- * texto e dois contadores (atrasadas e as de até 7 dias).
+ * Frase principal do resumo: o que a pessoa precisa resolver agora. Sem doses atrasadas, diz que
+ * está tudo em dia (ou que não há doses, quando a lista está vazia).
+ *
+ * @param contagem - Números calculados por {@link contarDoses}.
+ */
+export function frasePrincipalDoResumo(contagem: ContagemDeDoses): string {
+  if (contagem.atrasadas === 1) return '1 dose para resolver';
+  if (contagem.atrasadas > 1) return `${contagem.atrasadas} doses para resolver`;
+  return contagem.total === 0 ? 'Nenhuma dose por enquanto' : 'Nada atrasado por aqui';
+}
+
+/**
+ * Bloco de resumo da pessoa na aba Doses (ADR-036): o que resolver agora, o anel de doses
+ * aplicadas sobre o fundo da marca, a frase que diz o mesmo em texto e dois contadores (atrasadas e
+ * as de até 7 dias). Os contadores têm cor, ícone e número, não só cor.
  *
  * @param props.nome - Primeiro nome da pessoa.
  * @param props.contagem - Números calculados por {@link contarDoses}.
@@ -84,17 +97,15 @@ function Contador({
 export function ResumoDoses({ nome, contagem }: { nome: string; contagem: ContagemDeDoses }) {
   const cores = useThemeColors();
   return (
-    <Cartao className="gap-lg medio:flex-row medio:items-center">
-      <AnelProgresso aplicadas={contagem.aplicadas} total={contagem.total} />
-      <View className="flex-1 gap-md">
-        <View>
-          <Texto variante="titulo3" accessibilityRole="header">
-            Doses aplicadas
-          </Texto>
-          <Texto variante="apoio" className="text-textoSecundario">
-            {`${contagem.aplicadas} de ${contagem.total} doses de ${nome} já foram aplicadas.`}
-          </Texto>
-        </View>
+    <BlocoResumo
+      legenda={`Calendário de ${nome}`}
+      titulo={frasePrincipalDoResumo(contagem)}
+      aoLado={<AnelProgresso aplicadas={contagem.aplicadas} total={contagem.total} sobreMarca />}
+    >
+      <View className="gap-md">
+        <Texto variante="apoio" className="text-sobrePrimaria">
+          {`${contagem.aplicadas} de ${contagem.total} doses de ${nome} já foram aplicadas.`}
+        </Texto>
         <View className="flex-row flex-wrap gap-md">
           <Contador
             icone="atrasada"
@@ -112,6 +123,6 @@ export function ResumoDoses({ nome, contagem }: { nome: string; contagem: Contag
           />
         </View>
       </View>
-    </Cartao>
+    </BlocoResumo>
   );
 }

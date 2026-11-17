@@ -1,5 +1,7 @@
 import type { DoseResponse, DoseStatus } from '@vacina/shared';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { QuadroEstado } from '../../components/quadro-estado';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
@@ -52,21 +54,33 @@ export function doseDateRow(
 
 /**
  * Cartão de dose: quadro de 56 px com o ícone do estado, nome da vacina, quando é indicada, selo
- * e dica de leitura. Com `aoAbrir`, o cartão inteiro vira um botão que abre o detalhe.
+ * e dica de leitura. O texto quebra de linha, sem reticências: nome da vacina e datas nunca são
+ * cortados (ADR-036). Com `aoAbrir`, a parte de cima do cartão vira um botão que abre o detalhe;
+ * com `aoAplicar`, o cartão ganha a ação rápida "Aplicar" embaixo (fora do botão do detalhe, para
+ * não haver botão dentro de botão).
  *
  * @param props.dose - Dose a exibir.
  * @param props.aoAbrir - Chamada ao tocar no cartão.
+ * @param props.aoAplicar - Chamada ao tocar em "Aplicar" (só para dose atrasada).
  */
-export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () => void }) {
+export function DoseCard({
+  dose,
+  aoAbrir,
+  aoAplicar,
+}: {
+  dose: DoseResponse;
+  aoAbrir?: () => void;
+  aoAplicar?: () => void;
+}) {
   const reduzido = useMovimentoReduzido();
   const { sombra } = useVisual();
-  const cartao = (elevado: boolean) => (
-    <Cartao className="grow flex-row items-start gap-lg" style={elevado ? sombra(2) : undefined}>
+  const [passando, setPassando] = useState(false);
+  const conteudo = (
+    <>
       <QuadroEstado status={dose.status} />
       <View className="min-w-0 flex-1 gap-sm">
-        {/* Nomes muito longos (vacinas com várias regras por idade) ficam em até 2 linhas, para o cartão não crescer e entortar a grade; o texto inteiro está no detalhe da dose. */}
-        <Texto variante="titulo3" numberOfLines={2}>{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
-        <Texto variante="apoio" className="text-textoSecundario" numberOfLines={2}>
+        <Texto variante="titulo3">{`${dose.vaccine}, ${dose.doseLabel}`}</Texto>
+        <Texto variante="apoio" className="text-textoSecundario">
           {dose.timingLabel}
           {dose.conditional ? ' · depende de condições' : ''}
         </Texto>
@@ -78,27 +92,45 @@ export function DoseCard({ dose, aoAbrir }: { dose: DoseResponse; aoAbrir?: () =
           {doseHint(dose)}
         </Texto>
       </View>
-    </Cartao>
+    </>
   );
-  if (!aoAbrir) return cartao(false);
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${dose.vaccine}, ${dose.doseLabel}. Abrir detalhes`}
-      onPress={aoAbrir}
-      className="grow"
+    <Cartao
+      className="grow gap-md"
       // Elevar ao passar (só na web, com mouse): sobe 3 px e ganha a sombra 2; "Reduzir movimento" mantém só a sombra.
-      style={(estado) => {
-        const passando = Boolean((estado as { hovered?: boolean }).hovered);
-        return [
-          reduzido
-            ? null
-            : ({ transitionProperty: 'transform', transitionDuration: '200ms' } as object),
-          passando && !reduzido ? { transform: [{ translateY: -3 }] } : null,
-        ];
-      }}
+      style={[
+        passando ? sombra(2) : undefined,
+        reduzido
+          ? null
+          : ({ transitionProperty: 'transform', transitionDuration: '200ms' } as object),
+        passando && !reduzido ? { transform: [{ translateY: -3 }] } : null,
+      ]}
     >
-      {(estado) => cartao(Boolean((estado as { hovered?: boolean }).hovered))}
-    </Pressable>
+      {aoAbrir ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${dose.vaccine}, ${dose.doseLabel}. Abrir detalhes`}
+          onPress={aoAbrir}
+          onHoverIn={() => setPassando(true)}
+          onHoverOut={() => setPassando(false)}
+          className="flex-row items-start gap-lg"
+        >
+          {conteudo}
+        </Pressable>
+      ) : (
+        <View className="flex-row items-start gap-lg">{conteudo}</View>
+      )}
+      {aoAplicar ? (
+        <View className="items-start">
+          <Botao
+            titulo="Aplicar"
+            tamanho="compacto"
+            icone="aplicada"
+            accessibilityLabel={`Registrar aplicação de ${dose.vaccine}, ${dose.doseLabel}`}
+            onPress={aoAplicar}
+          />
+        </View>
+      ) : null}
+    </Cartao>
   );
 }

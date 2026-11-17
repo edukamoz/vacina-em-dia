@@ -1,5 +1,6 @@
 import type { DoseResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
@@ -15,6 +16,8 @@ import { todayCivil } from '../../lib/dates';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useConferenciaDoCalendario, useMemberDoses } from '../data/hooks';
+import { aplicadasVisiveisAoAbrir } from './grupos-de-doses';
+import { ConfirmarAplicacao } from './aplicar-rapido';
 import { BaixarCarteira } from './baixar-carteira';
 import { DoseCard } from './dose-card';
 import { Festa } from './festa';
@@ -71,6 +74,9 @@ export function DosesScreen() {
   const cores = useThemeColors();
   const { members, items, selected, selectMember } = useSelectedMember();
   const doses = useMemberDoses(selected?.id ?? null);
+  // Ação rápida "Aplicar": a dose atrasada que está sendo confirmada, e se a lista de aplicadas está aberta.
+  const [aplicando, setAplicando] = useState<DoseResponse | null>(null);
+  const [verAplicadas, setVerAplicadas] = useState(false);
 
   if (members.isPending) {
     return (
@@ -105,11 +111,11 @@ export function DosesScreen() {
   const primeiroNome = selected.name.split(' ')[0] ?? selected.name;
   const grupos = doses.data ? agruparDoses(doses.data.items) : null;
   const aplicadasVisiveis = grupos?.aplicadas.slice(0, LIMITE_APLICADAS) ?? [];
+  const aplicadasAbertas = grupos ? aplicadasVisiveisAoAbrir(grupos, verAplicadas) : false;
   const secoes = grupos
     ? [
-        { titulo: 'Precisam de atenção', lista: grupos.atencao },
-        { titulo: 'Próximas', lista: grupos.proximas },
-        { titulo: 'Aplicadas', lista: aplicadasVisiveis },
+        { titulo: 'Precisam de atenção', lista: grupos.atencao, rapida: true },
+        { titulo: 'Próximas', lista: grupos.proximas, rapida: false },
       ]
     : [];
 
@@ -148,7 +154,7 @@ export function DosesScreen() {
       {grupos &&
         !(animal && doses.data && doses.data.items.length === 0) &&
         grupos.atencao.length + grupos.proximas.length === 0 && <Festa nome={primeiroNome} />}
-      {secoes.map(({ titulo, lista }) =>
+      {secoes.map(({ titulo, lista, rapida }) =>
         lista.length === 0 ? null : (
           <View key={titulo} className="gap-lg">
             <Texto variante="titulo2" accessibilityRole="header">
@@ -156,6 +162,55 @@ export function DosesScreen() {
             </Texto>
             <Grade>
               {lista.map((dose) => (
+                <View key={dose.id} className="gap-md">
+                  <DoseCard
+                    dose={dose}
+                    aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
+                    {...(rapida && dose.status === 'OVERDUE'
+                      ? { aoAplicar: () => setAplicando(dose) }
+                      : {})}
+                  />
+                  {/* A confirmação aparece logo abaixo do cartão tocado, para a pessoa vê-la sem rolar. */}
+                  {aplicando?.id === dose.id && (
+                    <ConfirmarAplicacao
+                      dose={dose}
+                      aoFechar={() => setAplicando(null)}
+                      aoTrocarData={() => {
+                        setAplicando(null);
+                        router.push({ pathname: '/dose/[id]', params: { id: dose.id } });
+                      }}
+                    />
+                  )}
+                </View>
+              ))}
+            </Grade>
+          </View>
+        ),
+      )}
+      {aplicadasVisiveis.length > 0 && (
+        <View className="gap-lg">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Aplicadas, ${grupos?.aplicadas.length ?? 0}`}
+            accessibilityState={{ expanded: aplicadasAbertas }}
+            onPress={() => setVerAplicadas(!verAplicadas)}
+            className="min-h-principal flex-row items-center justify-between gap-md rounded-cartao border-fina border-bordaSuave bg-superficieSuave px-lg"
+          >
+            <Texto variante="titulo2" accessibilityRole="header" importantForAccessibility="no">
+              Aplicadas
+            </Texto>
+            <View className="flex-row items-center gap-sm">
+              <Texto variante="corpoNegrito" importantForAccessibility="no">
+                {String(grupos?.aplicadas.length ?? 0)}
+              </Texto>
+              <View style={{ transform: [{ rotate: aplicadasAbertas ? '90deg' : '0deg' }] }}>
+                <Icone nome="seta" cor={cores.textoSecundario} />
+              </View>
+            </View>
+          </Pressable>
+          {aplicadasAbertas && (
+            <Grade>
+              {aplicadasVisiveis.map((dose) => (
                 <DoseCard
                   key={dose.id}
                   dose={dose}
@@ -163,8 +218,8 @@ export function DosesScreen() {
                 />
               ))}
             </Grade>
-          </View>
-        ),
+          )}
+        </View>
       )}
       {grupos && grupos.aplicadas.length > LIMITE_APLICADAS && (
         <LinkTexto titulo="Ver todas no Histórico" onPress={() => router.push('/historico')} />

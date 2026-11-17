@@ -37,7 +37,9 @@ test.describe('Cadastro até a primeira dose (RF01, RF02, RF03, RF04, RF09)', ()
 
     // O calendário da Maria mostra a fonte oficial e o aviso.
     await expect(page.getByRole('heading', { name: 'Doses de Maria' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /BCG, dose única/ })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'BCG, dose única. Abrir detalhes' }),
+    ).toBeVisible();
     await expect(
       page
         .getByText(/Calendário Nacional de Vacinação 2026/)
@@ -52,7 +54,7 @@ test.describe('Cadastro até a primeira dose (RF01, RF02, RF03, RF04, RF09)', ()
     ).toBeVisible();
 
     // Detalhe e registro da aplicação.
-    await page.getByRole('button', { name: /BCG, dose única/ }).click();
+    await page.getByRole('button', { name: 'BCG, dose única. Abrir detalhes' }).click();
     await expect(page.getByText('tuberculose').filter({ visible: true }).first()).toBeVisible();
     // A ficha da vacina (B75) começa fechada e abre com o texto do manual do Ministério.
     await page.getByRole('button', { name: 'Sobre esta vacina' }).click();
