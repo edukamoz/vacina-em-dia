@@ -4,7 +4,9 @@ name: CI
 # mostra o resultado do push da própria branch, e rodar os dois dobrava os minutos mensais do GitHub
 # Actions. O pipeline falha se algum teste falhar, se a cobertura ficar abaixo de 80% ou se houver
 # vulnerabilidade grave nas dependências. Mudanças só em `doctos/` (Word) e `assets/` (arte) não têm
-# o que testar. O job de Docker (o mais demorado) roda na main e à mão, não em cada branch.
+# o que testar. O job de Docker (o mais demorado) roda na main e à mão, não em cada branch. Na
+# main, depois do merge, rodam só a qualidade e o Docker: o contrato do Firestore, o PLN e a
+# auditoria já passaram na branch e não se repetem a cada merge (à mão, rodam todos).
 on:
   push:
     paths-ignore:
@@ -84,6 +86,8 @@ jobs:
 
   firestore:
     name: Contrato do Firestore (emulador)
+    # Já passou na branch antes do merge; na main só à mão.
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -124,6 +128,8 @@ jobs:
 
   nlp:
     name: Serviço de PLN (pytest e cobertura)
+    # Já passou na branch antes do merge; na main só à mão.
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -165,6 +171,8 @@ jobs:
 
   seguranca:
     name: Auditoria de dependências (npm audit)
+    # Já passou na branch antes do merge; na main só à mão.
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

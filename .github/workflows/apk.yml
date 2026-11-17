@@ -2,10 +2,11 @@ name: APK do Android
 
 # Gera o APK do aplicativo e o publica nas Releases do GitHub.
 #
-# - Push na `main` que mude o app (ou o pacote compartilhado): atualiza a pré-release "apk-latest",
-#   sempre com o APK mais recente. Dura só uma pré-release; não enche a lista de versões.
+# O APK demora e não precisa sair a cada merge: ele só é gerado sob demanda (a Azure continua
+# atualizando a cada merge na `main`, pelo `deploy.yml`).
 # - Tag `v*` (por exemplo `v0.2.0`): cria uma release fixa dessa versão, com o APK.
-# - Execução manual (Actions > APK do Android > Run workflow): gera e publica como no push.
+# - Execução manual (Actions > APK do Android > Run workflow): gera o APK da branch escolhida e
+#   atualiza a pré-release "apk-latest" (dura só uma pré-release; não enche a lista de versões).
 # - Pull request que mude este arquivo ou o package.json do app: só compila e confere o APK (não publica).
 #
 # O app aponta para a API publicada (`EXPO_PUBLIC_API_URL`, embutida no pacote JavaScript na hora do
@@ -17,13 +18,6 @@ name: APK do Android
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'apps/mobile/**'
-      - 'packages/shared/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/apk.yml'
     tags: ['v*']
   # Mudou o próprio workflow ou as dependências do app (onde um módulo nativo pode quebrar o build)?
   # O PR já compila e confere o APK, mas não publica nada.
