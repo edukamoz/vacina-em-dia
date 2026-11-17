@@ -1,10 +1,13 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { useState } from 'react';
 import { AvisoDeConfirmacao, TEMPO_DO_AVISO } from './aviso-de-confirmacao';
+import { CampoTexto } from './campo-texto';
 import { Chave } from './chave';
+import { EstadoCarregando } from './estados';
 import { Segmentado } from './segmentado';
 import { Aparecer, Giro } from './animacao';
 import { Texto } from './texto';
+import { createFakeFetch, renderScreen } from '../test-utils';
 
 describe('movimento v4 (ADR-037)', () => {
   test('CT-UI-25: o aviso de confirmação mostra a mensagem e some sozinho depois do tempo', async () => {
@@ -81,5 +84,27 @@ describe('movimento v4 (ADR-037)', () => {
     );
     expect(screen.getByText('Lista aberta')).toBeOnTheScreen();
     expect(screen.getByText('Seta')).toBeOnTheScreen();
+  });
+  test('CT-UI-30: o carregamento de lista mostra o esqueleto e continua anunciando "Carregando"', async () => {
+    await render(<EstadoCarregando rotulo="Carregando as vacinas" esqueleto={3} />);
+    expect(screen.getByRole('progressbar', { name: 'Carregando as vacinas' })).toBeOnTheScreen();
+    expect(
+      screen.getByTestId('esqueleto-da-lista', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+
+  test('CT-UI-31: sem esqueleto o carregamento mantém o indicador de sempre', async () => {
+    await render(<EstadoCarregando rotulo="Carregando a dose" />);
+    expect(screen.getByRole('progressbar', { name: 'Carregando a dose' })).toBeOnTheScreen();
+    expect(screen.queryByTestId('esqueleto-da-lista')).not.toBeOnTheScreen();
+  });
+
+  test('CT-UI-32: o campo com erro mostra a mensagem e a anuncia (o balanço é só visual)', async () => {
+    await renderScreen(
+      <CampoTexto rotulo="Data de nascimento" erro="Essa data não existe." />,
+      createFakeFetch({}).fetchFn,
+    );
+    expect(screen.getByLabelText('Data de nascimento')).toBeOnTheScreen();
+    expect(screen.getByText('Essa data não existe.')).toBeOnTheScreen();
   });
 });

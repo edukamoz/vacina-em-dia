@@ -176,7 +176,7 @@ export function DosesScreen() {
           )}
         </View>
         <View className={`gap-xl ${muitas ? '' : 'expandido:flex-1'}`}>
-          {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
+          {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" esqueleto={3} />}
           {doses.error && (
             <EstadoErro
               mensagem={doses.error.message}
@@ -197,76 +197,78 @@ export function DosesScreen() {
             const limite = limites[titulo] ?? DOSES_POR_VEZ;
             const mostradas = lista.slice(0, limite);
             return (
-              <View key={titulo} className="gap-lg">
-                <View className="flex-row items-center gap-md">
-                  <Texto variante="titulo2" accessibilityRole="header">
-                    {titulo}
-                  </Texto>
-                  <View className="rounded-selo bg-primariaSuave px-md py-xs">
-                    <Texto variante="rotulo" className="text-primaria">
-                      {`${lista.length} ${lista.length === 1 ? 'dose' : 'doses'}`}
+              <Aparecer key={titulo}>
+                <View className="gap-lg">
+                  <View className="flex-row items-center gap-md">
+                    <Texto variante="titulo2" accessibilityRole="header">
+                      {titulo}
                     </Texto>
+                    <View className="rounded-selo bg-primariaSuave px-md py-xs">
+                      <Texto variante="rotulo" className="text-primaria">
+                        {`${lista.length} ${lista.length === 1 ? 'dose' : 'doses'}`}
+                      </Texto>
+                    </View>
                   </View>
-                </View>
-                <Grade colunas={duasColunas ? 2 : 1}>
-                  {mostradas.map((dose) => (
-                    <View key={dose.id} className="gap-md">
-                      <DoseCard
-                        dose={dose}
-                        aoAbrir={() =>
-                          router.push({ pathname: '/dose/[id]', params: { id: dose.id } })
-                        }
-                        {...(rapida && dose.status === 'OVERDUE'
-                          ? { aoAplicar: () => setAplicando(dose) }
-                          : {})}
-                      />
-                      {/* A confirmação abre numa janela por cima da tela (modal). */}
-                      {aplicando?.id === dose.id && (
-                        <ConfirmarAplicacao
+                  <Grade colunas={duasColunas ? 2 : 1}>
+                    {mostradas.map((dose) => (
+                      <View key={dose.id} className="gap-md">
+                        <DoseCard
                           dose={dose}
-                          aoFechar={() => setAplicando(null)}
-                          aoRegistrar={() => setAviso(`${dose.vaccine}: dose aplicada`)}
-                          aoTrocarData={() => {
-                            setAplicando(null);
-                            router.push({ pathname: '/dose/[id]', params: { id: dose.id } });
-                          }}
-                        />
-                      )}
-                    </View>
-                  ))}
-                </Grade>
-                {lista.length > DOSES_POR_VEZ ? (
-                  <View className="gap-sm">
-                    <Texto
-                      variante="apoio"
-                      className="text-textoSecundario"
-                      accessibilityLiveRegion="polite"
-                    >
-                      {`Mostrando ${mostradas.length} de ${lista.length} doses, da mais próxima para a mais distante.`}
-                    </Texto>
-                    <View className="flex-row flex-wrap gap-sm">
-                      {mostradas.length < lista.length ? (
-                        <Botao
-                          titulo={`Mostrar mais ${Math.min(DOSES_POR_VEZ, lista.length - mostradas.length)} doses`}
-                          variante="secundario"
-                          accessibilityLabel={`Mostrar mais doses em ${titulo}`}
-                          onPress={() =>
-                            setLimites({ ...limites, [titulo]: limite + DOSES_POR_VEZ })
+                          aoAbrir={() =>
+                            router.push({ pathname: '/dose/[id]', params: { id: dose.id } })
                           }
+                          {...(rapida && dose.status === 'OVERDUE'
+                            ? { aoAplicar: () => setAplicando(dose) }
+                            : {})}
                         />
-                      ) : null}
-                      {limite > DOSES_POR_VEZ ? (
-                        <Botao
-                          titulo="Mostrar menos"
-                          variante="secundario"
-                          accessibilityLabel={`Mostrar menos doses em ${titulo}`}
-                          onPress={() => setLimites({ ...limites, [titulo]: DOSES_POR_VEZ })}
-                        />
-                      ) : null}
+                        {/* A confirmação abre numa janela por cima da tela (modal). */}
+                        {aplicando?.id === dose.id && (
+                          <ConfirmarAplicacao
+                            dose={dose}
+                            aoFechar={() => setAplicando(null)}
+                            aoRegistrar={() => setAviso(`${dose.vaccine}: dose aplicada`)}
+                            aoTrocarData={() => {
+                              setAplicando(null);
+                              router.push({ pathname: '/dose/[id]', params: { id: dose.id } });
+                            }}
+                          />
+                        )}
+                      </View>
+                    ))}
+                  </Grade>
+                  {lista.length > DOSES_POR_VEZ ? (
+                    <View className="gap-sm">
+                      <Texto
+                        variante="apoio"
+                        className="text-textoSecundario"
+                        accessibilityLiveRegion="polite"
+                      >
+                        {`Mostrando ${mostradas.length} de ${lista.length} doses, da mais próxima para a mais distante.`}
+                      </Texto>
+                      <View className="flex-row flex-wrap gap-sm">
+                        {mostradas.length < lista.length ? (
+                          <Botao
+                            titulo={`Mostrar mais ${Math.min(DOSES_POR_VEZ, lista.length - mostradas.length)} doses`}
+                            variante="secundario"
+                            accessibilityLabel={`Mostrar mais doses em ${titulo}`}
+                            onPress={() =>
+                              setLimites({ ...limites, [titulo]: limite + DOSES_POR_VEZ })
+                            }
+                          />
+                        ) : null}
+                        {limite > DOSES_POR_VEZ ? (
+                          <Botao
+                            titulo="Mostrar menos"
+                            variante="secundario"
+                            accessibilityLabel={`Mostrar menos doses em ${titulo}`}
+                            onPress={() => setLimites({ ...limites, [titulo]: DOSES_POR_VEZ })}
+                          />
+                        ) : null}
+                      </View>
                     </View>
-                  </View>
-                ) : null}
-              </View>
+                  ) : null}
+                </View>
+              </Aparecer>
             );
           })}
           {aplicadasVisiveis.length > 0 && (

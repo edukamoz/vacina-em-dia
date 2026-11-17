@@ -1,9 +1,11 @@
-import { View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Easing, View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
+import { VistaAnimada } from '../../components/animacao';
 import { Cartao } from '../../components/cartao';
 import { Icone } from '../../components/icone';
 import { Texto } from '../../components/texto';
-import { useThemeColors, useVisual } from '../../theme/theme-provider';
+import { useMovimentoReduzido, useThemeColors, useVisual } from '../../theme/theme-provider';
 import { Ondas } from './ondas';
 
 /** Pinos do mapa de exemplo: posição em porcentagem da caixa. */
@@ -16,6 +18,51 @@ const PINOS = [
   { x: 12, y: 80 },
 ] as const;
 
+/**
+ * Ícone do sino que balança a cada 3,4 s (pausa de 2,6 s, depois cinco oscilações curtas). Parado com
+ * "Reduzir movimento".
+ */
+function SinoQueBalanca({ cor }: { cor: string }) {
+  const reduzido = useMovimentoReduzido();
+  const giro = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (reduzido) {
+      giro.setValue(0);
+      return undefined;
+    }
+    const passo = (para: number) =>
+      Animated.timing(giro, {
+        toValue: para,
+        duration: 160,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      });
+    const ciclo = Animated.loop(
+      Animated.sequence([
+        Animated.delay(2600),
+        passo(1),
+        passo(-0.85),
+        passo(0.55),
+        passo(-0.3),
+        passo(0),
+      ]),
+    );
+    ciclo.start();
+    return () => ciclo.stop();
+  }, [reduzido, giro]);
+  return (
+    <VistaAnimada
+      style={{
+        transform: [
+          { rotate: giro.interpolate({ inputRange: [-1, 1], outputRange: ['-14deg', '14deg'] }) },
+        ],
+      }}
+    >
+      <Icone nome="lembrete" cor={cor} tamanho={32} />
+    </VistaAnimada>
+  );
+}
+
 /** Quadro de ícone dos recursos (fundo suave da marca, sem contorno fora do Alto contraste). */
 function QuadroDeIcone({ icone }: { icone: 'lembrete' | 'voz' | 'familia' | 'local' }) {
   const cores = useThemeColors();
@@ -24,7 +71,11 @@ function QuadroDeIcone({ icone }: { icone: 'lembrete' | 'voz' | 'familia' | 'loc
       aria-hidden
       className="h-[64px] w-[64px] items-center justify-center rounded-[20px] bg-primariaSuave"
     >
-      <Icone nome={icone} cor={cores.primaria} tamanho={32} />
+      {icone === 'lembrete' ? (
+        <SinoQueBalanca cor={cores.primaria} />
+      ) : (
+        <Icone nome={icone} cor={cores.primaria} tamanho={32} />
+      )}
     </View>
   );
 }

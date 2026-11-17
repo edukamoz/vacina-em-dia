@@ -220,7 +220,7 @@ export function HistoryScreen() {
         apoio="Veja a situação das vacinas da família em gráficos."
         aoAbrir={() => router.push('/painel')}
       />
-      {carregando && <EstadoCarregando rotulo="Carregando o histórico" />}
+      {carregando && <EstadoCarregando rotulo="Carregando o histórico" esqueleto={3} />}
       {falha?.error && (
         <EstadoErro
           mensagem={falha.error.message}

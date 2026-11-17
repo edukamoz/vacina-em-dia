@@ -79,7 +79,7 @@ export function FamilyScreen() {
         <Botao titulo="Adicionar pessoa" icone="mais" onPress={() => router.push('/membro/novo')} />
       }
     >
-      {isPending && <EstadoCarregando rotulo="Carregando a família" />}
+      {isPending && <EstadoCarregando rotulo="Carregando a família" esqueleto={2} />}
       {error && <EstadoErro mensagem={error.message} onTentarDeNovo={() => void refetch()} />}
       {data && pessoas.length === 0 && (
         <EstadoVazio

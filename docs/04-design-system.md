@@ -370,7 +370,7 @@ Régua única de tempos e curvas (ADR-037, `duracoes` e `curvas` em `tokens.json
 | `lenta` | 400 ms | Painéis que abrem, esqueleto que vira conteúdo |
 | `enfase` | 500 ms | Visto da dose aplicada, entrada da promessa |
 
-Curvas: `padrao` `cubic-bezier(.22,1,.36,1)` para tudo que abre, fecha, desliza ou muda de tamanho; `salto` `cubic-bezier(.34,1.35,.64,1)` só em entradas curtas (visto, interruptor, número), nunca em saída. Entrada de blocos sobe 14 px e aparece; toque com escala de 0,95 a 0,98; o anel de progresso preenche em 900 ms (ciclo próprio). Nada é essencial para entender a tela; tudo para com "Reduzir movimento" (ADR-026), e o Alto contraste fica parado.
+Curvas: `padrao` `cubic-bezier(.22,1,.36,1)` para tudo que abre, fecha, desliza ou muda de tamanho; `salto` `cubic-bezier(.34,1.35,.64,1)` só em entradas curtas (visto, interruptor, número), nunca em saída. Entrada de blocos sobe 14 px e aparece; o aviso de confirmação ("BCG: dose aplicada") sobe em 350 ms e sai em 250 ms; o interruptor passa do fim e assenta (`salto`, 350 ms); a pílula do segmentado desliza em 250 ms; listas que carregam mostram esqueleto que pulsa (1,4 s) e o conteúdo entra com fade; o campo com erro balança uma vez (350 ms); toque com escala de 0,95 a 0,98; o anel de progresso preenche em 900 ms (ciclo próprio). Nada é essencial para entender a tela; tudo para com "Reduzir movimento" (ADR-026), e o Alto contraste fica parado.
 
 ### 10.8 Andamento por PR
 
