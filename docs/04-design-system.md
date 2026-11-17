@@ -160,11 +160,11 @@ A primeira tela escolhe o desenho por `lib/ambiente.ts` (`useAmbiente`):
 
 | Ambiente | Quando | Primeira tela |
 |---|---|---|
-| `web-grande` | site com janela de 1024 px ou mais | Página completa (design v3): menu com as seções, promessa com celular de exemplo e avisos flutuantes, Como funciona em três passos, personas, recursos, faixa final e rodapé |
-| `web-pequena` | site no celular ou em janela estreita | Página compacta: celular de exemplo, personas em carrossel, cartão "Leve no celular" e botão Criar conta fixo no pé |
+| `web-grande` | site com janela de 1024 px ou mais | Página completa (design v3.1): menu com as seções; promessa com palco de foto em arco e cartões de interface (a dose da BCG dá para aplicar); Para quem é em três capítulos presos à rolagem; recursos em grade; Fácil de ler, com os seletores reais de tamanho, tema e movimento; Privacidade em letras grandes; faixa final e rodapé |
+| `web-pequena` | site no celular ou em janela estreita | Página compacta: palco de foto, capítulos um abaixo do outro, cartão "Leve no celular" e botão Criar conta fixo no pé |
 | `app` | Android, iOS ou site instalado (PWA, `display-mode: standalone`) | Abertura enxuta: marca, pessoas e uma folha com "Criar conta" e "Já tenho conta" |
 
-No computador, o celular de exemplo fica inclinado 3 graus e os dois avisos que o cercam acompanham a rolagem devagar (paralaxe); as seções aparecem ao entrar na tela. Tudo para com "Reduzir movimento" e no Alto contraste.
+No computador, o lembrete e o botão de voz que cercam a foto acompanham a rolagem devagar (paralaxe) e as ondas de voz sobem e descem; os capítulos de Para quem é ficam presos à tela e trocam a cada terço da rolagem. Tudo para com "Reduzir movimento" e no Alto contraste (os capítulos viram uma lista, sem prender a rolagem).
 
 ## 3. Componentes base
 

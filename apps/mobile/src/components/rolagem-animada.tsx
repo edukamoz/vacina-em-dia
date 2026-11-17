@@ -7,6 +7,14 @@ import { DURACAO, RolagemAnimadaBase, VistaAnimada } from './animacao';
 const PosicaoDaRolagem = createContext<Animated.Value | null>(null);
 
 /**
+ * Posição vertical da rolagem (em pixels), para quem precisa reagir a ela (por exemplo, a troca de
+ * capítulo da apresentação). `null` fora de uma `RolagemAnimada`.
+ */
+export function usePosicaoDaRolagem(): Animated.Value | null {
+  return useContext(PosicaoDaRolagem);
+}
+
+/**
  * Rolagem que informa a posição aos filhos. É o que dá o "revelar na rolagem" e a paralaxe da tela
  * de apresentação; as outras telas usam a rolagem comum.
  */
