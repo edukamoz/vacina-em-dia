@@ -8,9 +8,6 @@ import { useThemeColors, useVisual } from '../../theme/theme-provider';
 import { FOTOS } from './fotos';
 import { Ondas } from './ondas';
 
-/** Proporção do recorte das pessoas: 640 x 856. */
-const PROPORCAO = 640 / 856;
-
 /**
  * Palco da abertura (design v3.1): a Mariana num arco sobre um sol, e cartões de interface real por
  * cima. O cartão da dose é interativo ("Aplicar" vira visto e "Desfazer"); o lembrete e o botão de
@@ -57,8 +54,9 @@ export function PalcoDaAbertura({ flutuantes }: { flutuantes: boolean }) {
             source={FOTOS.mariana.fonte}
             accessibilityLabel={FOTOS.mariana.alt}
             accessibilityIgnoresInvertColors
-            resizeMode="stretch"
-            style={{ height: '100%', aspectRatio: PROPORCAO }}
+            // `contain` mantém a proporção da foto (640 x 856) em qualquer caixa: nunca estica a pessoa.
+            resizeMode="contain"
+            style={{ width: '100%', height: '100%' }}
           />
         </View>
       </View>
