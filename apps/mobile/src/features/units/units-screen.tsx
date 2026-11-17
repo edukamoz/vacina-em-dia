@@ -1,14 +1,14 @@
 import type { HealthUnit } from '@vacina/shared';
 import { useMemo, useState } from 'react';
 import { Linking, Pressable, View } from 'react-native';
+import { AzulejoDeMarca } from '../../components/azulejo-de-marca';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { CampoTexto } from '../../components/campo-texto';
 import { EstadoCarregando } from '../../components/estados';
-import { Icone } from '../../components/icone';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
-import { useThemeColors, useVisual } from '../../theme/theme-provider';
+import { useVisual } from '../../theme/theme-provider';
 import { formatCivilDate } from '../doses/format-date';
 import { formatDistance, normalizeSearch, routeUrl, telUrl } from './units-format';
 import { UnitMap } from './unit-map';
@@ -28,7 +28,6 @@ function UnitCard({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const cores = useThemeColors();
   const { sombra, altoContraste } = useVisual();
   const where = [unit.address, unit.neighborhood].filter(Boolean).join(', ');
   return (
@@ -48,24 +47,32 @@ function UnitCard({
               : 'border-fina border-bordaSuave'
         }`}
       >
-        <View
-          aria-hidden
-          className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
-        >
-          <Icone nome="local" cor={cores.primaria} />
-        </View>
-        <View className="flex-1 gap-xs">
+        <AzulejoDeMarca icone="local" />
+        <View className="min-w-0 flex-1 gap-xs">
+          {/* O nome do posto quebra de linha; o endereço trunca em 2 linhas (o texto inteiro está no rótulo do botão). */}
           <Texto variante="titulo3" importantForAccessibility="no">
             {unit.name}
           </Texto>
-          <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-            {`${where}. ${formatDistance(unit.distanceMeters)}.`}
+          <Texto
+            variante="apoio"
+            className="text-textoSecundario"
+            truncar={2}
+            importantForAccessibility="no"
+          >
+            {where}
           </Texto>
-          {unit.shift ? (
-            <Texto variante="apoio" importantForAccessibility="no">
-              {`Atendimento: ${unit.shift}`}
-            </Texto>
-          ) : null}
+          <View className="flex-row flex-wrap items-center gap-sm">
+            <View className="rounded-selo bg-primariaSuave px-md py-xs">
+              <Texto variante="rotulo" className="text-primaria" importantForAccessibility="no">
+                {formatDistance(unit.distanceMeters)}
+              </Texto>
+            </View>
+            {unit.shift ? (
+              <Texto variante="apoio" importantForAccessibility="no">
+                {`Atendimento: ${unit.shift}`}
+              </Texto>
+            ) : null}
+          </View>
         </View>
       </Pressable>
       {selected ? (

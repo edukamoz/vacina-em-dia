@@ -68,8 +68,10 @@ function Noticia({ item, destaque }: { item: NewsItem; destaque: boolean }) {
         <View className="flex-row items-center justify-between">
           <View
             aria-hidden
-            className={`h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao ${
-              vacina ? 'border-sobrePrimaria' : 'border-primaria bg-primariaSuave'
+            className={`h-[48px] w-[48px] items-center justify-center rounded-quadro border-padrao ${
+              vacina
+                ? 'border-sobrePrimaria'
+                : `bg-primariaSuave ${altoContraste ? 'border-primaria' : 'border-transparent'}`
             }`}
           >
             <Icone
@@ -92,7 +94,6 @@ function Noticia({ item, destaque }: { item: NewsItem; destaque: boolean }) {
         <Texto
           variante={destaque ? 'titulo3' : 'corpoNegrito'}
           className={texto}
-          numberOfLines={5}
           importantForAccessibility="no"
         >
           {item.title}
