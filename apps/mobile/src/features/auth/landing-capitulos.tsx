@@ -74,8 +74,8 @@ function Revezar({
     }
     const animacao = Animated.timing(valor, {
       toValue: visivel ? 1 : 0,
-      duration: DURACAO.suave - 100,
-      easing: CURVA.saida,
+      duration: DURACAO.media,
+      easing: CURVA.padrao,
       useNativeDriver: USA_DRIVER_NATIVO,
     });
     animacao.start();
