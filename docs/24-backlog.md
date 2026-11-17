@@ -225,6 +225,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B73 | novo | Como tutora, quero cadastrar meus animais de estimação e registrar as vacinas deles, com repetição anual, para cuidar deles no mesmo lugar | Could | Em andamento | - |
 | B74 | novo | Como viajante, quero saber que vacinas considerar para o meu destino e a data da viagem, e ver o que já tenho no histórico, para me preparar com antecedência | Could | Em andamento | - |
 | B75 | novo | Como usuária, quero ver, no detalhe da dose, informações da vacina (tipo, composição, reações comuns e quem deve conversar com um profissional antes), para me informar | Should | Em andamento | - |
+| B78 | novo | Como tutora, quero colocar a foto de cada pessoa da família, para reconhecê-las rápido na lista | Could | A fazer | - |
 
 **B04** (PE1, PE3; requisitos: RF02; RNF03, RNF04)
 
@@ -277,6 +278,13 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - O app não cruza alergias cadastradas com a bula para dizer se a pessoa pode ou não tomar (isso seria orientação médica individual).
 - O chatbot responde sobre reações comuns com respostas curadas, e o F1 é reavaliado.
 - Atenção: Não achei API oficial documentada do bulário da Anvisa; o caminho é transcrição curada, feita ou conferida pelo autor. Compartilha com o B74 o mecanismo de dado clínico versionado com fonte e data.
+
+**B78** (PE1, PE3; requisitos: RF02; RNF02)
+
+- Cada pessoa pode ter uma foto opcional, guardada só para a família e apagada com a pessoa ou com a conta.
+- Dado de criança exige o mesmo consentimento do responsável já pedido no cadastro.
+- O armazenamento segue o da foto de perfil (B54).
+- Atenção: Fora do redesenho (B77): o protótipo mostra fotos, mas hoje só existe a foto de perfil da conta. Pede decisão do autor sobre LGPD antes de começar.
 
 ## E5 Doses e lembretes (SCRUM-9)
 
@@ -558,6 +566,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B57 | novo | Como equipe, quero que o APK do app seja gerado e publicado nas Releases do GitHub por um workflow, para qualquer pessoa instalar o app no Android sem montar o ambiente | Should | Concluído | Sprint 3 |
 | B59 | novo | Como usuária, quero ver as notícias recentes de saúde e vacinação do Ministério da Saúde, para me manter informada sem sair do app | Should | Concluído | Sprint 3 |
 | B60 | novo | Como usuária, quero ver a situação das vacinas da família em gráficos, para entender num relance o que já foi tomado, o que está atrasado e o que vem pela frente | Should | Concluído | Sprint 3 |
+| B77 | novo | Como usuária, quero um app com o visual mais claro, bonito e fácil de usar, mantendo a acessibilidade, para achar e fazer o que preciso com poucos toques | Should | Em andamento | Sprint 6 |
 
 **B41** (todas; requisitos: RNF04)
 
@@ -679,6 +688,17 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Os números vêm das doses cadastradas, calculadas no aparelho, sem biblioteca nova.
 - Evidência: apps/mobile/src/features/charts; apps/mobile/src/lib/estatisticas.ts
 - Atenção: Gráficos desenhados com react-native-svg e Views (sem biblioteca de gráficos). Atalho no Histórico.
+
+**B77** (PE1, PE2, PE3; requisitos: RNF04, RNF09)
+
+- Todas as telas usam os componentes do design system v3 (cartão, botão com hierarquia, selo, chip, resumo, cabeçalho, janela).
+- A barra inferior tem o microfone do assistente no centro e o balão flutuante deixou de existir.
+- Cor, fonte e espaçamento só por token, com regra de lint que reprova hexadecimal e tamanho de fonte avulso.
+- Texto longo segue a regra do ADR-036: nome da vacina, estado, datas e erros quebram; e-mail, nome em ficha e endereço usam reticências, desligadas com texto Grande ou Maior.
+- Passa a checagem de acessibilidade nos três temas e a 200% de texto, sem rolagem horizontal.
+- Capturas e documentações atualizadas.
+- Evidência: ADR-036; docs/04-design-system.md seção 10; PR 0 a 9
+- Atenção: Protótipo aprovado em 16/11/2026 (quadro "Vacina em Dia: novo design", no Claude). Decisão do autor: começar já, antes da entrega de 19/11. As capturas das documentações precisam ser refeitas no PR 9.
 
 ## Não migrados do Jira
 

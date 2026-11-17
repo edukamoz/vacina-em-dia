@@ -294,3 +294,83 @@ Tudo o que foi criado usa variáveis e estilos (nenhuma cor ou medida solta), en
 - WORLD WIDE WEB CONSORTIUM. *Web Content Accessibility Guidelines (WCAG) 2.1*. 2018. Critérios 1.4.3 (contraste mínimo), 1.4.4 (redimensionar texto), 1.4.11 (contraste de não texto) e 2.5.5 (tamanho do alvo).
 - BRAILLE INSTITUTE. *Atkinson Hyperlegible*. Fonte livre desenhada para legibilidade.
 - Pesquisas sobre alvos de toque para pessoas idosas, consultadas em 06/10/2026 (por exemplo, o resumo do W3C Mobile Accessibility Task Force sobre tamanho de alvo); os valores variam entre estudos, por isso adotamos margens acima do mínimo do WCAG.
+
+## 10. Versão 3: redesenho em andamento (ADR-036, B77)
+
+Esta seção descreve o **alvo** do redesenho aprovado em 16/11/2026. Enquanto os PRs 1 a 9 não entram, as seções 1 a 8 acima continuam sendo a descrição do que está no código. A cada PR, o trecho correspondente das seções 2, 3 e 4 é atualizado e o item da tabela 10.7 passa a "feito". O protótipo de referência é o quadro "Vacina em Dia: novo design" (Claude); o Figma da versão 2 fica como histórico.
+
+### 10.1 O que continua e o que muda
+
+| Continua | Muda |
+|---|---|
+| Paleta e os três temas, Atkinson Hyperlegible, base de 18 dp, alvos de 48 e 56 dp, contrastes, nunca só pela cor | Forma (raios e contornos), hierarquia de botões, navegação, cabeçalho de tela, bloco de resumo, movimento |
+
+### 10.2 Forma e profundidade
+
+- **Cartão:** raio 24, fio de 1 px (`bordaSuave`) e sombra suave; sem contorno de 2 px. No Alto contraste: borda de 3 px, sem sombra.
+- **Controles** (botão secundário, campo, opção, interruptor, chip): contorno de 2 px na cor `borda` (3:1 ou mais). É o que separa controle de conteúdo.
+- **Raios novos:** campo 16, botão 18, cartão 24, folha 32, selo e chip totalmente arredondados.
+- **Bloco de resumo:** um por tela, com degradê de `primaria` a `primariaProfunda`, texto em `sobPrimaria`, e o progresso em anel. No Escuro e no Alto contraste, cor chapada.
+- **Ícone de estado em "azulejo":** quadrado arredondado de 56 dp com a cor `...Suave` do estado e o ícone na cor do estado; o selo de texto ao lado continua obrigatório.
+
+### 10.3 Navegação e estrutura de tela
+
+- **Barra inferior (celular):** Doses, Família, **microfone central** (Assistente), Histórico, Conta. O microfone tem 72 dp, rótulo "Abrir o assistente e perguntar por voz" e sobe da barra. O balão flutuante deixa de existir.
+- **Web e tablet:** barra lateral com os 4 itens e o assistente em destaque no pé.
+- **Cabeçalho padrão:** título (`titulo1`, 30/36), subtítulo de apoio opcional e a ação à direita. Em Doses, o título é uma saudação com a data e a faixa de pessoas logo abaixo.
+- **Faixa de pessoas:** chips de 56 dp com avatar (inicial e cor; sem foto de membro, ver B78), ponto vermelho com a contagem acessível quando há dose atrasada.
+- **Ordem de uma tela de lista:** cabeçalho, resumo, "Precisam de atenção", "A caminho", "Já aplicadas" (recolhido), fonte e aviso.
+- **Janelas:** folha de 32 dp de raio com alça no topo (celular) e cartão centralizado (web). Confirmação de ação perigosa em caixa centralizada, com a consequência escrita e os dois botões de peso parecido.
+
+### 10.4 Botões
+
+| Tipo | Uso | Aparência |
+|---|---|---|
+| Principal | Uma ação por tela (por exemplo, "Registrar aplicação") | Fundo `primaria`, texto `sobPrimaria`, 56 dp |
+| Secundário | Alternativas | Fundo `superficie`, contorno de 2 px `borda`, 56 dp |
+| Texto | Ações de menor peso | Sem fundo, 48 dp; em vermelho (`erro`) para cancelar e excluir |
+| Rápido | "Aplicar" no cartão da dose atrasada | Principal compacto, 48 dp de altura |
+
+A ação rápida registra com a data de hoje e confirma antes de gravar, mostrando a data e permitindo trocá-la (aplicar exige data menor ou igual a hoje).
+
+### 10.5 Regra de texto longo (quebra e reticências)
+
+| Tipo de texto | Tratamento |
+|---|---|
+| Nome da vacina e da dose, estado, datas, erros, botões, rótulos de campo, fonte e avisos | **Quebra de linha, nunca reticências.** O cartão cresce em altura |
+| E-mail, nome de pessoa em ficha ou chip, endereço de posto, linhas de apoio | **Reticências** em 1 ou 2 linhas (`truncar` do componente `Texto`) |
+
+- Quem trunca fornece o texto inteiro no rótulo de acessibilidade, na dica ao passar o mouse (web) e na tela de detalhe.
+- O truncamento **desliga** com "Tamanho do texto" em Grande ou Maior, ou com fonte do aparelho acima de 130%: o texto quebra (WCAG 1.4.4).
+- Todo contêiner de texto tem `min-width: 0` e permite encolher; e-mails e códigos longos usam quebra em qualquer ponto (`overflow-wrap: anywhere`) quando não truncam.
+- Teste de aceite de cada tela: nome de pessoa e e-mail muito longos, a 200% de texto, sem rolagem horizontal e sem texto sobreposto.
+
+### 10.6 Consistência (regras verificadas por lint e revisão)
+
+1. Texto só pelo componente `Texto` e suas variantes; nada de tamanho de fonte avulso.
+2. Cor só por token; nenhum hexadecimal em arquivo `.tsx`.
+3. Espaçamento só na escala 4, 8, 12, 16, 24, 32 e 48; margens de tela de 16, 24 e 32.
+4. Raios, sombras, durações e curvas só dos tokens.
+5. Um botão principal por tela; hierarquia da seção 10.4.
+6. Texto alinhado à esquerda; números e datas no mesmo estilo em todas as telas (DD/MM/AAAA).
+7. Ícones só do conjunto do projeto (`src/components/icone.tsx` e `assets/icones`), com ícone novo desenhado no mesmo traço de 2 px.
+8. Todo estado novo (carregando, vazio, erro, desativado) usa os componentes de `estados.tsx`.
+
+### 10.7 Movimento
+
+Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada de blocos em sequência de 50 ms (sobe 10 dp e aparece); toque com escala de 0,95 a 0,98; o visto da dose aplicada se desenha em 500 ms; o anel de progresso preenche em 900 ms. Nada é essencial para entender a tela; tudo para com "Reduzir movimento" (ADR-026), e o Alto contraste fica parado.
+
+### 10.8 Andamento por PR
+
+| PR | Conteúdo | Situação |
+|---|---|---|
+| 0 | ADR-036, esta seção e o backlog (B77 e B78) | em análise |
+| 1 | Tokens 3.0.0, componentes base, `Texto` com `truncar`, regras de lint | a fazer |
+| 2 | Barra inferior com microfone central; fim do balão | a fazer |
+| 3 | Doses e detalhe da dose; ação rápida | a fazer |
+| 4 | Família, formulários, janelas e confirmações | a fazer |
+| 5 | Histórico, Painel de gráficos e Conta | a fazer |
+| 6 | Postos, Viagem e Novidades | a fazer |
+| 7 | Acesso: landing, abertura, Entrar, Criar conta, Consentimento | a fazer |
+| 8 | Movimento e app instalável | a fazer |
+| 9 | Fechamento: acessibilidade, capturas e documentos | a fazer |

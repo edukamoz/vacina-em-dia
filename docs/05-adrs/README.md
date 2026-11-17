@@ -36,6 +36,7 @@ Cada decisão técnica relevante tem um arquivo próprio, curto, com contexto, d
 | [ADR-033](ADR-033-fichas-das-vacinas.md) | Fichas "Sobre esta vacina", com trechos copiados dos manuais do Ministério | Aceita |
 | [ADR-034](ADR-034-codigo-por-plataforma.md) | Código de celular e de web em arquivos separados, com regra de lint | Aceita |
 | [ADR-035](ADR-035-contingencia-no-google-cloud.md) | Contingência no Google Cloud (Cloud Run + Firestore), com custo zero | Aceita |
+| [ADR-036](ADR-036-redesenho-visual-v3.md) | Redesenho visual v3: mesma paleta e fonte, nova forma, navegação com microfone central e regra de texto longo | Aceita |
 
 ## Estados possíveis
 
