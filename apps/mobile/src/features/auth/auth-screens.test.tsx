@@ -445,7 +445,7 @@ describe('conta com login', () => {
     });
     await renderScreen(<AccountScreen />, fake.fetchFn, { store });
     expect(await screen.findByText('mariana@exemplo.com.br')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Sair' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
     await waitFor(() => expect(fake.calls.some((c) => c.key === 'POST /auth/logout')).toBe(true));
     await waitFor(() => expect(box.saved).toBeNull());
   });

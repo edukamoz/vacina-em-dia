@@ -44,10 +44,10 @@ describe('botão Sair na aba Conta', () => {
   test('CT-APP-SAIR01: no celular o Sair fica logo abaixo do cabeçalho, antes das seções', async () => {
     largura(390);
     const box = await abrir();
-    const sair = await screen.findByRole('button', { name: 'Sair' });
+    const sair = await screen.findByRole('button', { name: 'Sair da conta' });
     expect(sair).toBeOnTheScreen();
     const botoes = screen.getAllByRole('button').map((b) => b.props.accessibilityLabel ?? '');
-    expect(botoes.indexOf('Sair')).toBeLessThan(botoes.indexOf('Excluir minha conta'));
+    expect(botoes.indexOf('Sair da conta')).toBeLessThan(botoes.indexOf('Excluir minha conta'));
     await fireEvent.press(sair);
     await waitFor(() => expect(box.clears).toBe(1));
   });
@@ -56,6 +56,6 @@ describe('botão Sair na aba Conta', () => {
     largura(1280);
     await abrir();
     expect(await screen.findByText('Seus dados')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: 'Sair' })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Sair da conta' })).not.toBeOnTheScreen();
   });
 });

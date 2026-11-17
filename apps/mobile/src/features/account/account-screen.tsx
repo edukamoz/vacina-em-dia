@@ -15,12 +15,15 @@ import { SeletorDeTema } from '../../components/seletor-de-tema';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { PIX_DA_DOACAO } from '../../lib/config-pix';
+import { todayCivil } from '../../lib/dates';
 import { modoDeLayout } from '../../lib/layout';
 import { useSession } from '../../session/session-provider';
 import { useTheme } from '../../theme/theme-provider';
 import { ControlesDeAvisos } from '../avisos/controles-de-avisos';
+import { formatCivilDate } from '../doses/format-date';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
 import {
+  useConferenciaDoCalendario,
   useConsent,
   useDeleteAccount,
   useHousehold,
@@ -34,17 +37,20 @@ function Secao({
   icone,
   titulo,
   apoio,
+  destaque = false,
   children,
 }: {
   icone: NomeDoIcone;
   titulo: string;
   apoio: string;
+  /** Cartão de destaque (verde suave, azulejo cheio), como "Apoie o projeto". */
+  destaque?: boolean;
   children: ReactNode;
 }) {
   return (
-    <Cartao className="gap-lg expandido:flex-1">
+    <Cartao className={`gap-lg expandido:flex-1 ${destaque ? 'bg-primariaSuave' : ''}`}>
       <View className="flex-row items-start gap-md">
-        <AzulejoDeMarca icone={icone} />
+        <AzulejoDeMarca icone={icone} tom={destaque ? 'cheio' : 'marca'} />
         <View className="flex-1">
           <Texto variante="titulo3" accessibilityRole="header">
             {titulo}
@@ -90,6 +96,7 @@ export function AccountScreen() {
   const reminders = useReminders();
   const familia = useHousehold();
   const setEmail = useSetEmailReminders();
+  const conferencia = useConferenciaDoCalendario();
   const [confirmando, setConfirmando] = useState(false);
 
   const members = useMembers();
@@ -105,7 +112,12 @@ export function AccountScreen() {
 
       {celular ? (
         <View className="flex-row">
-          <Botao titulo="Sair" icone="sair" variante="secundario" onPress={() => void logout()} />
+          <Botao
+            titulo="Sair da conta"
+            icone="sair"
+            variante="secundario"
+            onPress={() => void logout()}
+          />
         </View>
       ) : null}
 
@@ -167,6 +179,9 @@ export function AccountScreen() {
           apoio="Aumente as letras do aplicativo, além do tamanho do aparelho"
         >
           <SeletorDeTamanhoDoTexto />
+          <View className="rounded-[18px] bg-superficieSuave p-md">
+            <Texto>Exemplo: Covid-19, reforço. Agendada para 25/11/2026.</Texto>
+          </View>
         </Secao>
         <Secao icone="info" titulo="Movimento" apoio="Animações e efeitos de transição">
           <SeletorDeMovimento />
@@ -202,6 +217,11 @@ export function AccountScreen() {
           O calendário segue o Calendário Nacional de Vacinação 2026, do Ministério da Saúde. O
           aplicativo não substitui a caderneta oficial nem a orientação de profissionais de saúde.
         </Texto>
+        {conferencia.data?.checkedAt ? (
+          <Texto variante="apoio" className="text-textoSecundario">
+            {`Conferido com o site do Ministério da Saúde em ${formatCivilDate(todayCivil(new Date(conferencia.data.checkedAt)))}.`}
+          </Texto>
+        ) : null}
       </Secao>
 
       {PIX_DA_DOACAO ? (
@@ -209,6 +229,7 @@ export function AccountScreen() {
           icone="coracao"
           titulo="Apoie o projeto"
           apoio="Uma doação voluntária por Pix, de qualquer valor"
+          destaque
         >
           <Texto className="text-textoSecundario">
             O aplicativo é gratuito e continuará sendo. A doação não libera nada e é opcional.
@@ -225,13 +246,16 @@ export function AccountScreen() {
 
       {!confirmando ? (
         <View className="gap-md rounded-cartao border-padrao border-erro bg-superficie p-lg expandido:flex-row expandido:items-center expandido:justify-between">
-          <View className="flex-1">
-            <Texto variante="titulo3" accessibilityRole="header">
-              Excluir minha conta
-            </Texto>
-            <Texto variante="apoio">
-              Apaga todos os dados da família. Não é possível desfazer.
-            </Texto>
+          <View className="flex-1 flex-row items-start gap-md">
+            <AzulejoDeMarca icone="atrasada" tom="perigo" />
+            <View className="flex-1">
+              <Texto variante="titulo3" accessibilityRole="header">
+                Excluir minha conta
+              </Texto>
+              <Texto variante="apoio">
+                Apaga todos os dados da família. Não é possível desfazer.
+              </Texto>
+            </View>
           </View>
           <Botao
             titulo="Excluir minha conta"
