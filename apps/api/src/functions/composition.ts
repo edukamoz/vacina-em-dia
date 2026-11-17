@@ -31,6 +31,7 @@ import { createCalendarWatchService } from '../services/calendar-watch-service';
 import { createWarmupService } from '../services/warmup-service';
 import { withSecurityHeaders, type HttpResult } from '../http';
 import { DEMO_SESSION_HEADER, resolveOwner } from '../identity';
+import { clientIpFrom } from '../client-ip';
 import { createInMemoryAuthRepository, MAX_ACCOUNTS } from '../repositories/in-memory-auth';
 import { createInMemoryStore } from '../repositories/in-memory-store';
 import { createBlobFileStorage } from '../storage/blob-file-storage';
@@ -196,16 +197,22 @@ export const householdHandlers = createHouseholdHandlers(
   }),
 );
 
-/** A sessão de demonstração vale até ser desligada com `DEMO_SESSION_ENABLED=false`. */
-const demoEnabled = process.env['DEMO_SESSION_ENABLED'] !== 'false';
+/**
+ * A sessão de demonstração (cabeçalho `x-demo-session`, sem autenticação) fica **desligada** e só
+ * liga com `DEMO_SESSION_ENABLED=true`. Variável ausente ou com qualquer outro valor mantém o
+ * app exigindo login: esquecer a configuração nunca abre a API.
+ */
+const demoEnabled = process.env['DEMO_SESSION_ENABLED'] === 'true';
+
+/**
+ * Quantos servidores de confiança acrescentam o IP de quem chamou ao `X-Forwarded-For` (padrão 1:
+ * só o da plataforma). No Google Cloud o app web repassa a chamada (`nginx`), então são 2.
+ */
+const proxyHops = Number.parseInt(process.env['TRUSTED_PROXY_HOPS'] ?? '1', 10);
 
 /** Endereço de rede de quem chamou (sem a porta); só serve para limitar abusos. */
 export function originOf(request: HttpRequest): { ip: string } {
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
-  const ip = forwarded
-    .replace(/^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/, '$1')
-    .replace(/^\[(.+)\]:\d+$/, '$1');
-  return { ip: ip.slice(0, 64) || 'desconhecido' };
+  return { ip: clientIpFrom(request.headers.get('x-forwarded-for'), proxyHops) };
 }
 
 /**

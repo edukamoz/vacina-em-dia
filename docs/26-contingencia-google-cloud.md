@@ -68,6 +68,8 @@ Faturamento > Relatórios, filtrando pelo projeto. Esperado: R$ 0. Para zerar tu
 
 ## Limites e cuidados
 
+- **Endurecimento (17/11/2026):** o app web envia HSTS; o nginx repassa à API só o IP real do cliente (o último item do `X-Forwarded-For`, que o Cloud Run acrescenta) e a API usa `TRUSTED_PROXY_HOPS=2`, para o limite por origem valer por usuário e não para todos juntos. Chamar a API direto, sem passar pelo app web, ainda permite forjar o IP (o limite por e-mail continua valendo). O arquivo `firestore.rules` da raiz registra a regra de negar tudo; a conferência de fora (leitura anônima) responde 403.
+
 - Cada serviço tem no máximo **2 instâncias**, para o custo nunca crescer sem controle.
 - O Firestore só é acessado pela API (conta de serviço); confira em Firestore > Regras que não há regra aberta ao cliente (o padrão é negar tudo).
 - Dados criados no Google Cloud **não** voltam para a Azure, e o inverso também.

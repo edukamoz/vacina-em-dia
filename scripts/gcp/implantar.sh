@@ -90,7 +90,7 @@ gcloud run deploy vacina-nlp --image="${REPO}/nlp:latest" --port=80 --memory=1Gi
   --timeout=60 "${COMUM[@]}" "${FUNCOES[@]}"
 URL_NLP="$(gcloud run services describe vacina-nlp --region="${REGIAO}" --format='value(status.url)')"
 
-ENV_API="FIRESTORE_PROJECT=${PROJETO},NLP_BASE_URL=${URL_NLP}/api,NLP_FUNCTION_KEY=${CHAVE_FUNCAO},DEMO_SESSION_ENABLED=false,DOCS_ENABLED=false"
+ENV_API="FIRESTORE_PROJECT=${PROJETO},NLP_BASE_URL=${URL_NLP}/api,NLP_FUNCTION_KEY=${CHAVE_FUNCAO},DEMO_SESSION_ENABLED=false,TRUSTED_PROXY_HOPS=2,DOCS_ENABLED=false"
 [ -n "${EMAIL_SENDER_ADDRESS:-}" ] && ENV_API="${ENV_API},EMAIL_SENDER_ADDRESS=${EMAIL_SENDER_ADDRESS}"
 SEGREDOS_API="AUTH_TOKEN_SECRET=vacina-auth-token:latest"
 gcloud secrets describe vacina-brevo >/dev/null 2>&1 && SEGREDOS_API="${SEGREDOS_API},BREVO_API_KEY=vacina-brevo:latest"
