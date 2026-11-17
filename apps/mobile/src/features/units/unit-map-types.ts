@@ -10,6 +10,8 @@ export interface UnitMapProps {
   readonly position: MapPosition | null;
   /** Chamada com o código CNES da unidade tocada. */
   readonly onSelect: (cnes: string) => void;
+  /** Altura do mapa em pixels (computador: acompanha o painel da lista); sem ela, a altura padrão. */
+  readonly altura?: number;
 }
 
 /** Estilo dos controles de zoom: alvos de 48 px, como pede o design system. */
