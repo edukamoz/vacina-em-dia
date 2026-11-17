@@ -1,4 +1,4 @@
-import { Text, type TextProps } from 'react-native';
+import { Text, useWindowDimensions, type TextProps } from 'react-native';
 import { useEscalaDoTexto } from '../theme/theme-provider';
 import { baseTokens, getThemeColors } from '../theme/tokens';
 
@@ -45,20 +45,48 @@ export function textColorClass(className: string): string {
   return COLOR_CLASS.test(className) ? '' : 'text-texto';
 }
 
+/** Acima desta ampliação da fonte do aparelho, o truncamento é desligado e o texto quebra. */
+const AMPLIACAO_MAXIMA_COM_TRUNCAR = 1.3;
+
+/**
+ * Quantas linhas mostrar antes das reticências. O truncamento só vale com o texto no tamanho
+ * "Normal" e com a fonte do aparelho até 130%: acima disso o texto quebra, para ninguém perder
+ * conteúdo com o texto ampliado (WCAG 1.4.4; ADR-036).
+ *
+ * @param truncar - Linhas pedidas por quem usa o componente (`undefined` = nunca truncar).
+ * @param escalaDoApp - Multiplicador do "Tamanho do texto" da Conta (1, 1,15 ou 1,3).
+ * @param escalaDoAparelho - Ampliação da fonte feita nas configurações do aparelho.
+ * @returns Número de linhas, ou `undefined` quando o texto deve quebrar livremente.
+ */
+export function linhasDoTruncamento(
+  truncar: number | undefined,
+  escalaDoApp: number,
+  escalaDoAparelho: number,
+): number | undefined {
+  if (truncar === undefined) return undefined;
+  if (escalaDoApp > 1 || escalaDoAparelho > AMPLIACAO_MAXIMA_COM_TRUNCAR) return undefined;
+  return truncar;
+}
+
 /**
  * Texto com a fonte e o tamanho do design system. Escala com o tamanho de fonte do sistema e com
  * o "Tamanho do texto" escolhido na Conta.
  *
  * @param props.variante - Estilo tipográfico; por padrão `corpo`.
  * @param props.className - Classes extras (por exemplo a cor, `text-textoSecundario`).
+ * @param props.truncar - Linhas antes das reticências. Só para e-mail, nome de pessoa em ficha,
+ *   endereço e linhas de apoio; nome da vacina, estado, datas, erros, botões e rótulos nunca
+ *   truncam (ADR-036). Desligado com texto ampliado.
  */
 export function Texto({
   variante = 'corpo',
   className = '',
   style,
+  truncar,
   ...rest
-}: TextProps & { variante?: TextoVariante; className?: string }) {
+}: TextProps & { variante?: TextoVariante; className?: string; truncar?: 1 | 2 | 3 }) {
   const escala = useEscalaDoTexto();
+  const linhas = linhasDoTruncamento(truncar, escala, useWindowDimensions().fontScale);
   const base = baseTokens.typography.estilos[variante];
   // Com o tamanho "Normal" a classe basta; nos maiores, o estilo troca o corpo e a altura da linha.
   const escalado =
@@ -69,6 +97,7 @@ export function Texto({
     <Text
       className={`${textColorClass(className)} ${CLASSES[variante]} ${className}`}
       style={escalado}
+      {...(linhas === undefined ? {} : { numberOfLines: linhas, ellipsizeMode: 'tail' as const })}
       {...rest}
     />
   );

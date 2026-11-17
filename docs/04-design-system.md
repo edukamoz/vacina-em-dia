@@ -1,6 +1,6 @@
 # Vacina em Dia: Design System
 
-Item do Jira: SCRUM-32 (requisitos RNF04 e RNF09). Versão dos tokens 2.0.0, documento atualizado em 24/10/2026. Fonte dos valores: [`04-design-system/tokens.json`](04-design-system/tokens.json). Decisão relacionada: ADR-011.
+Item do Jira: SCRUM-32 (requisitos RNF04 e RNF09). Versão dos tokens 3.0.0 (raios, sombras e durações do redesenho, ADR-036), documento atualizado em 16/11/2026. Fonte dos valores: [`04-design-system/tokens.json`](04-design-system/tokens.json). Decisão relacionada: ADR-011.
 
 O app é **um só código para Android, iOS e web** (RNF09). Por isso o design system é **responsivo desde o início**: o mesmo conjunto de tokens e componentes serve ao celular (pessoa tocando) e à web em computador (mouse e teclado). O público inclui idosos (Sr. José, 68 anos) e pessoas com pouca familiaridade digital, então a acessibilidade é a regra principal, não um acabamento.
 
@@ -32,7 +32,7 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 | `foco` | Anel de foco do teclado |
 | `erro`, `erroSuave` | Mensagens de erro |
 
-**Valores dos três temas** (fonte: `tokens.json`, versão 2.0.0; um teste confere esta tabela com o arquivo):
+**Valores dos três temas** (fonte: `tokens.json`, versão 3.0.0, com as mesmas cores da 2.0.0; um teste confere esta tabela com o arquivo):
 
 | Token | Claro | Escuro | Alto contraste | Uso |
 |---|---|---|---|---|
@@ -121,7 +121,7 @@ Nenhum texto fica abaixo de 16 dp.
 | Grupo | Valores (dp) |
 |---|---|
 | Espaçamento | 4, 8, 12, 16, 24, 32, 48 |
-| Raios | campo 12, botão 16, quadro 18, cartão 20, folha 28, selo totalmente arredondado |
+| Raios | campo 16, botão 18, quadro 20, cartão 24, folha 32, selo totalmente arredondado |
 | Bordas | fina 1 (fio decorativo), padrão 2, faixa de estado 6, alto contraste 3, anel de foco 3 |
 
 Outros tokens (valores completos em `tokens.json`):
@@ -129,7 +129,7 @@ Outros tokens (valores completos em `tokens.json`):
 | Grupo | Valores |
 |---|---|
 | Sombras | `sombra-1`, `sombra-2` e `sombra-3`, em Claro e Escuro; no Alto contraste não há sombra |
-| Durações (ms) | rápida 120, padrão 200, enfática 320, lenta 400, intervalo entre itens 55 |
+| Durações (ms) | rápida 120, padrão 200, enfática 320, lenta 400, suave 450, intervalo entre itens 50 |
 | Curvas | `padrao`, `saida` e `mola` |
 | Layout (dp) | conteúdo até 960, página até 1184, formulário 440, lateral de Entrar 560; margens 16, 24 e 32 |
 
@@ -364,8 +364,8 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 
 | PR | Conteúdo | Situação |
 |---|---|---|
-| 0 | ADR-036, esta seção e o backlog (B77 e B78) | em análise |
-| 1 | Tokens 3.0.0, componentes base, `Texto` com `truncar`, regras de lint | a fazer |
+| 0 | ADR-036, esta seção e o backlog (B77 e B78) | feito (#276) |
+| 1 | Tokens 3.0.0, componentes base (`Texto` com `truncar`, `Botao` com `texto` e `compacto`, `Chip`, `Segmentado`, `BlocoResumo`, `AzulejoDeEstado`), regras de lint | em análise |
 | 2 | Barra inferior com microfone central; fim do balão | a fazer |
 | 3 | Doses e detalhe da dose; ação rápida | a fazer |
 | 4 | Família, formulários, janelas e confirmações | a fazer |

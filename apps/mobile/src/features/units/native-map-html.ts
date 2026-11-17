@@ -104,6 +104,7 @@ export function buildSetDataScript(
     position,
     pin: pinSvg(colors, false),
     pinSelected: pinSvg(colors, true),
+    // eslint-disable-next-line no-restricted-syntax -- aro branco do ponto de posição, fora do tema
     dot: positionDot(positionColor, '#ffffff'),
   };
   const json = JSON.stringify(data).replace(/</g, '\\u003c');

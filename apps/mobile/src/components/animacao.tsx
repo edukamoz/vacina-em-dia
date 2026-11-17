@@ -11,7 +11,14 @@ import {
 import { useMovimentoReduzido } from '../theme/theme-provider';
 
 /** Durações do design system, em milissegundos (`duracoes` em `tokens.json`). */
-export const DURACAO = { rapida: 120, padrao: 200, enfatica: 320, lenta: 400, passo: 55 } as const;
+export const DURACAO = {
+  rapida: 120,
+  padrao: 200,
+  enfatica: 320,
+  lenta: 400,
+  suave: 450,
+  passo: 50,
+} as const;
 
 /** Curvas do design system (`curvas` em `tokens.json`). */
 export const CURVA = {

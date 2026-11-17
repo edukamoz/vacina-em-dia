@@ -112,6 +112,7 @@ export function Selecao<T extends string>({
               width: posicao?.largura ?? janela.width - 32,
               ...lugar,
               elevation: 8,
+              // eslint-disable-next-line no-restricted-syntax -- sombra nativa: a cor da sombra é sempre preta
               shadowColor: '#000',
               shadowOpacity: 0.25,
               shadowRadius: 12,

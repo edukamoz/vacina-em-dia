@@ -33,6 +33,7 @@ export function SeletorDeTamanhoDoTexto() {
             <Text
               aria-hidden
               className="font-negrito text-texto"
+              // eslint-disable-next-line no-restricted-syntax -- prévia: mostra o tamanho que a opção aplica
               style={{ fontSize: 22 * ESCALA_DO_TEXTO[tamanho] }}
             >
               Aa

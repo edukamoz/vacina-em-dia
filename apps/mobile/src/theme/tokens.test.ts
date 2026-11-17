@@ -150,4 +150,27 @@ describe('tokens do design system', () => {
     expect(getBrandGradient('highContrast')).toBe(getThemeColors('highContrast').primaria);
     expect(getBackgroundGradient('highContrast')).toBe('#ffffff');
   });
+
+  test('CT-TOK-12: a versão 3.0.0 traz os raios do redesenho e mantém as cores da 2.0.0', () => {
+    expect(tokensJson.versao).toBe('3.0.0');
+    expect(tokensJson.raios).toMatchObject({
+      campo: 16,
+      botao: 18,
+      quadro: 20,
+      cartao: 24,
+      folha: 32,
+      selo: 999,
+    });
+    // As cores não mudam entre a 2.0.0 e a 3.0.0 (ADR-036): a primária segue sendo o verde-saúde.
+    expect(getThemeColors('light').primaria).toBe('#0b6b52');
+    expect(getThemeColors('dark').primaria).toBe('#6fd0aa');
+  });
+
+  test('CT-TOK-13: as durações do movimento suave ficam entre 120 e 450 ms', () => {
+    expect(tokensJson.duracoes).toMatchObject({ rapida: 120, padrao: 200, suave: 450, passo: 50 });
+    for (const ms of Object.values(tokensJson.duracoes)) {
+      expect(ms).toBeGreaterThanOrEqual(50);
+      expect(ms).toBeLessThanOrEqual(450);
+    }
+  });
 });

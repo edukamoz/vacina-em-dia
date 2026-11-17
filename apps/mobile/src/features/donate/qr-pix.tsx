@@ -46,7 +46,10 @@ export function QrPix({ texto, tamanho = 220 }: { texto: string; tamanho?: numbe
       accessibilityRole="image"
       accessibilityLabel="QR Code do Pix"
     >
+      {/* O QR Code precisa ser preto sobre branco para os leitores de Pix, em qualquer tema. */}
+      {/* eslint-disable-next-line no-restricted-syntax */}
       <Rect x={0} y={0} width={lado} height={lado} fill="#FFFFFF" />
+      {/* eslint-disable-next-line no-restricted-syntax */}
       <Path d={caminho} fill="#000000" />
     </Svg>
   );
