@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "9.1.0",
-    "@azure/functions": "4.16.5",
+    "@azure/functions": "4.17.1",
     "@azure/storage-blob": "12.34.0",
     "@google-cloud/firestore": "^9.4.1",
     "@vacina/shared": "0.1.0",
