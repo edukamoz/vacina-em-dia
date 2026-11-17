@@ -6,10 +6,10 @@ Item B57. O workflow `.github/workflows/apk.yml` gera o APK do aplicativo e o pu
 
 | O quê | Quando é atualizado | Onde |
 |---|---|---|
-| **APK mais recente** (pré-release `apk-latest`) | A cada push na `main` que mude o app (`apps/mobile`, `packages/shared`, `package.json`, `package-lock.json` ou o próprio workflow) e na execução manual | `https://github.com/edukamoz/vacina-em-dia/releases/tag/apk-latest` (arquivo `vacina-em-dia.apk`) |
+| **APK mais recente** (pré-release `apk-latest`) | Só na execução manual (Actions > APK do Android > Run workflow). O merge na `main` **não** gera APK, porque o build é demorado; a Azure continua atualizando a cada merge | `https://github.com/edukamoz/vacina-em-dia/releases/tag/apk-latest` (arquivo `vacina-em-dia.apk`) |
 | **Versão fixa** | Ao criar uma tag `v*`, por exemplo `v0.2.0` | Release com o nome da tag (arquivo `vacina-em-dia-v0.2.0.apk`) |
 
-Cada release traz também o arquivo `.sha256` para conferir a integridade do download. A pré-release `apk-latest` é recriada a cada build (o endereço do arquivo não muda); as versões fixas ficam.
+Cada release traz também o arquivo `.sha256` para conferir a integridade do download. A pré-release `apk-latest` é recriada a cada execução manual (o endereço do arquivo não muda); as versões fixas ficam.
 
 ## Como instalar no celular
 
@@ -47,3 +47,7 @@ Ou use **Actions > APK do Android > Run workflow** para gerar um APK sem tag.
 - O APK é assinado com a **chave de depuração** do projeto Expo: serve para instalar direto no celular, mas **não serve para a Google Play** (que exigiria uma chave própria guardada como segredo do repositório). Atualizações por cima funcionam enquanto a chave for a mesma, o que vale para os builds do CI.
 - Só Android. O iOS exigiria conta de desenvolvedor paga.
 - O app instalado precisa de internet (o uso offline fica fora do escopo do projeto).
+
+## Quando gerar
+
+O APK não sai mais a cada merge (decisão de 17/11/2026, para não atrasar o dia a dia). Gere quando precisar testar em aparelho, e sempre para a entrega: `git tag v0.16.0 && git push --tags` cria a release fixa, ou rode o workflow à mão para atualizar a `apk-latest`. O pull request que mexe no `apk.yml` ou no `package.json` do app continua compilando e conferindo o APK, sem publicar.
