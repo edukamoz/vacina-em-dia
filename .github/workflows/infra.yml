@@ -18,7 +18,7 @@ jobs:
     name: Compilar e checar os templates Bicep
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Compilar (falha em erro de sintaxe ou de tipo)
         run: az bicep build --file infra/main.bicep --stdout > /dev/null
       - name: Linter (falha em aviso)
