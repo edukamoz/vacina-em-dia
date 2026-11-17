@@ -121,7 +121,7 @@ export function UnitsScreen() {
 
   return (
     <Tela
-      reservaBalao
+      emAba
       titulo="Postos de saúde"
       subtitulo="Unidades básicas de saúde perto de você."
     >

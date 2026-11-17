@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 import { AssistenteProvider } from '../features/assistant/assistente-contexto';
 import { createFakeFetch, renderScreen } from '../test-utils';
-import { BalaoAssistente } from './balao-assistente';
 import { BarraDeNavegacao } from './barra-de-navegacao';
 
 jest.mock('expo-router', () => ({
@@ -40,13 +39,14 @@ describe('área segura do Android (barra do sistema)', () => {
     expect(estilo.paddingBottom).toBeUndefined();
   });
 
-  test('CT-LAY-22: o botão do assistente também sobe, para não ficar atrás da barra do sistema', async () => {
+  test('CT-LAY-22: o botão do assistente fica dentro da barra de baixo, que já sobe pela barra do sistema', async () => {
     await abrir(
       <AssistenteProvider>
-        <BalaoAssistente largura={390} />
+        <BarraDeNavegacao largura={390} />
       </AssistenteProvider>,
     );
-    const estilo = StyleSheet.flatten(screen.getByLabelText('Abrir o assistente').props.style);
-    expect(estilo.marginBottom).toBe(24);
+    expect(screen.getByRole('button', { name: 'Abrir o assistente' })).toBeOnTheScreen();
+    const barra = StyleSheet.flatten(screen.getByLabelText('Menu principal').props.style);
+    expect(barra.paddingBottom).toBe(8 + 24);
   });
 });

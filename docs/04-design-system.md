@@ -144,7 +144,7 @@ Outros tokens (valores completos em `tokens.json`):
 
 | Faixa | Largura | Onde | Navegação | Conteúdo |
 |---|---|---|---|---|
-| Compacto | menos de 600 | Celular | Barra inferior com 4 itens | Uma coluna, margem de 16 |
+| Compacto | menos de 600 | Celular | Barra inferior com 4 abas e o microfone do assistente no centro | Uma coluna, margem de 16 |
 | Médio | 600 a 1023 | Tablet e janela estreita | Barra lateral compacta (ícone e texto) | Uma ou duas colunas, margem de 24 |
 | Expandido | 1024 ou mais | Web em computador | Barra lateral fixa com texto | Largura máxima de 960 centralizada, doses em duas colunas, margem de 32 |
 
@@ -180,7 +180,7 @@ Todos aceitam os três temas, o texto a 200% e uso por teclado, toque e leitor d
 | **Caixa de confirmação** | cancelar dose, excluir conta | Título claro, consequência descrita em uma frase, botão perigoso e botão "Voltar" com o mesmo peso visual |
 | **Aviso de fonte e versão** | rodapé de conteúdo vacinal | Mostra fonte, versão e a frase de que o app não substitui a caderneta; marca "Calendário de exemplo" quando `is_fictitious` |
 | **Janela (modal)** | folha no celular, cartão centralizado no tablet e na web | Usada por Adicionar pessoa, Editar pessoa, Adicionar dose e detalhe da dose (a tela de trás continua visível sob o véu); papel de diálogo com o título como nome; fecha pelo botão "Fechar", tocando no véu e com Esc na web; sem histórico, volta ao início; a entrada (véu e subida) para com "Reduzir movimento" |
-| **Navegação** | barra inferior, lateral | 4 itens: Doses, Família, Histórico, Conta; item atual com texto em negrito e marca, não só cor |
+| **Navegação** | barra inferior, lateral | 4 abas (Doses, Família, Histórico, Conta) e o botão do assistente; aba atual com pílula atrás do ícone e texto em negrito, não só cor |
 | **Estado vazio** | | Ícone, título que convida ("Vamos cadastrar a primeira pessoa") e um botão de ação |
 | **Estado de erro** | | O que aconteceu, o que fazer, botão "Tentar de novo"; nunca mensagem técnica |
 | **Estado carregando** | esqueleto e indicador | Anuncia "Carregando" ao leitor de tela; sem tela em branco |
@@ -208,7 +208,7 @@ Cada tela tem versão **compacta (celular)** e **expandida (web)**. O protótipo
 | Detalhe da dose | RF04 | Ações: agendar, registrar aplicação, cancelar | Painel ao lado da lista |
 | Histórico | RF08 | Doses aplicadas e canceladas da **família inteira**, agrupadas por ano; cada cartão mostra "Pessoa, data" | Tabela (Vacina, Pessoa, Data, Estado) |
 | Perguntar por voz | RF06 | Botão grande de voz e resultado | Mesmo, com atalho de teclado |
-| Assistente (chatbot) | RF07 | Conversa com respostas e fonte; abre pelo **balão flutuante** no canto inferior direito de todas as abas (fora da barra de navegação) | Coluna central |
+| Assistente (chatbot) | RF07 | Conversa com respostas e fonte; abre pelo **microfone no centro da barra de navegação** (celular) ou pelo botão em destaque no pé da barra lateral (tablet e computador) | Coluna central |
 | Conta e privacidade | RF09 | "Seus dados" (e-mail), tema em botões de rádio (seguir o aparelho, Claro, Escuro, Alto contraste), privacidade, **sair** e **excluir conta** com confirmação | Cartões lado a lado; botões em linha |
 
 ## 5. Acessibilidade: checklist (RNF04)
@@ -315,8 +315,8 @@ Esta seção descreve o **alvo** do redesenho aprovado em 16/11/2026. Enquanto o
 
 ### 10.3 Navegação e estrutura de tela
 
-- **Barra inferior (celular):** Doses, Família, **microfone central** (Assistente), Histórico, Conta. O microfone tem 72 dp, rótulo "Abrir o assistente e perguntar por voz" e sobe da barra. O balão flutuante deixa de existir.
-- **Web e tablet:** barra lateral com os 4 itens e o assistente em destaque no pé.
+- **Barra inferior (celular):** Doses, Família, **microfone central** (Assistente), Histórico, Conta. O microfone tem 64 dp, dentro da barra de 84 dp (fora da área da barra, o toque falharia no Android), com rótulo "Abrir o assistente" e dica "Pergunte sobre vacinas por voz ou por texto". O balão flutuante deixou de existir (PR 2).
+- **Web e tablet:** barra lateral com os itens (Doses, Família, Histórico, Postos) e, no pé, o assistente em destaque (no computador com o texto "Assistente, fale ou escreva"; no tablet só o círculo), "Sair" e Conta.
 - **Cabeçalho padrão:** título (`titulo1`, 30/36), subtítulo de apoio opcional e a ação à direita. Em Doses, o título é uma saudação com a data e a faixa de pessoas logo abaixo.
 - **Faixa de pessoas:** chips de 56 dp com avatar (inicial e cor; sem foto de membro, ver B78), ponto vermelho com a contagem acessível quando há dose atrasada.
 - **Ordem de uma tela de lista:** cabeçalho, resumo, "Precisam de atenção", "A caminho", "Já aplicadas" (recolhido), fonte e aviso.
@@ -366,7 +366,7 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 |---|---|---|
 | 0 | ADR-036, esta seção e o backlog (B77 e B78) | feito (#276) |
 | 1 | Tokens 3.0.0, componentes base (`Texto` com `truncar`, `Botao` com `texto` e `compacto`, `Chip`, `Segmentado`, `BlocoResumo`, `AzulejoDeEstado`), regras de lint | em análise |
-| 2 | Barra inferior com microfone central; fim do balão | a fazer |
+| 2 | Barra inferior com microfone central; fim do balão | em análise |
 | 3 | Doses e detalhe da dose; ação rápida | a fazer |
 | 4 | Família, formulários, janelas e confirmações | a fazer |
 | 5 | Histórico, Painel de gráficos e Conta | a fazer |

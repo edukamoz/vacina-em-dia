@@ -1,7 +1,8 @@
 import { Link, usePathname, type Href } from 'expo-router';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { Pressable, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAssistente } from '../features/assistant/assistente-contexto';
 import { Logo } from '../features/auth/logo';
 import { useProfilePhoto } from '../features/data/hooks';
 import { modoDeLayout } from '../lib/layout';
@@ -31,12 +32,13 @@ function classesDoItem(
   lateral: boolean,
   altoContraste: boolean,
 ): string {
+  // Barra de baixo (celular): o destaque da aba ativa fica numa pílula atrás do ícone, não no
+  // item inteiro (ver `ItemDeNavegacao`); aqui o item só ocupa a sua fatia da barra.
+  if (!lateral) return 'min-h-[68px] min-w-toque flex-1 items-center justify-center gap-xs px-xs';
   return `items-center rounded-botao border-padrao hover:bg-superficieSuave ${
-    lateral && expandido
+    expandido
       ? 'min-h-principal flex-row gap-md px-lg'
-      : lateral
-        ? 'min-h-[68px] justify-center gap-xs px-xs py-sm'
-        : 'min-h-principal flex-1 justify-center gap-xs px-xs py-sm'
+      : 'min-h-[68px] justify-center gap-xs px-xs py-sm'
   } ${
     ativa
       ? `bg-primariaSuave ${altoContraste ? 'border-borda' : 'border-transparent'}`
@@ -92,7 +94,19 @@ function ItemDeNavegacao({
         aria-current={ativa ? 'page' : undefined}
         className={classesDoItem(ativa, expandido, lateral, altoContraste)}
       >
-        {miniatura ?? <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />}
+        {lateral ? (
+          (miniatura ?? <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />)
+        ) : (
+          <View
+            className={`h-[34px] w-[60px] items-center justify-center rounded-selo border-padrao ${
+              ativa
+                ? `bg-primariaSuave ${altoContraste ? 'border-borda' : 'border-transparent'}`
+                : 'border-transparent'
+            }`}
+          >
+            {miniatura ?? <Icone nome={icone} cor={ativa ? cores.primaria : cores.texto} />}
+          </View>
+        )}
         <Texto
           variante={expandido ? (ativa ? 'corpoNegrito' : 'corpo') : ativa ? 'rotulo' : 'apoio'}
           className={`${ativa ? 'text-primaria' : 'text-texto'} ${ativa && altoContraste ? 'underline' : ''}`}
@@ -102,6 +116,51 @@ function ItemDeNavegacao({
         </Texto>
       </Pressable>
     </Link>
+  );
+}
+
+/**
+ * Botão do assistente (ADR-036): o microfone no centro da barra de baixo (celular) e em destaque
+ * na barra lateral (tablet e computador). Abre a janela do assistente, onde se pergunta por voz ou
+ * por texto. Fica sempre à vista e não cobre conteúdo, ao contrário do antigo balão flutuante.
+ *
+ * @param props.forma - `central` (celular), `lateral` (tablet, só o círculo) ou `lateral-larga`
+ *   (computador, com texto).
+ */
+function BotaoDoAssistente({ forma }: { forma: 'central' | 'lateral' | 'lateral-larga' }) {
+  const { abrir } = useAssistente();
+  const cores = useThemeColors();
+  const { altoContraste, gradienteMarca, sombra } = useVisual();
+  const larga = forma === 'lateral-larga';
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Abrir o assistente"
+      accessibilityHint="Pergunte sobre vacinas por voz ou por texto"
+      onPress={abrir}
+      style={[gradienteMarca, sombra(forma === 'central' ? 3 : 2)]}
+      className={`items-center justify-center bg-primaria ${
+        larga ? 'min-h-principal flex-row gap-md rounded-quadro px-lg py-md' : 'rounded-selo'
+      } ${forma === 'central' ? 'h-[64px] w-[64px]' : ''} ${
+        forma === 'lateral' ? 'h-[56px] w-[56px] self-center' : ''
+      } ${altoContraste ? 'border-altoContraste border-borda' : ''}`}
+    >
+      <Icone nome="voz" cor={cores.sobrePrimaria} tamanho={larga ? 24 : 30} />
+      {larga ? (
+        <View className="min-w-0 flex-1">
+          <Texto
+            variante="corpoNegrito"
+            className="text-sobrePrimaria"
+            importantForAccessibility="no"
+          >
+            Assistente
+          </Texto>
+          <Texto variante="apoio" className="text-sobrePrimaria" importantForAccessibility="no">
+            Fale ou escreva
+          </Texto>
+        </View>
+      ) : null}
+    </Pressable>
   );
 }
 
@@ -132,9 +191,11 @@ function BotaoSair({ expandido }: { expandido: boolean }) {
 /**
  * Navegação principal, que muda de forma conforme a largura (`docs/04-design-system.md`, 2.5):
  * barra **inferior** no celular; barra **lateral compacta** (ícone sobre o texto) no tablet; barra
- * **lateral fixa** com o logo e o texto ao lado do ícone no computador. O assistente não é item
- * do menu: o botão flutuante (`BalaoAssistente`) abre a janela de conversa em todos os tamanhos. Cada aba é um link de verdade (na web, abre com o botão do meio e é navegável por teclado), com o estado
- * "página atual" anunciado ao leitor de tela e um destaque que não depende só da cor.
+ * **lateral fixa** com o logo e o texto ao lado do ícone no computador. O assistente é o botão do
+ * microfone: no centro da barra de baixo (entre as duas abas de cada lado) e em destaque no pé da
+ * barra lateral. Cada aba é um link de verdade (na web, abre com o botão do meio e é navegável por
+ * teclado), com o estado "página atual" anunciado ao leitor de tela e um destaque que não depende
+ * só da cor (pílula atrás do ícone e texto em negrito).
  *
  * A aba Conta mostra a foto de perfil (ou a inicial) no lugar do ícone. Na barra lateral, a Conta
  * fica no canto de baixo, com o botão "Sair" logo acima; no celular, o "Sair" fica no topo da
@@ -164,7 +225,7 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
           ? `${altoContraste ? 'border-r-altoContraste border-borda' : 'border-r-fina border-bordaSuave'} ${
               expandido ? 'w-[248px] gap-xl px-lg py-xl' : 'w-[96px] gap-lg px-sm py-lg'
             }`
-          : `min-h-[72px] flex-row p-sm ${altoContraste ? 'border-t-altoContraste border-borda' : 'border-t-fina border-bordaSuave'}`
+          : `min-h-[84px] flex-row items-center p-sm ${altoContraste ? 'border-t-altoContraste border-borda' : 'border-t-fina border-bordaSuave'}`
       }`}
     >
       {expandido ? (
@@ -173,20 +234,26 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
         </View>
       ) : null}
 
-      <View className={lateral ? 'flex-1 gap-sm' : 'flex-1 flex-row gap-sm'}>
-        {abas.map(({ caminho, titulo, icone }) => (
-          <ItemDeNavegacao
-            key={caminho}
-            caminho={caminho}
-            titulo={titulo}
-            icone={icone}
-            {...(caminho === '/conta'
-              ? { miniatura: <MiniaturaDaConta ativa={pathname === caminho} /> }
-              : {})}
-            ativa={pathname === caminho}
-            expandido={expandido}
-            lateral={lateral}
-          />
+      <View className={lateral ? 'flex-1 gap-sm' : 'flex-1 flex-row items-center gap-xs'}>
+        {abas.map(({ caminho, titulo, icone }, indice) => (
+          <Fragment key={caminho}>
+            {!lateral && indice === 2 ? (
+              <View className="items-center justify-center px-xs">
+                <BotaoDoAssistente forma="central" />
+              </View>
+            ) : null}
+            <ItemDeNavegacao
+              caminho={caminho}
+              titulo={titulo}
+              icone={icone}
+              {...(caminho === '/conta'
+                ? { miniatura: <MiniaturaDaConta ativa={pathname === caminho} /> }
+                : {})}
+              ativa={pathname === caminho}
+              expandido={expandido}
+              lateral={lateral}
+            />
+          </Fragment>
         ))}
         {lateral ? (
           <>
@@ -199,6 +266,7 @@ export function BarraDeNavegacao({ largura }: { largura?: number }) {
               lateral
             />
             <View className="mt-auto gap-sm">
+              <BotaoDoAssistente forma={expandido ? 'lateral-larga' : 'lateral'} />
               <BotaoSair expandido={expandido} />
               <ItemDeNavegacao
                 caminho="/conta"

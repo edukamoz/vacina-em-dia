@@ -169,14 +169,14 @@ export function HistoryScreen() {
 
   if (members.isPending) {
     return (
-      <Tela reservaBalao titulo="Histórico">
+      <Tela emAba titulo="Histórico">
         <EstadoCarregando rotulo="Carregando a família" />
       </Tela>
     );
   }
   if (members.error) {
     return (
-      <Tela reservaBalao titulo="Histórico">
+      <Tela emAba titulo="Histórico">
         <EstadoErro
           mensagem={members.error.message}
           onTentarDeNovo={() => void members.refetch()}
@@ -186,7 +186,7 @@ export function HistoryScreen() {
   }
   if (pessoas.length === 0) {
     return (
-      <Tela reservaBalao titulo="Histórico">
+      <Tela emAba titulo="Histórico">
         <EstadoVazio
           titulo="Nenhuma pessoa cadastrada"
           descricao="Adicione alguém da família para registrar e consultar as vacinas tomadas."
@@ -208,7 +208,7 @@ export function HistoryScreen() {
   const tabela = modoDeLayout(largura) === 'expandido';
 
   return (
-    <Tela reservaBalao titulo="Histórico">
+    <Tela emAba titulo="Histórico">
       <Pressable
         accessibilityRole="link"
         accessibilityLabel="Painel de gráficos. Veja a situação das vacinas da família em gráficos."
