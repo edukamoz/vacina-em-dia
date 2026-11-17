@@ -5,7 +5,7 @@ import type { DoseResponse } from '@vacina/shared';
 import { DoseDetailScreen } from './doses/dose-detail-screen';
 import { DosesScreen, LIMITE_APLICADAS, agruparDoses } from './doses/doses-screen';
 import { NewDoseScreen } from './doses/new-dose-screen';
-import { HistoryScreen, agruparHistorico } from './history/history-screen';
+import { HistoryScreen, LINHAS_POR_VEZ, agruparHistorico } from './history/history-screen';
 import {
   MEMBER,
   OTHER_MEMBER,
@@ -714,5 +714,31 @@ describe('dose avulsa (RF04)', () => {
     expect(await screen.findByRole('button', { name: 'Agendar' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Registrar aplicação' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Cancelar dose' })).toBeOnTheScreen();
+  });
+
+  test('CT-APP-H20: um ano com muitas doses mostra só as primeiras e deixa pedir mais ou menos', async () => {
+    const aplicadas = Array.from({ length: LINHAS_POR_VEZ + 3 }, (_, i) =>
+      dose({
+        id: `d-h${i}`,
+        vaccine: `vacina ${i + 1}`,
+        doseLabel: 'dose única',
+        status: 'APPLIED',
+        appliedDate: '2026-05-01',
+      }),
+    );
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'GET /members/m-1/doses': { status: 200, body: memberDoses(aplicadas) },
+      'GET /members/m-2/doses': { status: 200, body: memberDoses([]) },
+    });
+    await renderScreen(<HistoryScreen />, fake.fetchFn);
+    expect(await screen.findByRole('header', { name: '2026' })).toBeOnTheScreen();
+    expect(
+      screen.getByText(`Mostrando ${LINHAS_POR_VEZ} de ${LINHAS_POR_VEZ + 3} doses de 2026.`),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Mostrar mais doses de 2026' }));
+    expect(screen.queryByText(/Mostrando/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Mostrar menos doses de 2026' }));
+    expect(screen.getByRole('button', { name: 'Mostrar mais doses de 2026' })).toBeOnTheScreen();
   });
 });

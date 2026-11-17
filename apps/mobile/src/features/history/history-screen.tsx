@@ -1,5 +1,6 @@
 import type { CivilDate, DoseResponse, MemberResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, useWindowDimensions, View } from 'react-native';
 import { Atalho } from '../../components/atalho';
 import { AvisoFonte } from '../../components/aviso-fonte';
@@ -96,6 +97,9 @@ function CartaoDoHistorico({ linha, aoAbrir }: { linha: LinhaDoHistorico; aoAbri
   );
 }
 
+/** Quantas linhas cada ano mostra de início e a cada "Mostrar mais" (a página não vira uma lista enorme). */
+export const LINHAS_POR_VEZ = 10;
+
 const COLUNAS = ['Vacina', 'Pessoa', 'Data', 'Estado'] as const;
 
 /** Linha como tabela (computador): Vacina, Pessoa, Data e Estado, como no design. */
@@ -165,6 +169,8 @@ export function HistoryScreen() {
   const members = useMembers();
   const pessoas = members.data?.items ?? [];
   const doses = useDosesOfMembers(pessoas.map((pessoa) => pessoa.id));
+  // Quantas linhas cada ano mostra agora (por ano).
+  const [limites, setLimites] = useState<Record<string, number>>({});
 
   if (members.isPending) {
     return (
@@ -227,26 +233,59 @@ export function HistoryScreen() {
           descricao="Quando você registrar uma vacina como aplicada, ela aparece aqui."
         />
       )}
-      {anos.map(({ ano, linhas }) => (
-        <View key={ano} className="gap-lg">
-          <Texto variante="titulo2" accessibilityRole="header">
-            {ano}
-          </Texto>
-          {tabela ? (
-            <TabelaDoHistorico linhas={linhas} aoAbrir={abrir} />
-          ) : (
-            <View className="gap-lg">
-              {linhas.map((linha) => (
-                <CartaoDoHistorico
-                  key={linha.dose.id}
-                  linha={linha}
-                  aoAbrir={() => abrir(linha.dose)}
-                />
-              ))}
-            </View>
-          )}
-        </View>
-      ))}
+      {anos.map(({ ano, linhas }) => {
+        const limite = limites[ano] ?? LINHAS_POR_VEZ;
+        const mostradas = linhas.slice(0, limite);
+        return (
+          <View key={ano} className="gap-lg">
+            <Texto variante="titulo2" accessibilityRole="header">
+              {ano}
+            </Texto>
+            {tabela ? (
+              <TabelaDoHistorico linhas={mostradas} aoAbrir={abrir} />
+            ) : (
+              <View className="gap-lg">
+                {mostradas.map((linha) => (
+                  <CartaoDoHistorico
+                    key={linha.dose.id}
+                    linha={linha}
+                    aoAbrir={() => abrir(linha.dose)}
+                  />
+                ))}
+              </View>
+            )}
+            {linhas.length > LINHAS_POR_VEZ ? (
+              <View className="gap-sm">
+                <Texto
+                  variante="apoio"
+                  className="text-textoSecundario"
+                  accessibilityLiveRegion="polite"
+                >
+                  {`Mostrando ${mostradas.length} de ${linhas.length} doses de ${ano}.`}
+                </Texto>
+                <View className="flex-row flex-wrap gap-sm">
+                  {mostradas.length < linhas.length ? (
+                    <Botao
+                      titulo={`Mostrar mais ${Math.min(LINHAS_POR_VEZ, linhas.length - mostradas.length)} doses`}
+                      variante="secundario"
+                      accessibilityLabel={`Mostrar mais doses de ${ano}`}
+                      onPress={() => setLimites({ ...limites, [ano]: limite + LINHAS_POR_VEZ })}
+                    />
+                  ) : null}
+                  {limite > LINHAS_POR_VEZ ? (
+                    <Botao
+                      titulo="Mostrar menos"
+                      variante="secundario"
+                      accessibilityLabel={`Mostrar menos doses de ${ano}`}
+                      onPress={() => setLimites({ ...limites, [ano]: LINHAS_POR_VEZ })}
+                    />
+                  ) : null}
+                </View>
+              </View>
+            ) : null}
+          </View>
+        );
+      })}
       {fonte && <AvisoFonte conferencia={conferencia.data} fonte={fonte} />}
     </Tela>
   );
