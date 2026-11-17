@@ -370,7 +370,7 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 | 3 | Doses e detalhe da dose; ação rápida | feito (#279) |
 | 4 | Família, formulários, janelas e confirmações | feito (#280) |
 | 5 | Histórico, Painel de gráficos e Conta (atalhos, azulejo da marca, chips, caixas de exclusão) | feito (#281) |
-| 6 | Postos, Viagem e Novidades (azulejo da marca, distância em selo, destino da viagem em segmentado, títulos sem corte) | em análise |
+| 6 | Postos, Viagem e Novidades (azulejo da marca, distância em selo, destino da viagem em segmentado, títulos sem corte) | feito (#282) |
 | 7 | Acesso: Entrar e Criar conta com subtítulo e nota de privacidade (landing, abertura e consentimento já estavam no estilo novo) | feito (#283) |
-| 8 | App instalável: convite para instalar depois da primeira dose (botão no Android e no computador, passo a passo no iPhone) | em análise (#284) |
-| 9 | Fechamento: acessibilidade, capturas e documentos | a fazer |
+| 8 | App instalável: convite para instalar depois da primeira dose (botão no Android e no computador, passo a passo no iPhone) | feito (#284) |
+| 9 | Fechamento: acessibilidade, capturas e documentos | feito (#285) |

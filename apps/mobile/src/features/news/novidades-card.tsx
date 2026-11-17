@@ -43,7 +43,7 @@ function Noticia({ item, destaque }: { item: NewsItem; destaque: boolean }) {
   const vacina = item.vaccineRelated;
   const texto = vacina ? 'text-sobrePrimaria' : 'text-texto';
   return (
-    <View style={{ width: LARGURA }}>
+    <View role="listitem" testID="novidade" style={{ width: LARGURA }}>
       <Pressable
         accessibilityRole="link"
         accessibilityLabel={`${item.title}, ${formatCivilDate(item.publishedAt)}${vacina ? ', sobre vacinação' : ''}. Abre no site do Ministério da Saúde`}
