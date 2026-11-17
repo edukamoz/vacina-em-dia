@@ -56,7 +56,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <AuthFrame titulo="Criar conta">
+    <AuthFrame titulo="Criar conta" subtitulo="Só precisamos de e-mail e senha.">
       <CampoTexto
         rotulo="E-mail"
         value={email}
