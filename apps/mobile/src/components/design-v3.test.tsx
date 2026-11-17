@@ -113,6 +113,22 @@ describe('Chip', () => {
   });
 });
 
+describe('Chip em escolha múltipla', () => {
+  test('CT-UI-22: papel checkbox anuncia o estado ligado e mostra o visto', async () => {
+    const onPress = jest.fn();
+    await render(<Chip papel="checkbox" rotulo="7 dias antes" selecionado onPress={onPress} />);
+    const chip = screen.getByRole('checkbox', { name: '7 dias antes' });
+    expect(chip).toBeChecked();
+    await fireEvent.press(chip);
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
+
+  test('CT-UI-22b: desligado, o chip checkbox não está marcado', async () => {
+    await render(<Chip papel="checkbox" rotulo="3 dias antes" />);
+    expect(screen.getByRole('checkbox', { name: '3 dias antes' })).not.toBeChecked();
+  });
+});
+
 describe('Segmentado', () => {
   const opcoes = [
     { valor: 'a', rotulo: 'Claro' },

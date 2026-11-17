@@ -1,5 +1,5 @@
 import type * as Dates from '../../lib/dates';
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import { MEMBER, createFakeFetch, dose, memberDoses, renderScreen } from '../../test-utils';
 import { ViagemScreen } from './viagem-screen';
@@ -15,6 +15,17 @@ jest.mock('../../lib/dates', () => ({
 
 const FAMILIA = { 'GET /members': { status: 200, body: { items: [MEMBER] } } };
 
+/**
+ * Toca em "Ver o roteiro" só depois de o histórico carregar: enquanto carrega, o botão fica
+ * ocupado e ignora o toque. Sem esta espera, com a máquina carregada o toque se perdia e o teste
+ * falhava de vez em quando.
+ */
+async function verORoteiro() {
+  await screen.findByRole('button', { name: 'Ver o roteiro' });
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Ver o roteiro' })).not.toBeBusy());
+  await fireEvent.press(screen.getByRole('button', { name: 'Ver o roteiro' }));
+}
+
 describe('preparar viagem (B74)', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -26,7 +37,7 @@ describe('preparar viagem (B74)', () => {
     await renderScreen(<ViagemScreen />, fake.fetchFn);
     expect(await screen.findByRole('radio', { name: 'Dentro do Brasil' })).toBeChecked();
     expect(screen.queryByText('Febre amarela')).not.toBeOnTheScreen();
-    await fireEvent.press(await screen.findByRole('button', { name: 'Ver o roteiro' }));
+    await verORoteiro();
     expect(await screen.findByRole('header', { name: 'Febre amarela' })).toBeOnTheScreen();
     expect(screen.getByText(/Vacinar até/)).toBeOnTheScreen();
     expect(screen.getByText(/1 dose atrasada/)).toBeOnTheScreen();
@@ -42,7 +53,7 @@ describe('preparar viagem (B74)', () => {
       'GET /members/m-1/doses': { status: 200, body: memberDoses([]) },
     });
     await renderScreen(<ViagemScreen />, fake.fetchFn);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Ver o roteiro' }));
+    await verORoteiro();
     expect(await screen.findByRole('header', { name: 'Febre amarela' })).toBeOnTheScreen();
     expect(
       screen.queryByRole('header', { name: /Certificado Internacional/ }),
@@ -63,7 +74,7 @@ describe('preparar viagem (B74)', () => {
       'GET /members/m-1/doses': { status: 200, body: memberDoses([]) },
     });
     await renderScreen(<ViagemScreen />, fake.fetchFn);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Ver o roteiro' }));
+    await verORoteiro();
     await fireEvent.press(
       await screen.findByRole('button', { name: 'Febre amarela no Ministério da Saúde' }),
     );

@@ -236,6 +236,8 @@ describe('doses (RF03 e RF04)', () => {
   });
 
   test('CT-APP-K17: o nome da vacina no cartão quebra de linha, sem reticências', async () => {
+    // Fonte do aparelho normal: com a ampliação do mock (200%) qualquer truncamento ficaria desligado.
+    Dimensions.set({ window: { ...Dimensions.get('window'), fontScale: 1 } });
     const longa = dose({
       id: 'd-longa',
       vaccine: 'pneumocócica 23-valente (indicada a idosos e pessoas com condições especiais)',

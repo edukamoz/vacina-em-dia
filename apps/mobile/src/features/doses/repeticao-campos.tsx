@@ -1,8 +1,11 @@
 import { addMonths, type CivilDate, type RecurrenceUnit } from '@vacina/shared';
 import { View } from 'react-native';
 import { Alternar } from '../../components/alternar';
+import { Cartao } from '../../components/cartao';
 import { CampoTexto } from '../../components/campo-texto';
+import { Chip } from '../../components/chip';
 import { GrupoDeRadios, type OpcaoDeRadio } from '../../components/grupo-de-radios';
+import { Segmentado } from '../../components/segmentado';
 import { SeletorDeData } from '../../components/seletor-de-data';
 import { Texto } from '../../components/texto';
 import { formatCivilDate } from './format-date';
@@ -73,7 +76,7 @@ export function CamposDeRepeticao({
       />
 
       {forma.repete ? (
-        <View className="gap-lg rounded-campo border-padrao border-borda p-md">
+        <Cartao suave className="gap-lg">
           <CampoTexto
             rotulo="A cada quanto tempo"
             value={forma.cada}
@@ -84,7 +87,7 @@ export function CamposDeRepeticao({
             erro={erros.cada}
             ajuda="Escolha o número e a unidade logo abaixo."
           />
-          <GrupoDeRadios
+          <Segmentado
             rotulo="Unidade de tempo"
             valor={forma.unidade}
             opcoes={UNIDADES}
@@ -146,7 +149,7 @@ export function CamposDeRepeticao({
               erro={erros.totalDoses}
             />
           ) : null}
-        </View>
+        </Cartao>
       ) : null}
 
       <View className="gap-sm">
@@ -154,20 +157,26 @@ export function CamposDeRepeticao({
         <Texto variante="apoio" className="text-textoSecundario">
           Marque quantos avisos quiser. Sem marcar nada, avisamos 7 dias antes.
         </Texto>
-        {AVISO.map((opcao) => (
-          <Alternar
-            key={opcao.valor}
-            rotulo={opcao.rotulo}
-            marcado={forma.avisar.includes(opcao.valor)}
-            aoAlterar={(marcado) =>
-              aoMudar({
-                avisar: marcado
-                  ? [...forma.avisar, opcao.valor]
-                  : forma.avisar.filter((v) => v !== opcao.valor),
-              })
-            }
-          />
-        ))}
+        <View className="flex-row flex-wrap gap-sm">
+          {AVISO.map((opcao) => {
+            const marcado = forma.avisar.includes(opcao.valor);
+            return (
+              <Chip
+                key={opcao.valor}
+                papel="checkbox"
+                rotulo={opcao.rotulo}
+                selecionado={marcado}
+                onPress={() =>
+                  aoMudar({
+                    avisar: marcado
+                      ? forma.avisar.filter((v) => v !== opcao.valor)
+                      : [...forma.avisar, opcao.valor],
+                  })
+                }
+              />
+            );
+          })}
+        </View>
         <CampoTexto
           rotulo="Outro aviso, em dias antes (opcional)"
           value={forma.avisarOutro}

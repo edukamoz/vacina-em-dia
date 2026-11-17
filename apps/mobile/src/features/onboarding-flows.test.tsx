@@ -1,5 +1,6 @@
 import type * as Dates from '../lib/dates';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { Dimensions } from 'react-native';
 import { AccountScreen } from './account/account-screen';
 import { ConsentScreen } from './consent/consent-screen';
 import { FamilyScreen, resumoDaPessoa } from './family/family-screen';
@@ -131,6 +132,23 @@ describe('família (RF02)', () => {
     await renderScreen(<FamilyScreen />, fake.fetchFn);
     expect(await screen.findByLabelText('2 doses atrasadas')).toBeOnTheScreen();
     expect(await screen.findByLabelText('1 dose agendada')).toBeOnTheScreen();
+  });
+
+  test('CT-APP-F06: nome comprido de pessoa trunca em uma linha, e o rótulo do botão tem o nome inteiro', async () => {
+    // Fonte do aparelho normal: com a ampliação do mock (200%) o truncamento ficaria desligado.
+    Dimensions.set({ window: { ...Dimensions.get('window'), fontScale: 1 } });
+    const longo = { ...MEMBER, name: 'Maria da Conceição Aparecida de Oliveira Santos' };
+    const fake = createFakeFetch({ 'GET /members': { status: 200, body: { items: [longo] } } });
+    await renderScreen(<FamilyScreen />, fake.fetchFn);
+    const botao = await screen.findByRole('button', {
+      name: 'Ver vacinas de Maria da Conceição Aparecida de Oliveira Santos',
+    });
+    expect(botao).toBeOnTheScreen();
+    expect(
+      screen.getByText('Maria da Conceição Aparecida de Oliveira Santos', {
+        includeHiddenElements: true,
+      }).props.numberOfLines,
+    ).toBe(1);
   });
 
   test('CT-APP-F05: resumoDaPessoa dá preferência às atrasadas e depois às agendadas', () => {
