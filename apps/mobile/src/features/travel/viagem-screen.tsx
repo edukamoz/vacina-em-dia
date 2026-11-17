@@ -11,13 +11,14 @@ import { Linking, View } from 'react-native';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
-import { GrupoDeRadios } from '../../components/grupo-de-radios';
+import { Segmentado } from '../../components/segmentado';
 import { SeletorDeData } from '../../components/seletor-de-data';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { todayCivil } from '../../lib/dates';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useMemberDoses } from '../data/hooks';
+import { useVisual } from '../../theme/theme-provider';
 import { formatCivilDate } from '../doses/format-date';
 
 /** Rótulo de cada situação: o texto vem junto da cor, então nada depende só dela. */
@@ -28,19 +29,23 @@ export const ROTULO_DA_SITUACAO: Readonly<Record<TravelItemStatus, string>> = {
   INFO: 'Para conferir',
 };
 
-const CAIXA: Readonly<Record<TravelItemStatus, string>> = {
-  DONE: 'border-aplicada bg-aplicadaSuave',
-  TODO: 'border-pendente bg-pendenteSuave',
-  LATE: 'border-atrasada bg-atrasadaSuave',
-  INFO: 'border-borda bg-superficieSuave',
+/** Fundo e, só no Alto contraste, a borda de cada situação (como o selo da dose). */
+const CAIXA: Readonly<Record<TravelItemStatus, { fundo: string; borda: string }>> = {
+  DONE: { fundo: 'bg-aplicadaSuave', borda: 'border-aplicada' },
+  TODO: { fundo: 'bg-pendenteSuave', borda: 'border-pendente' },
+  LATE: { fundo: 'bg-atrasadaSuave', borda: 'border-atrasada' },
+  INFO: { fundo: 'bg-superficieSuave', borda: 'border-borda' },
 };
 
 /** Um item do checklist: situação, prazo, frase sobre a pessoa e links oficiais. */
 function ItemDoRoteiro({ item }: { item: TravelChecklistItem }) {
+  const { altoContraste } = useVisual();
   return (
     <Cartao className="gap-sm">
       <View
-        className={`self-start rounded-selo border-padrao px-md py-xs ${CAIXA[item.status]}`}
+        className={`self-start rounded-selo border-padrao px-md py-xs ${CAIXA[item.status].fundo} ${
+          altoContraste ? CAIXA[item.status].borda : 'border-transparent'
+        }`}
         accessibilityLabel={`Situação: ${ROTULO_DA_SITUACAO[item.status]}`}
       >
         <Texto variante="rotulo" importantForAccessibility="no">
@@ -130,7 +135,7 @@ export function ViagemScreen() {
       subtitulo={`Um roteiro para ${primeiroNome} se preparar com antecedência.`}
       modal
     >
-      <GrupoDeRadios
+      <Segmentado
         rotulo="Para onde é a viagem?"
         valor={destino}
         opcoes={[

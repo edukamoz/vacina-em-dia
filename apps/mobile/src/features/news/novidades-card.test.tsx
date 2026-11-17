@@ -61,6 +61,15 @@ describe('cartão Novidades de saúde', () => {
     expect(screen.getAllByTestId('novidade', { includeHiddenElements: true })).toHaveLength(3);
   });
 
+  test('CT-APP-NEW08: o título da notícia quebra de linha, sem reticências', async () => {
+    const longo =
+      'Ministério da Saúde amplia a vacinação contra a gripe para novos grupos de pessoas em todo o país nesta semana';
+    const fake = createFakeFetch({ 'GET /news': resposta([noticia(1, { title: longo })]) });
+    await renderScreen(<NovidadesCard />, fake.fetchFn);
+    const titulo = await screen.findByText(longo, { includeHiddenElements: true });
+    expect(titulo.props.numberOfLines).toBeUndefined();
+  });
+
   test('CT-APP-NEW02: tocar numa notícia abre a página original no site do Ministério', async () => {
     const abrir = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
     const fake = createFakeFetch({ 'GET /news': resposta([noticia(7)]) });

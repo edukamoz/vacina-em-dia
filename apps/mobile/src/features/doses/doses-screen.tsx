@@ -19,6 +19,7 @@ import { useSelectedMember } from '../calendar/use-selected-member';
 import { useConferenciaDoCalendario, useMemberDoses } from '../data/hooks';
 import { aplicadasVisiveisAoAbrir } from './grupos-de-doses';
 import { ConfirmarAplicacao } from './aplicar-rapido';
+import { ConviteDeInstalacao } from './convite-instalar';
 import { BaixarCarteira } from './baixar-carteira';
 import { DoseCard } from './dose-card';
 import { Festa } from './festa';
@@ -225,6 +226,7 @@ export function DosesScreen() {
       {grupos && grupos.aplicadas.length > LIMITE_APLICADAS && (
         <LinkTexto titulo="Ver todas no Histórico" onPress={() => router.push('/historico')} />
       )}
+      {grupos && <ConviteDeInstalacao dosesAplicadas={grupos.aplicadas.length} />}
       {doses.data && <BaixarCarteira memberId={selected.id} nome={primeiroNome} />}
       {animal ? null : (
         <Atalho
