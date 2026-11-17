@@ -2,6 +2,7 @@ import type { DoseResponse, DoseStatus, MemberResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { Avatar } from '../../components/avatar';
+import { AzulejoDeMarca } from '../../components/azulejo-de-marca';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { Icone } from '../../components/icone';
@@ -15,6 +16,7 @@ import { describeAge, todayCivil } from '../../lib/dates';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSession } from '../../session/session-provider';
 import { useDosesOfMembers, useMembers } from '../data/hooks';
+import { ResponsaveisDaFamilia } from '../household/responsaveis-da-familia';
 import { ESPECIE_ROTULO, PARENTESCO_ROTULO } from './parentesco';
 
 /** Rótulo de cada faixa etária, em linguagem simples. */
@@ -57,7 +59,8 @@ export function resumoDaPessoa(doses: readonly Pick<DoseResponse, 'status'>[]): 
 
 /**
  * Aba "Família" (RF02): as pessoas cadastradas, cada uma com o resumo das doses; tocar no cartão
- * abre as doses da pessoa. O botão de adicionar fica no alto, como no design.
+ * abre as doses da pessoa. O botão de adicionar fica no alto e, no fim, vem a seção de responsáveis
+ * (quem cuida junto, convite por código), como no design v3.
  */
 export function FamilyScreen() {
   const router = useRouter();
@@ -143,6 +146,20 @@ export function FamilyScreen() {
           })}
         </Grade>
       )}
+      <Cartao className="gap-lg">
+        <View className="flex-row items-start gap-md">
+          <AzulejoDeMarca icone="familia" />
+          <View className="flex-1">
+            <Texto variante="titulo3" accessibilityRole="header">
+              Responsáveis da família
+            </Texto>
+            <Texto variante="apoio" className="text-textoSecundario">
+              Quem também cuida das vacinas da sua família
+            </Texto>
+          </View>
+        </View>
+        <ResponsaveisDaFamilia />
+      </Cartao>
     </Tela>
   );
 }
