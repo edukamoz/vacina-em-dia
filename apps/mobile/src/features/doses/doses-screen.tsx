@@ -2,7 +2,9 @@ import type { DoseResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Aparecer, Giro } from '../../components/animacao';
 import { Atalho } from '../../components/atalho';
+import { AvisoDeConfirmacao } from '../../components/aviso-de-confirmacao';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
@@ -89,6 +91,8 @@ export function DosesScreen() {
   // Ação rápida "Aplicar": a dose atrasada que está sendo confirmada, e se a lista de aplicadas está aberta.
   const [aplicando, setAplicando] = useState<DoseResponse | null>(null);
   const [verAplicadas, setVerAplicadas] = useState(false);
+  // Aviso curto depois de registrar uma aplicação ("BCG: dose aplicada").
+  const [aviso, setAviso] = useState<string | null>(null);
   // Quantas doses cada grupo mostra agora (por título do grupo).
   const [limites, setLimites] = useState<Record<string, number>>({});
   const computador = modoDeLayout(useWindowDimensions().width) === 'expandido';
@@ -141,6 +145,7 @@ export function DosesScreen() {
     <Tela
       emAba
       titulo={`Doses de ${primeiroNome}`}
+      sobreposicao={<AvisoDeConfirmacao mensagem={aviso} aoSumir={() => setAviso(null)} />}
       acao={
         <View className="flex-row flex-wrap gap-md">
           <Botao titulo="Adicionar dose" icone="mais" onPress={() => router.push('/dose/nova')} />
@@ -220,6 +225,7 @@ export function DosesScreen() {
                         <ConfirmarAplicacao
                           dose={dose}
                           aoFechar={() => setAplicando(null)}
+                          aoRegistrar={() => setAviso(`${dose.vaccine}: dose aplicada`)}
                           aoTrocarData={() => {
                             setAplicando(null);
                             router.push({ pathname: '/dose/[id]', params: { id: dose.id } });
@@ -279,23 +285,25 @@ export function DosesScreen() {
                   <Texto variante="corpoNegrito" importantForAccessibility="no">
                     {String(grupos?.aplicadas.length ?? 0)}
                   </Texto>
-                  <View style={{ transform: [{ rotate: aplicadasAbertas ? '90deg' : '0deg' }] }}>
+                  <Giro ligado={aplicadasAbertas}>
                     <Icone nome="seta" cor={cores.textoSecundario} />
-                  </View>
+                  </Giro>
                 </View>
               </Pressable>
               {aplicadasAbertas && (
-                <Grade colunas={1}>
-                  {aplicadasVisiveis.map((dose) => (
-                    <DoseCard
-                      key={dose.id}
-                      dose={dose}
-                      aoAbrir={() =>
-                        router.push({ pathname: '/dose/[id]', params: { id: dose.id } })
-                      }
-                    />
-                  ))}
-                </Grade>
+                <Aparecer>
+                  <Grade colunas={duasColunas ? 2 : 1}>
+                    {aplicadasVisiveis.map((dose) => (
+                      <DoseCard
+                        key={dose.id}
+                        dose={dose}
+                        aoAbrir={() =>
+                          router.push({ pathname: '/dose/[id]', params: { id: dose.id } })
+                        }
+                      />
+                    ))}
+                  </Grade>
+                </Aparecer>
               )}
             </View>
           )}

@@ -24,6 +24,8 @@ import { Texto } from './texto';
  * @param props.abaixoDoTitulo - Conteúdo colado ao título, como o link "Trocar pessoa".
  * @param props.emAba - Tela de uma das abas: a barra de navegação já cuida da borda de baixo e da
  *   barra do sistema, então a moldura não repete essa folga.
+ * @param props.sobreposicao - Elemento por cima da tela, preso à parte de baixo (por exemplo, o
+ *   aviso "Dose aplicada"). Não rola junto com o conteúdo.
  * @param props.modal - Mostra a tela como janela por cima da anterior (`JanelaModal`), em vez de
  *   página inteira. Use nas telas de formulário e detalhe abertas a partir de outra tela.
  */
@@ -35,6 +37,7 @@ export function Tela({
   abaixoDoTitulo,
   emAba = false,
   modal = false,
+  sobreposicao,
   children,
 }: {
   titulo: string;
@@ -44,6 +47,7 @@ export function Tela({
   abaixoDoTitulo?: ReactNode;
   emAba?: boolean;
   modal?: boolean;
+  sobreposicao?: ReactNode;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -103,6 +107,7 @@ export function Tela({
           ))}
         </RolagemComTeclado>
       </RolagemDaTelaContext.Provider>
+      {sobreposicao}
     </SafeAreaView>
   );
 }
