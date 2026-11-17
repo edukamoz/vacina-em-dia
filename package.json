@@ -29,7 +29,7 @@
     "export:calendar": "node scripts/export-calendar.mjs && prettier --write apps/nlp/vacina_nlp/data/pni-2026.json"
   },
   "devDependencies": {
-    "@commitlint/cli": "21.2.3",
+    "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.3",
     "@eslint/js": "10.0.1",
     "@types/jest": "30.0.0",
