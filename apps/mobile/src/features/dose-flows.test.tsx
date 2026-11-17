@@ -225,6 +225,23 @@ describe('doses (RF03 e RF04)', () => {
     expect(fake.calls.some((c) => c.key === 'POST /doses/d-over/events')).toBe(false);
   });
 
+  test('CT-APP-K15b: a confirmação é uma janela e tocar no véu fecha sem registrar nada', async () => {
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'GET /members/m-1/doses': { status: 200, body: memberDoses([OVERDUE]) },
+    });
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Registrar aplicação de hepatite B, 1 dose' }),
+    );
+    expect(screen.getByLabelText('Registrar aplicação')).toBeOnTheScreen();
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Fechar a confirmação', includeHiddenElements: true }),
+    );
+    expect(screen.queryByText(/A data registrada será hoje/)).not.toBeOnTheScreen();
+    expect(fake.calls.some((c) => c.key === 'POST /doses/d-over/events')).toBe(false);
+  });
+
   test('CT-APP-K16: só a dose atrasada tem a ação rápida; próximas e aplicadas não', async () => {
     const fake = createFakeFetch({
       ...FAMILY,

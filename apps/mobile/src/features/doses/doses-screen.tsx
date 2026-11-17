@@ -215,7 +215,7 @@ export function DosesScreen() {
                           ? { aoAplicar: () => setAplicando(dose) }
                           : {})}
                       />
-                      {/* A confirmação aparece logo abaixo do cartão tocado, para a pessoa vê-la sem rolar. */}
+                      {/* A confirmação abre numa janela por cima da tela (modal). */}
                       {aplicando?.id === dose.id && (
                         <ConfirmarAplicacao
                           dose={dose}
