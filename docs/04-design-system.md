@@ -160,11 +160,11 @@ A primeira tela escolhe o desenho por `lib/ambiente.ts` (`useAmbiente`):
 
 | Ambiente | Quando | Primeira tela |
 |---|---|---|
-| `web-grande` | site com janela de 1024 px ou mais | Página completa: mosaico de peças animadas, fases da vida, personas, vantagens |
-| `web-pequena` | site no celular ou em janela estreita | Página compacta: mosaico de 2 colunas, personas em carrossel, cartão "Leve no celular" e botão Criar conta fixo no pé |
+| `web-grande` | site com janela de 1024 px ou mais | Página completa (design v3): menu com as seções, promessa com celular de exemplo e avisos flutuantes, Como funciona em três passos, personas, recursos, faixa final e rodapé |
+| `web-pequena` | site no celular ou em janela estreita | Página compacta: celular de exemplo, personas em carrossel, cartão "Leve no celular" e botão Criar conta fixo no pé |
 | `app` | Android, iOS ou site instalado (PWA, `display-mode: standalone`) | Abertura enxuta: marca, pessoas e uma folha com "Criar conta" e "Já tenho conta" |
 
-No mosaico (`hero-modular.web.tsx`), cada peça tem uma animação própria ao passar o mouse, e no celular ao tocar: a pessoa que sobe com corações, o alerta que treme, o calendário que gira, o visto que se desenha com confete, a onda de voz, o balão de fala, o sino que balança e o anel que fecha. Tudo para com "Reduzir movimento".
+No computador, o celular de exemplo fica inclinado 3 graus e os dois avisos que o cercam acompanham a rolagem devagar (paralaxe); as seções aparecem ao entrar na tela. Tudo para com "Reduzir movimento" e no Alto contraste.
 
 ## 3. Componentes base
 

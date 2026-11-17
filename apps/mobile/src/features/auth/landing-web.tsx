@@ -1,52 +1,61 @@
 import { useRouter } from 'expo-router';
 import { Image, ScrollView, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
 import { Bolha } from '../../components/bolha';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
-import { Inclinar } from '../../components/inclinar';
 import { Icone, type NomeDoIcone } from '../../components/icone';
-import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
+import { Inclinar } from '../../components/inclinar';
+import { LinkTexto } from '../../components/link-texto';
 import { Paralaxe, Revelar, RolagemAnimada } from '../../components/rolagem-animada';
+import { AtalhoDeMovimento } from '../../components/seletor-de-movimento';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
 import { ID_DO_CONTEUDO } from '../../lib/pular-conteudo';
-import { useThemeColors, useVisual } from '../../theme/theme-provider';
+import { useMovimentoReduzido, useThemeColors, useVisual } from '../../theme/theme-provider';
 import { FOTOS, type Foto } from './fotos';
-import { HeroModular } from './hero-modular';
 import { Logo, Simbolo } from './logo';
 
-/** Vantagens do app; "Aa" (texto grande) ou um desenho no quadro. */
-const VANTAGENS: readonly { titulo: string; texto: string; icone: NomeDoIcone | 'texto' }[] = [
+/** Os três passos de "Como funciona". */
+const PASSOS: readonly { titulo: string; texto: string }[] = [
   {
-    titulo: 'Fácil de ler',
-    texto: 'Texto grande e contraste alto em todas as telas.',
-    icone: 'texto',
+    titulo: 'Cadastre a família',
+    texto:
+      'Nome ou apelido e data de nascimento. Só isso. Pode incluir até os animais de estimação.',
   },
   {
-    titulo: 'Para toda a família',
-    texto: 'As doses de cada pessoa em um só lugar.',
-    icone: 'familia',
+    titulo: 'Veja o calendário de cada um',
+    texto:
+      'O app mostra as vacinas do Calendário Nacional de Vacinação indicadas para a idade de cada pessoa.',
   },
   {
-    titulo: 'Com fonte oficial',
-    texto: 'Fonte e versão do calendário sempre visíveis.',
-    icone: 'info',
+    titulo: 'Registre e receba avisos',
+    texto: 'Marque as doses aplicadas e receba lembretes antes de cada data.',
   },
 ];
 
-/** Fases da vida da seção "Para cada fase": foto (pessoa fictícia), rótulo e diâmetro do círculo. */
-const FASES: readonly {
-  foto: Foto;
-  rotulo: string;
-  tamanho: number;
-  cor: 'avatarA' | 'avatarB' | 'avatarC' | 'avatarD';
-}[] = [
-  { foto: FOTOS.bebe, rotulo: 'Bebês', tamanho: 120, cor: 'avatarC' },
-  { foto: FOTOS.crianca, rotulo: 'Crianças', tamanho: 136, cor: 'avatarB' },
-  { foto: FOTOS.gestante, rotulo: 'Adultos e gestantes', tamanho: 152, cor: 'avatarA' },
-  { foto: FOTOS.jose, rotulo: 'Pessoas idosas', tamanho: 140, cor: 'avatarD' },
+/** O que o app faz por você: quatro recursos, cada um com um ícone no quadro. */
+const RECURSOS: readonly { titulo: string; texto: string; icone: NomeDoIcone }[] = [
+  {
+    titulo: 'Lembretes',
+    texto: 'Avisos antes de cada dose, no dia que você escolher.',
+    icone: 'lembrete',
+  },
+  {
+    titulo: 'Assistente por voz',
+    texto: 'Pergunte falando ou escrevendo. Respostas com fonte oficial.',
+    icone: 'voz',
+  },
+  {
+    titulo: 'Vários responsáveis',
+    texto: 'Convide quem cuida junto, com um código.',
+    icone: 'familia',
+  },
+  {
+    titulo: 'Postos de saúde',
+    texto: 'Encontre a unidade mais perto e trace a rota.',
+    icone: 'local',
+  },
 ];
 
 /** Para quem o app é feito: as três personas do projeto (pessoas fictícias). */
@@ -81,13 +90,19 @@ const PERSONAS: readonly {
   },
 ];
 
-/** Objetos de saúde que ficam atrás do texto no computador (só decoração). */
-const FLUTUANTES = [
-  { icone: 'doses', lugar: 'left-[44%] top-[2%]', tamanho: 76, fundo: 'superficie' },
-  { icone: 'coracao', lugar: 'left-[1%] bottom-[8%]', tamanho: 68, fundo: 'avatarD' },
-  { icone: 'frasco', lugar: 'left-[36%] bottom-[10%]', tamanho: 64, fundo: 'agendadaSuave' },
-  { icone: 'curativo', lugar: 'right-[1%] top-[0%]', tamanho: 70, fundo: 'avatarB' },
-] as const;
+/** Identificadores das seções que o menu do alto leva a rolar até elas. */
+const ANCORA = { comoFunciona: 'como-funciona', paraQuem: 'para-quem-e' } as const;
+
+/**
+ * Rola a página até uma seção (só no site). Sem "movimento" quando a pessoa pediu para reduzir.
+ * Fora do navegador (testes) não faz nada.
+ */
+function irPara(id: string, reduzido: boolean) {
+  if (typeof document === 'undefined') return;
+  document
+    .getElementById(id)
+    ?.scrollIntoView({ behavior: reduzido ? 'auto' : 'smooth', block: 'start' });
+}
 
 /** Largura útil das seções da página: 1184 px com margem, centralizada. */
 const SECAO = 'w-full max-w-pagina self-center px-lg expandido:px-xxl';
@@ -155,24 +170,147 @@ function CartaoDePersona({ persona, cor }: { persona: (typeof PERSONAS)[number];
   );
 }
 
+/** Uma linha de dose dentro do celular de exemplo: quadro com ícone, nome e situação. */
+function LinhaDoCelular({
+  fundo,
+  cor,
+  icone,
+  nome,
+  situacao,
+}: {
+  fundo: string;
+  cor: string;
+  icone: NomeDoIcone;
+  nome: string;
+  situacao: string;
+}) {
+  return (
+    <View className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-md">
+      <View
+        style={{ backgroundColor: fundo }}
+        className="h-[44px] w-[44px] items-center justify-center rounded-[14px]"
+      >
+        <Icone nome={icone} cor={cor} tamanho={24} />
+      </View>
+      <View className="flex-1">
+        <Texto variante="corpoNegrito">{nome}</Texto>
+        <Texto variante="apoio" className="text-textoSecundario">
+          {situacao}
+        </Texto>
+      </View>
+    </View>
+  );
+}
+
 /**
- * Página de apresentação do site (primeiro contato de quem abre o endereço no navegador): cabeçalho
- * com "Entrar", a promessa com o mosaico de peças animadas, "Para cada fase da vida", as
- * personas, as vantagens, um cartão para criar a conta e o aviso de que o app não substitui a
- * caderneta. Os efeitos de fundo somem no Alto contraste.
+ * Celular de exemplo da promessa: o calendário de uma criança fictícia com uma dose atrasada, uma
+ * agendada e uma aplicada. É só ilustração (escondido do leitor de tela; a nota abaixo diz que os
+ * dados são inventados). No computador fica inclinado e flutua devagar.
  *
- * - Computador (`compacta` falso): promessa e mosaico lado a lado, objetos que seguem o mouse e
- *   personas em três colunas.
- * - Celular e janela estreita (`compacta`): mosaico de 2 colunas, personas num carrossel que se
+ * @param props.inclinado - Gira 3 graus, como no design (só no computador).
+ */
+function CelularDeExemplo({ inclinado }: { inclinado: boolean }) {
+  const cores = useThemeColors();
+  const { gradienteMarca, sombra } = useVisual();
+  return (
+    <View
+      aria-hidden
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[
+        sombra(3),
+        {
+          borderColor: cores.texto,
+          transform: inclinado ? [{ rotate: '3deg' }] : [],
+        },
+      ]}
+      className="h-[440px] w-[290px] gap-sm self-center overflow-hidden rounded-[44px] border-[10px] bg-fundo p-md expandido:h-[540px] expandido:w-[310px]"
+    >
+      <View style={gradienteMarca} className="rounded-[22px] bg-primaria p-md">
+        <Texto variante="apoio" className="text-sobrePrimaria">
+          Calendário de Helena, 3 anos
+        </Texto>
+        <Texto variante="titulo3" className="text-sobrePrimaria">
+          1 dose para resolver
+        </Texto>
+      </View>
+      <LinhaDoCelular
+        fundo={cores.atrasadaSuave}
+        cor={cores.atrasada}
+        icone="atrasada"
+        nome="BCG, dose única"
+        situacao="Era para 01/08/2026"
+      />
+      <LinhaDoCelular
+        fundo={cores.agendadaSuave}
+        cor={cores.agendada}
+        icone="agendada"
+        nome="Covid-19, reforço"
+        situacao="Agendada para 25/11/2026"
+      />
+      <LinhaDoCelular
+        fundo={cores.aplicadaSuave}
+        cor={cores.aplicada}
+        icone="aplicada"
+        nome="Rotavírus, 1ª dose"
+        situacao="Aplicada"
+      />
+    </View>
+  );
+}
+
+/** Aviso que flutua ao lado do celular de exemplo (só decoração). */
+function AvisoFlutuante({
+  icone,
+  cor,
+  texto,
+  lugar,
+  fator,
+}: {
+  icone: NomeDoIcone;
+  cor: string;
+  texto: string;
+  lugar: string;
+  fator: number;
+}) {
+  const { sombra } = useVisual();
+  return (
+    <Paralaxe
+      aria-hidden
+      fator={fator}
+      maximo={16}
+      style={sombra(2)}
+      className={`absolute flex-row items-center gap-sm rounded-cartao bg-superficie px-md py-md ${lugar}`}
+    >
+      <Icone nome={icone} cor={cor} tamanho={24} />
+      <Texto variante="corpoNegrito" style={{ color: cor }}>
+        {texto}
+      </Texto>
+    </Paralaxe>
+  );
+}
+
+/**
+ * Página de apresentação do site (primeiro contato de quem abre o endereço no navegador), no
+ * desenho do design v3 (ADR-036): menu no alto, a promessa com dois botões e um celular de exemplo
+ * com avisos flutuantes, "Como funciona" em três passos, "Para quem é" com as três personas, os
+ * quatro recursos, uma faixa final para criar a conta e o rodapé com a fonte do calendário e o
+ * aviso de que o app não substitui a caderneta. Os efeitos de fundo e as animações somem no Alto
+ * contraste e com "Reduzir movimento".
+ *
+ * - Computador (`compacta` falso): menu com as seções, promessa e celular lado a lado, personas
+ *   em três colunas.
+ * - Celular e janela estreita (`compacta`): só "Entrar" no alto, personas num carrossel que se
  *   arrasta com o dedo, um cartão ensinando a instalar o app e um botão "Criar conta" no pé da
- *   tela (fora da rolagem, não sobre ela, então não cobre o conteúdo nem anda com a barra do navegador).
+ *   tela (fora da rolagem, então não cobre o conteúdo nem anda com a barra do navegador).
  *
  * @param props.compacta - Janela abaixo de 1024 px.
  */
 export function LandingWeb({ compacta }: { compacta: boolean }) {
   const router = useRouter();
   const cores = useThemeColors();
-  const { altoContraste } = useVisual();
+  const { altoContraste, gradienteMarca, sombra } = useVisual();
+  const reduzido = useMovimentoReduzido();
   const expandido = modoDeLayout(useWindowDimensions().width) === 'expandido';
 
   return (
@@ -180,7 +318,31 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
       <RolagemAnimada>
         <View className={`${SECAO} min-h-[72px] flex-row items-center justify-between gap-lg`}>
           <Logo />
-          <Botao titulo="Entrar" variante="secundario" onPress={() => router.push('/entrar')} />
+          <View className="flex-row items-center gap-lg">
+            {compacta ? null : (
+              <>
+                <LinkTexto
+                  titulo="Como funciona"
+                  onPress={() => irPara(ANCORA.comoFunciona, reduzido)}
+                />
+                <LinkTexto titulo="Para quem é" onPress={() => irPara(ANCORA.paraQuem, reduzido)} />
+                <LinkTexto titulo="Privacidade" onPress={() => router.push('/privacidade')} />
+              </>
+            )}
+            <Botao
+              titulo="Entrar"
+              variante="secundario"
+              tamanho="compacto"
+              onPress={() => router.push('/entrar')}
+            />
+            {compacta ? null : (
+              <Botao
+                titulo="Criar conta"
+                tamanho="compacto"
+                onPress={() => router.push('/criar-conta')}
+              />
+            )}
+          </View>
         </View>
 
         <View nativeID={ID_DO_CONTEUDO} tabIndex={-1} className="relative overflow-hidden">
@@ -188,98 +350,66 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
             <>
               <Bolha
                 cor={cores.decorMenta}
-                tamanho={420}
-                opacidade={0.55}
-                className="absolute -right-[60px] -top-[40px]"
+                tamanho={520}
+                opacidade={0.6}
+                className="absolute -right-[120px] -top-[60px]"
               />
-              <Bolha
-                cor={cores.decorSol}
-                tamanho={180}
-                opacidade={0.35}
-                className="absolute bottom-[10px] right-[38%]"
-              />
-              <Bolha
-                cor={cores.primariaSuave}
-                tamanho={120}
-                className="absolute -left-[30px] top-[30px]"
-              />
-              {compacta ? null : (
-                <Svg
-                  viewBox="0 0 1200 150"
-                  preserveAspectRatio="none"
-                  aria-hidden
-                  pointerEvents="none"
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: 8,
-                    width: '100%',
-                    height: 150,
-                  }}
-                >
-                  <Path
-                    d="M0 90H330l22-12 20 12h60l18-70 26 122 20-52h70l20-14 22 14h150l18-58 24 100 18-42h382"
-                    fill="none"
-                    stroke={cores.primaria}
-                    strokeWidth={3}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    opacity={0.28}
-                  />
-                </Svg>
-              )}
             </>
           )}
 
           <View
-            className={`${SECAO} relative pb-[64px] pt-[32px] expandido:pb-[96px] expandido:pt-[56px]`}
+            className={`${SECAO} relative gap-xxl pb-[64px] pt-[32px] expandido:flex-row expandido:items-center expandido:gap-[40px] expandido:pb-[80px] expandido:pt-[36px]`}
           >
-            {expandido && !altoContraste
-              ? FLUTUANTES.map(({ icone, lugar, tamanho, fundo }, indice) => (
-                  <Paralaxe
-                    key={icone}
-                    aria-hidden
-                    fator={0.1 + indice * 0.04}
-                    maximo={12 + indice * 5}
-                    className={`absolute items-center justify-center rounded-[28px] border-fina border-bordaSuave ${lugar}`}
-                    style={{ width: tamanho, height: tamanho, backgroundColor: cores[fundo] }}
-                  >
-                    <Icone
-                      nome={icone}
-                      cor={
-                        fundo === 'avatarD' || fundo === 'avatarB'
-                          ? cores.sobreAvatar
-                          : cores.primaria
-                      }
-                      tamanho={38}
-                    />
-                  </Paralaxe>
-                ))
-              : null}
-            <View className="gap-xxl expandido:flex-row expandido:items-center expandido:gap-[48px]">
-              <View className="gap-xl expandido:flex-1">
-                <Texto variante={expandido ? 'exibicao' : 'titulo1'} accessibilityRole="header">
-                  {'As vacinas da sua família, '}
-                  <Texto variante={expandido ? 'exibicao' : 'titulo1'} className="text-primaria">
-                    em dia
-                  </Texto>
+            <View className="gap-xl expandido:flex-[6]">
+              <Texto variante={expandido ? 'exibicao' : 'titulo1'} accessibilityRole="header">
+                {'As vacinas da sua família, '}
+                <Texto variante={expandido ? 'exibicao' : 'titulo1'} className="text-primaria">
+                  em dia
                 </Texto>
-                <Texto variante={expandido ? 'destaque' : 'corpo'} className="text-textoSecundario">
-                  Veja o que está pendente, agendado ou atrasado. Tudo em letras grandes e fáceis de
-                  ler.
-                </Texto>
-                <View className="expandido:items-start">
-                  <Botao titulo="Criar conta" onPress={() => router.push('/criar-conta')} />
-                </View>
+              </Texto>
+              <Texto variante={expandido ? 'destaque' : 'corpo'} className="text-textoSecundario">
+                Veja o que está pendente, agendado ou atrasado para cada pessoa da casa. Receba
+                lembretes e tire dúvidas por voz. Tudo em letras grandes e fáceis de ler.
+              </Texto>
+              <View className="flex-row flex-wrap gap-md">
+                <Botao titulo="Criar conta grátis" onPress={() => router.push('/criar-conta')} />
+                <Botao
+                  titulo="Já tenho conta"
+                  variante="secundario"
+                  onPress={() => router.push('/entrar')}
+                />
               </View>
+              <View className="flex-row items-center gap-sm">
+                <Icone nome="info" cor={cores.primaria} tamanho={20} />
+                <Texto variante="apoio" className="flex-1 text-textoSecundario">
+                  Sem CPF. Você pode excluir a conta quando quiser.
+                </Texto>
+              </View>
+            </View>
 
-              <View className="w-full max-w-[560px] gap-md self-center expandido:w-[560px] expandido:self-auto">
-                <HeroModular compacto={compacta} />
-                <Texto variante="apoio" className="text-textoSecundario">
-                  Exemplo com dados inventados. As pessoas das fotos são fictícias.
-                </Texto>
-              </View>
+            <View className="relative gap-md expandido:flex-[5]">
+              <CelularDeExemplo inclinado={expandido && !altoContraste} />
+              {expandido && !altoContraste ? (
+                <>
+                  <AvisoFlutuante
+                    icone="lembrete"
+                    cor={cores.agendada}
+                    texto="Lembrete: Covid-19, em 7 dias"
+                    lugar="-left-[24px] top-[300px]"
+                    fator={0.12}
+                  />
+                  <AvisoFlutuante
+                    icone="voz"
+                    cor={cores.primaria}
+                    texto="Perguntar por voz"
+                    lugar="-right-[10px] bottom-[90px]"
+                    fator={0.18}
+                  />
+                </>
+              ) : null}
+              <Texto variante="apoio" className="text-center text-textoSecundario">
+                Exemplo com dados inventados. As pessoas das fotos são fictícias.
+              </Texto>
             </View>
           </View>
         </View>
@@ -300,48 +430,39 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
         ) : null}
 
         <Revelar>
-          <View className={`${SECAO} gap-xl py-xxl`}>
+          <View nativeID={ANCORA.comoFunciona} className={`${SECAO} gap-xl py-xxl`}>
             <View className="max-w-[640px] gap-sm">
               <Texto variante="titulo2" accessibilityRole="header">
-                Para cada fase da vida
+                Como funciona
               </Texto>
               <Texto className="text-textoSecundario">
-                O calendário oficial muda com a idade. O aplicativo mostra o que vale para cada
-                pessoa da família.
+                Em três passos, a carteira de vacinação da família fica no celular.
               </Texto>
             </View>
-            <View className="flex-row flex-wrap items-end justify-around gap-xl pt-lg">
-              {FASES.map(({ foto, rotulo, tamanho, cor }) => (
-                <View key={rotulo} className="w-[150px] items-center gap-md expandido:w-[170px]">
-                  <Inclinar graus={14}>
-                    <View
-                      style={{
-                        width: tamanho,
-                        height: tamanho,
-                        borderRadius: tamanho / 2,
-                        backgroundColor: cores[cor],
-                      }}
-                      className="overflow-hidden border-[4px] border-superficie"
-                    >
-                      <PessoaNoQuadro
-                        foto={foto}
-                        largura={tamanho * 1.05}
-                        topo={tamanho * 0.1}
-                        esquerda={tamanho * -0.025}
-                      />
-                    </View>
-                  </Inclinar>
-                  <Texto variante="corpoNegrito" className="text-center">
-                    {rotulo}
+            <View className="gap-lg expandido:flex-row expandido:gap-xl">
+              {PASSOS.map(({ titulo, texto }, indice) => (
+                <Cartao key={titulo} className="gap-sm expandido:flex-1 expandido:p-xl">
+                  <View
+                    aria-hidden
+                    style={gradienteMarca}
+                    className="h-[52px] w-[52px] items-center justify-center rounded-selo bg-primaria"
+                  >
+                    <Texto variante="titulo3" className="text-sobrePrimaria">
+                      {String(indice + 1)}
+                    </Texto>
+                  </View>
+                  <Texto variante="titulo3" accessibilityRole="header">
+                    {titulo}
                   </Texto>
-                </View>
+                  <Texto className="text-textoSecundario">{texto}</Texto>
+                </Cartao>
               ))}
             </View>
           </View>
         </Revelar>
 
         <Revelar>
-          <View className={`${SECAO} gap-xl pb-xxl`}>
+          <View nativeID={ANCORA.paraQuem} className={`${SECAO} gap-xl pb-xxl`}>
             <View className="max-w-[640px] gap-sm">
               <Texto variante="titulo2" accessibilityRole="header">
                 Feito para quem cuida de gente
@@ -382,22 +503,16 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
         <Revelar>
           <View className={`${SECAO} gap-xl pb-xxl`}>
             <Texto variante="titulo2" accessibilityRole="header">
-              Feito para ser simples
+              O que o app faz por você
             </Texto>
-            <View className="gap-lg expandido:flex-row expandido:gap-xl">
-              {VANTAGENS.map(({ titulo, texto, icone }) => (
-                <Cartao key={titulo} className="gap-md expandido:flex-1 expandido:p-xl">
+            <View className="gap-lg expandido:flex-row expandido:gap-lg">
+              {RECURSOS.map(({ titulo, texto, icone }) => (
+                <Cartao key={titulo} className="gap-md expandido:flex-1">
                   <View
                     aria-hidden
-                    className="h-[64px] w-[64px] items-center justify-center rounded-[22px] border-padrao border-primaria bg-primariaSuave"
+                    className="h-[56px] w-[56px] items-center justify-center rounded-[18px] bg-primariaSuave"
                   >
-                    {icone === 'texto' ? (
-                      <Texto variante="titulo2" className="text-primaria">
-                        Aa
-                      </Texto>
-                    ) : (
-                      <Icone nome={icone} cor={cores.primaria} tamanho={32} />
-                    )}
+                    <Icone nome={icone} cor={cores.primaria} tamanho={28} />
                   </View>
                   <Texto variante="titulo3" accessibilityRole="header">
                     {titulo}
@@ -411,31 +526,51 @@ export function LandingWeb({ compacta }: { compacta: boolean }) {
 
         <Revelar>
           <View className={`${SECAO} pb-xl`}>
-            <Cartao className="gap-xl overflow-hidden p-xl expandido:flex-row expandido:items-center expandido:justify-between expandido:p-[40px]">
+            <View
+              style={[gradienteMarca, sombra(2)]}
+              className="gap-xl overflow-hidden rounded-folha bg-primaria p-xl expandido:flex-row expandido:items-center expandido:justify-between expandido:p-[56px]"
+            >
               <View className="flex-row items-center gap-lg expandido:flex-1">
-                <Simbolo tamanho={72} />
-                <Texto variante="titulo2" accessibilityRole="header" className="flex-1">
-                  Comece a acompanhar as doses da família.
+                <Simbolo tamanho={72} invertido />
+                <Texto
+                  variante="titulo2"
+                  accessibilityRole="header"
+                  className="flex-1 text-sobrePrimaria"
+                >
+                  Comece agora. Leva menos de um minuto.
                 </Texto>
               </View>
               <View>
                 <Botao
-                  titulo="Criar conta"
+                  titulo="Criar conta grátis"
                   variante="secundario"
                   onPress={() => router.push('/criar-conta')}
                 />
               </View>
-            </Cartao>
+            </View>
           </View>
         </Revelar>
 
-        <View className={`${SECAO} gap-md pb-xxl pt-lg`}>
-          <Texto variante="apoio" className="text-textoSecundario">
-            O Vacina em Dia não substitui a caderneta oficial de vacinação nem a orientação de
-            profissionais de saúde.
-          </Texto>
-          <View className="max-w-[360px]">
-            <AtalhoDeMovimento />
+        <View
+          className={`${SECAO} gap-md border-t-fina border-bordaSuave pb-xxl pt-xl expandido:flex-row expandido:gap-xxl`}
+        >
+          <View className="gap-sm expandido:flex-[2]">
+            <Texto variante="corpoNegrito">Vacina em Dia</Texto>
+            <Texto variante="apoio" className="text-textoSecundario">
+              Projeto acadêmico da Fatec Votorantim (Desenvolvimento de Software Multiplataforma).
+              Alinhado aos Objetivos de Desenvolvimento Sustentável 3, Saúde e Bem-Estar, e 10,
+              Redução das Desigualdades.
+            </Texto>
+          </View>
+          <View className="gap-sm expandido:flex-1">
+            <Texto variante="apoio" className="text-textoSecundario">
+              Fonte do calendário: Calendário Nacional de Vacinação, Ministério da Saúde. O Vacina
+              em Dia não substitui a caderneta oficial de vacinação nem a orientação de
+              profissionais de saúde.
+            </Texto>
+            <View className="max-w-[360px]">
+              <AtalhoDeMovimento />
+            </View>
           </View>
         </View>
       </RolagemAnimada>
