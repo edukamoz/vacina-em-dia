@@ -1,6 +1,6 @@
 # Vacina em Dia: Design System
 
-Item do Jira: SCRUM-32 (requisitos RNF04 e RNF09). Versão dos tokens 3.0.0 (raios, sombras e durações do redesenho, ADR-036), documento atualizado em 16/11/2026. Fonte dos valores: [`04-design-system/tokens.json`](04-design-system/tokens.json). Decisão relacionada: ADR-011.
+Item do Jira: SCRUM-32 (requisitos RNF04 e RNF09). Versão dos tokens 3.1.0 (raios, sombras e a régua de movimento do redesenho, ADR-036 e ADR-037), documento atualizado em 17/11/2026. Fonte dos valores: [`04-design-system/tokens.json`](04-design-system/tokens.json). Decisão relacionada: ADR-011.
 
 O app é **um só código para Android, iOS e web** (RNF09). Por isso o design system é **responsivo desde o início**: o mesmo conjunto de tokens e componentes serve ao celular (pessoa tocando) e à web em computador (mouse e teclado). O público inclui idosos (Sr. José, 68 anos) e pessoas com pouca familiaridade digital, então a acessibilidade é a regra principal, não um acabamento.
 
@@ -32,7 +32,7 @@ Nomes semânticos (iguais nos três temas; só mudam os valores):
 | `foco` | Anel de foco do teclado |
 | `erro`, `erroSuave` | Mensagens de erro |
 
-**Valores dos três temas** (fonte: `tokens.json`, versão 3.0.0, com as mesmas cores da 2.0.0; um teste confere esta tabela com o arquivo):
+**Valores dos três temas** (fonte: `tokens.json`, versão 3.1.0, com as mesmas cores da 2.0.0; um teste confere esta tabela com o arquivo):
 
 | Token | Claro | Escuro | Alto contraste | Uso |
 |---|---|---|---|---|
@@ -358,7 +358,19 @@ A ação rápida registra com a data de hoje e confirma antes de gravar, mostran
 
 ### 10.7 Movimento
 
-Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada de blocos em sequência de 50 ms (sobe 10 dp e aparece); toque com escala de 0,95 a 0,98; o visto da dose aplicada se desenha em 500 ms; o anel de progresso preenche em 900 ms. Nada é essencial para entender a tela; tudo para com "Reduzir movimento" (ADR-026), e o Alto contraste fica parado.
+Régua única de tempos e curvas (ADR-037, `duracoes` e `curvas` em `tokens.json`). Cada tempo tem um uso fixo; abrir é mais lento que fechar, e nada que fecha espera.
+
+| Token | Valor | Onde entra |
+|---|---|---|
+| `escalonamento` | 40 ms | Atraso entre blocos e linhas que entram em sequência |
+| `micro` | 80 ms | Espera de dicas; início do traço do visto |
+| `rapida` | 150 ms | Fechar janelas e menus; trocar texto no lugar |
+| `passo` | 250 ms | Abas deslizantes, acordeão, abrir janela, toque em cartão |
+| `media` | 350 ms | Entrada de blocos, aviso, número que sobe, interruptor, troca de capítulo |
+| `lenta` | 400 ms | Painéis que abrem, esqueleto que vira conteúdo |
+| `enfase` | 500 ms | Visto da dose aplicada, entrada da promessa |
+
+Curvas: `padrao` `cubic-bezier(.22,1,.36,1)` para tudo que abre, fecha, desliza ou muda de tamanho; `salto` `cubic-bezier(.34,1.35,.64,1)` só em entradas curtas (visto, interruptor, número), nunca em saída. Entrada de blocos sobe 14 px e aparece; toque com escala de 0,95 a 0,98; o anel de progresso preenche em 900 ms (ciclo próprio). Nada é essencial para entender a tela; tudo para com "Reduzir movimento" (ADR-026), e o Alto contraste fica parado.
 
 ### 10.8 Andamento por PR
 

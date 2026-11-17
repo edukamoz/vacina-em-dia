@@ -1,5 +1,6 @@
 import { useRef, type ReactNode } from 'react';
 import { useMovimentoReduzido } from '../theme/theme-provider';
+import { CURVA_CSS, DURACAO } from './animacao';
 
 /**
  * Inclinação 3D que segue o mouse: o conteúdo gira em dois eixos, até `graus`, conforme a posição
@@ -36,7 +37,7 @@ export function Inclinar({ children, graus = 10 }: { children: ReactNode; graus?
         style={{
           display: 'flex',
           flexDirection: 'column',
-          transition: 'transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+          transition: `transform ${DURACAO.passo}ms ${CURVA_CSS}`,
           transformStyle: 'preserve-3d',
         }}
       >
