@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import type * as Dates from '../../lib/dates';
 import { ACCEPTED, createFakeFetch, renderScreen } from '../../test-utils';
 import { AccountScreen } from '../account/account-screen';
+import { FamilyScreen } from '../family/family-screen';
 import { EntrarNaFamiliaScreen } from './entrar-na-familia-screen';
 import { ResponsaveisDaFamilia } from './responsaveis-da-familia';
 
@@ -339,5 +340,34 @@ describe('excluir a conta com família (B15)', () => {
     expect(
       await screen.findByText(/A propriedade da família passa para j\*\*\*@e\*\*\*\.com\.br/),
     ).toBeOnTheScreen();
+  });
+});
+
+describe('onde ficam os responsáveis (design v3)', () => {
+  test('CT-FAMR-230: a aba Família traz a seção de responsáveis, mesmo sem ninguém cadastrado', async () => {
+    const fake = createFakeFetch({
+      'GET /members': { status: 200, body: { items: [] } },
+      'GET /family': { status: 200, body: SOZINHA },
+    });
+    await renderScreen(<FamilyScreen />, fake.fetchFn);
+    expect(
+      await screen.findByRole('header', { name: 'Responsáveis da família' }),
+    ).toBeOnTheScreen();
+    expect(
+      await screen.findByRole('button', { name: 'Convidar outro responsável' }),
+    ).toBeOnTheScreen();
+  });
+
+  test('CT-FAMR-231: a Conta não repete a lista de responsáveis; só leva à Família', async () => {
+    const fake = createFakeFetch({
+      'GET /consent': { status: 200, body: ACCEPTED },
+      'GET /family': { status: 200, body: SOZINHA },
+    });
+    await renderScreen(<AccountScreen />, fake.fetchFn);
+    expect(await screen.findByRole('button', { name: 'Ver família' })).toBeOnTheScreen();
+    expect(screen.queryByRole('header', { name: 'Responsáveis da família' })).not.toBeOnTheScreen();
+    expect(
+      screen.queryByRole('button', { name: 'Convidar outro responsável' }),
+    ).not.toBeOnTheScreen();
   });
 });

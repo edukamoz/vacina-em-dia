@@ -53,8 +53,16 @@ function Linha({ responsavel }: { responsavel: GuardianResponse }) {
       >
         {responsavel.isYou ? `${responsavel.emailHint} (você)` : responsavel.emailHint}
       </Texto>
-      <View className="rounded-selo border-padrao border-borda px-md py-xs">
-        <Texto variante="rotulo" importantForAccessibility="no">
+      <View
+        className={`rounded-selo px-md py-xs ${
+          responsavel.role === 'OWNER' ? 'bg-primariaSuave' : 'bg-fundo'
+        }`}
+      >
+        <Texto
+          variante="rotulo"
+          importantForAccessibility="no"
+          className={responsavel.role === 'OWNER' ? 'text-primaria' : 'text-textoSecundario'}
+        >
           {papel}
         </Texto>
       </View>
@@ -114,13 +122,15 @@ function PainelDeConvite({ aoFechar }: { aoFechar: () => void }) {
     return (
       <Cartao className="gap-md">
         <Texto variante="corpoNegrito">Código de convite</Texto>
-        <Texto
-          variante="titulo2"
-          accessibilityLabel={`Código de convite: ${codigo.replace('-', ' ').split('').join(' ')}`}
-          selectable
-        >
-          {codigo}
-        </Texto>
+        <View className="rounded-cartao border-padrao border-dashed border-borda bg-fundo px-lg py-md">
+          <Texto
+            variante="titulo2"
+            accessibilityLabel={`Código de convite: ${codigo.replace('-', ' ').split('').join(' ')}`}
+            selectable
+          >
+            {codigo}
+          </Texto>
+        </View>
         <Texto>{`Vale uma vez e até ${validade}. Mostramos o código só agora: se perder, gere outro.`}</Texto>
         <Botao
           titulo="Copiar código"
@@ -158,7 +168,7 @@ function PainelDeConvite({ aoFechar }: { aoFechar: () => void }) {
 }
 
 /**
- * Seção "Responsáveis da família" da aba Conta (B15, ADR-029): quem cuida da família, convite por
+ * Seção "Responsáveis da família" da aba Família (B15, ADR-029; veio da Conta no design v3): quem cuida da família, convite por
  * código, e sair, remover e passar a propriedade, sempre com confirmação. O dono que está só também
  * pode entrar na família de outra pessoa com um código.
  */

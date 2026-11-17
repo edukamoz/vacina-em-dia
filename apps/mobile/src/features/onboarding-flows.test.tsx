@@ -172,7 +172,7 @@ describe('família (RF02)', () => {
     expect(await screen.findByText(/O servidor não conseguiu responder/)).toBeOnTheScreen();
 
     routes['GET /members'] = { status: 200, body: { items: [MEMBER] } };
-    await fireEvent.press(screen.getByRole('button', { name: 'Tentar de novo' }));
+    await fireEvent.press((await screen.findAllByRole('button', { name: 'Tentar de novo' }))[0]!);
     expect(await screen.findByText('Maria')).toBeOnTheScreen();
   });
 });

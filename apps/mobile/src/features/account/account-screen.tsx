@@ -19,7 +19,6 @@ import { modoDeLayout } from '../../lib/layout';
 import { useSession } from '../../session/session-provider';
 import { useTheme } from '../../theme/theme-provider';
 import { ControlesDeAvisos } from '../avisos/controles-de-avisos';
-import { ResponsaveisDaFamilia } from '../household/responsaveis-da-familia';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
 import {
   useConsent,
@@ -158,16 +157,6 @@ export function AccountScreen() {
             </Texto>
           ) : null}
           <ControlesDeAvisos />
-        </Secao>
-      </View>
-
-      <View className="gap-lg expandido:flex-row expandido:items-stretch">
-        <Secao
-          icone="familia"
-          titulo="Responsáveis da família"
-          apoio="Quem também cuida das vacinas da sua família"
-        >
-          <ResponsaveisDaFamilia />
         </Secao>
       </View>
 
