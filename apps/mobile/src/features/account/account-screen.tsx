@@ -3,10 +3,11 @@ import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { Avatar } from '../../components/avatar';
+import { AzulejoDeMarca } from '../../components/azulejo-de-marca';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { Chave } from '../../components/chave';
-import { Icone, type NomeDoIcone } from '../../components/icone';
+import type { NomeDoIcone } from '../../components/icone';
 import { LinkTexto } from '../../components/link-texto';
 import { SeletorDeMovimento } from '../../components/seletor-de-movimento';
 import { SeletorDeTamanhoDoTexto } from '../../components/seletor-de-tamanho-do-texto';
@@ -16,7 +17,7 @@ import { Texto } from '../../components/texto';
 import { PIX_DA_DOACAO } from '../../lib/config-pix';
 import { modoDeLayout } from '../../lib/layout';
 import { useSession } from '../../session/session-provider';
-import { useTheme, useThemeColors } from '../../theme/theme-provider';
+import { useTheme } from '../../theme/theme-provider';
 import { ControlesDeAvisos } from '../avisos/controles-de-avisos';
 import { ResponsaveisDaFamilia } from '../household/responsaveis-da-familia';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
@@ -41,16 +42,10 @@ function Secao({
   apoio: string;
   children: ReactNode;
 }) {
-  const cores = useThemeColors();
   return (
     <Cartao className="gap-lg expandido:flex-1">
       <View className="flex-row items-start gap-md">
-        <View
-          aria-hidden
-          className="h-[48px] w-[48px] items-center justify-center rounded-botao border-padrao border-primaria bg-primariaSuave"
-        >
-          <Icone nome={icone} cor={cores.primaria} />
-        </View>
+        <AzulejoDeMarca icone={icone} />
         <View className="flex-1">
           <Texto variante="titulo3" accessibilityRole="header">
             {titulo}
@@ -240,7 +235,7 @@ export function AccountScreen() {
       ) : null}
 
       {!confirmando ? (
-        <Cartao className="gap-md border-erro expandido:flex-row expandido:items-center expandido:justify-between">
+        <View className="gap-md rounded-cartao border-padrao border-erro bg-superficie p-lg expandido:flex-row expandido:items-center expandido:justify-between">
           <View className="flex-1">
             <Texto variante="titulo3" accessibilityRole="header">
               Excluir minha conta
@@ -254,9 +249,12 @@ export function AccountScreen() {
             variante="perigo"
             onPress={() => setConfirmando(true)}
           />
-        </Cartao>
+        </View>
       ) : (
-        <Cartao className="gap-md border-erro">
+        <View
+          accessibilityRole="alert"
+          className="gap-md rounded-cartao border-padrao border-erro bg-superficie p-lg"
+        >
           <Texto variante="corpoNegrito">Excluir tudo?</Texto>
           <Texto>{textoDaExclusao(familia.data)}</Texto>
           {remove.error ? (
@@ -275,7 +273,7 @@ export function AccountScreen() {
             }
           />
           <Botao titulo="Não, voltar" variante="secundario" onPress={() => setConfirmando(false)} />
-        </Cartao>
+        </View>
       )}
     </Tela>
   );

@@ -1,9 +1,9 @@
 import { ActivityIndicator, View } from 'react-native';
 import { Botao } from './botao';
 import { Cartao } from './cartao';
-import { Icone, type NomeDoIcone } from './icone';
+import { AzulejoDeMarca } from './azulejo-de-marca';
+import type { NomeDoIcone } from './icone';
 import { Texto } from './texto';
-import { useThemeColors } from '../theme/theme-provider';
 
 /** Estado de carregamento: indicador com anúncio "Carregando" ao leitor de tela, sem tela em branco. */
 export function EstadoCarregando({ rotulo }: { rotulo: string }) {
@@ -62,19 +62,9 @@ export function EstadoVazio({
   descricao: string;
   icone?: NomeDoIcone;
 }) {
-  const cores = useThemeColors();
   return (
     <Cartao className="gap-sm">
-      {icone ? (
-        <View
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-          aria-hidden
-          className="mb-xs h-[56px] w-[56px] items-center justify-center rounded-quadro bg-primariaSuave"
-        >
-          <Icone nome={icone} cor={cores.primaria} tamanho={28} />
-        </View>
-      ) : null}
+      {icone ? <AzulejoDeMarca icone={icone} tamanho={56} /> : null}
       <Texto variante="titulo3" accessibilityRole="header">
         {titulo}
       </Texto>

@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { Dimensions } from 'react-native';
 import { createFakeFetch, renderScreen } from '../../test-utils';
 import { escolherFotoDePerfil } from '../../lib/escolher-foto';
 import { CabecalhoDaConta } from './cabecalho-da-conta';
@@ -34,6 +35,16 @@ describe('foto de perfil na aba Conta', () => {
     expect(screen.getByText('ana@exemplo.com.br')).toBeOnTheScreen();
     expect(screen.getByText('A', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(screen.getByText(/apagada se você excluir a conta/)).toBeOnTheScreen();
+  });
+
+  test('CT-APP-FOTO01b: e-mail muito longo trunca em uma linha (texto normal)', async () => {
+    // Fonte do aparelho normal: com a ampliação do mock (200%) o truncamento ficaria desligado.
+    Dimensions.set({ window: { ...Dimensions.get('window'), fontScale: 1 } });
+    const longo = 'maria.da.conceicao.aparecida.de.oliveira.santos@exemplo.com.br';
+    const fake = createFakeFetch({ 'GET /account/photo': SEM_FOTO });
+    await renderScreen(<CabecalhoDaConta email={longo} />, fake.fetchFn);
+    expect(await screen.findByText(longo)).toBeOnTheScreen();
+    expect(screen.getByText(longo).props.numberOfLines).toBe(1);
   });
 
   test('CT-APP-FOTO02: com foto oferece trocar e remover, e mostra a imagem no lugar da inicial', async () => {
