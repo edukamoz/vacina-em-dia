@@ -1,5 +1,7 @@
 import * as avisosNativo from './avisos-aparelho';
 import * as avisosWeb from './avisos-aparelho.web';
+import * as instalarNativo from './instalar-app';
+import * as instalarWeb from './instalar-app.web';
 import * as documentoNativo from './ler-documento';
 import * as documentoWeb from './ler-documento.web';
 
@@ -11,6 +13,7 @@ describe('variantes por plataforma (ADR-034)', () => {
   test.each([
     ['CT-PLAT-01', 'avisos-aparelho', avisosNativo, avisosWeb],
     ['CT-PLAT-02', 'ler-documento', documentoNativo, documentoWeb],
+    ['CT-PLAT-04', 'instalar-app', instalarNativo, instalarWeb],
   ] as const)('%s: %s.web exporta o mesmo que a versão do celular', (_id, _nome, nativo, web) => {
     expect(Object.keys(web).sort()).toEqual(Object.keys(nativo).sort());
   });
