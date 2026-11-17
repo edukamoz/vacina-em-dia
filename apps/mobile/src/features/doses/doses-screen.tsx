@@ -140,92 +140,110 @@ export function DosesScreen() {
     >
       <CarrosselDePessoas pessoas={items} selecionadaId={selected.id} aoEscolher={selectMember} />
       <LembretesCard />
-      {doses.data && (
-        <ResumoDoses nome={primeiroNome} contagem={contarDoses(doses.data.items, todayCivil())} />
-      )}
-      {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
-      {doses.error && (
-        <EstadoErro mensagem={doses.error.message} onTentarDeNovo={() => void doses.refetch()} />
-      )}
-      {animal && doses.data && doses.data.items.length === 0 && (
-        <EstadoVazio
-          titulo={`Nenhuma vacina de ${primeiroNome} cadastrada`}
-          descricao="Toque em Adicionar dose e informe a vacina e a data que o veterinário indicou. Dá para marcar que ela se repete, por exemplo todo ano."
-        />
-      )}
-      {grupos &&
-        !(animal && doses.data && doses.data.items.length === 0) &&
-        grupos.atencao.length + grupos.proximas.length === 0 && <Festa nome={primeiroNome} />}
-      {secoes.map(({ titulo, lista, rapida }) =>
-        lista.length === 0 ? null : (
-          <View key={titulo} className="gap-lg">
-            <Texto variante="titulo2" accessibilityRole="header">
-              {titulo}
-            </Texto>
-            <Grade>
-              {lista.map((dose) => (
-                <View key={dose.id} className="gap-md">
-                  <DoseCard
-                    dose={dose}
-                    aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
-                    {...(rapida && dose.status === 'OVERDUE'
-                      ? { aoAplicar: () => setAplicando(dose) }
-                      : {})}
-                  />
-                  {/* A confirmação aparece logo abaixo do cartão tocado, para a pessoa vê-la sem rolar. */}
-                  {aplicando?.id === dose.id && (
-                    <ConfirmarAplicacao
-                      dose={dose}
-                      aoFechar={() => setAplicando(null)}
-                      aoTrocarData={() => {
-                        setAplicando(null);
-                        router.push({ pathname: '/dose/[id]', params: { id: dose.id } });
-                      }}
-                    />
-                  )}
-                </View>
-              ))}
-            </Grade>
-          </View>
-        ),
-      )}
-      {aplicadasVisiveis.length > 0 && (
-        <View className="gap-lg">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Aplicadas, ${grupos?.aplicadas.length ?? 0}`}
-            accessibilityState={{ expanded: aplicadasAbertas }}
-            onPress={() => setVerAplicadas(!verAplicadas)}
-            className="min-h-principal flex-row items-center justify-between gap-md rounded-cartao border-fina border-bordaSuave bg-superficieSuave px-lg"
-          >
-            <Texto variante="titulo2" accessibilityRole="header" importantForAccessibility="no">
-              Aplicadas
-            </Texto>
-            <View className="flex-row items-center gap-sm">
-              <Texto variante="corpoNegrito" importantForAccessibility="no">
-                {String(grupos?.aplicadas.length ?? 0)}
-              </Texto>
-              <View style={{ transform: [{ rotate: aplicadasAbertas ? '90deg' : '0deg' }] }}>
-                <Icone nome="seta" cor={cores.textoSecundario} />
-              </View>
-            </View>
-          </Pressable>
-          {aplicadasAbertas && (
-            <Grade>
-              {aplicadasVisiveis.map((dose) => (
-                <DoseCard
-                  key={dose.id}
-                  dose={dose}
-                  aoAbrir={() => router.push({ pathname: '/dose/[id]', params: { id: dose.id } })}
-                />
-              ))}
-            </Grade>
+      {/* No computador (design v3): o resumo à esquerda e as doses em uma coluna à direita; no
+          celular e no tablet, tudo em uma coluna, na mesma ordem. */}
+      <View className="gap-xl expandido:flex-row expandido:items-start expandido:gap-xxl">
+        <View className="gap-xl expandido:w-[38%]">
+          {doses.data && (
+            <ResumoDoses
+              nome={primeiroNome}
+              contagem={contarDoses(doses.data.items, todayCivil())}
+            />
           )}
         </View>
-      )}
-      {grupos && grupos.aplicadas.length > LIMITE_APLICADAS && (
-        <LinkTexto titulo="Ver todas no Histórico" onPress={() => router.push('/historico')} />
-      )}
+        <View className="gap-xl expandido:flex-1">
+          {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
+          {doses.error && (
+            <EstadoErro
+              mensagem={doses.error.message}
+              onTentarDeNovo={() => void doses.refetch()}
+            />
+          )}
+          {animal && doses.data && doses.data.items.length === 0 && (
+            <EstadoVazio
+              titulo={`Nenhuma vacina de ${primeiroNome} cadastrada`}
+              descricao="Toque em Adicionar dose e informe a vacina e a data que o veterinário indicou. Dá para marcar que ela se repete, por exemplo todo ano."
+            />
+          )}
+          {grupos &&
+            !(animal && doses.data && doses.data.items.length === 0) &&
+            grupos.atencao.length + grupos.proximas.length === 0 && <Festa nome={primeiroNome} />}
+          {secoes.map(({ titulo, lista, rapida }) =>
+            lista.length === 0 ? null : (
+              <View key={titulo} className="gap-lg">
+                <Texto variante="titulo2" accessibilityRole="header">
+                  {titulo}
+                </Texto>
+                <Grade colunas={1}>
+                  {lista.map((dose) => (
+                    <View key={dose.id} className="gap-md">
+                      <DoseCard
+                        dose={dose}
+                        aoAbrir={() =>
+                          router.push({ pathname: '/dose/[id]', params: { id: dose.id } })
+                        }
+                        {...(rapida && dose.status === 'OVERDUE'
+                          ? { aoAplicar: () => setAplicando(dose) }
+                          : {})}
+                      />
+                      {/* A confirmação aparece logo abaixo do cartão tocado, para a pessoa vê-la sem rolar. */}
+                      {aplicando?.id === dose.id && (
+                        <ConfirmarAplicacao
+                          dose={dose}
+                          aoFechar={() => setAplicando(null)}
+                          aoTrocarData={() => {
+                            setAplicando(null);
+                            router.push({ pathname: '/dose/[id]', params: { id: dose.id } });
+                          }}
+                        />
+                      )}
+                    </View>
+                  ))}
+                </Grade>
+              </View>
+            ),
+          )}
+          {aplicadasVisiveis.length > 0 && (
+            <View className="gap-lg">
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Aplicadas, ${grupos?.aplicadas.length ?? 0}`}
+                accessibilityState={{ expanded: aplicadasAbertas }}
+                onPress={() => setVerAplicadas(!verAplicadas)}
+                className="min-h-principal flex-row items-center justify-between gap-md rounded-cartao border-fina border-bordaSuave bg-superficieSuave px-lg"
+              >
+                <Texto variante="titulo2" accessibilityRole="header" importantForAccessibility="no">
+                  Aplicadas
+                </Texto>
+                <View className="flex-row items-center gap-sm">
+                  <Texto variante="corpoNegrito" importantForAccessibility="no">
+                    {String(grupos?.aplicadas.length ?? 0)}
+                  </Texto>
+                  <View style={{ transform: [{ rotate: aplicadasAbertas ? '90deg' : '0deg' }] }}>
+                    <Icone nome="seta" cor={cores.textoSecundario} />
+                  </View>
+                </View>
+              </Pressable>
+              {aplicadasAbertas && (
+                <Grade colunas={1}>
+                  {aplicadasVisiveis.map((dose) => (
+                    <DoseCard
+                      key={dose.id}
+                      dose={dose}
+                      aoAbrir={() =>
+                        router.push({ pathname: '/dose/[id]', params: { id: dose.id } })
+                      }
+                    />
+                  ))}
+                </Grade>
+              )}
+            </View>
+          )}
+          {grupos && grupos.aplicadas.length > LIMITE_APLICADAS && (
+            <LinkTexto titulo="Ver todas no Histórico" onPress={() => router.push('/historico')} />
+          )}
+        </View>
+      </View>
       {grupos && <ConviteDeInstalacao dosesAplicadas={grupos.aplicadas.length} />}
       {doses.data && <BaixarCarteira memberId={selected.id} nome={primeiroNome} />}
       {animal ? null : (
