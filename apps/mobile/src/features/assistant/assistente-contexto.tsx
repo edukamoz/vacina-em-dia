@@ -13,8 +13,8 @@ export interface AssistenteContextoValor {
 const AssistenteContexto = createContext<AssistenteContextoValor | null>(null);
 
 /**
- * Guarda se a janela do assistente está aberta (Context API, ADR-006). O botão flutuante e o item
- * do menu abrem a janela; o botão "Fechar" a minimiza.
+ * Guarda se a janela do assistente está aberta (Context API, ADR-006). O botão do microfone da barra
+ * de navegação abre a janela; o botão "Fechar" a minimiza.
  *
  * @param props.inicialmenteAberto - Estado inicial; útil nos testes.
  */

@@ -120,11 +120,7 @@ export function UnitsScreen() {
   const receivedOn = units.receivedAt ? formatCivilDate(units.receivedAt.slice(0, 10)) : null;
 
   return (
-    <Tela
-      reservaBalao
-      titulo="Postos de saúde"
-      subtitulo="Unidades básicas de saúde perto de você."
-    >
+    <Tela emAba titulo="Postos de saúde" subtitulo="Unidades básicas de saúde perto de você.">
       <View className="flex-col-reverse gap-xl expandido:flex-row expandido:items-start">
         <View className="gap-lg expandido:w-[400px]">
           <Botao

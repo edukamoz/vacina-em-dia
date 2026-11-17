@@ -70,7 +70,7 @@ export function FamilyScreen() {
 
   return (
     <Tela
-      reservaBalao
+      emAba
       titulo="Família"
       acao={
         <Botao titulo="Adicionar pessoa" icone="mais" onPress={() => router.push('/membro/novo')} />

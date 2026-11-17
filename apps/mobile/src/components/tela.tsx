@@ -1,10 +1,8 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ID_DO_CONTEUDO } from '../lib/pular-conteudo';
-import { botaoRecolhido, definirBotaoRecolhido } from '../lib/rolagem-balao';
 import { useVisual } from '../theme/theme-provider';
 import { Children } from 'react';
 import { Entrada } from './animacao';
@@ -24,8 +22,8 @@ import { Texto } from './texto';
  * @param props.acao - Ação principal da tela (botão). No computador fica à direita do título; no
  *   celular, logo abaixo dele, em largura total.
  * @param props.abaixoDoTitulo - Conteúdo colado ao título, como o link "Trocar pessoa".
- * @param props.reservaBalao - Deixa espaço no fim para o balão do assistente não cobrir o conteúdo
- *   (telas das abas).
+ * @param props.emAba - Tela de uma das abas: a barra de navegação já cuida da borda de baixo e da
+ *   barra do sistema, então a moldura não repete essa folga.
  * @param props.modal - Mostra a tela como janela por cima da anterior (`JanelaModal`), em vez de
  *   página inteira. Use nas telas de formulário e detalhe abertas a partir de outra tela.
  */
@@ -35,7 +33,7 @@ export function Tela({
   voltar = false,
   acao,
   abaixoDoTitulo,
-  reservaBalao = false,
+  emAba = false,
   modal = false,
   children,
 }: {
@@ -44,23 +42,13 @@ export function Tela({
   voltar?: boolean;
   acao?: ReactNode;
   abaixoDoTitulo?: ReactNode;
-  reservaBalao?: boolean;
+  emAba?: boolean;
   modal?: boolean;
   children: ReactNode;
 }) {
   const router = useRouter();
   const { gradienteFundo } = useVisual();
   const [travada, setTravada] = useState(false);
-  const ultimoY = useRef(0);
-  const recolhido = useRef(false);
-  // Nas telas de aba o botão do assistente se recolhe ao rolar para baixo; ao sair da tela volta.
-  useEffect(() => () => definirBotaoRecolhido(false), []);
-  const aoRolar = (evento: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = evento.nativeEvent.contentOffset.y;
-    recolhido.current = botaoRecolhido(y, ultimoY.current, recolhido.current);
-    ultimoY.current = y;
-    definirBotaoRecolhido(recolhido.current);
-  };
   if (modal) {
     return (
       <JanelaModal
@@ -79,7 +67,7 @@ export function Tela({
     <SafeAreaView
       className="flex-1 bg-fundo"
       style={gradienteFundo}
-      edges={reservaBalao ? ['top', 'left', 'right'] : ['top', 'bottom', 'left', 'right']}
+      edges={emAba ? ['top', 'left', 'right'] : ['top', 'bottom', 'left', 'right']}
     >
       <RolagemDaTelaContext.Provider value={setTravada}>
         <RolagemComTeclado
@@ -87,10 +75,7 @@ export function Tela({
           testID="rolagem-da-tela"
           tabIndex={-1}
           scrollEnabled={!travada}
-          {...(reservaBalao ? { onScroll: aoRolar, scrollEventThrottle: 16 } : {})}
-          contentContainerClassName={`gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem ${
-            reservaBalao ? 'pb-[96px]' : ''
-          }`}
+          contentContainerClassName="gap-xl p-lg medio:p-xl expandido:gap-xxl expandido:p-xxl self-center w-full max-w-conteudoComMargem"
         >
           {voltar ? (
             <Botao

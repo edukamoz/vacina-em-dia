@@ -74,14 +74,14 @@ export function DosesScreen() {
 
   if (members.isPending) {
     return (
-      <Tela titulo="Doses" reservaBalao>
+      <Tela titulo="Doses" emAba>
         <EstadoCarregando rotulo="Carregando a família" />
       </Tela>
     );
   }
   if (members.error) {
     return (
-      <Tela titulo="Doses" reservaBalao>
+      <Tela titulo="Doses" emAba>
         <EstadoErro
           mensagem={members.error.message}
           onTentarDeNovo={() => void members.refetch()}
@@ -91,7 +91,7 @@ export function DosesScreen() {
   }
   if (!selected) {
     return (
-      <Tela titulo="Doses" reservaBalao>
+      <Tela titulo="Doses" emAba>
         <EstadoVazio
           titulo="Nenhuma pessoa cadastrada"
           descricao="Adicione alguém da família para ver as vacinas indicadas para a idade."
@@ -115,7 +115,7 @@ export function DosesScreen() {
 
   return (
     <Tela
-      reservaBalao
+      emAba
       titulo={`Doses de ${primeiroNome}`}
       acao={
         <View className="flex-row flex-wrap gap-md">

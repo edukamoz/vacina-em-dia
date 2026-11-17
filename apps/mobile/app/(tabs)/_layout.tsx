@@ -1,6 +1,5 @@
 import { Redirect, Tabs } from 'expo-router';
 import { useWindowDimensions, View } from 'react-native';
-import { BalaoAssistente } from '../../src/components/balao-assistente';
 import { ABAS, BarraDeNavegacao } from '../../src/components/barra-de-navegacao';
 import { EstadoCarregando, EstadoErro } from '../../src/components/estados';
 import { Tela } from '../../src/components/tela';
@@ -57,7 +56,6 @@ export default function TabsLayout() {
             <Tabs.Screen key={name} name={name} options={{ title: titulo }} />
           ))}
         </Tabs>
-        <BalaoAssistente />
         <JanelaDoAssistente />
         <AgendadorDeAvisos />
       </View>

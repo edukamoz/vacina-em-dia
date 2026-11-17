@@ -106,7 +106,7 @@ export function AccountScreen() {
   const celular = modoDeLayout(useWindowDimensions().width) === 'compacto';
 
   return (
-    <Tela reservaBalao titulo="Conta">
+    <Tela emAba titulo="Conta">
       <CabecalhoDaConta email={email} />
 
       {celular ? (

@@ -88,7 +88,7 @@ describe('navegação principal', () => {
   );
 
   test.each([390, 800, 1280])(
-    'CT-LAY-10: com %i px o assistente não é item do menu (o botão flutuante abre a janela)',
+    'CT-LAY-10: com %i px o assistente é um botão da barra (não um link de página) que abre a janela',
     async (largura) => {
       await abrir(
         <AssistenteProvider>
@@ -96,11 +96,54 @@ describe('navegação principal', () => {
           <Estado />
         </AssistenteProvider>,
       );
-      expect(screen.queryByRole('button', { name: 'Assistente' })).not.toBeOnTheScreen();
-      expect(screen.queryByRole('link', { name: 'Assistente' })).not.toBeOnTheScreen();
+      expect(screen.queryByRole('link', { name: /Assistente/ })).not.toBeOnTheScreen();
       expect(screen.getByText('janela fechada')).toBeOnTheScreen();
+      await fireEvent.press(screen.getByRole('button', { name: 'Abrir o assistente' }));
+      expect(screen.getByText('janela aberta')).toBeOnTheScreen();
     },
   );
+
+  test('CT-LAY-27: no celular o microfone fica no centro, entre as duas primeiras e as duas últimas abas', async () => {
+    await abrir(
+      <AssistenteProvider>
+        <BarraDeNavegacao largura={390} />
+      </AssistenteProvider>,
+    );
+    const ordem = screen
+      .getAllByRole(/link|button/)
+      .map((item) => item.props.accessibilityLabel as string);
+    expect(ordem).toEqual(['Doses', 'Família', 'Abrir o assistente', 'Histórico', 'Conta']);
+  });
+
+  test('CT-LAY-28: o botão do assistente tem rótulo e dica para o leitor de tela', async () => {
+    await abrir(
+      <AssistenteProvider>
+        <BarraDeNavegacao largura={390} />
+      </AssistenteProvider>,
+    );
+    const botao = screen.getByRole('button', { name: 'Abrir o assistente' });
+    expect(botao.props.accessibilityHint).toBe('Pergunte sobre vacinas por voz ou por texto');
+  });
+
+  test('CT-LAY-29: no computador o assistente ganha texto ("Assistente" e "Fale ou escreva")', async () => {
+    await abrir(
+      <AssistenteProvider>
+        <BarraDeNavegacao largura={1280} />
+      </AssistenteProvider>,
+    );
+    expect(screen.getByText('Assistente')).toBeOnTheScreen();
+    expect(screen.getByText('Fale ou escreva')).toBeOnTheScreen();
+  });
+
+  test('CT-LAY-30: no tablet o assistente é só o círculo, sem texto que estoure a barra estreita', async () => {
+    await abrir(
+      <AssistenteProvider>
+        <BarraDeNavegacao largura={800} />
+      </AssistenteProvider>,
+    );
+    expect(screen.queryByText('Fale ou escreva')).not.toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Abrir o assistente' })).toBeOnTheScreen();
+  });
   test.each([800, 1280])(
     'CT-LAY-23: com %i px o Sair fica na barra lateral, junto da aba Conta',
     async (largura) => {
