@@ -21,10 +21,18 @@ updates:
       prefix: 'chore'
       include: scope
     ignore:
+      # Pacotes do Expo seguem o SDK (`npx expo install --fix`), numa manutenção planejada: as
+      # atualizações de correção do grupo (PR 323) trocam a posição do `expo-modules-core` no lock e
+      # quebram os testes (o `jest-expo` o importa sem declarar). Segurança continua chegando.
       - dependency-name: 'expo*'
-        update-types: ['version-update:semver-major']
       - dependency-name: '@expo/*'
-        update-types: ['version-update:semver-major']
+      # Fixados pelo SDK do Expo: o async-storage 3 (PR 330) é versão maior da biblioteca nativa.
+      - dependency-name: '@react-native-async-storage/async-storage'
+      # O axe-core 4.14 passou a reprovar o rótulo que não contém o texto visível (WCAG 2.5.3,
+      # `label-content-name-mismatch`) em botões e cartões do app (PR 328). Corrigir os nomes
+      # acessíveis é tarefa própria; só depois sobe o axe.
+      - dependency-name: '@axe-core/playwright'
+        update-types: ['version-update:semver-minor']
       - dependency-name: 'jest-expo'
         update-types: ['version-update:semver-major']
       # React, React Native e as bibliotecas nativas (Reanimated, Screens, SVG, WebView...) seguem as
@@ -46,9 +54,6 @@ updates:
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
     groups:
-      expo:
-        patterns: ['expo*', '@expo/*']
-        update-types: ['minor', 'patch']
       testes:
         patterns: ['jest*', '@types/*', '@testing-library/*', 'playwright*', '@playwright/*']
         update-types: ['minor', 'patch']
