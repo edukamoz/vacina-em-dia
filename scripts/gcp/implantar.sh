@@ -111,13 +111,14 @@ echo ">> 7/7 Rotinas agendadas (Cloud Scheduler: 3 tarefas gratuitas por conta)"
 agendar() { # nome, cron, caminho
   local comum=(--location="${REGIAO}" --schedule="$2" --time-zone=UTC --uri="${URL_API}$3"
     --http-method=POST)
+  # A saída do gcloud mostraria a chave das rotinas na tela; por isso vai para /dev/null.
   # O update usa --update-headers (o create usa --headers); por isso os dois caminhos são separados.
   if gcloud scheduler jobs describe "$1" --location="${REGIAO}" >/dev/null 2>&1; then
     gcloud scheduler jobs update http "$1" "${comum[@]}" \
-      --update-headers="x-functions-key=${CHAVE_FUNCAO}" --quiet
+      --update-headers="x-functions-key=${CHAVE_FUNCAO}" --quiet >/dev/null
   else
     gcloud scheduler jobs create http "$1" "${comum[@]}" \
-      --headers="x-functions-key=${CHAVE_FUNCAO}" --quiet
+      --headers="x-functions-key=${CHAVE_FUNCAO}" --quiet >/dev/null
   fi
 }
 agendar vacina-lembretes "0 11 * * *" /api/jobs/daily-reminders      # 8h em Brasília
