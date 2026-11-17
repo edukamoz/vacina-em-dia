@@ -61,8 +61,8 @@ export function JanelaModal({
     }
     const animacao = Animated.timing(progresso, {
       toValue: 1,
-      duration: DURACAO.enfatica,
-      easing: CURVA.saida,
+      duration: DURACAO.passo,
+      easing: CURVA.padrao,
       useNativeDriver: USA_DRIVER_NATIVO,
     });
     animacao.start();

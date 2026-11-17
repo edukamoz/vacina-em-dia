@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { Animated, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useMovimentoReduzido } from '../theme/theme-provider';
-import { CURVA, USA_DRIVER_NATIVO, VistaAnimada } from './animacao';
+import { CURVA, DURACAO, USA_DRIVER_NATIVO, VistaAnimada } from './animacao';
 
 const CaminhoAnimado = Animated.createAnimatedComponent(Path);
 
@@ -30,8 +30,8 @@ export function VistoDesenhado({ cor, tamanho = 24 }: { cor: string; tamanho?: n
     }
     const animacao = Animated.timing(traco, {
       toValue: 0,
-      duration: 520,
-      easing: CURVA.saida,
+      duration: DURACAO.enfase,
+      easing: CURVA.padrao,
       useNativeDriver: false,
     });
     animacao.start();
@@ -83,9 +83,9 @@ export function AparecerComMola({
     }
     const animacao = Animated.timing(escala, {
       toValue: 1,
-      duration: 500,
+      duration: DURACAO.enfase,
       delay: atraso,
-      easing: CURVA.mola,
+      easing: CURVA.salto,
       useNativeDriver: USA_DRIVER_NATIVO,
     });
     animacao.start();

@@ -8,23 +8,25 @@ import {
   type ScrollViewProps,
   type ViewProps,
 } from 'react-native';
+import tokensJson from '../../../../docs/04-design-system/tokens.json';
 import { useMovimentoReduzido } from '../theme/theme-provider';
 
-/** Durações do design system, em milissegundos (`duracoes` em `tokens.json`). */
-export const DURACAO = {
-  rapida: 120,
-  padrao: 200,
-  enfatica: 320,
-  lenta: 400,
-  suave: 450,
-  passo: 50,
-} as const;
+/**
+ * Durações do design system, em milissegundos (`duracoes` em `tokens.json`, régua de movimento do
+ * ADR-037): escalonamento 40, micro 80, rapida 150, passo 250, media 350, lenta 400, enfase 500.
+ */
+export const DURACAO = tokensJson.duracoes;
 
-/** Curvas do design system (`curvas` em `tokens.json`). */
+/** Curva padrão em CSS (`curvas.padrao`), para os poucos efeitos feitos com `transition` na web. */
+export const CURVA_CSS = tokensJson.curvas.padrao;
+
+/**
+ * Curvas do design system (`curvas` em `tokens.json`): `padrao` para tudo que abre, fecha, desliza
+ * ou muda de tamanho; `salto` só para entradas curtas (visto, interruptor, número), nunca em saída.
+ */
 export const CURVA = {
-  padrao: Easing.bezier(0.2, 0, 0, 1),
-  saida: Easing.bezier(0.2, 0.8, 0.2, 1),
-  mola: Easing.bezier(0.34, 1.56, 0.64, 1),
+  padrao: Easing.bezier(0.22, 1, 0.36, 1),
+  salto: Easing.bezier(0.34, 1.35, 0.64, 1),
 } as const;
 
 // O `Animated` do React Native força `collapsable={false}` em tudo que anima; na web esse atributo
@@ -56,7 +58,7 @@ export const USA_DRIVER_NATIVO = Platform.OS !== 'web';
 const MAXIMO_ESCALONADO = 8;
 
 /**
- * Entrada de um bloco ao trocar de tela: sobe 14 px e aparece, com um pequeno atraso por posição
+ * Entrada de um bloco ao trocar de tela: sobe 14 px e aparece em 350 ms, com 40 ms de atraso por posição
  * (até 8 itens). Com "Reduzir movimento" o bloco já aparece pronto, sem nenhuma camada extra.
  *
  * @param props.indice - Posição do bloco na tela, que define o atraso.
@@ -72,9 +74,9 @@ export function Entrada({ indice = 0, children }: { indice?: number; children: R
     }
     const animacao = Animated.timing(progresso, {
       toValue: 1,
-      duration: DURACAO.enfatica,
-      delay: Math.min(indice, MAXIMO_ESCALONADO - 1) * DURACAO.passo,
-      easing: CURVA.saida,
+      duration: DURACAO.media,
+      delay: Math.min(indice, MAXIMO_ESCALONADO - 1) * DURACAO.escalonamento,
+      easing: CURVA.padrao,
       useNativeDriver: USA_DRIVER_NATIVO,
     });
     animacao.start();
@@ -118,7 +120,7 @@ export function useProgresso(final: number, duracao: number): number {
     const animacao = Animated.timing(animado, {
       toValue: final,
       duration: duracao,
-      easing: CURVA.saida,
+      easing: CURVA.padrao,
       useNativeDriver: false,
     });
     animacao.start();

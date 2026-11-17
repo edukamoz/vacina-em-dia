@@ -151,8 +151,8 @@ describe('tokens do design system', () => {
     expect(getBackgroundGradient('highContrast')).toBe('#ffffff');
   });
 
-  test('CT-TOK-12: a versão 3.0.0 traz os raios do redesenho e mantém as cores da 2.0.0', () => {
-    expect(tokensJson.versao).toBe('3.0.0');
+  test('CT-TOK-12: a versão 3.1.0 traz os raios do redesenho e mantém as cores da 2.0.0', () => {
+    expect(tokensJson.versao).toBe('3.1.0');
     expect(tokensJson.raios).toMatchObject({
       campo: 16,
       botao: 18,
@@ -166,11 +166,21 @@ describe('tokens do design system', () => {
     expect(getThemeColors('dark').primaria).toBe('#6fd0aa');
   });
 
-  test('CT-TOK-13: as durações do movimento suave ficam entre 120 e 450 ms', () => {
-    expect(tokensJson.duracoes).toMatchObject({ rapida: 120, padrao: 200, suave: 450, passo: 50 });
-    for (const ms of Object.values(tokensJson.duracoes)) {
-      expect(ms).toBeGreaterThanOrEqual(50);
-      expect(ms).toBeLessThanOrEqual(450);
-    }
+  test('CT-TOK-13: a régua de movimento tem sete durações em ordem crescente e duas curvas (ADR-037)', () => {
+    expect(tokensJson.duracoes).toEqual({
+      escalonamento: 40,
+      micro: 80,
+      rapida: 150,
+      passo: 250,
+      media: 350,
+      lenta: 400,
+      enfase: 500,
+    });
+    const valores = Object.values(tokensJson.duracoes);
+    expect([...valores].sort((a, b) => a - b)).toEqual(valores);
+    expect(tokensJson.curvas).toEqual({
+      padrao: 'cubic-bezier(.22,1,.36,1)',
+      salto: 'cubic-bezier(.34,1.35,.64,1)',
+    });
   });
 });
