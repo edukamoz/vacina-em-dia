@@ -7,6 +7,9 @@
 set -e
 if [ -f /segredos/host.json ]; then
   mkdir -p /azure-functions-host/Secrets
-  cp /segredos/host.json /azure-functions-host/Secrets/host.json
+  # cat e não cp: o volume de segredos do Cloud Run é virtual e o cp aborta com "replaced while
+  # being copied". O -s confere que o arquivo não ficou vazio.
+  cat /segredos/host.json > /azure-functions-host/Secrets/host.json
+  [ -s /azure-functions-host/Secrets/host.json ] || { echo "chaves do host vazias" >&2; exit 1; }
 fi
 exec /opt/startup/start_nonappservice.sh "$@"
