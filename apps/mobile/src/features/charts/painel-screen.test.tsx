@@ -70,6 +70,7 @@ describe('painel de gráficos (B60)', () => {
     expect(screen.queryByText('Por pessoa')).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Toda a família' }));
     expect(screen.getByText('Por pessoa')).toBeOnTheScreen();
+    expect(screen.getByText('A situação das vacinas da família, em gráficos.')).toBeOnTheScreen();
   });
 
   test('CT-APP-GRA03: tocar num estado da legenda o destaca (o centro mostra o número dele)', async () => {

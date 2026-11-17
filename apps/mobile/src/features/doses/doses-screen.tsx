@@ -2,6 +2,7 @@ import type { DoseResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
+import { Atalho } from '../../components/atalho';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
@@ -226,52 +227,22 @@ export function DosesScreen() {
       )}
       {doses.data && <BaixarCarteira memberId={selected.id} nome={primeiroNome} />}
       {animal ? null : (
-        <Pressable
-          accessibilityRole="link"
-          accessibilityLabel="Vou viajar. Monte um roteiro de vacinas para a viagem."
-          onPress={() => router.push('/viagem')}
-          className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
-        >
-          <View
-            aria-hidden
-            className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
-          >
-            <Icone nome="local" cor={cores.primaria} />
-          </View>
-          <View className="flex-1">
-            <Texto variante="titulo3" importantForAccessibility="no">
-              Vou viajar
-            </Texto>
-            <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-              Veja o que conferir antes da viagem.
-            </Texto>
-          </View>
-          <Icone nome="seta" cor={cores.textoSecundario} />
-        </Pressable>
+        <Atalho
+          icone="local"
+          titulo="Vou viajar"
+          apoio="Veja o que conferir antes da viagem."
+          rotuloAcessivel="Vou viajar. Monte um roteiro de vacinas para a viagem."
+          aoAbrir={() => router.push('/viagem')}
+        />
       )}
       {animal ? null : (
-        <Pressable
-          accessibilityRole="link"
-          accessibilityLabel="Postos de saúde perto de você. Veja no mapa onde tomar as doses."
-          onPress={() => router.push('/postos')}
-          className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
-        >
-          <View
-            aria-hidden
-            className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
-          >
-            <Icone nome="local" cor={cores.primaria} />
-          </View>
-          <View className="flex-1">
-            <Texto variante="titulo3" importantForAccessibility="no">
-              Postos de saúde perto de você
-            </Texto>
-            <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-              Veja no mapa onde tomar as doses.
-            </Texto>
-          </View>
-          <Icone nome="seta" cor={cores.textoSecundario} />
-        </Pressable>
+        <Atalho
+          icone="local"
+          titulo="Postos de saúde perto de você"
+          apoio="Veja no mapa onde tomar as doses."
+          rotuloAcessivel="Postos de saúde perto de você. Veja no mapa onde tomar as doses."
+          aoAbrir={() => router.push('/postos')}
+        />
       )}
       {animal ? null : <NovidadesCard />}
       {animal ? (

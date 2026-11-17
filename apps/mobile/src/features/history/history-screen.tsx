@@ -1,18 +1,18 @@
 import type { CivilDate, DoseResponse, MemberResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { Pressable, useWindowDimensions, View } from 'react-native';
+import { Atalho } from '../../components/atalho';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
-import { Icone } from '../../components/icone';
 import { QuadroEstado } from '../../components/quadro-estado';
 import { SeloEstadoDose } from '../../components/selo-estado-dose';
 import { SeloOrigem } from '../../components/selo-origem';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { modoDeLayout } from '../../lib/layout';
-import { useThemeColors, useVisual } from '../../theme/theme-provider';
+import { useVisual } from '../../theme/theme-provider';
 import { useConferenciaDoCalendario, useDosesOfMembers, useMembers } from '../data/hooks';
 import { formatCivilDate } from '../doses/format-date';
 
@@ -162,7 +162,6 @@ export function HistoryScreen() {
   const conferencia = useConferenciaDoCalendario();
   const router = useRouter();
   const largura = useWindowDimensions().width;
-  const cores = useThemeColors();
   const members = useMembers();
   const pessoas = members.data?.items ?? [];
   const doses = useDosesOfMembers(pessoas.map((pessoa) => pessoa.id));
@@ -209,28 +208,12 @@ export function HistoryScreen() {
 
   return (
     <Tela emAba titulo="Histórico">
-      <Pressable
-        accessibilityRole="link"
-        accessibilityLabel="Painel de gráficos. Veja a situação das vacinas da família em gráficos."
-        onPress={() => router.push('/painel')}
-        className="flex-row items-center gap-md rounded-cartao border-fina border-bordaSuave bg-superficie p-lg hover:bg-superficieSuave"
-      >
-        <View
-          aria-hidden
-          className="h-[44px] w-[44px] items-center justify-center rounded-[14px] border-padrao border-primaria bg-primariaSuave"
-        >
-          <Icone nome="historico" cor={cores.primaria} />
-        </View>
-        <View className="flex-1">
-          <Texto variante="titulo3" importantForAccessibility="no">
-            Painel de gráficos
-          </Texto>
-          <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-            Veja a situação das vacinas da família em gráficos.
-          </Texto>
-        </View>
-        <Icone nome="seta" cor={cores.textoSecundario} />
-      </Pressable>
+      <Atalho
+        icone="historico"
+        titulo="Painel de gráficos"
+        apoio="Veja a situação das vacinas da família em gráficos."
+        aoAbrir={() => router.push('/painel')}
+      />
       {carregando && <EstadoCarregando rotulo="Carregando o histórico" />}
       {falha?.error && (
         <EstadoErro
