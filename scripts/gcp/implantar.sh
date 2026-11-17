@@ -109,11 +109,16 @@ gcloud run services update vacina-api --region="${REGIAO}" --quiet \
 
 echo ">> 7/7 Rotinas agendadas (Cloud Scheduler: 3 tarefas gratuitas por conta)"
 agendar() { # nome, cron, caminho
-  local args=(--location="${REGIAO}" --schedule="$2" --time-zone=UTC --uri="${URL_API}$3"
-    --http-method=POST --headers="x-functions-key=${CHAVE_FUNCAO}")
-  gcloud scheduler jobs describe "$1" --location="${REGIAO}" >/dev/null 2>&1 &&
-    gcloud scheduler jobs update http "$1" "${args[@]}" --quiet ||
-    gcloud scheduler jobs create http "$1" "${args[@]}" --quiet
+  local comum=(--location="${REGIAO}" --schedule="$2" --time-zone=UTC --uri="${URL_API}$3"
+    --http-method=POST)
+  # O update usa --update-headers (o create usa --headers); por isso os dois caminhos são separados.
+  if gcloud scheduler jobs describe "$1" --location="${REGIAO}" >/dev/null 2>&1; then
+    gcloud scheduler jobs update http "$1" "${comum[@]}" \
+      --update-headers="x-functions-key=${CHAVE_FUNCAO}" --quiet
+  else
+    gcloud scheduler jobs create http "$1" "${comum[@]}" \
+      --headers="x-functions-key=${CHAVE_FUNCAO}" --quiet
+  fi
 }
 agendar vacina-lembretes "0 11 * * *" /api/jobs/daily-reminders      # 8h em Brasília
 agendar vacina-vigia "0 12 * * 1" /api/calendar/watch/check          # segunda, 9h em Brasília
