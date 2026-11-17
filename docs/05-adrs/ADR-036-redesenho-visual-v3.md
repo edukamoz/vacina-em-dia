@@ -39,7 +39,7 @@ O protótipo aprovado está no Claude (quadro "Vacina em Dia: novo design", priv
 
 - **Foto por pessoa** (o protótipo mostra fotos nos membros). Hoje só existe a foto de perfil da conta. Foto por pessoa seria funcionalidade nova, com implicação de LGPD (dado de criança): vai para o B78 e **não entra** no redesenho; os membros ficam com avatar de inicial e cor.
 - **Ação rápida "Aplicar".** Registra a aplicação **com a data de hoje** (regra: aplicar exige data menor ou igual a hoje) e mostra um passo de confirmação com a data e a opção de trocá-la, antes de gravar. Proposta do plano; vale como aceita se o autor não pedir outra.
-- **Fonte.** A variante "Atkinson Hyperlegible Next" será testada no PR 1 (zero sem corte). Só entra se a licença permitir e o pacote do Expo a trouxer; senão, fica a fonte atual e a nota sobre o zero.
+- **Fonte.** A variante "Atkinson Hyperlegible Next" será testada no PR 1 (zero sem corte). Só entra se a licença permitir e o pacote do Expo a trouxer; senão, fica a fonte atual e a nota sobre o zero. Conferido em 16/11/2026: existe o pacote `@expo-google-fonts/atkinson-hyperlegible-next` (versão 0.4.1, licenças MIT e OFL-1.1). Como é dependência nova, **não foi instalada**: depende da autorização do autor.
 - **Conta.** Só entram os controles que já existem. Os interruptores de lembrete do protótipo são ilustrativos.
 
 ## Alternativas consideradas

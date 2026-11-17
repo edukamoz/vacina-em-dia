@@ -27,6 +27,7 @@ export function UnitMap({ units, selectedCnes, position, onSelect }: UnitMapProp
         stroke: cores.sobrePrimaria,
       },
       positionColor: cores.agendada,
+      // eslint-disable-next-line no-restricted-syntax -- opção da biblioteca do mapa, fora do tema
       positionRing: '#ffffff',
       onSelect: (cnes) => onSelectRef.current(cnes),
     });

@@ -3,8 +3,11 @@ import { useMovimentoReduzido, useThemeColors, useVisual } from '../theme/theme-
 import { Icone, type NomeDoIcone } from './icone';
 import { Texto } from './texto';
 
-/** Tipo de botão: principal (no máximo um por tela), secundário ou perigo. */
-export type BotaoVariante = 'principal' | 'secundario' | 'perigo';
+/**
+ * Tipo de botão (ADR-036): principal (no máximo um por tela), secundário, perigo (caixa de
+ * confirmação), texto (ação de menor peso) e texto de perigo (cancelar e excluir fora da confirmação).
+ */
+export type BotaoVariante = 'principal' | 'secundario' | 'perigo' | 'texto' | 'perigoTexto';
 
 const ESTILOS: Readonly<Record<BotaoVariante, { caixa: string; texto: string }>> = {
   principal: {
@@ -13,6 +16,8 @@ const ESTILOS: Readonly<Record<BotaoVariante, { caixa: string; texto: string }>>
   },
   secundario: { caixa: 'min-h-principal bg-superficie border-borda', texto: 'text-texto' },
   perigo: { caixa: 'min-h-principal bg-erroSuave border-erro', texto: 'text-erro' },
+  texto: { caixa: 'min-h-toque bg-transparent border-transparent', texto: 'text-primaria' },
+  perigoTexto: { caixa: 'min-h-toque bg-transparent border-transparent', texto: 'text-erro' },
 };
 
 /**
@@ -20,12 +25,17 @@ const ESTILOS: Readonly<Record<BotaoVariante, { caixa: string; texto: string }>>
  *
  * @param variante - Tipo de botão.
  * @param desativado - Botão desativado (não vale para "carregando", que mantém a aparência normal).
+ * @param compacto - Altura de 48 dp no lugar de 56 dp (ação rápida dentro de um cartão).
  */
 export function classesDoBotao(
   variante: BotaoVariante,
   desativado: boolean,
+  compacto = false,
 ): { readonly caixa: string; readonly texto: string } {
-  return desativado ? ESTILO_DESATIVADO : ESTILOS[variante];
+  const estilo = desativado ? ESTILO_DESATIVADO : ESTILOS[variante];
+  return compacto
+    ? { ...estilo, caixa: estilo.caixa.replace('min-h-principal', 'min-h-toque') }
+    : estilo;
 }
 
 /**
@@ -45,6 +55,7 @@ const ESTILO_DESATIVADO = {
  * @param props.titulo - Texto do botão (também é o rótulo de acessibilidade).
  * @param props.variante - Tipo de botão; por padrão `principal`.
  * @param props.icone - Ícone opcional à esquerda do texto (decorativo; o texto continua sendo o rótulo).
+ * @param props.tamanho - `compacto` (48 dp) para a ação rápida dentro de um cartão; `padrao` (56 dp).
  * @param props.selecionado - Para botões de escolha (tema, pessoa): anuncia o item escolhido.
  * @param props.carregando - Ação em andamento: mostra um indicador no lugar do ícone, bloqueia o
  *   toque, anuncia "ocupado" ao leitor de tela e mantém a aparência normal do botão.
@@ -54,6 +65,7 @@ const ESTILO_DESATIVADO = {
 export function Botao({
   titulo,
   variante = 'principal',
+  tamanho = 'padrao',
   icone,
   selecionado,
   carregando = false,
@@ -62,19 +74,26 @@ export function Botao({
 }: Omit<PressableProps, 'children'> & {
   titulo: string;
   variante?: BotaoVariante;
+  tamanho?: 'padrao' | 'compacto';
   icone?: NomeDoIcone;
   selecionado?: boolean;
   carregando?: boolean;
 }) {
   const desativado = Boolean(disabled) && !carregando;
   const bloqueado = Boolean(disabled) || carregando;
-  const estilo = classesDoBotao(variante, desativado);
+  const estilo = classesDoBotao(variante, desativado, tamanho === 'compacto');
   const cores = useThemeColors();
   const reduzido = useMovimentoReduzido();
   const { altoContraste, gradienteMarca, sombra } = useVisual();
   const corDoIcone = desativado
     ? cores.textoSecundario
-    : { principal: cores.sobrePrimaria, secundario: cores.texto, perigo: cores.erro }[variante];
+    : {
+        principal: cores.sobrePrimaria,
+        secundario: cores.texto,
+        perigo: cores.erro,
+        texto: cores.primaria,
+        perigoTexto: cores.erro,
+      }[variante];
   return (
     <Pressable
       accessibilityRole="button"

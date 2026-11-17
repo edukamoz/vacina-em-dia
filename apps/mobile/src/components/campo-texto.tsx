@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 import { useTheme } from '../theme/theme-provider';
 import { getThemeColors } from '../theme/tokens';
@@ -21,6 +21,7 @@ export function CampoTexto({
   ajuda,
   aoLado,
   onFocus,
+  onBlur,
   ...rest
 }: Omit<TextInputProps, 'accessibilityLabel'> & {
   rotulo: string;
@@ -30,6 +31,7 @@ export function CampoTexto({
 }) {
   const { theme } = useTheme();
   const campo = useRef<TextInput>(null);
+  const [focado, setFocado] = useState(false);
   const rolarParaCampo = useRolarParaCampo();
   return (
     <View className="gap-sm">
@@ -40,13 +42,18 @@ export function CampoTexto({
           onFocus={(evento) => {
             // Com o teclado aberto, rola a tela até o campo para a pessoa ver o que digita.
             rolarParaCampo?.(campo.current);
+            setFocado(true);
             onFocus?.(evento);
+          }}
+          onBlur={(evento) => {
+            setFocado(false);
+            onBlur?.(evento);
           }}
           accessibilityLabel={rotulo}
           placeholderTextColor={getThemeColors(theme).textoSecundario}
           className={`min-h-principal rounded-campo border-padrao bg-superficie py-sm pl-lg text-corpo font-regular text-texto ${
             aoLado ? 'pr-[112px]' : 'pr-lg'
-          } ${erro ? 'border-erro' : 'border-borda'}`}
+          } ${erro ? 'border-erro' : focado ? 'border-primaria' : 'border-borda'}`}
           {...rest}
         />
         {aoLado ? <View className="absolute right-xs">{aoLado}</View> : null}

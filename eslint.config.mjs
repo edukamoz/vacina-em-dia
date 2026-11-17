@@ -114,5 +114,25 @@ export default tseslint.config(
     ignores: TESTES,
     rules: { 'no-restricted-imports': ['error', { paths: proibidas(SO_CELULAR, 'no celular') }] },
   },
+  {
+    // ADR-036: cor só por token e tamanho de letra só pelo componente `Texto`, para as telas
+    // ficarem iguais entre si. Exceção rara: `eslint-disable-next-line` com o motivo escrito.
+    files: APP,
+    ignores: [...TESTES, 'apps/mobile/src/components/texto.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+          message:
+            'Cor só por token do design system (classe como `bg-primaria` ou `useThemeColors`).',
+        },
+        {
+          selector: "Property[key.name='fontSize']",
+          message: 'Tamanho de letra só pelas variantes do componente `Texto`.',
+        },
+      ],
+    },
+  },
   prettier,
 );
