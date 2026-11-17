@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import { Dimensions, Platform } from 'react-native';
 import { AccountScreen } from '../account/account-screen';
@@ -49,39 +49,41 @@ async function aceitarTermos() {
 }
 
 describe('apresentação no site (computador)', () => {
-  test('CT-APP-L01: mostra a promessa, os passos, os recursos, o aviso e leva a "Criar conta" e "Entrar"', async () => {
+  test('CT-APP-L01: mostra a promessa, as fases, os recursos, o aviso e leva a "Criar conta" e "Entrar"', async () => {
     await renderScreen(<LandingWeb compacta={false} />, createFakeFetch({}).fetchFn);
     expect(
       screen.getByRole('header', { name: 'As vacinas da sua família, em dia' }),
     ).toBeOnTheScreen();
     expect(screen.getByText('Sem CPF. Você pode excluir a conta quando quiser.')).toBeOnTheScreen();
-    expect(screen.getByRole('header', { name: 'Como funciona' })).toBeOnTheScreen();
-    for (const passo of [
-      'Cadastre a família',
-      'Veja o calendário de cada um',
-      'Registre e receba avisos',
+    expect(
+      screen.getByRole('header', { name: 'Uma caderneta para cada fase da vida' }),
+    ).toBeOnTheScreen();
+    for (const titulo of [
+      'Quais doses do bebê estão chegando?',
+      'Todo mundo no mesmo lugar',
+      'Pergunte em voz alta',
     ]) {
-      expect(screen.getByRole('header', { name: passo })).toBeOnTheScreen();
+      expect(screen.getByRole('header', { name: titulo })).toBeOnTheScreen();
     }
     for (const recurso of [
-      'Lembretes',
       'Assistente por voz',
+      'Lembretes que não expõem ninguém',
       'Vários responsáveis',
       'Postos de saúde',
+      'Painel da família',
     ]) {
       expect(screen.getByRole('header', { name: recurso })).toBeOnTheScreen();
     }
+    expect(screen.getByRole('header', { name: /Letras que crescem/ })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('header', { name: 'Sem CPF. Sem cartão do SUS. Exclua quando quiser.' }),
+    ).toBeOnTheScreen();
     expect(screen.getByText(/não substitui a caderneta oficial/)).toBeOnTheScreen();
     expect(screen.getByText(/Objetivos de Desenvolvimento Sustentável 3/)).toBeOnTheScreen();
-
     expect(
       screen.getByText(/Exemplo com dados inventados\. As pessoas das fotos são fictícias/),
     ).toBeOnTheScreen();
-    expect(screen.getByText('Feito para quem cuida de gente')).toBeOnTheScreen();
-    for (const nome of ['Mariana, 32 anos', 'Sr. José, 68 anos', 'Carla, 45 anos']) {
-      expect(screen.getByRole('header', { name: nome })).toBeOnTheScreen();
-    }
-    expect(screen.getAllByLabelText(/personagem fict/).length).toBeGreaterThanOrEqual(3);
+    expect(screen.getAllByLabelText(/personagem fict/).length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('Comece agora. Leva menos de um minuto.')).toBeOnTheScreen();
     expect(screen.queryByText('Leve no celular')).not.toBeOnTheScreen();
 
@@ -109,11 +111,31 @@ describe('apresentação no site (computador)', () => {
     expect(mockPush).toHaveBeenCalledWith('/privacidade');
   });
 
-  test('CT-APP-L01b: o menu leva às seções "Como funciona" e "Para quem é" sem quebrar fora do navegador', async () => {
+  test('CT-APP-L01b: o menu leva às seções sem quebrar fora do navegador', async () => {
     await renderScreen(<LandingWeb compacta={false} />, createFakeFetch({}).fetchFn);
-    await fireEvent.press(screen.getByRole('link', { name: 'Como funciona' }));
-    await fireEvent.press(screen.getByRole('link', { name: 'Para quem é' }));
-    expect(screen.getByRole('header', { name: 'Como funciona' })).toBeOnTheScreen();
+    for (const nome of ['Para quem é', 'O que faz', 'Fácil de ler']) {
+      await fireEvent.press(screen.getByRole('link', { name: nome }));
+    }
+    expect(
+      screen.getByRole('header', { name: 'Uma caderneta para cada fase da vida' }),
+    ).toBeOnTheScreen();
+  });
+
+  test('CT-APP-L01c: o cartão da dose da abertura aplica e desfaz', async () => {
+    await renderScreen(<LandingWeb compacta={false} />, createFakeFetch({}).fetchFn);
+    const cartao = within(screen.getByTestId('cartao-da-dose'));
+    expect(cartao.getByText('Era para 01/08/2026')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Aplicar a BCG' }));
+    expect(cartao.getByText('Aplicada hoje')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Desfazer a aplicação da BCG' }));
+    expect(cartao.getByText('Era para 01/08/2026')).toBeOnTheScreen();
+  });
+
+  test('CT-APP-L01d: "Fácil de ler" traz os seletores reais de tamanho, tema e movimento', async () => {
+    await renderScreen(<LandingWeb compacta={false} />, createFakeFetch({}).fetchFn);
+    expect(screen.getByLabelText('Tamanho do texto')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Tema')).toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Reduzir movimento' })).toBeOnTheScreen();
   });
 });
 
@@ -123,12 +145,14 @@ describe('apresentação no site (celular)', () => {
     expect(screen.getByText('Leve no celular')).toBeOnTheScreen();
     expect(screen.getByText(/Instalar app/)).toBeOnTheScreen();
     // No celular o alto só tem "Entrar"; o botão fixo no pé é o único "Criar conta" curto.
-    expect(screen.queryByRole('link', { name: 'Como funciona' })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('link', { name: 'Para quem é' })).not.toBeOnTheScreen();
     const criar = screen.getAllByRole('button', { name: 'Criar conta' });
     expect(criar).toHaveLength(1);
     await fireEvent.press(criar[0]!);
     expect(mockPush).toHaveBeenCalledWith('/criar-conta');
-    expect(screen.getByText('Feito para quem cuida de gente')).toBeOnTheScreen();
+    expect(
+      screen.getByRole('header', { name: 'Quais doses do bebê estão chegando?' }),
+    ).toBeOnTheScreen();
   });
 });
 
@@ -156,7 +180,9 @@ describe('primeira tela: um desenho para cada forma de uso', () => {
     expect(
       screen.getByRole('header', { name: 'As vacinas da sua família, em dia' }),
     ).toBeOnTheScreen();
-    expect(screen.queryByRole('header', { name: 'Como funciona' })).not.toBeOnTheScreen();
+    expect(
+      screen.queryByRole('header', { name: 'Uma caderneta para cada fase da vida' }),
+    ).not.toBeOnTheScreen();
     expect(screen.queryByText('Leve no celular')).not.toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
     expect(mockPush).toHaveBeenCalledWith('/criar-conta');
@@ -171,7 +197,9 @@ describe('primeira tela: um desenho para cada forma de uso', () => {
 
   test('CT-APP-L04: no site, num computador, mostra a página de apresentação completa', async () => {
     await comWeb(1440, <WelcomeScreen />);
-    expect(screen.getByRole('header', { name: 'Como funciona' })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('header', { name: 'Uma caderneta para cada fase da vida' }),
+    ).toBeOnTheScreen();
     expect(screen.queryByText('Leve no celular')).not.toBeOnTheScreen();
     expect(screen.queryByRole('link', { name: 'Termos de uso' })).not.toBeOnTheScreen();
   });
