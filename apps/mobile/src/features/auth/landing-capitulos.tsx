@@ -52,9 +52,6 @@ const CAPITULOS: readonly {
   },
 ];
 
-/** Proporção do recorte das pessoas: 640 x 856. */
-const PROPORCAO = 640 / 856;
-
 /** Entra e sai de cena por opacidade e deslocamento; sai da frente do toque quando escondido. */
 function Revezar({
   visivel,
@@ -212,8 +209,9 @@ function PessoaDoCapitulo({ foto, altura = '94%' }: { foto: Foto; altura?: `${nu
         source={foto.fonte}
         accessibilityLabel={foto.alt}
         accessibilityIgnoresInvertColors
-        resizeMode="stretch"
-        style={{ height: '100%', aspectRatio: PROPORCAO }}
+        // `contain` mantém a proporção da foto (640 x 856) em qualquer caixa: nunca estica a pessoa.
+        resizeMode="contain"
+        style={{ width: '100%', height: '100%' }}
       />
     </View>
   );
