@@ -12,6 +12,8 @@ import { Texto } from './texto';
  * @param props.aviso - Mostra um ponto vermelho (por exemplo, pessoa com dose atrasada). O ponto é
  *   só decoração: quem usa o chip diz o motivo em `rotuloAcessivel`.
  * @param props.rotuloAcessivel - Rótulo completo para o leitor de tela; por padrão, o `rotulo`.
+ * @param props.papel - `button` (padrão) ou `radio`, quando o chip faz parte de um grupo de escolha
+ *   única (por exemplo, a faixa de pessoas).
  */
 export function Chip({
   rotulo,
@@ -19,6 +21,7 @@ export function Chip({
   inicio,
   aviso = false,
   rotuloAcessivel,
+  papel = 'button',
   ...rest
 }: Omit<PressableProps, 'children'> & {
   rotulo: string;
@@ -26,14 +29,19 @@ export function Chip({
   inicio?: React.ReactNode;
   aviso?: boolean;
   rotuloAcessivel?: string;
+  papel?: 'button' | 'radio';
 }) {
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={papel}
       accessibilityLabel={rotuloAcessivel ?? rotulo}
-      accessibilityState={{ selected: selecionado }}
-      // Na web, o estado de seleção só chega ao leitor de tela pela propriedade `aria-selected`.
-      aria-selected={selecionado}
+      accessibilityState={
+        papel === 'radio'
+          ? { selected: selecionado, checked: selecionado }
+          : { selected: selecionado }
+      }
+      // Na web, o estado só chega ao leitor de tela pela propriedade `aria-selected` ou `aria-checked`.
+      {...(papel === 'radio' ? { 'aria-checked': selecionado } : { 'aria-selected': selecionado })}
       className={`min-h-principal flex-row items-center gap-md self-start rounded-selo border-padrao ${
         inicio ? 'pl-xs' : 'pl-lg'
       } pr-lg ${selecionado ? 'border-primaria bg-primariaSuave' : 'border-borda bg-superficie'}`}

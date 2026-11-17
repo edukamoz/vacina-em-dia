@@ -172,7 +172,12 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
   return (
     <View className="gap-md">
       {erro}
-      {acoes.agendar ? <Botao titulo={acoes.agendar} onPress={() => escolher('SCHEDULE')} /> : null}
+      {/* Hierarquia (ADR-036): registrar a aplicação é a ação principal em qualquer estado; agendar,
+          reagendar e desmarcar são secundárias; cancelar é só texto em vermelho. */}
+      <Botao titulo="Registrar aplicação" onPress={() => escolher('APPLY')} />
+      {acoes.agendar ? (
+        <Botao titulo={acoes.agendar} variante="secundario" onPress={() => escolher('SCHEDULE')} />
+      ) : null}
       {acoes.desmarcar ? (
         <Botao
           titulo="Desmarcar o agendamento"
@@ -181,12 +186,7 @@ function DoseActions({ dose }: { dose: DoseResponse }) {
           onPress={() => enviar({ type: 'UNSCHEDULE' })}
         />
       ) : null}
-      <Botao
-        titulo="Registrar aplicação"
-        variante={acoes.agendar ? 'secundario' : 'principal'}
-        onPress={() => escolher('APPLY')}
-      />
-      <Botao titulo="Cancelar dose" variante="perigo" onPress={() => escolher('CANCEL')} />
+      <Botao titulo="Cancelar dose" variante="perigoTexto" onPress={() => escolher('CANCEL')} />
     </View>
   );
 }
