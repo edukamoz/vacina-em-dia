@@ -115,6 +115,15 @@ export function JanelaModal({
           compacto ? 'max-h-[92%] rounded-t-folha' : 'max-h-[88%] max-w-[680px] rounded-folha'
         }`}
       >
+        {compacto ? (
+          // Alça da folha: só decoração, indica que a janela sobe do rodapé e fecha ao tocar fora.
+          <View
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            aria-hidden
+            className="mt-sm h-[5px] w-[44px] self-center rounded-selo bg-bordaSuave"
+          />
+        ) : null}
         <View className="flex-row items-start gap-md border-b-fina border-bordaSuave px-lg py-md">
           <View className="flex-1 gap-xs">
             <Texto variante="titulo2" accessibilityRole="header">

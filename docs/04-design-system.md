@@ -368,7 +368,7 @@ Curva de saída `cubic-bezier(.2,.8,.2,1)`; durações de 200 a 450 ms; entrada 
 | 1 | Tokens 3.0.0, componentes base (`Texto` com `truncar`, `Botao` com `texto` e `compacto`, `Chip`, `Segmentado`, `BlocoResumo`, `AzulejoDeEstado`), regras de lint | em análise |
 | 2 | Barra inferior com microfone central; fim do balão | em análise |
 | 3 | Doses e detalhe da dose; ação rápida | em análise |
-| 4 | Família, formulários, janelas e confirmações | a fazer |
+| 4 | Família, formulários, janelas e confirmações | em análise |
 | 5 | Histórico, Painel de gráficos e Conta | a fazer |
 | 6 | Postos, Viagem e Novidades | a fazer |
 | 7 | Acesso: landing, abertura, Entrar, Criar conta, Consentimento | a fazer |

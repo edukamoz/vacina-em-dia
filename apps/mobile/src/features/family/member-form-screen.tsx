@@ -11,9 +11,8 @@ import { View } from 'react-native';
 import { Alternar } from '../../components/alternar';
 import { Botao } from '../../components/botao';
 import { CampoTexto } from '../../components/campo-texto';
-import { Cartao } from '../../components/cartao';
 import { EstadoCarregando, EstadoErro, EstadoVazio } from '../../components/estados';
-import { GrupoDeRadios } from '../../components/grupo-de-radios';
+import { Segmentado } from '../../components/segmentado';
 import { Selecao } from '../../components/selecao';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
@@ -92,7 +91,7 @@ function MemberForm({ membro }: FormProps) {
       modal
     >
       {membro ? null : (
-        <GrupoDeRadios
+        <Segmentado
           rotulo="O que você quer adicionar?"
           valor={tipo}
           opcoes={[
@@ -169,12 +168,15 @@ function MemberForm({ membro }: FormProps) {
       {membro && !confirmandoExclusao ? (
         <Botao
           titulo={`Excluir ${membro.name}`}
-          variante="perigo"
+          variante="perigoTexto"
           onPress={() => setConfirmandoExclusao(true)}
         />
       ) : null}
       {membro && confirmandoExclusao ? (
-        <Cartao className="gap-md border-erro">
+        <View
+          accessibilityRole="alert"
+          className="gap-md rounded-cartao border-padrao border-erro bg-superficie p-lg"
+        >
           <Texto variante="corpoNegrito">{`Excluir ${membro.name}?`}</Texto>
           <Texto>As vacinas e o histórico dessa pessoa serão apagados. Não dá para desfazer.</Texto>
           {remove.error ? (
@@ -202,7 +204,7 @@ function MemberForm({ membro }: FormProps) {
               onPress={() => setConfirmandoExclusao(false)}
             />
           </View>
-        </Cartao>
+        </View>
       ) : null}
     </Tela>
   );

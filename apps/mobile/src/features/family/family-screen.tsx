@@ -102,7 +102,8 @@ export function FamilyScreen() {
                 >
                   <Avatar nome={membro.name} indice={indice} tamanho={64} />
                   <View className="flex-1 gap-xs">
-                    <Texto variante="titulo3" importantForAccessibility="no">
+                    {/* Nome de pessoa em ficha: uma linha com reticências; o nome inteiro está no rótulo do botão (ADR-036). */}
+                    <Texto variante="titulo3" truncar={1} importantForAccessibility="no">
                       {membro.name}
                     </Texto>
                     <Texto
