@@ -308,6 +308,27 @@ describe('doses (RF03 e RF04)', () => {
     await fireEvent.press(screen.getByRole('link', { name: 'Ver todas no Histórico' }));
     expect(mockPush).toHaveBeenCalledWith('/historico');
   });
+
+  test('CT-APP-K22: um grupo com muitas doses mostra 6, conta o total e deixa pedir mais ou menos', async () => {
+    const muitas = Array.from({ length: 8 }, (_, i) =>
+      dose({ id: `d-p${i}`, vaccine: `vacina ${i + 1}`, doseLabel: 'dose única' }),
+    );
+    const fake = createFakeFetch({
+      ...FAMILY,
+      'GET /members/m-1/doses': { status: 200, body: memberDoses(muitas) },
+    });
+    await renderScreen(<DosesScreen />, fake.fetchFn);
+    expect(await screen.findByRole('header', { name: 'Próximas' })).toBeOnTheScreen();
+    expect(screen.getByText('8 doses')).toBeOnTheScreen();
+    expect(screen.getByText('vacina 6, dose única')).toBeOnTheScreen();
+    expect(screen.queryByText('vacina 7, dose única')).not.toBeOnTheScreen();
+    expect(screen.getByText(/Mostrando 6 de 8 doses/)).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Mostrar mais doses em Próximas' }));
+    expect(screen.getByText('vacina 8, dose única')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Mostrar menos doses em Próximas' }));
+    expect(screen.queryByText('vacina 7, dose única')).not.toBeOnTheScreen();
+  });
 });
 
 describe('histórico (RF08)', () => {

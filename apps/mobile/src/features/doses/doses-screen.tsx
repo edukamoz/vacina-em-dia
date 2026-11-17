@@ -1,7 +1,7 @@
 import type { DoseResponse } from '@vacina/shared';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, useWindowDimensions, View } from 'react-native';
 import { Atalho } from '../../components/atalho';
 import { AvisoFonte } from '../../components/aviso-fonte';
 import { Botao } from '../../components/botao';
@@ -14,6 +14,7 @@ import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
 import { podeLerDocumento } from '../../lib/ler-documento';
 import { todayCivil } from '../../lib/dates';
+import { modoDeLayout } from '../../lib/layout';
 import { useThemeColors } from '../../theme/theme-provider';
 import { useSelectedMember } from '../calendar/use-selected-member';
 import { useConferenciaDoCalendario, useMemberDoses } from '../data/hooks';
@@ -29,6 +30,15 @@ import { contarDoses, ResumoDoses } from './resumo-doses';
 
 /** Quantas aplicadas aparecem na tela; as demais ficam no Histórico. */
 export const LIMITE_APLICADAS = 5;
+
+/** Quantas doses cada grupo mostra de início e a cada "Mostrar mais" (a página não vira uma lista enorme). */
+export const DOSES_POR_VEZ = 6;
+
+/**
+ * Acima de quantas doses abertas (atrasadas e próximas) o computador troca o desenho "resumo ao lado
+ * + uma coluna" por "resumo em faixa + cartões em duas colunas", que aproveita melhor a largura.
+ */
+export const DOSES_PARA_GRADE = 4;
 
 /** Data mais próxima primeiro; dose sem data (conforme histórico, gestação) vai para o fim. */
 function dataDaProxima(dose: DoseResponse): string {
@@ -79,6 +89,9 @@ export function DosesScreen() {
   // Ação rápida "Aplicar": a dose atrasada que está sendo confirmada, e se a lista de aplicadas está aberta.
   const [aplicando, setAplicando] = useState<DoseResponse | null>(null);
   const [verAplicadas, setVerAplicadas] = useState(false);
+  // Quantas doses cada grupo mostra agora (por título do grupo).
+  const [limites, setLimites] = useState<Record<string, number>>({});
+  const computador = modoDeLayout(useWindowDimensions().width) === 'expandido';
 
   if (members.isPending) {
     return (
@@ -114,6 +127,9 @@ export function DosesScreen() {
   const grupos = doses.data ? agruparDoses(doses.data.items) : null;
   const aplicadasVisiveis = grupos?.aplicadas.slice(0, LIMITE_APLICADAS) ?? [];
   const aplicadasAbertas = grupos ? aplicadasVisiveisAoAbrir(grupos, verAplicadas) : false;
+  // Poucas doses: resumo à esquerda e lista à direita. Muitas: resumo em faixa e cartões em grade.
+  const muitas = grupos ? grupos.atencao.length + grupos.proximas.length > DOSES_PARA_GRADE : false;
+  const duasColunas = computador && muitas;
   const secoes = grupos
     ? [
         { titulo: 'Precisam de atenção', lista: grupos.atencao, rapida: true },
@@ -140,10 +156,13 @@ export function DosesScreen() {
     >
       <CarrosselDePessoas pessoas={items} selecionadaId={selected.id} aoEscolher={selectMember} />
       <LembretesCard />
-      {/* No computador (design v3): o resumo à esquerda e as doses em uma coluna à direita; no
-          celular e no tablet, tudo em uma coluna, na mesma ordem. */}
-      <View className="gap-xl expandido:flex-row expandido:items-start expandido:gap-xxl">
-        <View className="gap-xl expandido:w-[38%]">
+      {/* No computador (design v3): com poucas doses, o resumo à esquerda e as doses em uma coluna à
+          direita; com muitas, o resumo em faixa e os cartões em duas colunas. No celular e no tablet,
+          tudo em uma coluna, na mesma ordem. */}
+      <View
+        className={`gap-xl ${muitas ? '' : 'expandido:flex-row expandido:items-start expandido:gap-xxl'}`}
+      >
+        <View className={`gap-xl ${muitas ? '' : 'expandido:w-[38%]'}`}>
           {doses.data && (
             <ResumoDoses
               nome={primeiroNome}
@@ -151,7 +170,7 @@ export function DosesScreen() {
             />
           )}
         </View>
-        <View className="gap-xl expandido:flex-1">
+        <View className={`gap-xl ${muitas ? '' : 'expandido:flex-1'}`}>
           {doses.isPending && <EstadoCarregando rotulo="Carregando as vacinas" />}
           {doses.error && (
             <EstadoErro
@@ -168,14 +187,24 @@ export function DosesScreen() {
           {grupos &&
             !(animal && doses.data && doses.data.items.length === 0) &&
             grupos.atencao.length + grupos.proximas.length === 0 && <Festa nome={primeiroNome} />}
-          {secoes.map(({ titulo, lista, rapida }) =>
-            lista.length === 0 ? null : (
+          {secoes.map(({ titulo, lista, rapida }) => {
+            if (lista.length === 0) return null;
+            const limite = limites[titulo] ?? DOSES_POR_VEZ;
+            const mostradas = lista.slice(0, limite);
+            return (
               <View key={titulo} className="gap-lg">
-                <Texto variante="titulo2" accessibilityRole="header">
-                  {titulo}
-                </Texto>
-                <Grade colunas={1}>
-                  {lista.map((dose) => (
+                <View className="flex-row items-center gap-md">
+                  <Texto variante="titulo2" accessibilityRole="header">
+                    {titulo}
+                  </Texto>
+                  <View className="rounded-selo bg-primariaSuave px-md py-xs">
+                    <Texto variante="rotulo" className="text-primaria">
+                      {`${lista.length} ${lista.length === 1 ? 'dose' : 'doses'}`}
+                    </Texto>
+                  </View>
+                </View>
+                <Grade colunas={duasColunas ? 2 : 1}>
+                  {mostradas.map((dose) => (
                     <View key={dose.id} className="gap-md">
                       <DoseCard
                         dose={dose}
@@ -200,9 +229,40 @@ export function DosesScreen() {
                     </View>
                   ))}
                 </Grade>
+                {lista.length > DOSES_POR_VEZ ? (
+                  <View className="gap-sm">
+                    <Texto
+                      variante="apoio"
+                      className="text-textoSecundario"
+                      accessibilityLiveRegion="polite"
+                    >
+                      {`Mostrando ${mostradas.length} de ${lista.length} doses, da mais próxima para a mais distante.`}
+                    </Texto>
+                    <View className="flex-row flex-wrap gap-sm">
+                      {mostradas.length < lista.length ? (
+                        <Botao
+                          titulo={`Mostrar mais ${Math.min(DOSES_POR_VEZ, lista.length - mostradas.length)} doses`}
+                          variante="secundario"
+                          accessibilityLabel={`Mostrar mais doses em ${titulo}`}
+                          onPress={() =>
+                            setLimites({ ...limites, [titulo]: limite + DOSES_POR_VEZ })
+                          }
+                        />
+                      ) : null}
+                      {limite > DOSES_POR_VEZ ? (
+                        <Botao
+                          titulo="Mostrar menos"
+                          variante="secundario"
+                          accessibilityLabel={`Mostrar menos doses em ${titulo}`}
+                          onPress={() => setLimites({ ...limites, [titulo]: DOSES_POR_VEZ })}
+                        />
+                      ) : null}
+                    </View>
+                  </View>
+                ) : null}
               </View>
-            ),
-          )}
+            );
+          })}
           {aplicadasVisiveis.length > 0 && (
             <View className="gap-lg">
               <Pressable
