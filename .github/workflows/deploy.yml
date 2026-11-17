@@ -58,7 +58,7 @@ jobs:
           cp -rL node_modules pacote/node_modules
 
       - name: Entrar na Azure (OIDC)
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -103,7 +103,7 @@ jobs:
           find pacote-nlp -name __pycache__ -type d -prune -exec rm -rf {} +
 
       - name: Entrar na Azure (OIDC)
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
