@@ -1,0 +1,44 @@
+# Atualizações automáticas de dependências (aviso de vulnerabilidade e PR com a correção).
+# Os PRs seguem o commitlint do projeto (chore/ci), rodam o CI completo e nunca entram sozinhos:
+# o autor revisa e mescla. Poucos PRs abertos por vez e agrupados, para não inundar a fila.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore'
+      include: scope
+    groups:
+      expo:
+        patterns: ['expo*', '@expo/*', 'react-native*', '@react-native/*', 'react', 'react-dom']
+      testes:
+        patterns: ['jest*', '@types/*', '@testing-library/*', 'playwright*', '@playwright/*']
+      lint-e-formato:
+        patterns: ['eslint*', '@eslint/*', 'typescript-eslint', 'prettier*', 'typescript']
+  - package-ecosystem: pip
+    directory: /apps/nlp
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'chore'
+      include: scope
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'ci'
+  - package-ecosystem: docker
+    directory: /apps/api
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: 'chore'

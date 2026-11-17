@@ -34,7 +34,8 @@ Cadastro e entrada por e-mail e senha, na própria API. Decisão e alternativas:
 | Variável | Para quê |
 |---|---|
 | `AUTH_TOKEN_SECRET` | Chave de assinatura (32 caracteres ou mais; Key Vault). Sem ela, o login responde 503 |
-| `DEMO_SESSION_ENABLED` | `false` desliga o cabeçalho `x-demo-session` (ADR-013). Hoje fica ligado até o app usar o login |
+| `DEMO_SESSION_ENABLED` | `true` liga o cabeçalho `x-demo-session`, sem autenticação (ADR-013). **Padrão: desligado**; variável ausente ou diferente de `true` exige login |
+| `TRUSTED_PROXY_HOPS` | Quantos servidores de confiança acrescentam o IP de quem chamou ao `X-Forwarded-For` (1 a 5; padrão 1). O limite de abusos por origem usa o item contado do fim da lista, porque o começo é forjável. No Google Cloud vale 2 (o app web repassa a chamada) |
 
 ## Testes
 
@@ -54,7 +55,7 @@ Cadastro e entrada por e-mail e senha, na própria API. Decisão e alternativas:
 
 1. ~~Persistência no Azure SQL~~ (feito). **Ligar no Azure** (`SQL_SERVER` e `SQL_DATABASE`) só junto com o app usando o login: com o banco ligado, a sessão de demonstração deixa de funcionar, porque os dados passam a pertencer a uma conta.
 2. ~~Telas Entrar e Criar conta~~ (feito, ver abaixo).
-3. `AUTH_TOKEN_SECRET` no Key Vault; depois `DEMO_SESSION_ENABLED=false`.
+3. `AUTH_TOKEN_SECRET` no Key Vault. A sessão de demonstração já vem desligada; não é preciso configurar nada.
 4. ~~Recuperação de senha~~ (feita, ver abaixo); confirmação de e-mail do cadastro (a decidir).
 
 ## Telas e sessão no app (SCRUM-13)

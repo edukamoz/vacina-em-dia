@@ -1,11 +1,21 @@
 # Versão do nginx para o Cloud Run (plano de contingência no Google Cloud, ADR-035). O contêiner
 # `nginx` troca as variáveis ${...} ao subir: PORT (o Cloud Run define), API_URL (endereço do serviço
 # da API, sem barra no fim), API_HOST (só o nome do host dele) e DNS_RESOLVER (padrão 8.8.8.8).
+
+# IP real de quem chamou: o Cloud Run acrescenta o endereço do cliente ao fim de X-Forwarded-For.
+# Sem isto, a API veria só o endereço interno do Cloud Run e o limite por origem valeria para todos
+# os usuários juntos (ADR-035). O primeiro item da lista pode ser forjado, por isso se usa o último.
+map $http_x_forwarded_for $cliente_ip {
+  default $remote_addr;
+  "~(?<ultimo>[^,\s]+)\s*$" $ultimo;
+}
+
 server {
   listen ${PORT};
   server_name _;
   root /usr/share/nginx/html;
 
+  add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
   add_header X-Content-Type-Options "nosniff" always;
   add_header X-Frame-Options "DENY" always;
   add_header Referrer-Policy "strict-origin-when-cross-origin" always;
@@ -20,7 +30,7 @@ server {
     proxy_pass $api_upstream;
     proxy_ssl_server_name on;
     proxy_set_header Host ${API_HOST};
-    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-For $cliente_ip;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_read_timeout 60s;
   }

@@ -80,7 +80,7 @@ export function buildOpenApiDocument(): object {
     in: 'header',
     name: 'x-demo-session',
     description:
-      'Provisório (sessão de demonstração): identificador aleatório gerado pelo navegador. Não é autenticação; só vale enquanto `DEMO_SESSION_ENABLED` não for `false` e será removido quando o app usar o login (ADR-014).',
+      'Provisório (sessão de demonstração): identificador aleatório gerado pelo navegador. Não é autenticação; só vale quando `DEMO_SESSION_ENABLED=true` (o padrão é desligado) e será removido quando o app usar o login (ADR-014).',
   });
 
   registry.registerPath({

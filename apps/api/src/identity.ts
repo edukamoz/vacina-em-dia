@@ -8,8 +8,8 @@ const BEARER_PATTERN = /^Bearer ([A-Za-z0-9_.-]{20,2048})$/;
  * Descobre o dono dos dados a partir do cabeçalho da sessão de demonstração (ADR-013).
  *
  * **Provisório e sem autenticação:** quem souber o identificador acessa os dados. Fica só para
- * desenvolvimento e para a transição até o app usar o login (ADR-014); em produção é desligado com
- * `DEMO_SESSION_ENABLED=false`.
+ * desenvolvimento e para a transição até o app usar o login (ADR-014). Vem **desligada**: só liga
+ * com `DEMO_SESSION_ENABLED=true`.
  *
  * @param headerValue - Valor do cabeçalho `x-demo-session`, se enviado.
  * @returns O identificador do dono ou `undefined` quando ausente ou fora do formato.

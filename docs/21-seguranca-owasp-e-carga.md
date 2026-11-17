@@ -83,3 +83,16 @@ O autor ligou **1 instância sempre pronta** (`az functionapp scale config alway
 ### Conclusão para o RNF01
 
 Cumprido: a API local responde em até 21 ms e a produção, com uma instância sempre pronta, atende o requisito sem falhas na rota pública medida. **Ressalvas:** as rotas autenticadas reais não foram medidas (exigiriam conta de teste no ambiente real), e restam poucos casos isolados de 10 a 20 s em rajadas. Sem a instância sempre pronta, a produção devolve 503 intermitente.
+
+## Revisão de segurança de 17/11/2026 (20 pontos)
+
+Revisão do código, da infraestrutura e dos ambientes publicados, ponto a ponto. Atendidos: chaves fora do app e do Git (secret scanning e push protection ligados), banco acessado só pela API (Entra ID, sem senha de SQL), autenticação no servidor (token assinado de 15 minutos, renovação rotativa), hash scrypt, consultas parametrizadas, validação com Zod, upload restrito (tipo, tamanho e assinatura do arquivo), cabeçalhos de segurança, HTTPS forçado e auditoria de dependências no CI.
+
+Corrigido nesta revisão:
+
+- A sessão de demonstração (`x-demo-session`) agora vem **desligada** e só liga com `DEMO_SESSION_ENABLED=true`; antes, esquecer a variável abria a API sem login.
+- O limite por origem deixou de usar o primeiro item do `X-Forwarded-For` (forjável): usa o item que a plataforma acrescenta, contado do fim (`TRUSTED_PROXY_HOPS`; testes `CT-IP-*`).
+- Dependabot ligado (alertas, atualizações de segurança e `.github/dependabot.yml`), porque o CI só reprova vulnerabilidade `critical` no conjunto do app.
+- HSTS no app web do Google Cloud e `firestore.rules` versionado com negar tudo.
+
+Riscos aceitos, a revisitar se o projeto crescer: RLS no Azure SQL (o isolamento é na aplicação, com testes); CAPTCHA no cadastro e na recuperação de senha (exigiria conta em serviço externo); limite de taxa compartilhado entre instâncias (hoje em memória, ADR-010); Swagger público na Azure (`DOCS_ENABLED`); firewall do SQL aberto aos serviços do Azure (protegido por autenticação só com Entra ID); criptografia por campo (valem a do banco em repouso e o TLS).
