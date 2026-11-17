@@ -1,10 +1,17 @@
-import { Pressable, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Pressable, View } from 'react-native';
+import { useMovimentoReduzido } from '../theme/theme-provider';
+import { CURVA, DURACAO, USA_DRIVER_NATIVO, VistaAnimada } from './animacao';
 import { Texto } from './texto';
+
+/** Quanto o botão da chave anda de uma ponta à outra, em dp (trilho de 56 menos botão e bordas). */
+const PERCURSO = 24;
 
 /**
  * Chave de liga e desliga (lembretes por e-mail, por exemplo). Mostra o rótulo, o estado em texto
  * ("Ligado" ou "Desligado") e a posição do botão, então nada depende só da cor. Área de toque de
- * pelo menos 48 dp e papel `switch` para o leitor de tela.
+ * pelo menos 48 dp e papel `switch` para o leitor de tela. O botão atravessa o trilho em 350 ms e
+ * passa um pouco do fim antes de assentar (curva `salto`); com "Reduzir movimento" troca na hora.
  *
  * @param props.rotulo - Texto ao lado da chave (também é o rótulo de acessibilidade).
  * @param props.ligada - Se está ligada.
@@ -19,6 +26,23 @@ export function Chave({
   ligada: boolean;
   aoAlterar: (valor: boolean) => void;
 }) {
+  const reduzido = useMovimentoReduzido();
+  const posicao = useRef(new Animated.Value(ligada ? 1 : 0)).current;
+  useEffect(() => {
+    if (reduzido) {
+      posicao.setValue(ligada ? 1 : 0);
+      return undefined;
+    }
+    const animacao = Animated.timing(posicao, {
+      toValue: ligada ? 1 : 0,
+      duration: DURACAO.media,
+      easing: CURVA.salto,
+      useNativeDriver: USA_DRIVER_NATIVO,
+    });
+    animacao.start();
+    return () => animacao.stop();
+  }, [ligada, reduzido, posicao]);
+
   return (
     <Pressable
       accessibilityRole="switch"
@@ -41,10 +65,18 @@ export function Chave({
             ligada ? 'border-primaria bg-primaria' : 'border-borda bg-superficieSuave'
           }`}
         >
-          <View
-            className={`h-[24px] w-[24px] rounded-selo ${
-              ligada ? 'self-end bg-sobrePrimaria' : 'self-start bg-borda'
-            }`}
+          <VistaAnimada
+            className={`h-[24px] w-[24px] rounded-selo ${ligada ? 'bg-sobrePrimaria' : 'bg-borda'}`}
+            style={{
+              transform: [
+                {
+                  translateX: posicao.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, PERCURSO],
+                  }),
+                },
+              ],
+            }}
           />
         </View>
       </View>

@@ -169,13 +169,19 @@ export function useDose(id: string) {
   });
 }
 
-/** Aplica um evento do ciclo de vida à dose e atualiza as telas que a mostram. */
-export function useDoseEvent(id: string) {
+/**
+ * Aplica um evento do ciclo de vida à dose e atualiza as telas que a mostram.
+ *
+ * @param aoGravar - Chamada assim que a API grava o evento, antes de atualizar as listas. Vale
+ *   mesmo que a tela que pediu já tenha saído de cena quando a lista se refaz.
+ */
+export function useDoseEvent(id: string, aoGravar?: () => void) {
   const { api } = useSession();
   const client = useQueryClient();
   return useMutation({
     mutationFn: (event: DoseEventInput) => endpoints.sendDoseEvent(api, id, event),
     onSuccess: async (dose) => {
+      aoGravar?.();
       client.setQueryData(['dose', id], dose);
       await client.invalidateQueries({ queryKey: ['member-doses'] });
       await client.invalidateQueries({ queryKey: ['reminders'] });

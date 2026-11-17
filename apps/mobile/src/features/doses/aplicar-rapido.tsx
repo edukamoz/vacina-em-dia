@@ -16,18 +16,21 @@ import { formatCivilDate } from './format-date';
  *
  * @param props.dose - Dose que seria registrada.
  * @param props.aoFechar - Chamada ao registrar com sucesso ou ao voltar.
+ * @param props.aoRegistrar - Chamada só quando a aplicação foi gravada (antes de fechar).
  * @param props.aoTrocarData - Chamada ao escolher outra data (abre o detalhe da dose).
  */
 export function ConfirmarAplicacao({
   dose,
   aoFechar,
   aoTrocarData,
+  aoRegistrar,
 }: {
   dose: DoseResponse;
   aoFechar: () => void;
   aoTrocarData: () => void;
+  aoRegistrar?: () => void;
 }) {
-  const mutation = useDoseEvent(dose.id);
+  const mutation = useDoseEvent(dose.id, aoRegistrar);
   const hoje = todayCivil();
   const estiloDoTema = useEstiloDoTema();
   return (

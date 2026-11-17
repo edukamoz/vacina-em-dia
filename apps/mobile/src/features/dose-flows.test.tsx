@@ -206,6 +206,8 @@ describe('doses (RF03 e RF04)', () => {
         date: '2026-10-06',
       }),
     );
+    // Depois de gravar, um aviso curto confirma (região de status, sem pedir ação).
+    expect(await screen.findByText('hepatite B: dose aplicada')).toBeOnTheScreen();
   });
 
   test('CT-APP-K15: na confirmação, "Trocar a data" abre o detalhe e "Voltar" não registra nada', async () => {

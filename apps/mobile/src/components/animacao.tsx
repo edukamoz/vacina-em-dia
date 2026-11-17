@@ -132,3 +132,87 @@ export function useProgresso(final: number, duracao: number): number {
 
   return valor;
 }
+
+/**
+ * Faz o conteúdo aparecer ao entrar na tela: sobe 8 px e surge em 250 ms (`passo`). Para blocos que
+ * abrem por escolha da pessoa (uma lista que se expande, por exemplo). Com "Reduzir movimento" o
+ * conteúdo já aparece pronto, sem nenhuma camada extra.
+ */
+export function Aparecer({ children }: { children: ReactNode }) {
+  const reduzido = useMovimentoReduzido();
+  const progresso = useRef(new Animated.Value(reduzido ? 1 : 0)).current;
+  useEffect(() => {
+    if (reduzido) {
+      progresso.setValue(1);
+      return undefined;
+    }
+    const animacao = Animated.timing(progresso, {
+      toValue: 1,
+      duration: DURACAO.passo,
+      easing: CURVA.padrao,
+      useNativeDriver: USA_DRIVER_NATIVO,
+    });
+    animacao.start();
+    return () => animacao.stop();
+  }, [reduzido, progresso]);
+  if (reduzido) return <>{children}</>;
+  return (
+    <VistaAnimada
+      style={{
+        opacity: progresso,
+        transform: [
+          { translateY: progresso.interpolate({ inputRange: [0, 1], outputRange: [8, 0] }) },
+        ],
+      }}
+    >
+      {children}
+    </VistaAnimada>
+  );
+}
+
+/**
+ * Gira o conteúdo (por exemplo, a seta de um bloco que abre) entre 0 e `graus` em 250 ms. Parado
+ * com "Reduzir movimento".
+ *
+ * @param props.ligado - Se está no ângulo final.
+ * @param props.graus - Ângulo final, em graus (padrão 90).
+ */
+export function Giro({
+  ligado,
+  graus = 90,
+  children,
+}: {
+  ligado: boolean;
+  graus?: number;
+  children: ReactNode;
+}) {
+  const reduzido = useMovimentoReduzido();
+  const valor = useRef(new Animated.Value(ligado ? 1 : 0)).current;
+  useEffect(() => {
+    if (reduzido) {
+      valor.setValue(ligado ? 1 : 0);
+      return undefined;
+    }
+    const animacao = Animated.timing(valor, {
+      toValue: ligado ? 1 : 0,
+      duration: DURACAO.passo,
+      easing: CURVA.padrao,
+      useNativeDriver: USA_DRIVER_NATIVO,
+    });
+    animacao.start();
+    return () => animacao.stop();
+  }, [ligado, reduzido, valor]);
+  return (
+    <VistaAnimada
+      style={{
+        transform: [
+          {
+            rotate: valor.interpolate({ inputRange: [0, 1], outputRange: ['0deg', `${graus}deg`] }),
+          },
+        ],
+      }}
+    >
+      {children}
+    </VistaAnimada>
+  );
+}
