@@ -3,10 +3,12 @@
 # o autor revisa e mescla. Poucos PRs abertos por vez e agrupados, para não inundar a fila.
 #
 # Versões MAIORES de plataforma não vêm por aqui (decisão de 17/11/2026): o Expo SDK 57 para o 58,
-# o React Native, o TypeScript 7, o `@types/node` (o projeto fixa o Node 24 em `.nvmrc`) e o Node da
-# imagem Docker quebram o app e o CI juntos (PRs 300, 307, 308 e 309). Cada uma é uma tarefa própria,
+# o TypeScript 7, o `@types/node` (o projeto fixa o Node 24 em `.nvmrc`) e o Node da imagem Docker
+# quebram o app e o CI juntos (PRs 300, 307, 308 e 309). React e React Native, com as bibliotecas
+# nativas, também não vêm por aqui, nem em versão menor (PR 319). Cada uma é uma tarefa própria,
 # com migração e teste em aparelho, feita por pedido e não por robô. Os grupos só aceitam
-# atualizações menores e de correção.
+# atualizações menores e de correção. As correções de SEGURANÇA continuam chegando (o `ignore`
+# vale só para as atualizações de versão).
 version: 2
 updates:
   - package-ecosystem: npm
@@ -25,21 +27,21 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: 'jest-expo'
         update-types: ['version-update:semver-major']
-      - dependency-name: 'react-native*'
-        update-types: ['version-update:semver-major']
-      - dependency-name: '@react-native/*'
-        update-types: ['version-update:semver-major']
+      # React, React Native e as bibliotecas nativas (Reanimated, Screens, SVG, WebView...) seguem as
+      # versões exatas que o Expo SDK pede (`npx expo install --fix`); qualquer salto, até o "menor"
+      # do React Native (0.86 para 0.88), quebra os tipos e o Gradle (PR 319). Nenhuma versão vem por robô.
       - dependency-name: 'react'
-        update-types: ['version-update:semver-major']
       - dependency-name: 'react-dom'
-        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-native'
+      - dependency-name: 'react-native-*'
+      - dependency-name: '@react-native/*'
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
     groups:
       expo:
-        patterns: ['expo*', '@expo/*', 'react-native*', '@react-native/*', 'react', 'react-dom']
+        patterns: ['expo*', '@expo/*']
         update-types: ['minor', 'patch']
       testes:
         patterns: ['jest*', '@types/*', '@testing-library/*', 'playwright*', '@playwright/*']
