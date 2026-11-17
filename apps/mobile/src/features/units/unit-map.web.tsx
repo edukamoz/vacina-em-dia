@@ -10,7 +10,7 @@ import { MAP_CONTROLS_CSS, type UnitMapProps } from './unit-map-types';
  * Mapa de postos para a web: Leaflet com os mapas do OpenStreetMap direto no navegador. Os
  * marcadores têm o nome da unidade (funcionam por teclado) e o mapa cabe no espaço que receber.
  */
-export function UnitMap({ units, selectedCnes, position, onSelect }: UnitMapProps) {
+export function UnitMap({ units, selectedCnes, position, onSelect, altura }: UnitMapProps) {
   const cores = useThemeColors();
   const container = useRef<HTMLDivElement>(null);
   const controller = useRef<UnitsMapController | null>(null);
@@ -46,6 +46,7 @@ export function UnitMap({ units, selectedCnes, position, onSelect }: UnitMapProp
     <View
       accessibilityLabel="Mapa dos postos de saúde"
       role="group"
+      style={altura ? { height: altura } : undefined}
       className="h-[360px] w-full overflow-hidden rounded-cartao border-fina border-bordaSuave expandido:h-[560px]"
     >
       <style>{MAP_CONTROLS_CSS}</style>

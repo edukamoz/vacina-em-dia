@@ -1,6 +1,13 @@
 import type { HealthUnit } from '@vacina/shared';
-import { useMemo, useState } from 'react';
-import { Linking, Pressable, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+  View,
+  type LayoutChangeEvent,
+} from 'react-native';
 import { AzulejoDeMarca } from '../../components/azulejo-de-marca';
 import { Botao } from '../../components/botao';
 import { Cartao } from '../../components/cartao';
@@ -8,7 +15,8 @@ import { CampoTexto } from '../../components/campo-texto';
 import { EstadoCarregando } from '../../components/estados';
 import { Tela } from '../../components/tela';
 import { Texto } from '../../components/texto';
-import { useVisual } from '../../theme/theme-provider';
+import { modoDeLayout } from '../../lib/layout';
+import { useMovimentoReduzido, useVisual } from '../../theme/theme-provider';
 import { formatCivilDate } from '../doses/format-date';
 import { formatDistance, normalizeSearch, routeUrl, telUrl } from './units-format';
 import { UnitMap } from './unit-map';
@@ -23,15 +31,18 @@ function UnitCard({
   unit,
   selected,
   onSelect,
+  aoMedir,
 }: {
   unit: HealthUnit;
   selected: boolean;
   onSelect: () => void;
+  /** Informa a posição vertical do cartão na lista (para rolar até ele quando o mapa o escolhe). */
+  aoMedir?: (evento: LayoutChangeEvent) => void;
 }) {
   const { sombra, altoContraste } = useVisual();
   const where = [unit.address, unit.neighborhood].filter(Boolean).join(', ');
   return (
-    <View role="listitem">
+    <View role="listitem" {...(aoMedir ? { onLayout: aoMedir } : {})}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${unit.name}, ${formatDistance(unit.distanceMeters)}. ${where}`}
@@ -126,153 +137,215 @@ export function UnitsScreen() {
   const hasList = units.items.length > 0;
   const receivedOn = units.receivedAt ? formatCivilDate(units.receivedAt.slice(0, 10)) : null;
 
-  return (
-    <Tela emAba titulo="Postos de saúde" subtitulo="Unidades básicas de saúde perto de você.">
-      <View className="flex-col-reverse gap-xl expandido:flex-row expandido:items-start">
-        <View className="gap-lg expandido:w-[400px]">
-          <Botao
-            titulo="Usar minha localização"
-            icone="local"
-            variante={hasList ? 'secundario' : 'principal'}
-            disabled={busy}
-            onPress={() => void units.locate()}
+  // No computador (design v3) a lista vira um painel com rolagem própria, da altura do mapa, e o
+  // mapa fica ao lado: a página não cresce com o número de postos. Um posto escolhido no mapa
+  // rola a lista até o seu cartão.
+  const { width, height } = useWindowDimensions();
+  const reduzido = useMovimentoReduzido();
+  const painel = modoDeLayout(width) === 'expandido';
+  const alturaDoPainel = Math.max(560, Math.min(820, height - 200));
+  const rolagem = useRef<ScrollView>(null);
+  const topoDaLista = useRef(0);
+  const topoDosCartoes = useRef(new Map<string, number>());
+  useEffect(() => {
+    if (!painel || !selectedCnes) return;
+    const topo = topoDosCartoes.current.get(selectedCnes);
+    if (topo !== undefined) {
+      rolagem.current?.scrollTo({
+        y: Math.max(0, topoDaLista.current + topo - 8),
+        animated: !reduzido,
+      });
+    }
+  }, [painel, selectedCnes, reduzido]);
+
+  const campos = hasList ? (
+    <>
+      <CampoTexto
+        rotulo="Buscar por nome ou rua"
+        value={search}
+        onChangeText={(texto) => {
+          setSearch(texto);
+          setMostrados(POSTOS_INICIAIS);
+        }}
+        autoCorrect={false}
+      />
+      {!units.position && receivedOn ? (
+        <Texto variante="apoio" className="text-textoSecundario">
+          {`Lista salva em ${receivedOn}. Toque em "Usar minha localização" para ver os postos perto de você agora.`}
+        </Texto>
+      ) : null}
+    </>
+  ) : null;
+
+  const cartoes = hasList ? (
+    <>
+      <View
+        role="list"
+        className="gap-md"
+        onLayout={(evento) => {
+          topoDaLista.current = evento.nativeEvent.layout.y;
+        }}
+      >
+        {listados.map((unit) => (
+          <UnitCard
+            key={unit.cnes}
+            unit={unit}
+            selected={unit.cnes === selectedCnes}
+            onSelect={() => setSelectedCnes(unit.cnes === selectedCnes ? null : unit.cnes)}
+            aoMedir={(evento) => topoDosCartoes.current.set(unit.cnes, evento.nativeEvent.layout.y)}
           />
-          <Texto variante="apoio" className="text-textoSecundario">
-            O app pede a sua localização só agora, só para achar os postos, e não guarda a sua
-            posição.
+        ))}
+        {visible.length === 0 ? (
+          <Texto className="text-textoSecundario">Nenhum posto encontrado. Tente outro nome.</Texto>
+        ) : null}
+      </View>
+      {visible.length > POSTOS_INICIAIS ? (
+        <View className="gap-sm">
+          <Texto variante="apoio" className="text-textoSecundario" accessibilityLiveRegion="polite">
+            {`Mostrando ${listados.length} de ${visible.length} postos, do mais perto para o mais longe.`}
           </Texto>
-
-          {busy ? (
-            <EstadoCarregando
-              rotulo={units.phase === 'locating' ? 'Buscando a sua posição' : 'Buscando os postos'}
-            />
-          ) : null}
-          {units.error ? (
-            <View
-              accessible
-              accessibilityRole="alert"
-              className="flex-row gap-sm rounded-[16px] border-padrao border-erro bg-erroSuave p-md"
-            >
-              <Texto className="flex-1">{units.error}</Texto>
-            </View>
-          ) : null}
-          {units.offline ? (
-            <View
-              accessible
-              accessibilityRole="alert"
-              className="rounded-[16px] border-padrao border-agendada bg-agendadaSuave p-md"
-            >
-              <Texto>
-                Sem internet agora. Mostrando a lista salva neste aparelho
-                {receivedOn ? ` em ${receivedOn}` : ''}, da mais perto para a mais longe de você.
-              </Texto>
-            </View>
-          ) : null}
-
-          {hasList ? (
-            <>
-              <CampoTexto
-                rotulo="Buscar por nome ou rua"
-                value={search}
-                onChangeText={(texto) => {
-                  setSearch(texto);
-                  setMostrados(POSTOS_INICIAIS);
-                }}
-                autoCorrect={false}
+          <View className="flex-row flex-wrap gap-sm">
+            {listados.length < visible.length ? (
+              <Botao
+                titulo={`Mostrar mais ${Math.min(POSTOS_POR_VEZ, visible.length - listados.length)} postos`}
+                variante="secundario"
+                onPress={() => setMostrados(limite + POSTOS_POR_VEZ)}
               />
-              {!units.position && receivedOn ? (
-                <Texto variante="apoio" className="text-textoSecundario">
-                  {`Lista salva em ${receivedOn}. Toque em "Usar minha localização" para ver os postos perto de você agora.`}
-                </Texto>
-              ) : null}
-              <View role="list" className="gap-md">
-                {listados.map((unit) => (
-                  <UnitCard
-                    key={unit.cnes}
-                    unit={unit}
-                    selected={unit.cnes === selectedCnes}
-                    onSelect={() => setSelectedCnes(unit.cnes === selectedCnes ? null : unit.cnes)}
-                  />
-                ))}
-                {visible.length === 0 ? (
-                  <Texto className="text-textoSecundario">
-                    Nenhum posto encontrado. Tente outro nome.
-                  </Texto>
-                ) : null}
-              </View>
-              {visible.length > POSTOS_INICIAIS ? (
-                <View className="gap-sm">
-                  <Texto
-                    variante="apoio"
-                    className="text-textoSecundario"
-                    accessibilityLiveRegion="polite"
-                  >
-                    {`Mostrando ${listados.length} de ${visible.length} postos, do mais perto para o mais longe.`}
-                  </Texto>
-                  <View className="flex-row flex-wrap gap-sm">
-                    {listados.length < visible.length ? (
-                      <Botao
-                        titulo={`Mostrar mais ${Math.min(POSTOS_POR_VEZ, visible.length - listados.length)} postos`}
-                        variante="secundario"
-                        onPress={() => setMostrados(limite + POSTOS_POR_VEZ)}
-                      />
-                    ) : null}
-                    {limite > POSTOS_INICIAIS ? (
-                      <Botao
-                        titulo="Mostrar só os mais perto"
-                        variante="secundario"
-                        onPress={() => setMostrados(POSTOS_INICIAIS)}
-                      />
-                    ) : null}
-                  </View>
-                </View>
-              ) : null}
-            </>
-          ) : !busy && !units.error ? (
-            <Cartao className="gap-sm">
-              <Texto variante="titulo3" accessibilityRole="header">
-                Vamos achar os postos perto de você
-              </Texto>
-              <Texto className="text-textoSecundario">
-                Toque em "Usar minha localização". Se preferir não permitir, as outras telas do app
-                continuam funcionando normalmente.
-              </Texto>
-            </Cartao>
-          ) : null}
-
-          <View className="gap-sm rounded-[16px] border-fina border-bordaSuave bg-superficieSuave p-lg">
-            <Texto variante="apoio" className="font-negrito text-texto">
-              Ligue antes de ir
-            </Texto>
-            <Texto variante="apoio" className="text-textoSecundario">
-              {units.notice ??
-                'A lista traz unidades básicas de saúde do cadastro oficial (CNES). Nem todas têm sala de vacina: ligue antes de ir.'}
-            </Texto>
-            {units.source ? (
-              <Texto variante="apoio" className="text-textoSecundario">
-                {`Fonte: ${units.source.name}, ${units.source.publisher}, arquivo de ${formatCivilDate(
-                  units.source.dataVersion,
-                )}. ${
-                  units.source.live
-                    ? 'Telefone e turno atualizados agora pela API oficial.'
-                    : 'Telefone e turno podem estar desatualizados.'
-                }`}
-              </Texto>
             ) : null}
-            <Texto variante="apoio" className="text-textoSecundario">
-              Mapa: © colaboradores do OpenStreetMap.
-            </Texto>
+            {limite > POSTOS_INICIAIS ? (
+              <Botao
+                titulo="Mostrar só os mais perto"
+                variante="secundario"
+                onPress={() => setMostrados(POSTOS_INICIAIS)}
+              />
+            ) : null}
           </View>
         </View>
+      ) : null}
+    </>
+  ) : !busy && !units.error ? (
+    <Cartao className="gap-sm">
+      <Texto variante="titulo3" accessibilityRole="header">
+        Vamos achar os postos perto de você
+      </Texto>
+      <Texto className="text-textoSecundario">
+        Toque em "Usar minha localização". Se preferir não permitir, as outras telas do app
+        continuam funcionando normalmente.
+      </Texto>
+    </Cartao>
+  ) : null;
 
-        <View className="expandido:flex-1">
-          <UnitMap
-            units={visible}
-            selectedCnes={selectedCnes}
-            position={units.position}
-            onSelect={setSelectedCnes}
-          />
+  const notas = (
+    <View className="gap-sm rounded-[16px] border-fina border-bordaSuave bg-superficieSuave p-lg">
+      <Texto variante="apoio" className="font-negrito text-texto">
+        Ligue antes de ir
+      </Texto>
+      <Texto variante="apoio" className="text-textoSecundario">
+        {units.notice ??
+          'A lista traz unidades básicas de saúde do cadastro oficial (CNES). Nem todas têm sala de vacina: ligue antes de ir.'}
+      </Texto>
+      {units.source ? (
+        <Texto variante="apoio" className="text-textoSecundario">
+          {`Fonte: ${units.source.name}, ${units.source.publisher}, arquivo de ${formatCivilDate(
+            units.source.dataVersion,
+          )}. ${
+            units.source.live
+              ? 'Telefone e turno atualizados agora pela API oficial.'
+              : 'Telefone e turno podem estar desatualizados.'
+          }`}
+        </Texto>
+      ) : null}
+      <Texto variante="apoio" className="text-textoSecundario">
+        Mapa: © colaboradores do OpenStreetMap.
+      </Texto>
+    </View>
+  );
+
+  const controles = (
+    <>
+      <Botao
+        titulo="Usar minha localização"
+        icone="local"
+        variante={hasList ? 'secundario' : 'principal'}
+        disabled={busy}
+        onPress={() => void units.locate()}
+      />
+      <Texto variante="apoio" className="text-textoSecundario">
+        O app pede a sua localização só agora, só para achar os postos, e não guarda a sua posição.
+      </Texto>
+
+      {busy ? (
+        <EstadoCarregando
+          rotulo={units.phase === 'locating' ? 'Buscando a sua posição' : 'Buscando os postos'}
+        />
+      ) : null}
+      {units.error ? (
+        <View
+          accessible
+          accessibilityRole="alert"
+          className="flex-row gap-sm rounded-[16px] border-padrao border-erro bg-erroSuave p-md"
+        >
+          <Texto className="flex-1">{units.error}</Texto>
         </View>
+      ) : null}
+      {units.offline ? (
+        <View
+          accessible
+          accessibilityRole="alert"
+          className="rounded-[16px] border-padrao border-agendada bg-agendadaSuave p-md"
+        >
+          <Texto>
+            Sem internet agora. Mostrando a lista salva neste aparelho
+            {receivedOn ? ` em ${receivedOn}` : ''}, da mais perto para a mais longe de você.
+          </Texto>
+        </View>
+      ) : null}
+      {campos}
+    </>
+  );
+
+  const mapa = (
+    <UnitMap
+      units={visible}
+      selectedCnes={selectedCnes}
+      position={units.position}
+      onSelect={setSelectedCnes}
+      {...(painel ? { altura: alturaDoPainel } : {})}
+    />
+  );
+
+  if (painel) {
+    return (
+      <Tela emAba titulo="Postos de saúde" subtitulo="Unidades básicas de saúde perto de você.">
+        <View className="flex-row items-start gap-xl">
+          <View className="w-[420px] gap-lg" style={{ height: alturaDoPainel }}>
+            {controles}
+            <ScrollView
+              ref={rolagem}
+              testID="painel-de-postos"
+              className="min-h-0 flex-1"
+              contentContainerClassName="gap-lg pb-md"
+              showsVerticalScrollIndicator
+            >
+              {cartoes}
+            </ScrollView>
+          </View>
+          <View className="flex-1">{mapa}</View>
+        </View>
+        {notas}
+      </Tela>
+    );
+  }
+
+  return (
+    <Tela emAba titulo="Postos de saúde" subtitulo="Unidades básicas de saúde perto de você.">
+      <View className="flex-col-reverse gap-xl">
+        <View className="gap-lg">
+          {controles}
+          {cartoes}
+          {notas}
+        </View>
+        <View>{mapa}</View>
       </View>
     </Tela>
   );

@@ -212,3 +212,37 @@ describe('tela de postos de saúde (RF10)', () => {
     expect(screen.getAllByRole('button', { name: /, a \d/ })).toHaveLength(5);
   });
 });
+
+describe('postos no computador (design v3)', () => {
+  const comLargura = (largura: number) =>
+    jest
+      .spyOn(Dimensions, 'get')
+      .mockReturnValue({ width: largura, height: 900, scale: 1, fontScale: 1 });
+
+  test('CT-UNI-APP-51: no computador a lista fica num painel com rolagem própria, ao lado do mapa', async () => {
+    const dim = comLargura(1280);
+    try {
+      const fake = createFakeFetch({ [URL_BUSCA]: { status: 200, body: DUAS } });
+      await renderScreen(<UnitsScreen />, fake.fetchFn);
+      await fireEvent.press(screen.getByRole('button', { name: 'Usar minha localização' }));
+      expect(await screen.findByTestId('painel-de-postos')).toBeOnTheScreen();
+      expect(screen.getByText(/Unidade Básica de Saúde Rio Acima/)).toBeOnTheScreen();
+      expect(screen.getByText('Ligue antes de ir')).toBeOnTheScreen();
+    } finally {
+      dim.mockRestore();
+    }
+  });
+
+  test('CT-UNI-APP-52: no celular a lista segue a página, sem painel com rolagem', async () => {
+    const dim = comLargura(390);
+    try {
+      const fake = createFakeFetch({ [URL_BUSCA]: { status: 200, body: DUAS } });
+      await renderScreen(<UnitsScreen />, fake.fetchFn);
+      await fireEvent.press(screen.getByRole('button', { name: 'Usar minha localização' }));
+      expect(await screen.findByText(/Unidade Básica de Saúde Rio Acima/)).toBeOnTheScreen();
+      expect(screen.queryByTestId('painel-de-postos')).not.toBeOnTheScreen();
+    } finally {
+      dim.mockRestore();
+    }
+  });
+});
