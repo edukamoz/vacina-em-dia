@@ -2,7 +2,7 @@ name: APK do Android
 
 # Gera o APK do aplicativo e o publica nas Releases do GitHub.
 #
-# O APK demora e não precisa sair a cada merge: ele só é gerado sob demanda (a Azure continua
+# O APK demora e não precisa sair a cada merge: ele só é gerado sob demanda (o Google Cloud continua
 # atualizando a cada merge na `main`, pelo `deploy.yml`).
 # - Tag `v*` (por exemplo `v0.2.0`): cria uma release fixa dessa versão, com o APK.
 # - Execução manual (Actions > APK do Android > Run workflow): gera o APK da branch escolhida e
@@ -36,7 +36,7 @@ concurrency:
 
 env:
   # Mesma API do deploy (`deploy.yml`). Mudou o endereço lá? Mude aqui também.
-  API_URL: https://func-vacinaemdia-vedia6398.azurewebsites.net/api
+  API_URL: https://vacina-api-mdqonfxhra-uc.a.run.app/api
 
 jobs:
   apk:

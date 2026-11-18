@@ -63,13 +63,12 @@ describe('app instalável (PWA)', () => {
     expect(modelo).toContain('<link rel="manifest" href="/manifest.webmanifest" />');
     expect(modelo).toContain('rel="apple-touch-icon"');
     expect(modelo).toContain('lang="%LANG_ISO_CODE%"');
-    const swa = JSON.parse(readFileSync(join(PUBLICA, 'staticwebapp.config.json'), 'utf8')) as {
-      navigationFallback: { exclude: string[] };
-      mimeTypes: Record<string, string>;
-    };
-    expect(swa.navigationFallback.exclude).toEqual(
-      expect.arrayContaining(['/manifest.webmanifest', '/icons/*']),
-    );
-    expect(swa.mimeTypes['.webmanifest']).toBe('application/manifest+json');
+    // O app roda no nginx (Cloud Run): a CSP libera o manifesto (mesma origem) e tudo que não é
+    // arquivo cai no index.html do app, sem engolir o manifesto e os ícones, que existem de verdade.
+    const nginx = readFileSync(join(__dirname, '..', 'nginx.cloudrun.conf.template'), 'utf8');
+    expect(nginx).toContain("default-src 'self'");
+    expect(nginx).not.toMatch(/manifest-src/);
+    expect(nginx).toContain('try_files $uri $uri/ /index.html;');
+    expect(existsSync(join(PUBLICA, 'manifest.webmanifest'))).toBe(true);
   });
 });
