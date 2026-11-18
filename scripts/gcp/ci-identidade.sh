@@ -28,10 +28,16 @@ echo ">> 2/4 Conta de serviço do deploy"
 gcloud iam service-accounts describe "${SA}" >/dev/null 2>&1 ||
   gcloud iam service-accounts create vacina-deploy --display-name="Vacina em Dia (deploy pelo GitHub)"
 for papel in roles/run.admin roles/cloudbuild.builds.editor roles/artifactregistry.writer \
-  roles/storage.objectAdmin roles/serviceusage.serviceUsageConsumer roles/logging.viewer; do
+  roles/serviceusage.serviceUsageConsumer roles/logging.viewer; do
   gcloud projects add-iam-policy-binding "${PROJETO}" --member="serviceAccount:${SA}" \
     --role="${papel}" --condition=None --quiet >/dev/null
 done
+# O `gcloud builds submit` envia o código para o balde do Cloud Build e precisa ler os dados do balde
+# (`storage.buckets.get`), que o papel de objetos não inclui; por isso o papel vale só neste balde.
+BALDE="gs://${PROJETO}_cloudbuild"
+gcloud storage buckets describe "${BALDE}" >/dev/null 2>&1 ||
+  gcloud storage buckets create "${BALDE}" --location=us --quiet
+gcloud storage buckets add-iam-policy-binding "${BALDE}" --member="serviceAccount:${SA}" \n  --role=roles/storage.admin >/dev/null
 # Para trocar a imagem de um serviço, a conta de deploy precisa poder "agir como" a conta do Cloud Run.
 gcloud iam service-accounts add-iam-policy-binding "${SA_RUN}" --member="serviceAccount:${SA}" \
   --role=roles/iam.serviceAccountUser --quiet >/dev/null
