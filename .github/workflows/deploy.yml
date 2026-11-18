@@ -1,14 +1,18 @@
 name: Deploy
 
-# Publica a API (Azure Functions) e o app web (Static Web Apps) na Azure (SCRUM-22).
-# Roda ao integrar na main ou manualmente. Os segredos ficam em Settings > Secrets do GitHub,
-# nunca no repositório. A API entra na Azure por login federado (OIDC, sem senha guardada):
-# AZURE_CLIENT_ID, AZURE_TENANT_ID e AZURE_SUBSCRIPTION_ID (identificadores, não são segredos de
-# acesso por si sós). O app web usa AZURE_STATIC_WEB_APPS_API_TOKEN.
+# Publica a API, o PLN e o app web no Google Cloud Run (B79, ADR-038). Roda ao integrar na main ou
+# manualmente. A Azure não é mais usada (créditos esgotados em 17/11/2026).
+#
+# O GitHub entra no Google Cloud por login federado (Workload Identity, sem chave guardada); o
+# roteiro `scripts/gcp/ci-identidade.sh` cria a identidade uma vez. Ficam em Settings > Secrets and
+# variables > Actions > Variables (identificadores, não são segredos de acesso por si sós):
+#   GCP_PROJECT, GCP_WORKLOAD_IDENTITY_PROVIDER e GCP_SERVICE_ACCOUNT.
+# Os serviços já existem (criados por `scripts/gcp/implantar.sh`); aqui só entra a imagem nova, e as
+# variáveis e os segredos de cada serviço ficam como estão.
 on:
   push:
     branches: [main]
-    # Documentos Word e arte não mudam o que vai para a Azure.
+    # Documentos Word e arte não mudam o que vai para o Google Cloud.
     paths-ignore:
       - 'doctos/**'
       - 'assets/**'
@@ -23,139 +27,63 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  FUNCTIONAPP_NAME: func-vacinaemdia-vedia6398
-  API_URL: https://func-vacinaemdia-vedia6398.azurewebsites.net/api
-  NLP_FUNCTIONAPP_NAME: func-nlp-vacinaemdia-vedia6398
+  REGIAO: us-central1
+  # Endereços públicos dos serviços (mesmo valor em `apk.yml` e em `native-map-html.ts`).
+  WEB_URL: https://vacina-web-mdqonfxhra-uc.a.run.app
+  API_URL: https://vacina-api-mdqonfxhra-uc.a.run.app/api
+  NLP_URL: https://vacina-nlp-mdqonfxhra-uc.a.run.app/api
 
 jobs:
-  api:
-    name: Publicar a API
+  publicar:
+    name: Construir e publicar no Cloud Run
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - name: Baixar o código
         uses: actions/checkout@v7
 
-      - name: Instalar o Node.js
-        uses: actions/setup-node@v7
+      - name: Entrar no Google Cloud (Workload Identity)
+        uses: google-github-actions/auth@v3
         with:
-          node-version-file: .nvmrc
-          cache: npm
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - name: Compilar o domínio compartilhado e a API
-        run: |
-          npm ci --ignore-scripts
-          npm run build -w @vacina/shared -w @vacina/api
+      - name: Instalar o gcloud
+        uses: google-github-actions/setup-gcloud@v3
 
-      - name: Montar o pacote de produção
-        run: |
-          rm -rf node_modules
-          npm ci --omit=dev --ignore-scripts -w @vacina/api -w @vacina/shared
-          mkdir -p pacote
-          cp apps/api/host.json apps/api/package.json pacote/
-          cp -r apps/api/dist pacote/dist
-          # -L resolve o link do workspace @vacina/shared para os arquivos reais.
-          cp -rL node_modules pacote/node_modules
-
-      - name: Entrar na Azure (OIDC)
-        uses: azure/login@v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Publicar na Function App (Flex Consumption)
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ env.FUNCTIONAPP_NAME }}
-          package: pacote
-          sku: flexconsumption
-
-      - name: Teste de fumaça
-        run: |
-          for i in 1 2 3 4 5 6; do
-            if curl -fsS "$API_URL/health"; then exit 0; fi
-            sleep 10
-          done
-          exit 1
-
-  nlp:
-    name: Publicar o serviço de PLN
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - name: Baixar o código
-        uses: actions/checkout@v7
-
-      - name: Instalar o Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: '3.13'
-
-      # As bibliotecas vão dentro do pacote (.python_packages), compiladas para Linux, como o
-      # Flex Consumption espera. O modelo é treinado na partida do serviço.
-      - name: Montar o pacote
-        run: |
-          mkdir -p pacote-nlp
-          pip install -r apps/nlp/requirements.txt --target pacote-nlp/.python_packages/lib/site-packages
-          cp apps/nlp/host.json apps/nlp/function_app.py pacote-nlp/
-          cp -r apps/nlp/vacina_nlp pacote-nlp/vacina_nlp
-          find pacote-nlp -name __pycache__ -type d -prune -exec rm -rf {} +
-
-      - name: Entrar na Azure (OIDC)
-        uses: azure/login@v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Publicar na Function App (Flex Consumption)
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ env.NLP_FUNCTIONAPP_NAME }}
-          package: pacote-nlp
-          sku: flexconsumption
-
-      - name: Teste de fumaça
-        run: |
-          for i in 1 2 3 4 5 6 7 8; do
-            if curl -fsS "https://${NLP_FUNCTIONAPP_NAME}.azurewebsites.net/api/health"; then exit 0; fi
-            sleep 15
-          done
-          exit 1
-
-  web:
-    name: Publicar o app web
-    runs-on: ubuntu-latest
-    needs: api
-    timeout-minutes: 20
-    steps:
-      - name: Baixar o código
-        uses: actions/checkout@v7
-
-      - name: Instalar o Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - name: Gerar o app web
+      # As três imagens saem do Cloud Build (amd64, como o Cloud Run), com a etiqueta do commit e
+      # `latest`. O `^@^` troca o separador das substituições, porque a cidade do Pix pode ter vírgula.
+      - name: Construir as imagens (Cloud Build)
         env:
-          # Valor público (endereço da API), nunca um segredo.
-          EXPO_PUBLIC_API_URL: ${{ env.API_URL }}
+          PROJETO: ${{ vars.GCP_PROJECT }}
           # Pix de doação (variáveis do repositório). Chave aleatória, mostrada no QR: não é segredo.
-          EXPO_PUBLIC_PIX_KEY: ${{ vars.PIX_KEY }}
-          EXPO_PUBLIC_PIX_NAME: ${{ vars.PIX_NAME }}
-          EXPO_PUBLIC_PIX_CITY: ${{ vars.PIX_CITY }}
+          PIX_KEY: ${{ vars.PIX_KEY }}
+          PIX_NAME: ${{ vars.PIX_NAME }}
+          PIX_CITY: ${{ vars.PIX_CITY }}
         run: |
-          npm ci --ignore-scripts
-          npm run build -w @vacina/shared
-          npm run build -w @vacina/mobile
+          REPO="${REGIAO}-docker.pkg.dev/${PROJETO}/vacina"
+          gcloud builds submit --project "${PROJETO}" --config scripts/gcp/cloudbuild.yaml \
+            --substitutions "^@^_REPO=${REPO}@_TAG=${GITHUB_SHA}@_PIX_KEY=${PIX_KEY}@_PIX_NAME=${PIX_NAME}@_PIX_CITY=${PIX_CITY}" .
 
-      - name: Publicar no Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: upload
-          app_location: apps/mobile/dist
-          skip_app_build: true
+      - name: Publicar os serviços
+        env:
+          PROJETO: ${{ vars.GCP_PROJECT }}
+        run: |
+          REPO="${REGIAO}-docker.pkg.dev/${PROJETO}/vacina"
+          for par in vacina-nlp:nlp vacina-api:api vacina-web:web; do
+            gcloud run services update "${par%%:*}" --project "${PROJETO}" --region "${REGIAO}" \
+              --image "${REPO}/${par##*:}:${GITHUB_SHA}" --quiet
+          done
+
+      - name: Teste de fumaça
+        run: |
+          conferir() { # nome, endereço, tentativas
+            for i in $(seq 1 "$3"); do
+              if curl -fsS -m 60 "$2" >/dev/null; then echo "$1 respondeu"; return 0; fi
+              sleep 15
+            done
+            echo "::error::$1 não respondeu em $2"; return 1
+          }
+          conferir "API" "${API_URL}/health" 6
+          conferir "PLN" "${NLP_URL}/health" 8
+          conferir "App web (repassando /api)" "${WEB_URL}/api/health" 6

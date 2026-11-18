@@ -1,18 +1,45 @@
 # Constrói as três imagens no Cloud Build (amd64, como o Cloud Run) e as envia ao Artifact Registry.
 # Uso (a partir da raiz do repositório): gcloud builds submit --config scripts/gcp/cloudbuild.yaml \
 #   --substitutions _REPO=<regiao>-docker.pkg.dev/<projeto>/vacina .
+# Substituições opcionais: _TAG (etiqueta além de `latest`; o deploy automático usa o commit) e
+# _PIX_KEY, _PIX_NAME e _PIX_CITY (Pix de doação do app web; vazios, a seção não aparece).
 # O Cloud Build tem 120 minutos gratuitos por dia; cada imagem leva alguns minutos.
 # O Dockerfile usa `$BUILDPLATFORM` (BuildKit); o construtor padrão do Cloud Build não o conhece,
 # por isso cada passo liga o BuildKit.
+substitutions:
+  _TAG: manual
+  _PIX_KEY: ''
+  _PIX_NAME: ''
+  _PIX_CITY: ''
 steps:
   - name: gcr.io/cloud-builders/docker
     id: api
     env: ['DOCKER_BUILDKIT=1']
-    args: ['build', '-f', 'apps/api/Dockerfile', '-t', '${_REPO}/api:latest', '.']
+    args:
+      [
+        'build',
+        '-f',
+        'apps/api/Dockerfile',
+        '-t',
+        '${_REPO}/api:latest',
+        '-t',
+        '${_REPO}/api:${_TAG}',
+        '.',
+      ]
   - name: gcr.io/cloud-builders/docker
     id: nlp
     env: ['DOCKER_BUILDKIT=1']
-    args: ['build', '-f', 'apps/nlp/Dockerfile', '-t', '${_REPO}/nlp:latest', 'apps/nlp']
+    args:
+      [
+        'build',
+        '-f',
+        'apps/nlp/Dockerfile',
+        '-t',
+        '${_REPO}/nlp:latest',
+        '-t',
+        '${_REPO}/nlp:${_TAG}',
+        'apps/nlp',
+      ]
   - name: gcr.io/cloud-builders/docker
     id: web
     env: ['DOCKER_BUILDKIT=1']
@@ -24,11 +51,22 @@ steps:
       - cloudrun
       - -t
       - ${_REPO}/web:latest
+      - -t
+      - ${_REPO}/web:${_TAG}
+      - --build-arg
+      - EXPO_PUBLIC_PIX_KEY=${_PIX_KEY}
+      - --build-arg
+      - EXPO_PUBLIC_PIX_NAME=${_PIX_NAME}
+      - --build-arg
+      - EXPO_PUBLIC_PIX_CITY=${_PIX_CITY}
       - .
 images:
   - ${_REPO}/api:latest
+  - ${_REPO}/api:${_TAG}
   - ${_REPO}/nlp:latest
+  - ${_REPO}/nlp:${_TAG}
   - ${_REPO}/web:latest
+  - ${_REPO}/web:${_TAG}
 options:
   # A máquina padrão (e2-standard-2) é a que tem os 120 minutos gratuitos por dia.
   logging: CLOUD_LOGGING_ONLY

@@ -19,7 +19,7 @@ const LEAFLET_JS_SRI = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
  * Endereço usado como origem da página do mapa. Os mapas do OpenStreetMap pedem que quem os usa se
  * identifique pela origem (`Referer`); aqui é o endereço público do app.
  */
-export const MAP_BASE_URL = 'https://blue-rock-0d7abc710.4.azurestaticapps.net';
+export const MAP_BASE_URL = 'https://vacina-web-mdqonfxhra-uc.a.run.app';
 
 /**
  * Página HTML do mapa, para a `WebView` do celular: Leaflet (com controles de 48 px), os mapas do
