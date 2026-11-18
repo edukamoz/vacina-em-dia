@@ -62,7 +62,9 @@ jobs:
           PIX_CITY: ${{ vars.PIX_CITY }}
         run: |
           REPO="${REGIAO}-docker.pkg.dev/${PROJETO}/vacina"
+          # O build roda numa conta própria e mínima (vacina-build), não na conta padrão do projeto.
           gcloud builds submit --project "${PROJETO}" --config scripts/gcp/cloudbuild.yaml \
+            --service-account "projects/${PROJETO}/serviceAccounts/vacina-build@${PROJETO}.iam.gserviceaccount.com" 
             --substitutions "^@^_REPO=${REPO}@_TAG=${GITHUB_SHA}@_PIX_KEY=${PIX_KEY}@_PIX_NAME=${PIX_NAME}@_PIX_CITY=${PIX_CITY}" .
 
       - name: Publicar os serviços
