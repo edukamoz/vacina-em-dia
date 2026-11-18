@@ -32,7 +32,7 @@ tentar() {
 
 echo ">> 1/7 Ativando as APIs"
 gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com \
-  firestore.googleapis.com secretmanager.googleapis.com cloudscheduler.googleapis.com --quiet
+  firestore.googleapis.com secretmanager.googleapis.com cloudscheduler.googleapis.com speech.googleapis.com --quiet
 
 echo ">> 2/7 Firestore (modo nativo)"
 gcloud firestore databases describe --database='(default)' >/dev/null 2>&1 ||
@@ -90,7 +90,7 @@ gcloud run deploy vacina-nlp --image="${REPO}/nlp:latest" --port=80 --memory=1Gi
   --timeout=60 "${COMUM[@]}" "${FUNCOES[@]}"
 URL_NLP="$(gcloud run services describe vacina-nlp --region="${REGIAO}" --format='value(status.url)')"
 
-ENV_API="FIRESTORE_PROJECT=${PROJETO},NLP_BASE_URL=${URL_NLP}/api,NLP_FUNCTION_KEY=${CHAVE_FUNCAO},DEMO_SESSION_ENABLED=false,TRUSTED_PROXY_HOPS=2,DOCS_ENABLED=false"
+ENV_API="FIRESTORE_PROJECT=${PROJETO},NLP_BASE_URL=${URL_NLP}/api,NLP_FUNCTION_KEY=${CHAVE_FUNCAO},DEMO_SESSION_ENABLED=false,TRUSTED_PROXY_HOPS=2,DOCS_ENABLED=false,GOOGLE_SPEECH=on,VOICE_MONTHLY_SECONDS=3000"
 [ -n "${EMAIL_SENDER_ADDRESS:-}" ] && ENV_API="${ENV_API},EMAIL_SENDER_ADDRESS=${EMAIL_SENDER_ADDRESS}"
 SEGREDOS_API="AUTH_TOKEN_SECRET=vacina-auth-token:latest"
 gcloud secrets describe vacina-brevo >/dev/null 2>&1 && SEGREDOS_API="${SEGREDOS_API},BREVO_API_KEY=vacina-brevo:latest"
@@ -100,7 +100,7 @@ gcloud run deploy vacina-api --image="${REPO}/api:latest" --port=80 --memory=1Gi
 URL_API="$(gcloud run services describe vacina-api --region="${REGIAO}" --format='value(status.url)')"
 
 gcloud run deploy vacina-web --image="${REPO}/web:latest" --memory=256Mi --cpu=1 --max-instances=2 \
-  --region="${REGIAO}" --allow-unauthenticated --quiet \
+  --region="${REGIAO}" --service-account="${SA}" --allow-unauthenticated --quiet \
   --set-env-vars="API_URL=${URL_API},API_HOST=${URL_API#https://}"
 URL_WEB="$(gcloud run services describe vacina-web --region="${REGIAO}" --format='value(status.url)')"
 # Os links dos e-mails apontam para o app web.

@@ -11,6 +11,12 @@ import {
   unavailableOfficialUnitsClient,
 } from '../clients/official-units-client';
 import { createHttpNlpClient, unavailableNlpClient } from '../clients/nlp-http-client';
+import {
+  createGoogleSpeechClient,
+  createMetadataTokenProvider,
+  createMonthlyVoiceBudget,
+  DEFAULT_VOICE_MONTHLY_SECONDS,
+} from '../clients/google-speech-client';
 import { createHttpSpeechClient, unavailableSpeechClient } from '../clients/speech-http-client';
 import { createAccountHandlers } from '../handlers/account';
 import { createAssistantHandlers } from '../handlers/assistant';
@@ -224,10 +230,27 @@ const nlp =
   env['NLP_BASE_URL'] && env['NLP_FUNCTION_KEY']
     ? createHttpNlpClient({ baseUrl: env['NLP_BASE_URL'], functionKey: env['NLP_FUNCTION_KEY'] })
     : unavailableNlpClient;
+/**
+ * Voz: `GOOGLE_SPEECH=on` usa o Google Cloud Speech-to-Text (V1, conta de serviço do Cloud Run, sem
+ * chave) com teto mensal de áudio (`VOICE_MONTHLY_SECONDS`, padrão 50 minutos) para ficar na faixa
+ * gratuita. O Azure AI Speech (`SPEECH_ENDPOINT` e `SPEECH_KEY`) fica como histórico.
+ */
+const voiceLimit = Number(env['VOICE_MONTHLY_SECONDS']);
 const speech =
-  env['SPEECH_ENDPOINT'] && env['SPEECH_KEY']
-    ? createHttpSpeechClient({ endpoint: env['SPEECH_ENDPOINT'], key: env['SPEECH_KEY'] })
-    : unavailableSpeechClient;
+  env['GOOGLE_SPEECH'] === 'on'
+    ? createGoogleSpeechClient({
+        getToken: createMetadataTokenProvider(),
+        budget: createMonthlyVoiceBudget({
+          storage: firestoreClient
+            ? createFirestoreFileStorage(firestoreClient, 'uso-da-voz')
+            : createInMemoryFileStorage(),
+          clock,
+          limitSeconds: voiceLimit > 0 ? voiceLimit : DEFAULT_VOICE_MONTHLY_SECONDS,
+        }),
+      })
+    : env['SPEECH_ENDPOINT'] && env['SPEECH_KEY']
+      ? createHttpSpeechClient({ endpoint: env['SPEECH_ENDPOINT'], key: env['SPEECH_KEY'] })
+      : unavailableSpeechClient;
 export const assistantHandlers = createAssistantHandlers(
   createAssistantService({ nlp, speech, limiter: createFixedWindowLimiter(clock) }),
 );
