@@ -63,7 +63,10 @@ jobs:
         run: |
           REPO="${REGIAO}-docker.pkg.dev/${PROJETO}/vacina"
           # O build roda numa conta própria e mínima (vacina-build), não na conta padrão do projeto.
+          # O balde do código é dado por inteiro: assim o gcloud não precisa listar os baldes do
+          # projeto para achá-lo, permissão que a conta de deploy não tem.
           gcloud builds submit --project "${PROJETO}" --config scripts/gcp/cloudbuild.yaml \
+            --gcs-source-staging-dir "gs://${PROJETO}_cloudbuild/source" \
             --service-account "projects/${PROJETO}/serviceAccounts/vacina-build@${PROJETO}.iam.gserviceaccount.com" \
             --substitutions "^@^_REPO=${REPO}@_TAG=${GITHUB_SHA}@_PIX_KEY=${PIX_KEY}@_PIX_NAME=${PIX_NAME}@_PIX_CITY=${PIX_CITY}" .
 
