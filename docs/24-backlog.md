@@ -108,6 +108,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B23 | novo | Como autora, quero o repositório público com proteção ativada, para usar o GitHub Actions sem limite de minutos e sem expor segredos | Should | Em análise | Sprint 6 |
 | B62 | novo | Como equipe, quero um endereço mais bonito para o site, sem pagar nada, para apresentar e divulgar o app com um link fácil de lembrar | Should | A fazer | Sprint 3 |
 | B76 | novo | Como equipe, quero um ambiente reserva no Google Cloud, pronto e sem custo, para a apresentação não depender só da Azure | Should | Em andamento | Sprint 6 |
+| B79 | novo | Como equipe, quero a produção no Google Cloud, com deploy automático e custo controlado, porque os créditos da Azure acabaram | Must | Em andamento | Sprint 6 |
 
 **B16** (todas; requisitos: RNF02, RNF05, RNF09)
 
@@ -138,8 +139,8 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 
 - Estimativa mensal por serviço registrada.
 - Alerta de orçamento configurado na assinatura.
-- Evidência: docs/16-custos-azure.md
-- Atenção: A estimativa existe; confirmar o alerta de orçamento na Azure.
+- Evidência: docs/16-custos-azure.md; docs/29-migracao-azure-para-google-cloud.md
+- Atenção: A estimativa da Azure existe e virou histórico (créditos acabaram em 17/11/2026). No Google Cloud há dois orçamentos de alerta (R$ 5 e R$ 50); falta a estimativa na calculadora do Google.
 
 **B21** (todas; requisitos: RNF02, RNF03)
 
@@ -174,7 +175,16 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Há scripts para implantar, ligar, desligar e conferir o ambiente sem senha, e um roteiro em docs/26.
 - O Firestore passa nos mesmos testes de contrato dos outros bancos, no CI.
 - Evidência: ADR-035; docs/26-contingencia-google-cloud.md; PRs #261 a #265; CT-GCP-*
-- Atenção: Implantado em 16/11/2026 e dormindo (0 instâncias). Falta a autora entrar com a conta de demonstração e ensaiar ligar e desligar. Os dados do Google começam vazios (não copia o Azure SQL) e a voz não é replicada.
+- Atenção: Implantado em 16/11/2026 e dormindo (0 instâncias). Em 17/11/2026 virou a produção (B79, ADR-038): os créditos da Azure acabaram. Falta a autora entrar com a conta de demonstração e ensaiar ligar e desligar. Os dados do Google começam vazios (não copia o Azure SQL). A voz passou ao Google no B80.
+
+**B79** (todas; requisitos: RNF05, RNF09)
+
+- Cada merge na main constrói as imagens e publica API, PLN e app web no Cloud Run, com login federado do GitHub e sem chave guardada.
+- O teste de fumaça confere os três serviços depois do deploy.
+- Há dois alertas de orçamento (R$ 5 líquido e R$ 50 bruto) e limpeza das imagens antigas.
+- A documentação explica o motivo da saída, o que pesou no orçamento da Azure e o caminho AWS, Azure e Google Cloud.
+- Evidência: ADR-038; docs/29-migracao-azure-para-google-cloud.md; PRs #341 a #346
+- Atenção: Deploy automático verde em 17/11/2026. Falta o autor informar o valor gasto na Azure e a estimativa da calculadora do Google, e ensaiar o ambiente com a conta de demonstração.
 
 ## E3 Conta e privacidade (SCRUM-7)
 
@@ -357,6 +367,7 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 | B50 | novo | Como equipe, quero um painel visual com as métricas do chatbot (acurácia, F1 por intenção, matriz de confusão e limiar), para mostrar e defender a avaliação do PLN em 16/11 | Should | Concluído | Sprint 1 |
 | B58 | novo | Como equipe, quero comparar as técnicas de PLN das aulas (Bag-of-Words, TF-IDF, Naive Bayes, KNN, Regressão Logística, stopwords e stemming) com as do projeto e acrescentar embeddings à busca, para defender as escolhas e fortalecer o sistema de busca semântica | Must | Concluído | Sprint 3 |
 | B61 | novo | Como usuária, quero que o assistente consulte a minha conta e execute comandos (adicionar pessoa, registrar e agendar dose, abrir telas) e explique qualquer recurso do app, para resolver tudo conversando, sem perder o controle dos meus dados | Must | Concluído | Sprint 3 |
+| B80 | novo | Como usuária, quero falar a pergunta ao assistente também na nuvem nova, para continuar usando a voz sem custo | Must | Em andamento | Sprint 6 |
 
 **B10** (PE2, PE1; requisitos: RF06; RNF01, RNF04, RNF09)
 
@@ -403,6 +414,14 @@ Backlog organizado em épicos, com prioridade (MoSCoW), critérios de aceite, re
 - Nenhum dado da conta vai ao serviço de PLN; segurança de saúde vem antes de qualquer comando; F1 macro do classificador continua acima de 0,85.
 - Evidência: docs/05-adrs/ADR-025-assistente-com-poder-sobre-a-conta.md; docs/07-testes/avaliacao-chatbot.md
 - Atenção: Dataset de 20 para 39 intenções (1.060 frases); limiar de confiança de 0,40 para 0,30.
+
+**B80** (PE2; requisitos: RF06; RNF01, RNF05)
+
+- A voz usa o Google Cloud Speech-to-Text (API V1), sem chave guardada.
+- Um teto mensal de 50 minutos de áudio mantém o uso na faixa gratuita; acima dele a voz responde indisponível e a pessoa digita.
+- O áudio não é guardado.
+- Evidência: ADR-038; apps/api/src/clients/google-speech-client.ts; PR #344; CT-VOZ-01 a CT-VOZ-14
+- Atenção: Preços conferidos na página do Google em 17/11/2026. Falta uma chamada real com áudio, que depende da conta de demonstração.
 
 ## E7 Qualidade e testes (SCRUM-11)
 

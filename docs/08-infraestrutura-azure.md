@@ -1,5 +1,7 @@
 # Infraestrutura na Azure (SCRUM-22)
 
+> **Histórico.** A Azure deixou de ser usada em 17/11/2026, quando os créditos de estudante acabaram; a produção está no Google Cloud (ADR-038). Veja `docs/29-migracao-azure-para-google-cloud.md`, que traz a equivalência AWS, Azure e Google Cloud e o que foi migrado.
+
 Criada em **06/10/2026** com o Azure CLI, na assinatura **Azure for Students**, região **Brazil South** (exceto o Static Web Apps, que não existe no Brasil e fica em **Central US**). Tudo no grupo de recursos `rg-vacinaemdia`, na camada gratuita ou de menor custo (ADR-004, ADR-005 e ADR-008).
 
 | Recurso | Nome | Camada | Observação |

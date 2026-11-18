@@ -1,6 +1,6 @@
-# Contingência no Google Cloud: como preparar, ligar e desligar
+# Google Cloud: como preparar, ligar e desligar (antes contingência, hoje produção)
 
-Plano de reserva para a apresentação, caso a Azure não possa rodar (decisão e motivos no ADR-035). **Custo zero:** conta com o teste gratuito de US$ 300 e serviços dentro das cotas gratuitas.
+**Atualização de 17/11/2026:** este ambiente era a reserva da Azure (ADR-035) e virou a **produção** (ADR-038), porque os créditos da Azure acabaram; o motivo e o histórico estão em `docs/29-migracao-azure-para-google-cloud.md`. O deploy agora é automático (`deploy.yml`); os passos manuais abaixo servem para criar o ambiente do zero e para ligar e desligar na apresentação (**01/12/2026, às 19:00**). **Custo zero:** conta com o teste gratuito de US$ 300 e serviços dentro das cotas gratuitas.
 
 ## O que vai para o Google Cloud
 
@@ -65,6 +65,14 @@ Parado (0 instâncias), a primeira chamada leva alguns segundos na API e cerca d
 ## 5. Conferir o custo
 
 Faturamento > Relatórios, filtrando pelo projeto. Esperado: R$ 0. Para zerar tudo depois do evento, exclua o projeto (Configurações do IAM > Encerrar).
+
+## Custos, alertas e voz (17/11/2026)
+
+- **Orçamentos de alerta** (só avisam, não bloqueiam): `vacinaemdia-gcp-reserva` (R$ 5 por mês, descontando créditos: dispara quando algo começa a ser cobrado de verdade) e `vacinaemdia-gcp-uso-bruto` (R$ 50 por mês, sem descontar créditos: dispara por consumo anormal durante o teste). Avisos a 20%, 50% e 100% no segundo.
+- **Artifact Registry:** política de limpeza que mantém a `latest` e as 3 imagens mais recentes de cada serviço.
+- **Voz:** Google Cloud Speech-to-Text V1 (`GOOGLE_SPEECH=on`), com teto de `VOICE_MONTHLY_SECONDS` (3000 s, 50 minutos) por mês, abaixo dos 60 minutos gratuitos. Passando do teto, a voz responde "indisponível" e a pessoa digita a pergunta. O `implantar.sh` liga a API e define as variáveis.
+- **Deploy automático:** o `scripts/gcp/ci-identidade.sh` cria a identidade do GitHub (uma vez); depois cada merge na `main` publica as três imagens.
+- **Primeiro deploy automático verde:** 17/11/2026.
 
 ## Limites e cuidados
 

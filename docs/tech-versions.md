@@ -135,3 +135,13 @@ Versões conferidas no PyPI (`pip index versions`) em 07/10/2026 e fixadas em `a
 | @react-native-async-storage/async-storage | 2.2.0 | Lista de postos guardada no aparelho, para funcionar sem internet (ADR-018) |
 | react-native-svg | 15.15.4 | Marca do Vacina em Dia nas telas de entrada (versão indicada pelo `expo install`) |
 | expo-notifications | ~57.0.25 | Avisos de dose agendados no aparelho, só no app de Android e iOS (B70; ADR-028). Versão do SDK 57 (`npx expo install`, conferida no registro em 10/11/2026) |
+
+## Google Cloud (produção desde 17/11/2026, ADR-038; conferido em 17/11/2026)
+
+| Item | Versão | Observação |
+|---|---|---|
+| Google Cloud SDK (`gcloud`) | 594.0.0 | instalado no computador de desenvolvimento (winget `Google.CloudSDK`) |
+| Cloud Run, Firestore (modo nativo), Secret Manager, Cloud Scheduler, Cloud Build, Artifact Registry | serviços gerenciados | região `us-central1`; sem versão fixa |
+| Cloud Speech-to-Text | API V1 (`speech:recognize`) | primeiros 60 minutos por mês gratuitos; a V2 não tem faixa gratuita |
+| google-github-actions/auth | v3 | login do GitHub por Workload Identity Federation |
+| google-github-actions/setup-gcloud | v3.0.1 | instala o `gcloud` no GitHub Actions |

@@ -6,7 +6,7 @@ Estado em **06/10/2026** (terça-feira, fim da sessão). Este arquivo resume o q
 
 Este arquivo é o canal de continuidade entre computadores e sessões. A memória local do Claude **não** sincroniza entre máquinas; só o que está commitado e enviado ao GitHub (`origin`) chega ao outro computador.
 
-**Última atualização:** 17/11/2026 (**leia a seção 0.16 primeiro**, que atualiza a 0.15; a 0.15 guarda o estado de 12/11/2026, que atualiza a 0.14; a 0.14 guarda o estado de 24/10/2026, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
+**Última atualização:** 17/11/2026 (**leia a seção 0.17 primeiro**, que atualiza a 0.16 e a 0.15; a 0.16 atualiza a 0.15; a 0.15 guarda o estado de 12/11/2026, que atualiza a 0.14; a 0.14 guarda o estado de 24/10/2026, que atualiza a 0.13; a 0.13 guarda o estado de 20/10/2026, que atualiza a 0.12; a 0.12 guarda o estado de 10/10/2026: backlog no GitHub Projects, documentações e entrega; a 0.11 guarda o estado de 08/10/2026: redesenho concluído, mapa de postos, repositório público; a 0.10 guarda o estado de 07/10; as seções 0.6 a 0.8 guardam o histórico). Na `main`: tudo até a dose avulsa (código; **ainda não publicada**, ver 0.10), parentesco, telas Doses, Família e Detalhe da dose, calendário de datas, balão do assistente e 4 abas. **Não há PR aberto**: ver 0.10.
 
 ### 0.1 Como retomar em casa
 
@@ -99,6 +99,19 @@ Esta lista antiga (tenant do Entra, etc.) não vale mais: o Entra foi descartado
 5. **Não** aplicar o Bicep no grupo de recursos atual (o `what-if` mostra recriações; o `infra.yml` só compila e valida).
 
 **Armadilhas novas:** o deploy **não** aplica migrações do banco (usar `scripts/db-migrate.mjs`); o `npm run format:check` local reclama de CRLF no Windows (use `--end-of-line auto`); o commitlint recusa `style`; a porta 7071 e a 8081 podem estar ocupadas por `func` e Expo do autor (use outras portas); a documentação do Docker lista as outras.
+
+### 0.17 Produção no Google Cloud (17/11/2026): leia primeiro
+
+Atualiza a 0.15 e a 0.16. Os **créditos de estudante da Azure acabaram em 17/11/2026** (site 404, APIs 403) e a produção passou ao **Google Cloud** (ADR-038), onde a reserva da ADR-035 já rodava. **A apresentação foi remarcada para 01/12/2026, às 19:00.** Tudo o que a 0.15 diz sobre ligar instâncias na Azure, rodar migrações no Azure SQL e a tarefa agendada de 29/11 **não vale mais**: ficou como histórico.
+
+- **Motivo, o que pesou no orçamento da Azure e o caminho AWS, Azure e Google Cloud:** `docs/29-migracao-azure-para-google-cloud.md`.
+- **Deploy:** `.github/workflows/deploy.yml` constrói as imagens no Cloud Build e troca a imagem no Cloud Run a cada merge na `main`, com login federado (Workload Identity, sem chave). Variáveis do repositório: `GCP_PROJECT`, `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`. O roteiro `scripts/gcp/ci-identidade.sh` cria as contas `vacina-deploy`, `vacina-build` e o provedor do GitHub. Verde em 17/11/2026 (PRs #341 a #343).
+- **Voz (B80, #344):** Google Cloud Speech-to-Text V1 com teto de 50 minutos por mês (`GOOGLE_SPEECH=on`, `VOICE_MONTHLY_SECONDS`). Ligada na API; **falta uma chamada real com áudio** (precisa da conta de demonstração).
+- **Custos e alertas:** gasto líquido R$ 0,00 em 17/11/2026, com R$ 1.830,53 de crédito restante. Orçamentos `vacinaemdia-gcp-reserva` (R$ 5, líquido de créditos) e `vacinaemdia-gcp-uso-bruto` (R$ 50, sem descontar créditos); limpeza do Artifact Registry. O teste gratuito acaba por volta de 14/02/2027.
+- **Ferramenta:** `gcloud` 594.0.0 instalado no computador do autor (winget). Funciona no Git Bash; o login (`gcloud auth login`) é do autor.
+- **Itens:** B79 (produção no Google Cloud) e B80 (voz) em Em andamento; B76 e B20 atualizados. Só o autor conclui.
+- **Pendente (autor):** criar a conta de demonstração (`SENHA='...' scripts/gcp/semear.sh demo@exemplo.com`) e testar a voz; informar o valor gasto na Azure (Cost Management) e a estimativa da calculadora do Google para a Documentação Técnica; ensaiar `scripts/gcp/apresentacao.sh ligar` antes de 01/12.
+- **Pendente (Claude):** atualizar os Word (Técnica, Usuário, panfleto, roteiro e apresentação) com o Google Cloud, o endereço novo e as datas; `docs/13`, `docs/17`, `docs/20` e `docs/21` ainda falam em Azure.
 
 ### 0.16 Redesenho visual v3 (17/11/2026)
 
