@@ -449,8 +449,8 @@
    ],
    "estado": "Em andamento",
    "sprint": 5,
-   "evidencia": "docs/16-custos-azure.md",
-   "nota": "A estimativa existe; confirmar o alerta de orçamento na Azure.",
+   "evidencia": "docs/16-custos-azure.md; docs/29-migracao-azure-para-google-cloud.md",
+   "nota": "A estimativa da Azure existe e virou histórico (créditos acabaram em 17/11/2026). No Google Cloud há dois orçamentos de alerta (R$ 5 e R$ 50); falta a estimativa na calculadora do Google.",
    "curto": "Custo na Azure e alertas de orçamento"
   },
   {
@@ -1464,7 +1464,7 @@
    "estado": "Em andamento",
    "sprint": 6,
    "evidencia": "ADR-035; docs/26-contingencia-google-cloud.md; PRs #261 a #265; CT-GCP-*",
-   "nota": "Implantado em 16/11/2026 e dormindo (0 instâncias). Falta a autora entrar com a conta de demonstração e ensaiar ligar e desligar. Os dados do Google começam vazios (não copia o Azure SQL) e a voz não é replicada.",
+   "nota": "Implantado em 16/11/2026 e dormindo (0 instâncias). Em 17/11/2026 virou a produção (B79, ADR-038): os créditos da Azure acabaram. Falta a autora entrar com a conta de demonstração e ensaiar ligar e desligar. Os dados do Google começam vazios (não copia o Azure SQL). A voz passou ao Google no B80.",
    "curto": "Contingência no Google Cloud"
   },
   {
@@ -1507,6 +1507,45 @@
    "evidencia": "",
    "nota": "Fora do redesenho (B77): o protótipo mostra fotos, mas hoje só existe a foto de perfil da conta. Pede decisão do autor sobre LGPD antes de começar.",
    "curto": "Foto por pessoa da família"
+  },
+  {
+   "id": "B79",
+   "jira": null,
+   "titulo": "Como equipe, quero a produção no Google Cloud, com deploy automático e custo controlado, porque os créditos da Azure acabaram",
+   "epico": "E2",
+   "prioridade": "Must",
+   "personas": "todas",
+   "requisitos": "RNF05, RNF09",
+   "criterios": [
+    "Cada merge na main constrói as imagens e publica API, PLN e app web no Cloud Run, com login federado do GitHub e sem chave guardada.",
+    "O teste de fumaça confere os três serviços depois do deploy.",
+    "Há dois alertas de orçamento (R$ 5 líquido e R$ 50 bruto) e limpeza das imagens antigas.",
+    "A documentação explica o motivo da saída, o que pesou no orçamento da Azure e o caminho AWS, Azure e Google Cloud."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "ADR-038; docs/29-migracao-azure-para-google-cloud.md; PRs #341 a #346",
+   "nota": "Deploy automático verde em 17/11/2026. Falta o autor informar o valor gasto na Azure e a estimativa da calculadora do Google, e ensaiar o ambiente com a conta de demonstração.",
+   "curto": "Produção no Google Cloud (saída da Azure)"
+  },
+  {
+   "id": "B80",
+   "jira": null,
+   "titulo": "Como usuária, quero falar a pergunta ao assistente também na nuvem nova, para continuar usando a voz sem custo",
+   "epico": "E6",
+   "prioridade": "Must",
+   "personas": "PE2",
+   "requisitos": "RF06; RNF01, RNF05",
+   "criterios": [
+    "A voz usa o Google Cloud Speech-to-Text (API V1), sem chave guardada.",
+    "Um teto mensal de 50 minutos de áudio mantém o uso na faixa gratuita; acima dele a voz responde indisponível e a pessoa digita.",
+    "O áudio não é guardado."
+   ],
+   "estado": "Em andamento",
+   "sprint": 6,
+   "evidencia": "ADR-038; apps/api/src/clients/google-speech-client.ts; PR #344; CT-VOZ-01 a CT-VOZ-14",
+   "nota": "Preços conferidos na página do Google em 17/11/2026. Falta uma chamada real com áudio, que depende da conta de demonstração.",
+   "curto": "Voz pelo Google Speech-to-Text"
   },
   {
    "id": "B48",

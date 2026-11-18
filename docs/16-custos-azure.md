@@ -1,5 +1,7 @@
 # Estimativa de custos na Azure (SCRUM-26)
 
+> **Histórico.** Estes custos descrevem a Azure, que deixou de ser usada em 17/11/2026 (créditos esgotados). O que pesou no orçamento e o custo atual no Google Cloud estão em `docs/29-migracao-azure-para-google-cloud.md`.
+
 Critério da banca de CN2 ("Apresentação dos custos de serviços no Azure") e seção de custos da Documentação Técnica. Valores em **dólar americano (USD)**, região **Brazil South** (Static Web Apps em Central US), lidos da **API pública de preços de varejo da Azure** (`prices.azure.com/api/retail/prices`) em **07/10/2026**. A **calculadora oficial** (azure.microsoft.com/pricing/calculator) deve ser reaberta antes da entrega para gerar o PDF/print que a documentação pede; este arquivo registra a conta e as premissas.
 
 > **Regra do projeto:** só entra aqui valor conferido. O que não foi possível confirmar está marcado como **a confirmar**.
