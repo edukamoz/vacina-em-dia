@@ -170,7 +170,7 @@ describe('assistente: pergunta por voz (RF06)', () => {
     const fake = api();
     await renderScreen(<AssistantPanel aoFechar={jest.fn()} />, fake.fetchFn);
     await fireEvent.press(screen.getByRole('button', { name: 'Falar a pergunta' }));
-    expect(await screen.findByText(/Gravando\.\.\. fale a sua pergunta/)).toBeOnTheScreen();
+    expect(await screen.findByText(/Gravando… fale a sua pergunta/)).toBeOnTheScreen();
     expect(mockRecorder.start).toHaveBeenCalledTimes(1);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Parar e enviar' }));

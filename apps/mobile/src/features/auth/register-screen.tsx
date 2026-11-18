@@ -64,6 +64,7 @@ export function RegisterScreen() {
         erro={errors.email}
         keyboardType="email-address"
         autoCapitalize="none"
+        spellCheck={false}
         autoComplete="email"
         textContentType="emailAddress"
         returnKeyType="next"
@@ -115,7 +116,7 @@ export function RegisterScreen() {
         </Texto>
       ) : null}
       <Botao
-        titulo={pending ? 'Criando a conta...' : 'Criar conta'}
+        titulo={pending ? 'Criando a conta…' : 'Criar conta'}
         carregando={pending}
         onPress={() => void submit()}
       />

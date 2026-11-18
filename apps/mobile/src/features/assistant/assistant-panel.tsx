@@ -172,7 +172,7 @@ export function AssistantPanel({
           {chat.thinking ? (
             <View
               accessibilityRole="progressbar"
-              accessibilityLabel="Entendendo a sua pergunta..."
+              accessibilityLabel="Entendendo a sua pergunta…"
               className="flex-row items-center gap-sm self-start rounded-[22px] border-fina border-bordaSuave bg-superficie px-lg py-md"
             >
               <PontosEscrevendo />
@@ -181,7 +181,7 @@ export function AssistantPanel({
                 className="text-textoSecundario"
                 importantForAccessibility="no"
               >
-                Entendendo a sua pergunta...
+                Entendendo a sua pergunta…
               </Texto>
             </View>
           ) : null}
@@ -206,7 +206,7 @@ export function AssistantPanel({
           <View className="gap-sm">
             <OndaDaVoz alturas={ONDA} />
             <Texto variante="corpoNegrito" accessibilityLiveRegion="polite">
-              {`Gravando... fale a sua pergunta (${segundos} s)`}
+              {`Gravando… fale a sua pergunta (${segundos} s)`}
             </Texto>
             <Botao titulo="Parar e enviar" onPress={() => void finishRecording()} />
             <Botao titulo="Cancelar" variante="secundario" onPress={cancelRecording} />
@@ -230,7 +230,7 @@ export function AssistantPanel({
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={
-                    voiceState === 'processing' ? 'Enviando o áudio...' : 'Falar a pergunta'
+                    voiceState === 'processing' ? 'Enviando o áudio…' : 'Falar a pergunta'
                   }
                   disabled={chat.thinking || voiceState !== 'idle'}
                   onPress={() => void startRecording()}
