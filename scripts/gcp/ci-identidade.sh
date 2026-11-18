@@ -38,15 +38,19 @@ done
 BALDE="gs://${PROJETO}_cloudbuild"
 gcloud storage buckets describe "${BALDE}" >/dev/null 2>&1 ||
   gcloud storage buckets create "${BALDE}" --location=us --quiet
-gcloud storage buckets add-iam-policy-binding "${BALDE}" --member="serviceAccount:${SA}" \n  --role=roles/storage.admin >/dev/null
+gcloud storage buckets add-iam-policy-binding "${BALDE}" --member="serviceAccount:${SA}" \
+  --role=roles/storage.admin >/dev/null
 # O Cloud Build roda numa conta própria e mínima: grava logs, envia as imagens e lê o código no balde.
 gcloud iam service-accounts describe "${SA_BUILD}" >/dev/null 2>&1 ||
   gcloud iam service-accounts create vacina-build --display-name="Vacina em Dia (Cloud Build)"
 for papel in roles/logging.logWriter roles/artifactregistry.writer; do
-  gcloud projects add-iam-policy-binding "${PROJETO}" --member="serviceAccount:${SA_BUILD}" \n    --role="${papel}" --condition=None --quiet >/dev/null
+  gcloud projects add-iam-policy-binding "${PROJETO}" --member="serviceAccount:${SA_BUILD}" \
+    --role="${papel}" --condition=None --quiet >/dev/null
 done
-gcloud storage buckets add-iam-policy-binding "${BALDE}" --member="serviceAccount:${SA_BUILD}" \n  --role=roles/storage.objectViewer >/dev/null
-gcloud iam service-accounts add-iam-policy-binding "${SA_BUILD}" --member="serviceAccount:${SA}" \n  --role=roles/iam.serviceAccountUser --quiet >/dev/null
+gcloud storage buckets add-iam-policy-binding "${BALDE}" --member="serviceAccount:${SA_BUILD}" \
+  --role=roles/storage.objectViewer >/dev/null
+gcloud iam service-accounts add-iam-policy-binding "${SA_BUILD}" --member="serviceAccount:${SA}" \
+  --role=roles/iam.serviceAccountUser --quiet >/dev/null
 # Para trocar a imagem de um serviço, a conta de deploy precisa poder "agir como" a conta do Cloud Run.
 gcloud iam service-accounts add-iam-policy-binding "${SA_RUN}" --member="serviceAccount:${SA}" \
   --role=roles/iam.serviceAccountUser --quiet >/dev/null
