@@ -82,7 +82,7 @@ export function ForgotPasswordScreen() {
         </Texto>
       ) : null}
       <Botao
-        titulo={pending ? 'Enviando...' : 'Enviar o link'}
+        titulo={pending ? 'Enviando…' : 'Enviar o link'}
         carregando={pending}
         onPress={() => void submit()}
       />

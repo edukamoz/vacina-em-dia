@@ -101,7 +101,7 @@ export function CabecalhoDaConta({ email }: { email: string }) {
       </View>
       {salvar.isPending ? (
         <Texto className="text-sobrePrimaria" accessibilityLiveRegion="polite">
-          Guardando a foto...
+          Guardando a foto…
         </Texto>
       ) : null}
       {aviso ? (

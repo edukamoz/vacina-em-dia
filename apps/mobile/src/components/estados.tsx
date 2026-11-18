@@ -82,7 +82,7 @@ export function EstadoCarregando({
         <ActivityIndicator size="large" />
       )}
       <Texto variante="apoio" className="text-textoSecundario" importantForAccessibility="no">
-        Carregando...
+        Carregando…
       </Texto>
     </View>
   );
