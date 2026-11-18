@@ -52,6 +52,7 @@ export function LoginScreen() {
         erro={errors.email}
         keyboardType="email-address"
         autoCapitalize="none"
+        spellCheck={false}
         autoComplete="email"
         textContentType="emailAddress"
         returnKeyType="next"
@@ -71,7 +72,7 @@ export function LoginScreen() {
         </Texto>
       ) : null}
       <Botao
-        titulo={pending ? 'Entrando...' : 'Entrar'}
+        titulo={pending ? 'Entrando…' : 'Entrar'}
         carregando={pending}
         onPress={() => void submit()}
       />
