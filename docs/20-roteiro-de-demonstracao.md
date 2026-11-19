@@ -1,6 +1,6 @@
 # Roteiro de demonstração por persona
 
-> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). Use o endereço `https://vacina-web-mdqonfxhra-uc.a.run.app` e ligue as instâncias com `scripts/gcp/apresentacao.sh ligar` cerca de 30 minutos antes; a apresentação é em 01/12/2026, às 19h. Esta página mantém o texto original como histórico.
+> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). Use o endereço `https://vacina-web-mdqonfxhra-uc.a.run.app` e ligue as instâncias com `scripts/gcp/apresentacao.sh ligar` cerca de 30 minutos antes; a apresentação é em 02/12/2026 (feira de tecnologia; horário a confirmar). Esta página mantém o texto original como histórico.
 
 Item do backlog: B35 (e SCRUM-27; critério 5 da banca: funcionalidades por persona). Estado em 10/10/2026. Serve para a apresentação: cada persona do `docs/01-visao-e-escopo.md` tem um caminho curto, com o que dizer e o que mostrar. Os nomes dos botões são os do app.
 

@@ -1,6 +1,6 @@
 # Vacina em Dia: Documento de Visão e Escopo (Fase 0)
 
-> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). Onde este documento diz Azure, leia Google Cloud (Cloud Run, Firestore, Secret Manager, Speech-to-Text); a apresentação passou para 01/12/2026, às 19h. Esta página mantém o texto original como histórico.
+> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). Onde este documento diz Azure, leia Google Cloud (Cloud Run, Firestore, Secret Manager, Speech-to-Text); a apresentação passou para 02/12/2026 (feira de tecnologia; horário a confirmar). Esta página mantém o texto original como histórico.
 
 > Versão 1.0, 06/10/2026. Autores: Eduardo Kamo Iguei, Fernando Ribeiro dos Santos, Gustavo Lopes Ferreira, Iago Yuri Rossan e Lucas Vinicios Consani. Projeto Interdisciplinar VI (PI-VI), Fatec Votorantim.
 > Este arquivo é a versão em Markdown, para consulta no repositório e pelo Claude Code. O documento formal, em ABNT, é `Fase0_Documento_de_Visao_e_Escopo.docx`.

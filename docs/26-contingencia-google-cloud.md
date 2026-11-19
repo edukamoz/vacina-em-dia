@@ -1,6 +1,6 @@
 # Google Cloud: como preparar, ligar e desligar (antes contingência, hoje produção)
 
-**Atualização de 17/11/2026:** este ambiente era a reserva da Azure (ADR-035) e virou a **produção** (ADR-038), porque os créditos da Azure acabaram; o motivo e o histórico estão em `docs/29-migracao-azure-para-google-cloud.md`. O deploy agora é automático (`deploy.yml`); os passos manuais abaixo servem para criar o ambiente do zero e para ligar e desligar na apresentação (**01/12/2026, às 19:00**). **Custo zero:** conta com o teste gratuito de US$ 300 e serviços dentro das cotas gratuitas.
+**Atualização de 17/11/2026:** este ambiente era a reserva da Azure (ADR-035) e virou a **produção** (ADR-038), porque os créditos da Azure acabaram; o motivo e o histórico estão em `docs/29-migracao-azure-para-google-cloud.md`. O deploy agora é automático (`deploy.yml`); os passos manuais abaixo servem para criar o ambiente do zero e para ligar e desligar na apresentação (**02/12/2026 (feira de tecnologia; horário a confirmar)**). **Custo zero:** conta com o teste gratuito de US$ 300 e serviços dentro das cotas gratuitas.
 
 ## O que vai para o Google Cloud
 
