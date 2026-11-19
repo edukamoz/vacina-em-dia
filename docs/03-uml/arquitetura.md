@@ -1,5 +1,7 @@
 # Diagrama de arquitetura
 
+
+> **Atualização de 19/11/2026:** a figura do bloco principal (`arq.mmd`, `deploy.mmd` e `voz.mmd`) mostra o Google Cloud (Cloud Run, Firestore, Speech-to-Text), onde a produção roda desde 17/11/2026 (ADR-038). O texto e o diagrama abaixo descrevem o desenho original na Azure, como histórico.
 Item do Jira: SCRUM-31. Atende à seção 4.1 do modelo de Documentação Técnica (visão geral e arquitetura). Decisões: ADR-001 a ADR-010 em `docs/05-adrs/`.
 
 ## Visão geral

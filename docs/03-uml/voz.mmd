@@ -1,13 +1,13 @@
 sequenceDiagram
     participant U as Usuário
     participant A as App
-    participant API as API (Functions)
-    participant S as Azure AI Speech
+    participant API as API (Cloud Run)
+    participant S as Google Speech-to-Text
     participant P as Serviço de PLN
     U->>A: toca em "Falar a pergunta" e fala
     A->>A: captura o microfone e monta o WAV de 16 kHz, mono
     A->>API: POST /api/assistant/voice (audio/wav, token)
-    API->>API: valida token, tipo e tamanho e aplica o limite de uso
+    API->>API: valida token, tipo e tamanho e aplica os limites de uso e o teto mensal
     API->>S: áudio curto (pt-BR)
     S-->>API: transcrição
     par chatbot

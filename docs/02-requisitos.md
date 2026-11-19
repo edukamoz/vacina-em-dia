@@ -1,5 +1,7 @@
 # Vacina em Dia: Requisitos (RF01 a RF12 e RNF01 a RNF10)
 
+> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). Onde o RNF02 diz Key Vault, leia Secret Manager. Esta página mantém o texto original como histórico.
+
 > Extraído do Documento de Visão e Escopo (`01-visao-e-escopo.md`, seção 6). Em caso de divergência, vale este arquivo e o documento deve ser atualizado.
 > Personas: PE1 Mariana, PE2 Sr. José, PE3 Carla (ver seção 4 do documento de visão).
 

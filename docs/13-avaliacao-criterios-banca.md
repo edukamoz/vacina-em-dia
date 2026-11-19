@@ -1,5 +1,7 @@
 # Avaliação do projeto contra os critérios da banca (PI-VI, 26s1)
 
+> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). As referências a serviços da Azure valem para o histórico; os pontos de nuvem devem ser reavaliados com o Google Cloud. Esta página mantém o texto original como histórico.
+
 Fonte: `26s1)LabDM-V-Criterios_de_avaliacao.pdf`. Cada critério vale de 0 a 5 pontos, exceto **PLN (busca semântica), de 0 a 20**. Total possível: 16 × 5 + 20 = **100 pontos**. Estado em 07/10/2026. A coluna "Nota estimada" é uma **autoavaliação** para priorizar o trabalho, não a nota da banca.
 
 | # | Critério | Disciplina | Situação hoje | Nota estimada | O que falta |
