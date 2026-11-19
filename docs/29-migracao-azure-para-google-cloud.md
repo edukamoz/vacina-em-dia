@@ -2,7 +2,7 @@
 
 Registro do motivo, do que pesou no orçamento da Azure e do que mudou de fornecedor. Os documentos da Azure (`docs/08`, `docs/16`, `infra/`) continuam no repositório como **histórico**; este arquivo explica por que o ambiente de produção hoje é outro. Decisão formal: `docs/05-adrs/ADR-038-producao-no-google-cloud.md`.
 
-> **Regra do projeto:** só entra aqui valor conferido. O que depende de um número que só o autor vê (portal da Azure) está marcado **[a informar]**.
+> **Regra do projeto:** só entra aqui valor conferido. O que depende de um número que só o autor vê (portal da Azure) foi informado pelo autor e está identificado como tal.
 
 ## 1. Resumo
 
@@ -41,7 +41,7 @@ Fatos registrados em `docs/16-custos-azure.md` e `docs/00-handoff.md` (seção 0
 | **Religar o banco foi irreversível** | Para aplicar as migrações 008 e 009, o banco passou de `AutoPause` para `BillOverUsage`, e a Azure não deixa voltar. Cada despertar passou a custar cerca de 0,5 vCore por 15 minutos |
 | **Serviço de PLN com partida lenta** | O Python carrega bibliotecas de ML na partida (cerca de 50 s), o que justificou deixar a instância sempre pronta em vez de escalar a zero |
 
-**Saldo final do crédito e valor total gasto na Azure: [a informar]** (leitura do Cost Management; este documento não estima esses números). O que o repositório prova é a causa dos gastos acima, não o valor final.
+**Valor total gasto na Azure: R$ 612, o que zerou os créditos de estudante** (valor informado pelo autor em 19/11/2026, lido no portal da Azure). O que o repositório prova é a causa dos gastos acima, não o valor final.
 
 **O que se aprende disso:** serviço que "dorme" mas acorda toda hora (banco com rotinas diárias, instância sempre pronta) não é gratuito; e uma ação irreversível (`BillOverUsage`) deve ser pesada antes do custo, não depois.
 
@@ -98,7 +98,7 @@ Fonte da coluna Google Cloud: os serviços do próprio projeto, listados com o `
 
 O Google leva até 24 horas para registrar os custos, então o alerta não é instantâneo.
 
-**Valor mensal da estimativa na calculadora do Google: [a informar]** (a Documentação Técnica pede o print ou o link da calculadora).
+**Estimativa na calculadora do Google Cloud: cerca de R$ 100** (valor informado pelo autor em 19/11/2026; é uma estimativa de custo mensal para quando o teste gratuito acabar, e o gasto real hoje é R$ 0,00). A Documentação Técnica pode receber o print ou o link da calculadora.
 
 ## 8. Riscos e limites
 

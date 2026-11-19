@@ -47,7 +47,7 @@ A única parcela relevante é a **instância sempre pronta do PLN** (US$ 6,50 po
 - Demonstração e avaliação: até alguns milhares de chamadas por mês e poucos usuários simultâneos.
 - 30 dias por mês (2.592.000 s). Em meses de 31 dias a base do PLN sobe para US$ 6,70.
 - Sem conversão para real: usar a cotação do dia da entrega, se a documentação exigir.
-- A assinatura Azure for Students tem crédito inicial; o custo estimado cabe nele (valor do crédito: **a confirmar** no portal).
+- A assinatura Azure for Students tem crédito inicial; o custo estimado cabe nele (valor total gasto até o fim dos créditos: **R$ 612**, informado pelo autor em 19/11/2026).
 
 ## Como reproduzir
 
