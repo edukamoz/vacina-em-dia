@@ -1,5 +1,7 @@
 # Docker: execução e manutenção (SCRUM-25)
 
+> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). O Docker não mudou (o `docker compose up` continua o mesmo); as imagens publicadas agora vão para o Artifact Registry e o Cloud Run, pelo Cloud Build. Esta página mantém o texto original como histórico.
+
 Seção de **manutenção do Docker** da Documentação Técnica (critério "Documentação Técnica: Docker, manutenção"). Tudo foi **verificado em 07/10/2026** no Windows com Docker 29.8.1 e Compose 5.5.1: o ambiente subiu, passou pelo login, pelo chatbot e pelos cabeçalhos de segurança, e foi derrubado.
 
 ## 1. O que roda

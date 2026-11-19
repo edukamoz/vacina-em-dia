@@ -7,7 +7,7 @@
 
 ## Contexto
 
-A Azure for Students esgotou os créditos em 17/11/2026: o app web responde 404 e as Function Apps respondem 403. A reserva da ADR-035 já estava implantada no Google Cloud (Cloud Run, Firestore, Secret Manager e Cloud Scheduler), com os três serviços respondendo, e o teste gratuito de US$ 300 estava ativo desde 16/11/2026. A apresentação foi remarcada para 01/12/2026 às 19:00.
+A Azure for Students esgotou os créditos em 17/11/2026: o app web responde 404 e as Function Apps respondem 403. A reserva da ADR-035 já estava implantada no Google Cloud (Cloud Run, Firestore, Secret Manager e Cloud Scheduler), com os três serviços respondendo, e o teste gratuito de US$ 300 estava ativo desde 16/11/2026. A apresentação foi remarcada para 02/12/2026 (feira de tecnologia; horário a confirmar).
 
 ## Decisão
 
@@ -23,7 +23,7 @@ A Azure for Students esgotou os créditos em 17/11/2026: o app web responde 404 
 | Alternativa | Por que não |
 |---|---|
 | Pagar a Azure | Fora do orçamento do projeto |
-| Outro fornecedor (AWS, Render, Fly.io) | A reserva no Google Cloud já estava pronta e testada; trocar de novo custaria tempo que não há antes de 01/12 |
+| Outro fornecedor (AWS, Render, Fly.io) | A reserva no Google Cloud já estava pronta e testada; trocar de novo custaria tempo que não há antes de 02/12 |
 | Cloud SQL (relacional) | Não tem camada gratuita |
 
 ## Consequências

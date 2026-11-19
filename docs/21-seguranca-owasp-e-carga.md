@@ -1,5 +1,7 @@
 # Checklist OWASP Top 10 e carga leve (RNF01 e RNF02)
 
+> **Atualização de 19/11/2026:** a produção deixou a Azure em 17/11/2026 e roda no Google Cloud (ADR-038; `docs/29-migracao-azure-para-google-cloud.md`). Os itens sobre Key Vault, SQL e Application Insights valem para a Azure (histórico); no Google Cloud, veja o ADR-038 e `docs/26-contingencia-google-cloud.md`. Esta página mantém o texto original como histórico.
+
 Item do Jira: SCRUM-30. Estado em 07/10/2026. Fecha duas lacunas do `docs/19-rastreabilidade.md`: o checklist de segurança do RNF02 e a medição de desempenho do RNF01. A lista é a **OWASP Top 10:2021**. Cada linha diz o que existe, onde verificar e o que **não** está resolvido. É uma autoavaliação do projeto, não um teste de invasão.
 
 ## Parte 1: OWASP Top 10:2021

@@ -8,7 +8,7 @@ Registro do motivo, do que pesou no orçamento da Azure e do que mudou de fornec
 
 - Em **17/11/2026** os créditos de estudante da Azure acabaram: o app web respondia 404 e as duas Function Apps respondiam 403.
 - O Google Cloud já rodava o app inteiro como reserva desde **16/11/2026** (ADR-035), com o teste gratuito de US$ 300. Em 17/11 a reserva virou a **produção** (ADR-038).
-- A apresentação foi remarcada para **01/12/2026 às 19:00**.
+- A apresentação foi remarcada para **02/12/2026 (feira de tecnologia; horário a confirmar)**.
 - O deploy a cada merge na `main` passou a publicar no Google Cloud (Cloud Build e Cloud Run), com login federado do GitHub, sem chave guardada.
 - A voz trocou o Azure AI Speech pelo Google Cloud Speech-to-Text, com teto mensal de áudio para ficar na faixa gratuita (B80).
 
@@ -22,7 +22,7 @@ Registro do motivo, do que pesou no orçamento da Azure e do que mudou de fornec
 | 12/11/2026 | O alerta do orçamento da Azure previu R$ 604 para o ano; as instâncias sempre prontas são desligadas; o banco religado para aplicar migrações |
 | 16/11/2026 | Contingência no Google Cloud implantada e respondendo (ADR-035); orçamento de alerta de R$ 5 criado no Google |
 | 17/11/2026 | Créditos da Azure acabam; ADR-038; deploy automático e voz no Google Cloud; segundo orçamento de alerta e limpeza do registro de imagens |
-| 01/12/2026, 19:00 | Apresentação |
+| 02/12/2026 (feira de tecnologia; horário a confirmar) | Apresentação |
 
 ## 3. Por que migramos
 
