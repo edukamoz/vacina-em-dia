@@ -8,5 +8,5 @@ threadpoolctl==3.8.0
 # Dependências transitivas fixadas para o build ser reproduzível.
 cloudpickle==3.1.2
 MarkupSafe==3.0.4
-narwhals==2.28.0
+narwhals==2.29.0
 Werkzeug==3.1.9
