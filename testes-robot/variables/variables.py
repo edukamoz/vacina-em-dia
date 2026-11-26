@@ -1,5 +1,5 @@
 # Dados do ambiente. Troque a URL aqui para testar outro ambiente (por exemplo, o local).
-URL = "https://blue-rock-0d7abc710.4.azurestaticapps.net"
+URL = "https://vacina-web-mdqonfxhra-uc.a.run.app"
 
 # Dados fictícios: este cenário não envia nada ao servidor, então nenhuma conta é criada.
 EMAIL = "teste.robot@exemplo.com.br"
