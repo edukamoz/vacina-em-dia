@@ -18,7 +18,7 @@ ${BOTAO_SALVAR_PESSOA}    xpath://button[@aria-label="Salvar e ver as vacinas"]
 Abrir navegador
     [Documentation]    Chrome sem o gerenciador de senhas e sem avisos de senha vazada, que atrapalham o login automatico.
     ${opcoes}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    Call Method    ${opcoes}    add_argument    --disable-features\=PasswordLeakDetection,PasswordManagerOnboarding
+    Evaluate    $opcoes.add_argument("--disable-features=PasswordLeakDetection,PasswordManagerOnboarding")
     Call Method    ${opcoes}    add_argument    --disable-save-password-bubble
     ${prefs}=    Create Dictionary    credentials_enable_service=${False}    profile.password_manager_enabled=${False}
     Call Method    ${opcoes}    add_experimental_option    prefs    ${prefs}
@@ -58,6 +58,7 @@ Entrar na conta de teste
     # recarregar a pagina antes disso cancela o login e o app volta para a tela inicial.
     Wait Until Keyword Succeeds    30s    1s    Saiu Da Tela De Entrar
     Wait Until Keyword Succeeds    15s    1s    Sessao Deve Estar Gravada
+    Wait Until Page Does Not Contain    Carregando...    timeout=30s
     Capture Page Screenshot
 
 Saiu Da Tela De Entrar
@@ -72,10 +73,23 @@ Abrir formulario de nova pessoa
     Go To    ${URL}/membro/novo
     Wait Until Element Is Visible    ${CAMPO_NOME}    timeout=20s
     ...    error=O app nao abriu o formulario (provavel sessao perdida). Veja o ultimo print em results/.
+    Wait Until Keyword Succeeds    5s    100ms    Janela De Pessoa Esta Aberta
+
+Janela De Pessoa Esta Aberta
+    ${opacidade}=    Execute Javascript    return Number(getComputedStyle(document.querySelector('[role="dialog"][aria-label="Adicionar pessoa"]')).opacity)
+    Should Be True    ${opacidade} >= 0.99
 
 Preencher dados da pessoa
-    Input Text    ${CAMPO_NOME}          ${PESSOA_NOME}
-    Input Text    ${CAMPO_NASCIMENTO}    ${PESSOA_NASCIMENTO}
+    Digitar E Conferir    ${CAMPO_NOME}    ${PESSOA_NOME}    ${PESSOA_NOME}
+    Digitar E Conferir    ${CAMPO_NASCIMENTO}    ${PESSOA_NASCIMENTO}    20/05/1990
+
+Digitar E Conferir
+    [Arguments]    ${locator}    ${valor}    ${esperado}
+    Wait Until Element Is Enabled    ${locator}    timeout=3s
+    Click Element    ${locator}
+    Press Keys    ${locator}    ${valor}
+    ${atual}=    Get Value    ${locator}
+    Should Be Equal As Strings    ${atual}    ${esperado}
 
 Salvar pessoa
     Click Element    ${BOTAO_SALVAR_PESSOA}
