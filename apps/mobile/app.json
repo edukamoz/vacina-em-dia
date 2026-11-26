@@ -3,6 +3,7 @@
     "name": "Vacina em Dia",
     "slug": "vacina-em-dia",
     "version": "0.1.0",
+    "platforms": ["ios", "android", "web"],
     "scheme": "vacinaemdia",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
